@@ -17,6 +17,8 @@ Dieses ZIP ist ein lokales **Änderungspaket**, keine vollständige Webseite und
 
 - `treffpunkt-international.html`
 - `priority1-ergaenzungen.css`
+- `assets/images/garten-hintergrundbild.jpg`
+- `assets/images/eingang-deutschtraining.jpg`
 - `AENDERUNGEN.md`
 - `OFFENE-PUNKTE.md`
 - `PRUEFBERICHT.md`
@@ -33,6 +35,7 @@ Dieses ZIP ist ein lokales **Änderungspaket**, keine vollständige Webseite und
 - OpenStreetMap-Links als sichere Ersatzfunktion
 - 25 Google-Translate-Links zur GitHub-Pages-Adresse
 - alle auf der Originalsprachseite sichtbaren Länderflaggen
-- fehlendes Deutschtraining-Bild vorläufig aus der HTML-Ausgabe entfernt
+- Garten-Hintergrundbild zentral eingebunden
+- Deutschtraining-Bild auf `deutschtraining.html` und `begegnungstreffen.html` an der zugehörigen Originalposition eingebunden
 
 Unveränderte Bestandsdateien gehören absichtlich nicht zum Änderungspaket.

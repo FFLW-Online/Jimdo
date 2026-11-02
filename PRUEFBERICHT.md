@@ -29,7 +29,7 @@ Die internen Linkziele gehören entweder zu den sieben geänderten Dateien oder 
 
 ## Bildprüfung
 
-- Die noch nicht vorhandene Datei `assets/eingang-deutschtraining.jpg` wird nicht referenziert und nicht mitgeliefert.
+- Die noch nicht vorhandene Datei `assets/images/eingang-deutschtraining.jpg` wird nicht referenziert und nicht mitgeliefert.
 - Es wurde kein Ersatzbild und kein leerer Medienordner erzeugt.
 - Die spätere Einfügestelle ist in `OFFENE-PUNKTE.md` dokumentiert.
 

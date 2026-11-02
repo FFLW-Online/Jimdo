@@ -15,6 +15,8 @@ Dieses Paket wird in den Stamm des bestehenden Webseiten-Repositorys entpackt. V
 
 - `treffpunkt-international.html`
 - `priority1-ergaenzungen.css`
+- `assets/images/garten-hintergrundbild.jpg`
+- `assets/images/eingang-deutschtraining.jpg`
 - `AENDERUNGEN.md`
 - `OFFENE-PUNKTE.md`
 - `PRUEFBERICHT.md`
@@ -24,7 +26,7 @@ Dieses Paket wird in den Stamm des bestehenden Webseiten-Repositorys entpackt. V
 
 ## 3. Noch fehlende Dateien
 
-- `assets/eingang-deutschtraining.jpg`
+- Keine für diesen Medien-Schritt.
 
 ## Kurzer Upload-Ablauf
 

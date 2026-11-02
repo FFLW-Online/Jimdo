@@ -1,11 +1,8 @@
 # MEDIENLISTE – Änderungspaket Priorität 1
 
-## Im Änderungspaket enthalten
+## Enthaltene freigegebene Originalmedien
 
-Keine Medien. Für dieses Änderungspaket liegen keine tatsächlich vorhandenen neuen Bild-, Audio- oder Videodateien vor.
+- `assets/images/garten-hintergrundbild.jpg` – Garten-Hintergrundbild
+- `assets/images/eingang-deutschtraining.jpg` – Eingang zum Deutschtraining, auf der rechten Seite
 
-## Noch fehlend
-
-- `assets/eingang-deutschtraining.jpg`
-
-Die Datei wird erst ergänzt, wenn das freigegebene Original tatsächlich vorliegt. Es wurde kein Platzhalter erzeugt.
+Es wurden keine Ersatz- oder Platzhalterbilder erzeugt.
