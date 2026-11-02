@@ -1,13 +1,5 @@
-# FFLW - Jimdo-Bestandskopie
+# FFLW Jimdo-Bestandskopie V2
 
-Erste möglichst originalgetreue Übernahme der öffentlich sichtbaren Jimdo-Inhalte.
+Ziel: Originaltexte ohne redaktionelle Kürzungen, alle erfassten Seiten, alle 25 Sprachkacheln mit Flaggen und Google-Translate-Funktion sowie alle bereitgestellten Bilder.
 
-## Installation
-Alle Dateien und den Ordner `assets` in die oberste Ebene des GitHub-Pages-Repositorys hochladen.
-
-## Noch zu prüfen
-- Impressum und Datenschutz
-- aktuelle Termine, Adressen und Kontaktdaten
-- externe Formulare und Downloads
-- Bildrechte und Veröffentlichungserlaubnisse
-- vollständige Sprachübersetzung
+Hinweis: Externe Jimdo-Downloads, Karten und Videos bleiben als externe Links erhalten.

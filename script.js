@@ -1,1 +1,1 @@
-document.querySelector('.menu')?.addEventListener('click',()=>document.querySelector('nav').classList.toggle('open'));
+document.querySelector('.menu')?.addEventListener('click',()=>document.querySelector('nav').classList.toggle('open'));document.querySelectorAll('[data-translate]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const lang=a.dataset.translate;const url=location.href;location.href='https://translate.google.com/translate?sl=de&tl='+encodeURIComponent(lang)+'&u='+encodeURIComponent(url);}));
