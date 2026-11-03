@@ -1,18 +1,7 @@
-# OFFENE PUNKTE – Änderungspaket Priorität 1
+# Offene Punkte
 
-Stand: 2. November 2026
-
-## Medien
-
-Die beiden freigegebenen Originalbilder sind nun enthalten:
-
-- `assets/images/garten-hintergrundbild.jpg`
-- `assets/images/eingang-deutschtraining.jpg`
-
-Für diese beiden Bilder besteht kein offener Dateipunkt mehr.
-
-## Weitere offene Qualitätsprüfung
-
-- abschließende Sichtprüfung der geänderten Seiten nach dem Hochladen
-- Kontaktformular bleibt absichtlich nicht versandfähig
-- OpenStreetMap bleibt vorerst als Linklösung statt eingebetteter Karte
+- Das Vereinslogo lag in den lokalen Arbeitsdateien nicht als eigenständige Bilddatei vor und konnte daher nicht in das Paket aufgenommen werden. Die Kopfzeile nutzt bis zur Bereitstellung den Vereinsnamen.
+- Die Startseite war im vorhandenen Änderungspaket nicht als bearbeitete HTML-Datei enthalten; ihr Pilotinhalt muss gegen die freigegebene Referenzfassung endgeprüft werden.
+- Das Kontaktformular ist nur optisch dargestellt und hat keine Übermittlungsfunktion.
+- Impressum, Datenschutz und Sitemap sind verlinkt, aber nicht Bestandteil dieses Fünf-Seiten-Piloten.
+- Personen- und Medienrechte müssen vor Veröffentlichung bestätigt werden.
