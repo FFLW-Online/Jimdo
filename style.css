@@ -78,3 +78,34 @@
     margin: 0 0 18px;
   }
 }
+
+/* Warenhaus-Zeichnung links mit Textumfluss */
+.content img.warenhaus-zeichnung {
+  float: left;
+  display: block;
+  width: 58%;
+  max-width: 390px;
+  height: auto;
+  margin: 0 28px 16px 0;
+}
+
+/* Verhindert, dass der folgende Absatz unter das Bild gedrückt wird */
+.content img.warenhaus-zeichnung + p {
+  display: block;
+}
+
+/* Nach dem gesamten Warenhaus-Abschnitt wieder sauber beenden */
+.content::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+@media (max-width: 767px) {
+  .content img.warenhaus-zeichnung {
+    float: none;
+    width: 100%;
+    max-width: none;
+    margin: 0 0 18px;
+  }
+}
