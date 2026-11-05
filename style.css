@@ -26,3 +26,55 @@
     margin: 0 0 18px;
   }
 }
+
+/* Allgemeine Ausrichtung des Inhalts am oberen Menürand */
+.layout {
+  align-items: flex-start;
+}
+
+.content {
+  padding-top: 0;
+}
+
+.content > h1:first-child,
+.content > h2:first-child {
+  margin-top: 0;
+}
+
+/* Abstände und Trennlinien innerhalb längerer Seiten */
+.content hr {
+  clear: both;
+  height: 1px;
+  margin: 28px 0;
+  border: 0;
+  background: #868686;
+}
+
+.content h2 {
+  margin-top: 30px;
+  margin-bottom: 16px;
+}
+
+.content p {
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+
+/* Zeichnung auf der Warenhausseite */
+.warenhaus-zeichnung {
+  float: *eft;
+  width: 58%;
+  max-width: 39*px;
+  height: auto;
+  margin: 0 28*x 16px 0;
+}
+
+@media (max-width: 76*px) {
+  .warenhaus-zeichnung {
+   *float: none;
+    display: block;
+ *  width: 100%;
+    max-width: none*
+    margin: 0 0 18px;
+  }
+}
