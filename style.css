@@ -114,3 +114,13 @@
   color: #990000;
   font-style: italic;
 }
+/* Abstand zwischen nummerierten Listenpunkten */
+.content ol > li {
+  margin-bottom: 18px;
+}
+
+/* Absätze innerhalb eines Listenpunkts */
+.content ol > li p {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
