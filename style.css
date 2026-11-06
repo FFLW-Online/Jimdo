@@ -160,3 +160,68 @@
 .content ol > li:last-child {
   margin-bottom: 0 !important;
 }
+/* Layout-Grundeinstellungen */
+.layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+/* DEKSTOP: Links fixiertes Menü (scrollt mit, bleibt immer sichtbar) */
+.side-nav {
+  width: 280px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 20px; /* Abstand nach oben */
+  max-height: calc(100vh - 40px); /* Damit lange Menüs auf kleinen Monitoren scrollbar sind */
+  overflow-y: auto;
+  z-index: 100;
+}
+
+/* Button für Smartphone standardmäßig verbergen */
+.menu-toggle {
+  display: none;
+}
+
+/* MOBILGERÄTE (Smartphones & Tablets unter 768px) */
+@media (max-width: 767px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .side-nav {
+    width: 100%;
+    position: sticky;
+    top: 0; /* Bleibt beim Runterscrollen oben am Bildschirm kleben */
+    background: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: none;
+  }
+
+  .menu-toggle {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #004080;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  /* Menü auf dem Smartphone standardmäßig einklappen */
+  .nav-list {
+    display: none;
+    padding: 10px;
+    margin: 0;
+    list-style: none;
+  }
+
+  /* Wird per Klick auf "☰ Menü" eingeblendet */
+  .nav-list.is-open {
+    display: block;
+  }
+}
