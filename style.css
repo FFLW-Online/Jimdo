@@ -124,3 +124,12 @@
   margin-top: 12px;
   margin-bottom: 12px;
 }
+.content ol > li {
+  display: list-item !important;
+  margin: 0 0 22px 0 !important;
+  padding: 0 !important;
+}
+
+.content ol > li:last-child {
+  margin-bottom: 0 !important;
+}
