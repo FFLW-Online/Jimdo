@@ -7,7 +7,7 @@ html, body {
   padding: 0;
   font-family: Arial, Helvetica, sans-serif;
   color: #333333;
-  background-color: #f4f4f4;
+  background-color: #ffffff;
 }
 
 /* Container für Inhalt und Bilder responsive halten */
@@ -29,8 +29,6 @@ img {
 .side-nav summary {
   list-style: none; /* Für Firefox & Chrome */
   cursor: pointer;
-  position: relative;
-  padding-right: 25px; /* Platz für eigenen Pfeil */
   user-select: none;
 }
 
@@ -38,8 +36,8 @@ img {
   display: none; /* Für ältere Safari/Webkit Browser */
 }
 
-/* Eigener eleganter Pfeil (❯) */
-.side-nav summary::after {
+/* Untermenü-Pfeil (❯) für tiefere Ebenen */
+.side-nav details details summary::after {
   content: "❯";
   position: absolute;
   right: 15px;
@@ -49,8 +47,7 @@ img {
   transition: transform 0.2s ease-in-out;
 }
 
-/* Pfeil um 90 Grad drehen, wenn das Untermenü offen ist */
-.side-nav details[open] > summary::after {
+.side-nav details details[open] > summary::after {
   transform: translateY(-50%) rotate(90deg);
 }
 
@@ -68,12 +65,12 @@ img {
     padding: 0;
   }
 
-  /* Abstand oben schaffen, damit der fixe Menübalken den Text nicht verdeckt */
+  /* Abstand oben schaffen, damit der fixe Menübalken nichts verdeckt */
   body {
     padding-top: 55px !important; 
   }
 
-  /* Inhalts-Container auf volle Breite ohne Überlappen */
+  /* Inhalts-Container auf volle Breite */
   #container, #wrapper, #main, .content, .main-content, main {
     width: 100% !important;
     max-width: 100% !important;
@@ -83,7 +80,7 @@ img {
     overflow: visible !important;
   }
 
-  /* 2. Menüleiste fest am oberen Bildschirmrand anheften (Fixed Navbar) */
+  /* 2. Menüleiste fest als blauer Balken oben fixieren */
   #main-nav, .side-nav {
     position: fixed !important;
     top: 0 !important;
@@ -91,53 +88,77 @@ img {
     right: 0 !important;
     width: 100% !important;
     z-index: 99999 !important;
-    box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+    background-color: #004b8d !important; /* Blaues Band über die volle Breite */
+    box-shadow: 0px 3px 8px rgba(0,0,0,0.2);
   }
 
-  /* 3. Hamburger-Klappverhalten für das Smartphone-Menü */
   .side-nav details {
     width: 100%;
     margin: 0;
   }
 
-  /* Der blaue Hauptbalken (≡ Menü) */
-  .side-nav summary {
-    display: block;
-    padding: 12px 15px;
+  /* 3. Der blaue Hauptbalken: Links "Menü", Rechts "☰" */
+  .side-nav > details > summary {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 20px !important;
     font-size: 1.1rem;
     font-weight: bold;
+    color: #ffffff !important;
+    background-color: #004b8d !important;
+    box-sizing: border-box;
+    width: 100%;
   }
 
-  /* Menüpunkte im eingeklappten Zustand ausblenden */
+  /* Rechter Rand: 3 Hamburger-Balken anzeigen */
+  .side-nav > details > summary::after {
+    content: "☰" !important;
+    font-size: 1.4rem !important;
+    font-weight: normal;
+    transform: none !important; /* Keinen Pfeil drehen */
+    position: static !important;
+  }
+
+  /* 4. Ausgeklapptes Menü (blickdicht weiß unter dem Balken) */
   .side-nav details:not([open]) > *:not(summary) {
     display: none !important;
   }
 
-  /* Ausgeklapptes Menü: Hintergrund weiß & gut lesbare Farben */
   .side-nav details[open] > *:not(summary) {
     display: block !important;
-    background-color: #ffffff;
-    border-bottom: 1px solid #eeeeee;
+    background-color: #ffffff !important;
+    border-bottom: 2px solid #004b8d;
+    position: relative;
+    z-index: 99999;
   }
 
-  /* 4. Gute Lesbarkeit und Daumen-Bedienbarkeit für Links */
+  /* 5. Links und Lesbarkeit im ausgeklappten Menü */
   .side-nav a, 
   .side-nav details[open] summary {
-    color: #222222 !important; /* Dunkle Schrift auf weißem Grund */
+    color: #222222 !important;
     display: block;
     padding: 12px 20px;
     font-size: 1rem;
     text-decoration: none;
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #eeeeee;
   }
 
-  .side-nav a:hover,
-  .side-nav summary:hover {
-    color: #000000 !important;
-    background-color: #f0f0f0;
+  .side-nav a:hover {
+    background-color: #f5f5f5 !important;
   }
 
-  /* Einrückung für tiefer liegende Untermenüs */
-  .side-nav details details {
-    padding-left: 15px;
+  /* Aufzählungspunkte im Mobil-Menü entfernen */
+  .side-nav ul, .side-nav li {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Header-Bilder & Logo skalieren */
+  header img, .header img, #header img {
+    max-width: 100% !important;
+    height: auto !important;
   }
 }
