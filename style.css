@@ -315,3 +315,38 @@
     font-size: 1.1rem;
   }
 }
+/* --- Vollständige Mobile Optimierung für Smartphones --- */
+@media (max-width: 768px) {
+
+  /* 1. Verhindern, dass Elemente über den Bildschirm hinausfragen */
+  html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden; /* Unterdrückt seitliches Scrollen */
+    margin: 0;
+    padding: 0;
+  }
+
+  /* 2. Haupt-Container & Layout auf volle Breite setzen */
+  #container, #wrapper, #main, .content, .main-content, main {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+    padding: 10px;
+  }
+
+  /* 3. Menü oben fixation (Sticky Navbar) */
+  #main-nav, .side-nav {
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    width: 100% !important;
+  }
+
+  /* 4. Bilder automatisch an die volle Breite anpassen */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
