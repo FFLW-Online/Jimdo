@@ -290,3 +290,28 @@
 .side-nav details[open] > summary::after {
   transform: translateY(-50%) rotate(90deg);
 }
+
+/* --- Fix für Smartphone-Ansicht --- */
+@media (max-width: 768px) {
+  
+  /* Textfarbe im Menü auf Dunkelgrau zwingen */
+  .side-nav, 
+  .side-nav a, 
+  .side-nav summary {
+    color: #222222 !important; /* Macht den Text wieder sichtbar */
+  }
+
+  /* Aktiver Link oder Hover-Zustand lesbar halten */
+  .side-nav a:hover,
+  .side-nav summary:hover {
+    color: #000000 !important;
+  }
+
+  /* Menü-Links größer für Daumen-Bedienung */
+  .side-nav a, 
+  .side-nav summary {
+    display: block;
+    padding: 10px 12px;
+    font-size: 1.1rem;
+  }
+}
