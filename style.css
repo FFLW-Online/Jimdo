@@ -261,3 +261,32 @@
   margin-top: 5px;
   margin-bottom: 5px;
 }
+/* --- Styling für Aufklapp-Menüs (<details>/<summary>) --- */
+
+/* Standard-Pfeil des Browsers entfernen */
+.side-nav summary {
+  list-style: none; /* Für Firefox & Chrome */
+  cursor: pointer;
+  position: relative;
+  padding-right: 25px; /* Platz für unseren eigenen Pfeil */
+}
+
+.side-nav summary::-webkit-details-marker {
+  display: none; /* Für ältere Safari/Webkit Browser */
+}
+
+/* Eigener eleganter Pfeil (▼) */
+.side-nav summary::after {
+  content: "❯";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%) rotate(0deg);
+  font-size: 0.8em;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Pfeil drehen, wenn das Menü offen ist */
+.side-nav details[open] > summary::after {
+  transform: translateY(-50%) rotate(90deg);
+}
