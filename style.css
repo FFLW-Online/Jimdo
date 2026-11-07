@@ -225,3 +225,39 @@
     display: block;
   }
 }
+/* Styling für klappbare Untermenüs */
+.side-nav details {
+  cursor: pointer;
+}
+
+.side-nav summary {
+  list-style-type: none; /* Standard-Pfeil verstecken */
+  position: relative;
+  padding-right: 20px;
+}
+
+.side-nav summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Eigener kleiner Pfeil für Klapp-Menüs */
+.side-nav summary::after {
+  content: '▸';
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+}
+
+.side-nav details[open] > summary::after {
+  transform: translateY(-50%) rotate(90deg); /* Pfeil dreht sich beim Öffnen */
+}
+
+/* Einrückung der Unterpunkte */
+.side-nav details ul {
+  padding-left: 15px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
