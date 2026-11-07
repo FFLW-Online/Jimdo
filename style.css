@@ -1,206 +1,218 @@
 /* ==========================================================================
-   HAUPT-STYLES (Desktop & Allgemeine Grundlagen)
+   VOLLSTÄNDIGE STYLE.CSS (Desktop Baseline + Mobile Details/Summary Navigation)
    ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. GENERAL RESETS & DESKTOP BASELINE (> 768px)
+   -------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   margin: 0;
   padding: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  color: #333333;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #222222;
   background-color: #ffffff;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
+/* Layout-Grid für Desktop */
+.page-wrapper {
+  display: flex;
+  min-height: 100vh;
 }
 
-#container, #wrapper, #main, .content, main {
-  box-sizing: border-box;
+/* Seitenleiste (Desktop) */
+.side-nav,
+#main-nav {
+  width: 260px;
+  background-color: #f8f9fa;
+  border-right: 1px solid #e5e5e5;
+  padding: 20px 0;
+  flex-shrink: 0;
 }
 
-/* Desktop Navigation Base */
-.side-nav summary {
-  list-style: none;
-  cursor: pointer;
-  user-select: none;
+/* Auf Desktop wird die Umschalt-Schaltfläche (<summary>) ausgeblendet */
+.side-nav summary,
+#main-nav summary {
+  display: none !important;
 }
 
-.side-nav summary::-webkit-details-marker {
-  display: none;
+/* Desktop Navigation immer sichtbar schalten */
+.side-nav details,
+#main-nav details {
+  display: block;
 }
 
-/* ==========================================================================
-   MOBILE OPTIMIERUNG (Smartphones bis 768px)
-   ========================================================================== */
+.side-nav details > *:not(summary),
+#main-nav details > *:not(summary) {
+  display: block !important;
+}
 
+.side-nav ul,
+#main-nav ul {
+  list-style: none !important;
+  margin: 0;
+  padding: 0;
+}
+
+.side-nav li a,
+#main-nav li a {
+  display: block;
+  padding: 12px 24px;
+  color: #222222;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.side-nav li a:hover,
+.side-nav li a:focus,
+#main-nav li a:hover,
+#main-nav li a:focus {
+  background-color: #e9ecef;
+  color: #004b8d;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 40px;
+}
+
+
+/* --------------------------------------------------------------------------
+   2. MOBILE NAVIGATION (@media (max-width: 768px))
+   -------------------------------------------------------------------------- */
 @media (max-width: 768px) {
 
-  /* 1. Grund-Layout & Abstand oben */
-  html, body {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* Abstand oben schaffen, damit der blaue Balken keine Inhalte verdeckt */
+  /* Body-Abstand oben für den fixierten 50px-Balken */
   body {
-    padding-top: 55px !important; 
+    padding-top: 55px !important;
   }
 
-  /* Hauptinhalt responsive anpassen */
-  #container, #wrapper, #main, .content, .main-content, main {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    padding: 15px !important;
+  .page-wrapper {
+    display: block;
   }
 
-  /* 2. Fixierter blauer Top-Balken über die volle Breite */
-  #main-nav, .side-nav {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    height: 50px !important;
-    z-index: 99999 !important;
-    background-color: #004b8d !important;
-    box-shadow: 0px 2px 8px rgba(0,0,0,0.25);
-    margin: 0 !important;
-    padding: 0 !important;
+  .main-content {
+    padding: 20px;
   }
 
-  .side-nav details {
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    position: relative !important;
+  /* Containereinstellungen für Mobile */
+  .side-nav,
+  #main-nav {
+    width: 100%;
+    border-right: none;
+    padding: 0;
+    margin: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99999;
+    background-color: transparent;
   }
 
-  /* 3. Balken-Design: "Menü" MITTIG, Hamburger "☰" RECHTSBÜNDIG */
+  .side-nav details,
+  #main-nav details {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Pfeile / Marker der Browser-Standardanzeige ausblenden */
+  .side-nav summary::-webkit-details-marker,
+  #main-nav summary::-webkit-details-marker,
+  .side-nav summary::marker,
+  #main-nav summary::marker {
+    display: none !important;
+  }
+
+  /* 1 & 2. Fixierter blauer Header-Balken (<summary>) */
   .side-nav summary,
   #main-nav summary {
     display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    position: relative !important;
-    width: 100% !important;
-    height: 50px !important;
-    line-height: 50px !important;
-    background-color: #004b8d !important;
-    color: #ffffff !important;
-    font-size: 1.1rem !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: 50px;
+    background-color: #004b8d;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
     list-style: none !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-    padding: 0 50px !important;
-    text-align: center !important;
-    user-select: none !important;
+    margin: 0;
+    padding: 0;
   }
 
-  .side-nav summary::-webkit-details-marker,
-  #main-nav summary::-webkit-details-marker {
+  /* Hamburger-Icon (☰) strikt am rechten Rand */
+  .side-nav summary .hamburger,
+  #main-nav summary .hamburger,
+  .side-nav summary span:last-child,
+  #main-nav summary span:last-child {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+
+  /* 3. Eingeklappter Zustand: Alles außer dem <summary>-Balken verstecken */
+  .side-nav details:not([open]) > *:not(summary),
+  #main-nav details:not([open]) > *:not(summary) {
     display: none !important;
   }
 
-  /* Hamburger Icon rechts im Balken verankern */
-  .side-nav > details > summary::after,
-  #main-nav > details > summary::after,
-  .side-nav summary:first-of-type::after {
-    content: "☰" !important;
-    position: absolute !important;
-    right: 15px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    font-size: 1.5rem !important;
-    color: #ffffff !important;
-    font-weight: normal !important;
-  }
-
-  /* 4. EINGEKLAPPTER ZUSTAND: Alle Menüinhalte strikt verstecken */
-  .side-nav details:not([open]) > *:not(summary) {
-    display: none !important;
-  }
-
-  /* 5. AUSGEKLAPPTER ZUSTAND: Blickdichtes weißes Menü über der Seite */
-  .side-nav details[open] > *:not(summary) {
+  /* 4. Ausgeklappter Zustand (details[open]) */
+  .side-nav details[open] > *:not(summary),
+  #main-nav details[open] > *:not(summary) {
     display: block !important;
-    position: absolute !important;
-    top: 50px !important;
-    left: 0 !important;
-    width: 100% !important;
-    background-color: #ffffff !important; /* 100 % deckendes Weiß */
-    box-shadow: 0px 10px 25px rgba(0,0,0,0.3) !important;
-    max-height: calc(100vh - 55px) !important;
-    overflow-y: auto !important;
-    z-index: 99999 !important;
-    padding: 10px 0 !important;
-    box-sizing: border-box !important;
-    border-bottom: 3px solid #004b8d !important;
+    background-color: #ffffff !important;
+    width: 100%;
+    max-height: calc(100vh - 50px);
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border-bottom: 3px solid #004b8d;
   }
 
-  /* 6. Menü-Links & Aufzählungen im ausgeklappten Zustand */
-  .side-nav details[open] ul,
-  .side-nav details[open] li {
+  .side-nav ul,
+  #main-nav ul {
     list-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0;
+    padding: 0;
     background-color: #ffffff !important;
   }
 
-  .side-nav details[open] a {
-    display: block !important;
+  .side-nav li,
+  #main-nav li {
+    list-style: none !important;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid #eeeeee;
+  }
+
+  .side-nav li a,
+  #main-nav li a {
+    display: block;
+    padding: 14px 20px;
     color: #222222 !important;
-    padding: 12px 20px !important;
-    font-size: 1rem !important;
-    text-decoration: none !important;
+    font-size: 1rem;
+    text-decoration: none;
     background-color: #ffffff !important;
-    border-bottom: 1px solid #eeeeee !important;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.05);
   }
 
-  .side-nav details[open] a:hover,
-  .side-nav details[open] a:active {
+  .side-nav li a:active,
+  .side-nav li a:hover,
+  #main-nav li a:active,
+  #main-nav li a:hover {
     background-color: #f5f5f5 !important;
     color: #004b8d !important;
-  }
-
-  /* Verschachtelte Untermenüs im Mobil-Menü */
-  .side-nav details[open] details summary {
-    background-color: #f8f9fa !important;
-    color: #222222 !important;
-    font-weight: bold !important;
-    padding: 12px 20px !important;
-    height: auto !important;
-    line-height: normal !important;
-    border-bottom: 1px solid #eeeeee !important;
-    text-align: left !important;
-    justify-content: space-between !important;
-  }
-
-  .side-nav details[open] details summary::after {
-    content: "❯" !important;
-    position: static !important;
-    font-size: 0.8rem !important;
-    color: #555555 !important;
-    transform: rotate(0deg) !important;
-  }
-
-  .side-nav details[open] details[open] > summary::after {
-    transform: rotate(90deg) !important;
-  }
-
-  .side-nav details[open] details a {
-    padding-left: 35px !important;
-  }
-
-  /* 7. Header-Bilder & Grafiken flexibel anpassen */
-  header img, .header img, #header img {
-    max-width: 100% !important;
-    height: auto !important;
   }
 }
