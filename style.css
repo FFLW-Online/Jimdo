@@ -377,6 +377,9 @@ body {
 
   .nav-list.is-open {
     display: block;
+    max-height: calc(100vh - 60px); /* Nutzt die verfügbare Bildschirmhöhe */
+    overflow-y: auto;               /* Macht das Menü in sich scrollbar */
+    -webkit-overflow-scrolling: touch; /* Garantiert weiches Scrollen auf iPhones */
   }
 
   .content {
