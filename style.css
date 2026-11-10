@@ -79,7 +79,7 @@ html, body {
 }
 
 /* ==========================================================================
-   3. NAVIGATION (DESKTOP-SÄULE)
+   3. NAVIGATION (STRENG LINKSBÜNDIG & FEHLERFREI SANIERT)
    ========================================================================== */
 .side-nav {
   width: 250px;
@@ -94,25 +94,67 @@ html, body {
   display: none; /* Auf Desktop ausgeblendet */
 }
 
-.nav-list {
-  list-style: none;
+.nav-list,
+.side-nav ul {
+  list-style: none !important;
   padding: 0 !important;
   margin: 0 !important;
 }
 
 .nav-list li {
   position: relative;
-  list-style: none;
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.nav-list a,
+/* 3.1 Browser-Standards für Aufklappmenüs (<details> & <summary>) bereinigen */
+.side-nav details {
+  display: block;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 .side-nav details summary {
   display: block;
-  padding: 10px 18px !important;
+  cursor: pointer;
+  list-style: none !important;
+  position: relative;
+  margin: 0 !important;
+  padding: 10px 18px !important; /* Exakt 18px Abstand nach links */
+  color: #ffffff;
+  font-weight: bold;
+  text-align: left !important;
+  box-sizing: border-box;
+}
+
+/* Entfernt den unsichtbaren Standard-Browser-Pfeil */
+.side-nav details summary::-webkit-details-marker,
+.side-nav details summary::marker {
+  display: none !important;
+  content: "" !important;
+}
+
+/* 3.2 Normale Direkt-Links ausrichten */
+.nav-list > li > a {
+  display: block;
+  padding: 10px 18px !important; /* Exakt 18px Abstand nach links */
+  margin: 0 !important;
   color: #ffffff;
   text-decoration: none;
   font-weight: bold;
   text-align: left !important;
+  box-sizing: border-box;
+}
+
+/* 3.3 Doppel-Padding bei Links innerhalb von <summary> unterbinden */
+.side-nav details summary a {
+  display: inline-block;
+  padding: 0 !important; /* Kein eigenes Padding, erbt 18px von <summary> */
+  margin: 0 !important;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .nav-list a:hover,
@@ -120,7 +162,7 @@ html, body {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Klickbarer Flexbox-Link für Übersetzungstool */
+/* Flexbox für Übersetzungstool (einzeilig) */
 .nav-link-flex {
   display: flex !important;
   align-items: center;
@@ -128,7 +170,6 @@ html, body {
   width: 100%;
 }
 
-/* Kompaktes Flaggen-Fenster (3 Flaggen parallel) */
 .flag-carousel-inline {
   display: inline-flex;
   overflow: hidden;
@@ -153,26 +194,12 @@ html, body {
   100% { transform: translateX(-50%); }
 }
 
-/* Aufklappbare Sub-Menüs (<details> & <summary>) */
-.side-nav details summary {
-  cursor: pointer;
-  list-style: none;
-  position: relative;
-}
-
-.side-nav details summary::-webkit-details-marker {
-  display: none;
-}
-
-.side-nav details ul {
-  list-style: none;
-  padding: 0 !important;
-  margin: 0 !important;
-  background-color: rgba(0, 0, 0, 0.15);
-}
-
+/* 3.4 Sub-Menüs (Unterpunkte) gezielt einrücken */
 .side-nav details ul li a {
-  padding-left: 32px !important;
+  display: block;
+  padding-left: 32px !important; /* Nur Unterpunkte rücken weiter nach rechts */
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
   font-weight: normal;
   font-size: 0.95rem;
 }
@@ -258,7 +285,7 @@ html, body {
   color: #ffd700;
 }
 
-/* Zentrierter Flaschenpost-Button / Titel aus dem Screenshot */
+/* Zentrierter Flaschenpost-Button / Titel */
 .flaschenpost-title {
   display: inline-block;
   background-color: #1a237e;
