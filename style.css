@@ -31,7 +31,7 @@ html, body {
   html, body {
     background-color: #dce6f2; /* Fallback-Farbe */
     /* TIPP: Falls das Bild nicht erscheint, bitte den Dateinamen (z.B. .jpg / .png) in deinem Ordner prüfen! */
-    background-image: url('./assets/images/hintergrund.jpg'), url('assets/images/hintergrund.jpg');
+    background-image: url('./assets/images/garten-hintergrundbild.jpg'), url('assets/images/garten-hintergrundbild.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
