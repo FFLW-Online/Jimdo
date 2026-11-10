@@ -227,11 +227,21 @@ html, body {
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Silbentrennung & Größenanpassung für ALLE Mobil-Überschriften */
-  .content h1 { font-size: 1.5rem; }
-  .content h2 { font-size: 1.35rem; }
-  .content h3 { font-size: 1.2rem; }
-  .content h4 { font-size: 1.1rem; }
+ /* Alle Inhalts-Überschriften auf Mobilgeräten auf einheitliche Hauptgröße setzen */
+  .content h1,
+  .content h2,
+  .content h3 {
+    font-size: 1.5rem !important;
+    line-height: 1.3;
+    margin-top: 1.2em;
+    margin-bottom: 0.5em;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  .content h4 {
+    font-size: 1.2rem !important;
+  }
 
   .content {
     width: 100%;
