@@ -38,7 +38,8 @@ html, body {
   }
   
   body {
-    background: transparent; /* Body transparent halten, damit das Gartenbild in den Zwischenräumen durchscheint */
+    background: transparent;
+    padding: 30px 0;
   }
 }
 
@@ -51,12 +52,12 @@ html, body {
 }
 
 /* ==========================================================================
-   2. HEADER & LAYOUT (DESKTOP)
+   2. HEADER & LAYOUT (DESKTOP: WEISSER GESAMTCARD-CONTAINER)
    ========================================================================== */
 .site-header {
-  max-width: 1200px;
-  margin: 20px auto 0 auto;
-  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 25px 25px 10px 25px;
   text-align: center;
   background-color: #ffffff;
   border-radius: 4px 4px 0 0;
@@ -69,24 +70,24 @@ html, body {
 
 .layout {
   display: flex;
-  max-width: 1200px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 0 20px 20px 20px;
-  gap: 20px; /* Sichtbare Lücke zwischen blauem Menü und weißem Inhalt */
+  padding: 0 25px;
+  background-color: #ffffff; /* Zusammenhängende weiße Fläche hinter Navigation und Inhalt */
+  gap: 20px;
   align-items: flex-start;
 }
 
 /* ==========================================================================
-   3. NAVIGATION (DESKTOP & CENTRAL)
+   3. NAVIGATION (BLAUE SÄULE AUF WEISSEM GRUND)
    ========================================================================== */
 .side-nav {
-  width: 260px;
+  width: 250px;
   flex-shrink: 0;
   background-color: var(--nav);
   color: #ffffff;
   padding: 10px 0;
   border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .menu-toggle {
@@ -202,15 +203,13 @@ html, body {
 }
 
 /* ==========================================================================
-   4. INHALTSBEREICH (EIGENER WEISSER BLOCK MIT SCHATTEN)
+   4. INHALTSBEREICH (TEIL DES WEISSEN CONTAINERS)
    ========================================================================== */
 .content {
   flex-grow: 1;
   background: #ffffff;
-  padding: 30px;
+  padding: 0 10px 20px 10px;
   min-width: 0;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Eigenständige weiße Karte */
 }
 
 .content h1,
@@ -225,42 +224,91 @@ html, body {
 }
 
 /* ==========================================================================
-   5. UNTERER KONTAKT-BLOCK ("FLASCHENPOST" WEISS AUF BLAU)
+   5. UNTERER BLAUER KONTAKT-BLOCK (BLAUE BOX INNERHALB DES WEISSEN BEREICHS)
    ========================================================================== */
 .contact-block {
-  max-width: 1200px;
-  margin: 30px auto;
-  padding: 30px;
-  background-color: var(--primary-color);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 40px;
+  background-color: #0b5fb4; /* Blau wie im Original-Screenshot */
   color: #ffffff;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background-clip: content-box; /* Erzeugt weißen Rand links/rechts */
+}
+
+@media (min-width: 768px) {
+  /* Hüllstruktur für Desktop: schließt alles in einen großen weißen Kasten ein */
+  .contact-block {
+    background-color: #ffffff; /* Weißer Kasten außen */
+    padding: 10px 25px 25px 25px;
+  }
+  
+  .contact-block-inner {
+    background-color: #0b5fb4; /* Die eigentliche blaue Box innen */
+    padding: 25px;
+    border-radius: 2px;
+  }
 }
 
 .contact-block p {
-  margin-bottom: 15px;
+  margin-bottom: 12px;
   color: #ffffff;
 }
 
 .contact-block a {
-  color: #ffd700;
+  color: #ffffff;
   text-decoration: underline;
 }
 
 .contact-block a:hover {
+  color: #ffd700;
+}
+
+/* Zentrierter Flaschenpost-Button / Titel aus dem Screenshot */
+.flaschenpost-title {
+  display: inline-block;
+  background-color: #1a237e;
   color: #ffffff;
+  padding: 10px 25px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 15px 0;
+  border-radius: 3px;
 }
 
 .legal-footer {
-  text-align: center;
-  padding: 20px;
-  color: #ffffff; /* Auf Hintergrundbild weiß & gut lesbar */
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 15px 25px 25px 25px;
+  background-color: #ffffff; /* Auch unten weißer Hintergrund */
+  text-align: left;
+  font-size: 0.85rem;
+  color: #666666;
+  border-radius: 0 0 4px 4px;
 }
 
 .legal-footer a {
-  color: #ffffff;
+  color: #666666;
+  text-decoration: none;
+}
+
+.legal-footer a:hover {
   text-decoration: underline;
+}
+
+/* SCHATTEN FÜR DEN WEISSEN DESKTOP-GESAMTKASTEN */
+@media (min-width: 768px) {
+  .site-header {
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+  }
+  .layout {
+    box-shadow: -3px 0 10px -2px rgba(0,0,0,0.15), 3px 0 10px -2px rgba(0,0,0,0.15);
+  }
+  .contact-block {
+    box-shadow: -3px 0 10px -2px rgba(0,0,0,0.15), 3px 0 10px -2px rgba(0,0,0,0.15);
+  }
+  .legal-footer {
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  }
 }
 
 /* ==========================================================================
@@ -344,8 +392,6 @@ html, body {
   .content {
     width: 100%;
     padding: 15px 10px;
-    border-radius: 0;
-    box-shadow: none;
   }
 
   .content .float-left,
@@ -358,17 +404,12 @@ html, body {
   }
 
   .contact-block {
-    margin: 20px 10px;
-    padding: 20px 15px;
-    border-radius: 0;
+    margin: 0;
+    padding: 15px 10px;
+    background-color: #0b5fb4;
   }
 
   .legal-footer {
-    color: #666666;
-    text-shadow: none;
-  }
-
-  .legal-footer a {
-    color: var(--primary-color);
+    padding: 15px 10px;
   }
 }
