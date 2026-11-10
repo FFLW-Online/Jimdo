@@ -397,3 +397,30 @@ body {
     border-top: 0;
   }
 }
+/* Plus-Symbole mit rechteckigem Hintergrund versehen */
+.side-nav summary::after {
+  content: "+";
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.1em;
+  font-weight: bold;
+  
+  /* Das Rechteck hinter dem Plus */
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Aus dem Plus-Kästchen wird beim Öffnen ein Minus-Kästchen */
+.side-nav details[open] > summary::after {
+  content: "−";
+  background: rgba(255, 255, 255, 0.35);
+}
