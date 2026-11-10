@@ -14,14 +14,27 @@
   box-sizing: border-box;
 }
 
+/* Mobil: Keines oder schlichtes Hintergrundbild für bessere Lesbarkeit */
 html, body {
   margin: 0;
   padding: 0;
   font-family: Arial, sans-serif;
   color: var(--text-color);
   background-color: var(--bg-color);
+  background-image: none;
   line-height: 1.6;
   overflow-x: hidden; /* Verhindert seitliches Verziehen der gesamten Seite */
+}
+
+/* Desktop (ab 768px): Hintergrundbild aus Nostalgiegründen beibehalten */
+@media (min-width: 768px) {
+  html, body {
+    background-image: url('assets/images/hintergrund.jpg'); /* PFAD ANPASSEN falls abweichend */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+  }
 }
 
 /* Alle Bilder im Inhaltsbereich flexibel an Mobilbildschirme anpassen */
@@ -145,6 +158,29 @@ html, body {
   background: rgba(255, 255, 255, 0.35);
 }
 
+/* Flaggen-Laufband im Menü (Unter dem ÜbersetzungsTool) */
+.flag-carousel {
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 6px 18px;
+  opacity: 0.9;
+}
+
+.flag-track {
+  display: inline-block;
+  animation: flag-scroll 10s linear infinite;
+}
+
+.flag-track span {
+  font-size: 1.1rem;
+  margin-right: 6px;
+}
+
+@keyframes flag-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* ==========================================================================
    4. INHALTSBEREICH (CONTENT)
    ========================================================================== */
@@ -227,7 +263,7 @@ html, body {
     -webkit-overflow-scrolling: touch;
   }
 
- /* Alle Inhalts-Überschriften auf Mobilgeräten auf einheitliche Hauptgröße setzen */
+  /* Alle Inhalts-Überschriften auf Mobilgeräten auf einheitliche Hauptgröße setzen */
   .content h1,
   .content h2,
   .content h3 {
