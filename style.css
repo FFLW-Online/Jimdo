@@ -320,37 +320,51 @@ body {
 @media (max-width: 767px) {
   body {
     margin: 0;
+    padding-top: 60px; /* Platzhalter oben, damit der fixierte Balken nichts verdeckt */
     background: #fff;
+  }
+
+  /* Header-Logo ganz oben auf Handys verkleinern */
+  .site-header {
+    padding: 10px 15px;
+    text-align: center;
+  }
+
+  .site-header img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    margin: 0 auto;
   }
 
   .layout {
     flex-direction: column;
   }
 
+  /* Navigationsleiste oben festpinnen */
   .side-nav {
     width: 100%;
-    position: fixed; /* Bleibt beim Scrollen fest am oberen Rand stehen */
+    position: fixed;
     top: 0;
     left: 0;
-    background: var(--nav); /* Behält das blaue Menü-Design bei */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    background: var(--nav);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     z-index: 9999;
     max-height: none;
     padding: 0;
   }
 
-  
   .menu-toggle {
     display: block;
     width: 100%;
-    padding: 12px;
-    background-color: #004080;
+    padding: 12px 18px;
+    background-color: var(--nav);
     color: #ffffff;
     font-size: 1.1rem;
     font-weight: bold;
     border: none;
     cursor: pointer;
-    text-align: center;
+    text-align: left;
   }
 
   .nav-list {
@@ -358,6 +372,7 @@ body {
     padding: 10px;
     margin: 0;
     list-style: none;
+    background: var(--nav);
   }
 
   .nav-list.is-open {
@@ -399,6 +414,7 @@ body {
     border-top: 0;
   }
 }
+
 /* Plus-Symbole mit rechteckigem Hintergrund versehen */
 .side-nav summary::after {
   content: "+";
@@ -408,8 +424,6 @@ body {
   transform: translateY(-50%);
   font-size: 1.1em;
   font-weight: bold;
-  
-  /* Das Rechteck hinter dem Plus */
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 4px;
