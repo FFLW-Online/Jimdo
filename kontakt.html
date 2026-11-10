@@ -20,21 +20,21 @@
     <main class="content">
       <h2>Schreib uns.</h2>
       
-      <!-- Mailto-Formular ohne Fremdanbieter -->
-      <form action="mailto:Kontakt@freundeleuwi.org" method="post" enctype="text/plain" class="contact-form">
+      <!-- Formspree Kontaktformular -->
+      <form action="https://formspree.io/f/xzeenrgo" method="POST" class="contact-form">
         <p>
           <label for="name"><strong>Dein Name *</strong></label><br>
-          <input type="text" id="name" name="Name" required style="width: 100%; max-width: 400px; padding: 8px;">
+          <input type="text" id="name" name="name" required style="width: 100%; max-width: 400px; padding: 8px;">
         </p>
 
         <p>
           <label for="email"><strong>Deine E-Mail-Adresse *</strong></label><br>
-          <input type="email" id="email" name="E-Mail" required style="width: 100%; max-width: 400px; padding: 8px;">
+          <input type="email" id="email" name="_replyto" required style="width: 100%; max-width: 400px; padding: 8px;">
         </p>
 
         <p>
           <label for="message"><strong>Deine Nachricht für uns *</strong></label><br>
-          <textarea id="message" name="Nachricht" rows="6" required style="width: 100%; max-width: 500px; padding: 8px;"></textarea>
+          <textarea id="message" name="message" rows="6" required style="width: 100%; max-width: 500px; padding: 8px;"></textarea>
         </p>
 
         <p>
@@ -43,11 +43,11 @@
 
         <p>
           <button type="submit" class="button" style="padding: 10px 20px; cursor: pointer; background-color: #0056b3; color: white; border: none; border-radius: 4px;">
-            In E-Mail-Programm öffnen &amp; absenden
+            Nachricht absenden
           </button>
         </p>
 
-        <p><small><strong>Hinweis:</strong> Beim Klick öffnet sich dein E-Mail-Programm mit deinen eingetragenen Daten.</small></p>
+        <p><small><strong>Hinweis:</strong> Bitte alle mit * gekennzeichneten Felder ausfüllen.</small></p>
       </form>
     </main>
   </div>
