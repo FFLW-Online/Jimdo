@@ -26,7 +26,7 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Desktop (ab 768px): Hintergrundbild auf HTML/BODY aktivieren */
+/* Desktop (ab 768px): Garten-Hintergrundbild auf HTML aktivieren */
 @media (min-width: 768px) {
   html {
     background-color: #dce6f2;
@@ -52,7 +52,7 @@ html, body {
 }
 
 /* ==========================================================================
-   2. HEADER & LAYOUT (DESKTOP: WEISSER GESAMTCARD-CONTAINER)
+   2. HEADER & LAYOUT (DESKTOP: TEIL DES WEISSEN CONTAINER-DOKUMENTS)
    ========================================================================== */
 .site-header {
   max-width: 1100px;
@@ -79,7 +79,7 @@ html, body {
 }
 
 /* ==========================================================================
-   3. NAVIGATION (BLAUE SÄULE AUF WEISSEM GRUND)
+   3. NAVIGATION (DESKTOP-SÄULE)
    ========================================================================== */
 .side-nav {
   width: 250px;
@@ -203,7 +203,7 @@ html, body {
 }
 
 /* ==========================================================================
-   4. INHALTSBEREICH (TEIL DES WEISSEN CONTAINERS)
+   4. INHALTSBEREICH (TEIL DER NAHTLOSEN WEISSEN FLÄCHE)
    ========================================================================== */
 .content {
   flex-grow: 1;
@@ -224,28 +224,23 @@ html, body {
 }
 
 /* ==========================================================================
-   5. UNTERER BLAUER KONTAKT-BLOCK (BLAUE BOX INNERHALB DES WEISSEN BEREICHS)
+   5. UNTERER BLAUER KONTAKT-BLOCK (FLASCHENPOST)
    ========================================================================== */
 .contact-block {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 30px 40px;
-  background-color: #0b5fb4; /* Blau wie im Original-Screenshot */
+  background-color: var(--primary-color); /* Blaue Farbe wie die Navigation */
   color: #ffffff;
-  background-clip: content-box; /* Erzeugt weißen Rand links/rechts */
+  padding: 30px;
 }
 
 @media (min-width: 768px) {
-  /* Hüllstruktur für Desktop: schließt alles in einen großen weißen Kasten ein */
+  /* Liegt auf Desktop als blaue Box INMITTEN der weißen Gesamtfläche */
   .contact-block {
-    background-color: #ffffff; /* Weißer Kasten außen */
-    padding: 10px 25px 25px 25px;
-  }
-  
-  .contact-block-inner {
-    background-color: #0b5fb4; /* Die eigentliche blaue Box innen */
-    padding: 25px;
-    border-radius: 2px;
+    background-color: var(--primary-color);
+    border-left: 25px solid #ffffff;
+    border-right: 25px solid #ffffff;
+    padding: 30px;
   }
 }
 
@@ -279,7 +274,7 @@ html, body {
   max-width: 1100px;
   margin: 0 auto;
   padding: 15px 25px 25px 25px;
-  background-color: #ffffff; /* Auch unten weißer Hintergrund */
+  background-color: #ffffff; /* Schließt nahtlos unten weiß ab */
   text-align: left;
   font-size: 0.85rem;
   color: #666666;
@@ -295,19 +290,17 @@ html, body {
   text-decoration: underline;
 }
 
-/* SCHATTEN FÜR DEN WEISSEN DESKTOP-GESAMTKASTEN */
+/* SCHATTEN FÜR DEN EINZIGEN WEISSEN GESAMTKASTEN (DESKTOP) */
 @media (min-width: 768px) {
   .site-header {
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
   }
-  .layout {
-    box-shadow: -3px 0 10px -2px rgba(0,0,0,0.15), 3px 0 10px -2px rgba(0,0,0,0.15);
-  }
+  .layout,
   .contact-block {
-    box-shadow: -3px 0 10px -2px rgba(0,0,0,0.15), 3px 0 10px -2px rgba(0,0,0,0.15);
+    box-shadow: -3px 0 10px -2px rgba(0, 0, 0, 0.15), 3px 0 10px -2px rgba(0, 0, 0, 0.15);
   }
   .legal-footer {
-    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -324,12 +317,14 @@ html, body {
     margin: 0;
     padding: 10px 15px;
     border-radius: 0;
+    box-shadow: none;
   }
 
   .layout {
     flex-direction: column;
     padding: 10px;
     gap: 0;
+    box-shadow: none;
   }
 
   .side-nav {
@@ -405,11 +400,14 @@ html, body {
 
   .contact-block {
     margin: 0;
-    padding: 15px 10px;
-    background-color: #0b5fb4;
+    padding: 20px 15px;
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
   }
 
   .legal-footer {
     padding: 15px 10px;
+    box-shadow: none;
   }
 }
