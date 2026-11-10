@@ -1,0 +1,17 @@
+media:
+  input: assets/images
+  output: assets/images
+
+content:
+  - label: "Seiten & Veranstaltungen"
+    type: collection
+    path: ""
+    format: html
+    exclude: ["index.html", "impressum.html", "datenschutz.html"]
+    fields:
+      - label: "Titel der Seite"
+        name: title
+        type: string
+      - label: "Inhalt (Haupttext)"
+        name: body
+        type: rich-text
