@@ -1,330 +1,170 @@
+/* ==========================================================================
+   1. GLOBALE EINSTELLUNGEN & VARIABLEN
+   ========================================================================== */
 :root {
-  --nav: #0660b2;
-  --content: #212ab8;
+  --primary-color: #004080;
+  --nav: #004080;
+  --text-color: #333333;
+  --bg-color: #ffffff;
+  --light-bg: #f4f4f4;
+  --border-color: #dddddd;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html {
-  background: #41533d url("assets/images/garten-hintergrundbild.jpg") center top/cover fixed no-repeat;
-}
-
 body {
-  margin: 150px auto 40px;
-  max-width: 980px;
-  background: #fff;
-  color: #333;
-  font-family: "Open Sans Condensed", "Arial Narrow", Arial, sans-serif;
-  box-shadow: 0 0 20px #0005;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  line-height: 1.6;
 }
 
-/* Header & Logo */
+/* ==========================================================================
+   2. HEADER & LAYOUT (DESKTOP)
+   ========================================================================== */
 .site-header {
-  padding: 20px 28px;
-  background: #fff;
+  padding: 20px;
+  text-align: center;
+  background-color: #ffffff;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  color: var(--content);
-  text-decoration: none;
-  font-size: 29px;
-  font-weight: 700;
+.site-header img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
-.brand img {
-  max-width: 180px;
-  max-height: 90px;
-}
-
-/* Layout-Grundeinstellungen */
 .layout {
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  gap: 20px;
 }
 
-/* Side Navigation (Desktop sticky) */
+/* ==========================================================================
+   3. NAVIGATION (DESKTOP & CENTRAL)
+   ========================================================================== */
 .side-nav {
-  width: 280px;
+  width: 260px;
   flex-shrink: 0;
-  background: var(--nav);
-  padding: 20px 0;
-  position: sticky;
-  top: 20px;
-  max-height: calc(100vh - 40px);
-  overflow-y: auto;
-  z-index: 100;
+  background-color: var(--nav);
+  color: #ffffff;
+  padding: 10px 0;
+  border-radius: 4px;
 }
 
-.side-nav ul {
+.menu-toggle {
+  display: none; /* Auf Desktop ausgeblendet */
+}
+
+.nav-list {
   list-style: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
 }
 
-.side-nav details {
-  cursor: pointer;
-  margin: 0;
-  padding: 0;
+.nav-list li {
+  position: relative;
 }
 
-/* ALLE Hauptmenü-Punkte & Summary-Elemente strikt gleich ausrichten */
-.side-nav a,
-.side-nav summary {
+.nav-list a {
   display: block;
-  color: #fff;
-  text-decoration: none;
   padding: 10px 18px;
-  margin: 0;
-  cursor: pointer;
-  font-size: 1.1em;
-  font-weight: 500;
-  box-sizing: border-box;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
 }
 
-/* Aufklapp-Header (<summary>) zurücksetzen – verhindert das Verspringen nach rechts */
-.side-nav summary {
+.nav-list a:hover,
+.nav-list summary:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Aufklappbare Sub-Menüs (<details> & <summary>) */
+.side-nav details summary {
+  padding: 10px 18px;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
   list-style: none;
   position: relative;
-  padding-right: 35px;
 }
 
-.side-nav summary::-webkit-details-marker,
-.side-nav summary::marker {
+.side-nav details summary::-webkit-details-marker {
   display: none;
 }
 
-.side-nav a:hover,
-.side-nav a:focus,
-.side-nav summary:hover {
-  background: #034d91;
-}
-
-/* Nur die echten Unterseiten im geöffneten Zustand leicht einrücken */
 .side-nav details ul {
+  list-style: none;
   padding: 0;
   margin: 0;
-  background: rgba(0, 0, 0, 0.15);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
-.side-nav details ul a {
-  padding-left: 32px;
-  font-size: 0.95em;
-  font-weight: 400;
+.side-nav details ul li a {
+  padding-left: 32px !important;
+  font-weight: normal;
+  font-size: 0.95rem;
 }
 
-/* Plus-/Minussymbole */
+/* Plus- & Minus-Kästchen im Menü */
 .side-nav summary::after {
   content: "+";
   position: absolute;
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.3em;
+  font-size: 1.1em;
   font-weight: bold;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 .side-nav details[open] > summary::after {
   content: "−";
+  background: rgba(255, 255, 255, 0.35);
 }
 
-/* Inhaltsbereich */
+/* ==========================================================================
+   4. INHALTSBEREICH (CONTENT)
+   ========================================================================== */
 .content {
-  width: 76%;
-  padding: 0 42px 34px;
-  min-height: 520px;
-}
-
-.content > h1:first-child,
-.content > h2:first-child {
-  margin-top: 0;
+  flex-grow: 1;
+  background: #ffffff;
+  padding: 20px;
 }
 
 .content h1,
 .content h2,
-.content h3,
-.content a {
-  color: var(--content);
-}
-
-.content h2 {
-  margin-top: 30px;
-  margin-bottom: 16px;
-}
-
-.content p {
+.content h3 {
+  color: var(--primary-color);
   margin-top: 0;
-  margin-bottom: 18px;
 }
 
-.content img {
-  max-width: 100%;
-  height: auto;
-}
-
-.content hr {
-  clear: both;
-  height: 1px;
-  margin: 28px 0;
-  border: 0;
-  background: #868686;
-}
-
-/* Über uns: Bild links im Fließtext */
-.content .float-left {
-  float: left;
-  width: 66%;
-  max-width: 450px;
-  height: auto;
-  margin: 0 22px 16px 0;
-}
-
-/* Warenhaus-Zeichnung links mit Textumfluss */
-.content img.warenhaus-zeichnung {
-  float: left;
-  display: block;
-  width: 58%;
-  max-width: 390px;
-  height: auto;
-  margin: 0 28px 16px 0;
-}
-
-.content img.warenhaus-zeichnung + p {
-  display: block;
-}
-
-.content::after {
-  content: "";
-  display: block;
-  clear: both;
-}
-
-/* Nummerierte Listen */
-.content ol > li {
-  display: list-item !important;
-  margin: 0 0 22px 0 !important;
-  padding: 0 !important;
-}
-
-.content ol > li:last-child {
-  margin-bottom: 0 !important;
-}
-
-.content ol > li p {
-  margin-top: 12px;
-  margin-bottom: 12px;
-}
-
-/* Sponsoren Grid */
-.sponsor-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
-  align-items: center;
-  margin: 24px 0 32px;
-}
-
-.sponsor-grid figure {
-  margin: 0;
-  text-align: center;
-}
-
-.sponsor-image {
-  display: block;
-  width: 100%;
-  max-width: 280px;
-  max-height: 150px;
-  height: auto;
-  object-fit: contain;
-  margin: 0 auto;
-}
-
-/* Kontakt-Block unten & Footer */
-.contact-block {
-  background: var(--nav);
-  color: #fff;
-  padding: 28px 42px;
-}
-
-.contact-block h2,
-.contact-block a {
-  color: #fff;
-}
-
-.legal-footer {
-  background: #f3f3f3;
-  padding: 17px 42px;
-  text-align: center;
-}
-
-.legal-footer a {
-  color: #333;
-}
-
-/* Tabellen & Spezials */
-.language-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.language-table td {
-  width: 50%;
-  border: 1px solid #777;
-  padding: 8px;
-  vertical-align: top;
-}
-
-.training-image {
-  margin-top: 18px;
-  border-top: 1px solid #aaa;
-  padding-top: 18px;
-}
-
-.contact-form {
-  display: grid;
-  gap: 12px;
-}
-
-.contact-form input,
-.contact-form textarea {
-  width: 100%;
-  padding: 9px;
-  border: 1px solid #aaa;
-}
-
-.contact-form button {
-  width: max-content;
-  padding: 9px 18px;
-  background: var(--nav);
-  color: #fff;
-  border: 0;
-}
-
-.image-missing {
-  margin: 12px 0 20px;
-  color: #990000;
-  font-style: italic;
-}
-
-/* Mobile-Button (Smartphone standardmäßig verbergen) */
-.menu-toggle {
-  display: none;
-}
-
-/* Mobile Responsiveness (unter 768px) */
+/* ==========================================================================
+   5. MOBILE RESPONSIVENESS (BILD SCHMALER ALS 768PX)
+   ========================================================================== */
 @media (max-width: 767px) {
   body {
     margin: 0;
-    padding-top: 60px; /* Platzhalter oben, damit der fixierte Balken nichts verdeckt */
-    background: #fff;
+    padding-top: 60px; /* Platzhalter für den fixierten blauen Menübalken */
+    background: #ffffff;
   }
 
-  /* Header-Logo ganz oben auf Handys verkleinern */
+  /* Header-Logo verkleinern */
   .site-header {
     padding: 10px 15px;
     text-align: center;
@@ -339,9 +179,10 @@ body {
 
   .layout {
     flex-direction: column;
+    padding: 10px;
   }
 
-  /* Navigationsleiste oben festpinnen */
+  /* Fixierte Navigationsleiste oben */
   .side-nav {
     width: 100%;
     position: fixed;
@@ -352,6 +193,7 @@ body {
     z-index: 9999;
     max-height: none;
     padding: 0;
+    border-radius: 0;
   }
 
   .menu-toggle {
@@ -369,22 +211,33 @@ body {
 
   .nav-list {
     display: none;
-    padding: 10px;
+    padding: 0;
     margin: 0;
     list-style: none;
     background: var(--nav);
   }
 
+  /* Aufklappbarer & scrollbarer Bereich des Handymenüs */
   .nav-list.is-open {
     display: block;
-    max-height: calc(100vh - 60px); /* Nutzt die verfügbare Bildschirmhöhe */
-    overflow-y: auto;               /* Macht das Menü in sich scrollbar */
-    -webkit-overflow-scrolling: touch; /* Garantiert weiches Scrollen auf iPhones */
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Silbentrennung & Größenanpassung für Mobil-Überschriften */
+  .content h1,
+  .content h2,
+  .content h3 {
+    font-size: 1.4rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
   }
 
   .content {
     width: 100%;
-    padding: 26px 22px;
+    padding: 15px;
   }
 
   .content .float-left,
@@ -418,47 +271,21 @@ body {
   }
 }
 
-/* Plus-Symbole mit rechteckigem Hintergrund versehen */
-.side-nav summary::after {
-  content: "+";
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1.1em;
-  font-weight: bold;
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 4px;
-  width: 26px;
-  height: 26px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
+/* ==========================================================================
+   6. FEINJUSTIERUNG AUSRICHTUNG (EXAKT LINKSBÜNDIG)
+   ========================================================================== */
+.side-nav ul {
+  padding-left: 0 !important;
+  margin: 0 !important;
 }
 
-/* Aus dem Plus-Kästchen wird beim Öffnen ein Minus-Kästchen */
-.side-nav details[open] > summary::after {
-  content: "−";
-  background: rgba(255, 255, 255, 0.35);
-}
-/* Erzwingt gleiche Ausrichtung für alle Menüpunkte links */
-.side-nav ul, 
 .side-nav li {
-  margin: 0;
-  padding: 0;
   list-style: none;
 }
 
-.side-nav a, 
-.side-nav summary {
-  padding-left: 15px !important; /* Alle Textanfänge auf dieselbe Linie setzen */
+.side-nav > ul > li > a,
+.side-nav > ul > li > details > summary {
+  padding-left: 18px !important;
   text-align: left !important;
   box-sizing: border-box;
-}
-
-/* Untermenü-Punkte leicht einrücken, damit die Hierarchie klar bleibt */
-.side-nav details ul li a {
-  padding-left: 30px !important;
 }
