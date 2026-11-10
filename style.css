@@ -443,3 +443,22 @@ body {
   content: "−";
   background: rgba(255, 255, 255, 0.35);
 }
+/* Erzwingt gleiche Ausrichtung für alle Menüpunkte links */
+.side-nav ul, 
+.side-nav li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.side-nav a, 
+.side-nav summary {
+  padding-left: 15px !important; /* Alle Textanfänge auf dieselbe Linie setzen */
+  text-align: left !important;
+  box-sizing: border-box;
+}
+
+/* Untermenü-Punkte leicht einrücken, damit die Hierarchie klar bleibt */
+.side-nav details ul li a {
+  padding-left: 30px !important;
+}
