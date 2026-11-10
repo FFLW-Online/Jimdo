@@ -73,13 +73,13 @@ html, body {
   max-width: 1100px;
   margin: 0 auto;
   padding: 0 25px;
-  background-color: #ffffff; /* Zusammenhängende weiße Fläche hinter Navigation und Inhalt */
+  background-color: #ffffff;
   gap: 20px;
   align-items: flex-start;
 }
 
 /* ==========================================================================
-   3. NAVIGATION (STRENG LINKSBÜNDIG & FEHLERFREI SANIERT)
+   3. NAVIGATION (BOMBENFEST LINKSBÜNDIG + WEISSE SUBMENÜ-SCHRIFT)
    ========================================================================== */
 .side-nav {
   width: 250px;
@@ -91,7 +91,7 @@ html, body {
 }
 
 .menu-toggle {
-  display: none; /* Auf Desktop ausgeblendet */
+  display: none;
 }
 
 .nav-list,
@@ -121,14 +121,13 @@ html, body {
   list-style: none !important;
   position: relative;
   margin: 0 !important;
-  padding: 10px 18px !important; /* Exakt 18px Abstand nach links */
+  padding: 10px 18px !important;
   color: #ffffff;
   font-weight: bold;
   text-align: left !important;
   box-sizing: border-box;
 }
 
-/* Entfernt den unsichtbaren Standard-Browser-Pfeil */
 .side-nav details summary::-webkit-details-marker,
 .side-nav details summary::marker {
   display: none !important;
@@ -136,11 +135,12 @@ html, body {
 }
 
 /* 3.2 Normale Direkt-Links ausrichten */
-.nav-list > li > a {
+.nav-list > li > a,
+.nav-list > li > a:visited {
   display: block;
-  padding: 10px 18px !important; /* Exakt 18px Abstand nach links */
+  padding: 10px 18px !important;
   margin: 0 !important;
-  color: #ffffff;
+  color: #ffffff !important;
   text-decoration: none;
   font-weight: bold;
   text-align: left !important;
@@ -148,11 +148,12 @@ html, body {
 }
 
 /* 3.3 Doppel-Padding bei Links innerhalb von <summary> unterbinden */
-.side-nav details summary a {
+.side-nav details summary a,
+.side-nav details summary a:visited {
   display: inline-block;
-  padding: 0 !important; /* Kein eigenes Padding, erbt 18px von <summary> */
+  padding: 0 !important;
   margin: 0 !important;
-  color: #ffffff;
+  color: #ffffff !important;
   text-decoration: none;
   font-weight: bold;
 }
@@ -162,7 +163,7 @@ html, body {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Flexbox für Übersetzungstool (einzeilig) */
+/* Flexbox für Übersetzungstool */
 .nav-link-flex {
   display: flex !important;
   align-items: center;
@@ -194,14 +195,22 @@ html, body {
   100% { transform: translateX(-50%); }
 }
 
-/* 3.4 Sub-Menüs (Unterpunkte) gezielt einrücken */
-.side-nav details ul li a {
+/* 3.4 Sub-Menüs (Unterpunkte) gezielt einrücken & auf leuchtendes Weiß zwingen */
+.side-nav details ul li a,
+.side-nav details ul li a:visited {
   display: block;
-  padding-left: 32px !important; /* Nur Unterpunkte rücken weiter nach rechts */
+  padding-left: 32px !important;
   padding-top: 8px !important;
   padding-bottom: 8px !important;
   font-weight: normal;
   font-size: 0.95rem;
+  color: #ffffff !important;
+  text-decoration: none;
+}
+
+.side-nav details ul li a:hover {
+  color: #ffd700 !important;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Plus- & Minus-Kästchen im Menü */
@@ -256,13 +265,12 @@ html, body {
 .contact-block {
   max-width: 1100px;
   margin: 0 auto;
-  background-color: var(--primary-color); /* Blaue Farbe wie die Navigation */
+  background-color: var(--primary-color);
   color: #ffffff;
   padding: 30px;
 }
 
 @media (min-width: 768px) {
-  /* Liegt auf Desktop als blaue Box INMITTEN der weißen Gesamtfläche */
   .contact-block {
     background-color: var(--primary-color);
     border-left: 25px solid #ffffff;
@@ -285,7 +293,6 @@ html, body {
   color: #ffd700;
 }
 
-/* Zentrierter Flaschenpost-Button / Titel */
 .flaschenpost-title {
   display: inline-block;
   background-color: #1a237e;
@@ -301,7 +308,7 @@ html, body {
   max-width: 1100px;
   margin: 0 auto;
   padding: 15px 25px 25px 25px;
-  background-color: #ffffff; /* Schließt nahtlos unten weiß ab */
+  background-color: #ffffff;
   text-align: left;
   font-size: 0.85rem;
   color: #666666;
@@ -317,7 +324,7 @@ html, body {
   text-decoration: underline;
 }
 
-/* SCHATTEN FÜR DEN EINZIGEN WEISSEN GESAMTKASTEN (DESKTOP) */
+/* SCHATTEN FÜR DEN WEISSEN GESAMTKASTEN (DESKTOP) */
 @media (min-width: 768px) {
   .site-header {
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
