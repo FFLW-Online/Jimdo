@@ -26,9 +26,10 @@ html, body {
   overflow-x: hidden; /* Verhindert seitliches Verziehen der gesamten Seite */
 }
 
-/* Desktop (ab 768px): Hintergrundbild aus Nostalgiegründen beibehalten */
+/* Desktop (ab 768px): Hintergrundbild auf html UND body aktivieren */
 @media (min-width: 768px) {
   html, body {
+    background-color: #e6ecf2; /* Fallback-Farbe falls Bildpfad abweicht */
     background-image: url('assets/images/hintergrund.jpg'); /* PFAD ANPASSEN falls abweichend */
     background-repeat: no-repeat;
     background-size: cover;
@@ -106,6 +107,42 @@ html, body {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
+/* Einzeilige Ausrichtung für Menüpunkt mit Flaggen */
+.nav-item-flex {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 14px;
+}
+
+.nav-item-flex a {
+  padding-right: 6px !important;
+}
+
+/* Kompaktes Flaggen-Fenster auf gleicher Zeile (ca. 2 Flaggen sichtbar) */
+.flag-carousel-inline {
+  display: inline-flex;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 44px; /* Breite für ca. 2 Flaggen */
+  pointer-events: none;
+}
+
+.flag-track-inline {
+  display: inline-block;
+  animation: flag-scroll 8s linear infinite;
+}
+
+.flag-track-inline span {
+  font-size: 1rem;
+  margin-right: 3px;
+}
+
+@keyframes flag-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* Aufklappbare Sub-Menüs (<details> & <summary>) */
 .side-nav details summary {
   padding: 10px 18px;
@@ -156,29 +193,6 @@ html, body {
 .side-nav details[open] > summary::after {
   content: "−";
   background: rgba(255, 255, 255, 0.35);
-}
-
-/* Flaggen-Laufband im Menü (Unter dem ÜbersetzungsTool) */
-.flag-carousel {
-  overflow: hidden;
-  white-space: nowrap;
-  padding: 6px 18px;
-  opacity: 0.9;
-}
-
-.flag-track {
-  display: inline-block;
-  animation: flag-scroll 10s linear infinite;
-}
-
-.flag-track span {
-  font-size: 1.1rem;
-  margin-right: 6px;
-}
-
-@keyframes flag-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
 }
 
 /* ==========================================================================
