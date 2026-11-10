@@ -20,36 +20,34 @@
     <main class="content">
       <h2>Schreib uns.</h2>
       
-      <!-- Kontaktformular via Formspree -->
-      <form action="https://formspree.io/f/xknpzgvq" method="POST" class="contact-form">
-        <!-- Versteckte Weiterleitung an eure E-Mail -->
-        <input type="hidden" name="_to" value="Kontakt@freundeleuwi.org">
-        <input type="hidden" name="_subject" value="Neue Nachricht über das Kontaktformular">
-
+      <!-- Mailto-Formular ohne Fremdanbieter -->
+      <form action="mailto:Kontakt@freundeleuwi.org" method="post" enctype="text/plain" class="contact-form">
         <p>
-          <label for="name"><strong>Name *</strong></label><br>
-          <input type="text" id="name" name="name" required style="width: 100%; max-width: 400px; padding: 8px;">
+          <label for="name"><strong>Dein Name *</strong></label><br>
+          <input type="text" id="name" name="Name" required style="width: 100%; max-width: 400px; padding: 8px;">
         </p>
 
         <p>
-          <label for="email"><strong>E-Mail *</strong></label><br>
-          <input type="email" id="email" name="email" required style="width: 100%; max-width: 400px; padding: 8px;">
+          <label for="email"><strong>Deine E-Mail-Adresse *</strong></label><br>
+          <input type="email" id="email" name="E-Mail" required style="width: 100%; max-width: 400px; padding: 8px;">
         </p>
 
         <p>
           <label for="message"><strong>Deine Nachricht für uns *</strong></label><br>
-          <textarea id="message" name="message" rows="6" required style="width: 100%; max-width: 500px; padding: 8px;"></textarea>
+          <textarea id="message" name="Nachricht" rows="6" required style="width: 100%; max-width: 500px; padding: 8px;"></textarea>
         </p>
 
         <p>
-          <small>Es gilt die <a href="datenschutz.html" target="_blank">Datenschutzerklärung</a>.</small>
+          <small>Es gilt unsere <a href="datenschutz.html" target="_blank">Datenschutzerklärung</a>.</small>
         </p>
 
         <p>
-          <button type="submit" class="button" style="padding: 10px 20px; cursor: pointer;">Absenden</button>
+          <button type="submit" class="button" style="padding: 10px 20px; cursor: pointer; background-color: #0056b3; color: white; border: none; border-radius: 4px;">
+            In E-Mail-Programm öffnen &amp; absenden
+          </button>
         </p>
 
-        <p><small><strong>Hinweis:</strong> Bitte die mit * gekennzeichneten Felder ausfüllen.</small></p>
+        <p><small><strong>Hinweis:</strong> Beim Klick öffnet sich dein E-Mail-Programm mit deinen eingetragenen Daten.</small></p>
       </form>
     </main>
   </div>
