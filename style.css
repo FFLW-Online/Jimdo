@@ -26,15 +26,19 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Desktop (ab 768px): Hintergrundbild auf HTML & BODY aktivieren */
+/* Desktop (ab 768px): Hintergrundbild auf HTML/BODY aktivieren */
 @media (min-width: 768px) {
-  html, body {
-    background-color: #dce6f2; /* Fallback-Farbe */
+  html {
+    background-color: #dce6f2;
     background-image: url('assets/images/garten-hintergrundbild.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
     background-position: center center;
+  }
+  
+  body {
+    background: transparent; /* Body transparent halten, damit das Gartenbild in den Zwischenräumen durchscheint */
   }
 }
 
@@ -50,9 +54,12 @@ html, body {
    2. HEADER & LAYOUT (DESKTOP)
    ========================================================================== */
 .site-header {
+  max-width: 1200px;
+  margin: 20px auto 0 auto;
   padding: 20px;
   text-align: center;
   background-color: #ffffff;
+  border-radius: 4px 4px 0 0;
 }
 
 .site-header img {
@@ -64,12 +71,13 @@ html, body {
   display: flex;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-  gap: 20px;
+  padding: 0 20px 20px 20px;
+  gap: 20px; /* Sichtbare Lücke zwischen blauem Menü und weißem Inhalt */
+  align-items: flex-start;
 }
 
 /* ==========================================================================
-   3. NAVIGATION (STRENG LINKSBÜNDIG & KLICKBAR)
+   3. NAVIGATION (DESKTOP & CENTRAL)
    ========================================================================== */
 .side-nav {
   width: 260px;
@@ -78,6 +86,7 @@ html, body {
   color: #ffffff;
   padding: 10px 0;
   border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .menu-toggle {
@@ -95,7 +104,6 @@ html, body {
   list-style: none;
 }
 
-/* Strenge Ausrichtung: Haupt-Links exakt linksbündig ab 18px */
 .nav-list a,
 .side-nav details summary {
   display: block;
@@ -111,7 +119,7 @@ html, body {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Klickbarer Flexbox-Link für Übersetzungstool (exakt auf der linken Linie) */
+/* Klickbarer Flexbox-Link für Übersetzungstool */
 .nav-link-flex {
   display: flex !important;
   align-items: center;
@@ -163,7 +171,7 @@ html, body {
 }
 
 .side-nav details ul li a {
-  padding-left: 32px !important; /* Einrückung für Unterpunkte */
+  padding-left: 32px !important;
   font-weight: normal;
   font-size: 0.95rem;
 }
@@ -194,13 +202,15 @@ html, body {
 }
 
 /* ==========================================================================
-   4. INHALTSBEREICH (CONTENT)
+   4. INHALTSBEREICH (EIGENER WEISSER BLOCK MIT SCHATTEN)
    ========================================================================== */
 .content {
   flex-grow: 1;
   background: #ffffff;
-  padding: 20px;
+  padding: 30px;
   min-width: 0;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Eigenständige weiße Karte */
 }
 
 .content h1,
@@ -224,6 +234,7 @@ html, body {
   background-color: var(--primary-color);
   color: #ffffff;
   border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .contact-block p {
@@ -243,12 +254,13 @@ html, body {
 .legal-footer {
   text-align: center;
   padding: 20px;
-  color: #666666;
+  color: #ffffff; /* Auf Hintergrundbild weiß & gut lesbar */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .legal-footer a {
-  color: var(--primary-color);
-  text-decoration: none;
+  color: #ffffff;
+  text-decoration: underline;
 }
 
 /* ==========================================================================
@@ -257,16 +269,19 @@ html, body {
 @media (max-width: 767px) {
   body {
     padding-top: 60px;
+    background-color: #ffffff;
   }
 
   .site-header {
+    margin: 0;
     padding: 10px 15px;
-    text-align: center;
+    border-radius: 0;
   }
 
   .layout {
     flex-direction: column;
     padding: 10px;
+    gap: 0;
   }
 
   .side-nav {
@@ -329,6 +344,8 @@ html, body {
   .content {
     width: 100%;
     padding: 15px 10px;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .content .float-left,
@@ -343,5 +360,15 @@ html, body {
   .contact-block {
     margin: 20px 10px;
     padding: 20px 15px;
+    border-radius: 0;
+  }
+
+  .legal-footer {
+    color: #666666;
+    text-shadow: none;
+  }
+
+  .legal-footer a {
+    color: var(--primary-color);
   }
 }
