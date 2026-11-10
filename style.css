@@ -14,7 +14,7 @@
   box-sizing: border-box;
 }
 
-/* Mobil: Mobilansicht schlicht weiß halten */
+/* Mobil: Schlicht weißer Hintergrund */
 html, body {
   margin: 0;
   padding: 0;
@@ -26,15 +26,16 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Desktop (ab 768px): Hintergrundbild auf html UND body aktivieren */
+/* Desktop (ab 768px): Hintergrundbild auf HTML & BODY erzwingen */
 @media (min-width: 768px) {
   html, body {
     background-color: #dce6f2; /* Fallback-Farbe */
-    background-image: url('assets/images/hintergrund.jpg'); /* PFAD ANPASSEN falls abweichend */
+    /* TIPP: Falls das Bild nicht erscheint, bitte den Dateinamen (z.B. .jpg / .png) in deinem Ordner prüfen! */
+    background-image: url('./assets/images/hintergrund.jpg'), url('assets/images/hintergrund.jpg');
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed;
-    background-position: center;
+    background-position: center center;
   }
 }
 
@@ -69,7 +70,7 @@ html, body {
 }
 
 /* ==========================================================================
-   3. NAVIGATION (DESKTOP & CENTRAL)
+   3. NAVIGATION (STRENG LINKSBÜNDIG & KLICKBAR)
    ========================================================================== */
 .side-nav {
   width: 260px;
@@ -86,28 +87,32 @@ html, body {
 
 .nav-list {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .nav-list li {
   position: relative;
+  list-style: none;
 }
 
-.nav-list a {
+/* Strenge Ausrichtung: Haupt-Links exakt linksbündig ab 18px */
+.nav-list a,
+.side-nav details summary {
   display: block;
-  padding: 10px 18px;
+  padding: 10px 18px !important;
   color: #ffffff;
   text-decoration: none;
   font-weight: bold;
+  text-align: left !important;
 }
 
 .nav-list a:hover,
-.nav-list summary:hover {
+.side-nav details summary:hover {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Klickbarer Flexbox-Link für Übersetzungstool inkl. Flaggen */
+/* Klickbarer Flexbox-Link für Übersetzungstool (exakt auf der linken Linie) */
 .nav-link-flex {
   display: flex !important;
   align-items: center;
@@ -115,13 +120,13 @@ html, body {
   width: 100%;
 }
 
-/* Kompaktes Flaggen-Fenster auf gleicher Zeile (ca. 3 Flaggen sichtbar) */
+/* Kompaktes Flaggen-Fenster (3 Flaggen parallel) */
 .flag-carousel-inline {
   display: inline-flex;
   overflow: hidden;
   white-space: nowrap;
-  width: 65px; /* Erhöht auf 65px für ca. 3 Flaggen gleichzeitig */
-  margin-left: 8px;
+  width: 65px;
+  margin-left: 6px;
   flex-shrink: 0;
 }
 
@@ -142,9 +147,6 @@ html, body {
 
 /* Aufklappbare Sub-Menüs (<details> & <summary>) */
 .side-nav details summary {
-  padding: 10px 18px;
-  color: #ffffff;
-  font-weight: bold;
   cursor: pointer;
   list-style: none;
   position: relative;
@@ -156,13 +158,13 @@ html, body {
 
 .side-nav details ul {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 0 !important;
+  margin: 0 !important;
   background-color: rgba(0, 0, 0, 0.15);
 }
 
 .side-nav details ul li a {
-  padding-left: 32px !important;
+  padding-left: 32px !important; /* Einrückung für Unterpunkte */
   font-weight: normal;
   font-size: 0.95rem;
 }
@@ -199,7 +201,7 @@ html, body {
   flex-grow: 1;
   background: #ffffff;
   padding: 20px;
-  min-width: 0; /* Verhindert, dass Flexbox-Elemente durch lange Texte gesprengt werden */
+  min-width: 0;
 }
 
 .content h1,
@@ -231,7 +233,7 @@ html, body {
 }
 
 .contact-block a {
-  color: #ffd700; /* Gut lesbares Gold-Gelb auf Dunkelblau */
+  color: #ffd700;
   text-decoration: underline;
 }
 
@@ -251,11 +253,11 @@ html, body {
 }
 
 /* ==========================================================================
-   6. MOBILE RESPONSIVENESS (BILD SCHMALER ALS 768PX)
+   6. MOBILE RESPONSIVENESS (SCHMALER ALS 768PX)
    ========================================================================== */
 @media (max-width: 767px) {
   body {
-    padding-top: 60px; /* Platzhalter für den fixierten blauen Menübalken */
+    padding-top: 60px;
   }
 
   .site-header {
@@ -268,7 +270,6 @@ html, body {
     padding: 10px;
   }
 
-  /* Fixierte Navigationsleiste oben */
   .side-nav {
     width: 100%;
     position: fixed;
@@ -303,7 +304,6 @@ html, body {
     background: var(--nav);
   }
 
-  /* Aufklappbarer & scrollbarer Bereich des Handymenüs */
   .nav-list.is-open {
     display: block;
     max-height: calc(100vh - 60px);
@@ -311,7 +311,6 @@ html, body {
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Alle Inhalts-Überschriften auf Mobilgeräten auf einheitliche Hauptgröße setzen */
   .content h1,
   .content h2,
   .content h3 {
@@ -323,6 +322,7 @@ html, body {
     overflow-wrap: break-word;
     hyphens: auto;
   }
+
   .content h4 {
     font-size: 1.2rem !important;
   }
@@ -341,43 +341,8 @@ html, body {
     margin: 0 0 18px;
   }
 
-  .sponsor-grid {
-    grid-template-columns: 1fr;
-  }
-
   .contact-block {
     margin: 20px 10px;
     padding: 20px 15px;
   }
-
-  .language-table,
-  .language-table tbody,
-  .language-table tr,
-  .language-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .language-table td + td {
-    border-top: 0;
-  }
-}
-
-/* ==========================================================================
-   7. FEINJUSTIERUNG AUSRICHTUNG (EXAKT LINKSBÜNDIG)
-   ========================================================================== */
-.side-nav ul {
-  padding-left: 0 !important;
-  margin: 0 !important;
-}
-
-.side-nav li {
-  list-style: none;
-}
-
-.side-nav > ul > li > a,
-.side-nav > ul > li > details > summary {
-  padding-left: 18px !important;
-  text-align: left !important;
-  box-sizing: border-box;
 }
