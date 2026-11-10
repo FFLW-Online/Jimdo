@@ -14,7 +14,7 @@
   box-sizing: border-box;
 }
 
-/* Mobil: Keines oder schlichtes Hintergrundbild für bessere Lesbarkeit */
+/* Mobil: Mobilansicht schlicht weiß halten */
 html, body {
   margin: 0;
   padding: 0;
@@ -23,13 +23,13 @@ html, body {
   background-color: var(--bg-color);
   background-image: none;
   line-height: 1.6;
-  overflow-x: hidden; /* Verhindert seitliches Verziehen der gesamten Seite */
+  overflow-x: hidden;
 }
 
 /* Desktop (ab 768px): Hintergrundbild auf html UND body aktivieren */
 @media (min-width: 768px) {
   html, body {
-    background-color: #e6ecf2; /* Fallback-Farbe falls Bildpfad abweicht */
+    background-color: #dce6f2; /* Fallback-Farbe */
     background-image: url('assets/images/hintergrund.jpg'); /* PFAD ANPASSEN falls abweichend */
     background-repeat: no-repeat;
     background-size: cover;
@@ -107,25 +107,22 @@ html, body {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Einzeilige Ausrichtung für Menüpunkt mit Flaggen */
-.nav-item-flex {
+/* Klickbarer Flexbox-Link für Übersetzungstool inkl. Flaggen */
+.nav-link-flex {
   display: flex !important;
   align-items: center;
   justify-content: space-between;
-  padding-right: 14px;
+  width: 100%;
 }
 
-.nav-item-flex a {
-  padding-right: 6px !important;
-}
-
-/* Kompaktes Flaggen-Fenster auf gleicher Zeile (ca. 2 Flaggen sichtbar) */
+/* Kompaktes Flaggen-Fenster auf gleicher Zeile (ca. 3 Flaggen sichtbar) */
 .flag-carousel-inline {
   display: inline-flex;
   overflow: hidden;
   white-space: nowrap;
-  width: 44px; /* Breite für ca. 2 Flaggen */
-  pointer-events: none;
+  width: 65px; /* Erhöht auf 65px für ca. 3 Flaggen gleichzeitig */
+  margin-left: 8px;
+  flex-shrink: 0;
 }
 
 .flag-track-inline {
@@ -135,7 +132,7 @@ html, body {
 
 .flag-track-inline span {
   font-size: 1rem;
-  margin-right: 3px;
+  margin-right: 4px;
 }
 
 @keyframes flag-scroll {
@@ -217,7 +214,44 @@ html, body {
 }
 
 /* ==========================================================================
-   5. MOBILE RESPONSIVENESS (BILD SCHMALER ALS 768PX)
+   5. UNTERER KONTAKT-BLOCK ("FLASCHENPOST" WEISS AUF BLAU)
+   ========================================================================== */
+.contact-block {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 30px;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border-radius: 6px;
+}
+
+.contact-block p {
+  margin-bottom: 15px;
+  color: #ffffff;
+}
+
+.contact-block a {
+  color: #ffd700; /* Gut lesbares Gold-Gelb auf Dunkelblau */
+  text-decoration: underline;
+}
+
+.contact-block a:hover {
+  color: #ffffff;
+}
+
+.legal-footer {
+  text-align: center;
+  padding: 20px;
+  color: #666666;
+}
+
+.legal-footer a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   6. MOBILE RESPONSIVENESS (BILD SCHMALER ALS 768PX)
    ========================================================================== */
 @media (max-width: 767px) {
   body {
@@ -311,9 +345,9 @@ html, body {
     grid-template-columns: 1fr;
   }
 
-  .contact-block,
-  .legal-footer {
-    padding: 24px 22px;
+  .contact-block {
+    margin: 20px 10px;
+    padding: 20px 15px;
   }
 
   .language-table,
@@ -330,7 +364,7 @@ html, body {
 }
 
 /* ==========================================================================
-   6. FEINJUSTIERUNG AUSRICHTUNG (EXAKT LINKSBÜNDIG)
+   7. FEINJUSTIERUNG AUSRICHTUNG (EXAKT LINKSBÜNDIG)
    ========================================================================== */
 .side-nav ul {
   padding-left: 0 !important;
