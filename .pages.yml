@@ -1,22 +1,27 @@
 media:
   input: assets/images
   output: assets/images
+
 content:
   - name: startseite
     label: "Startseite"
     type: file
     path: index.html
     format: frontmatter
+
     fields:
       - name: title
         label: "Hauptüberschrift"
         type: string
+
       - name: intro
         label: "Einleitungstext"
         type: textarea
+
       - name: hero_image
         label: "Titelbild / Hauptbild"
         type: image
-         name: body
+
+      - name: body
         label: "Haupttext der Seite"
         type: rich-text
