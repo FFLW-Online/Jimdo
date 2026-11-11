@@ -6,6 +6,7 @@ content:
   - label: "Seiten & Veranstaltungen"
     type: collection
     path: ""
+    match: "*.html"
     format: html/frontmatter
     exclude: ["index.html", "impressum.html", "datenschutz.html"]
     fields:
