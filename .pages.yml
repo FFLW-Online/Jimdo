@@ -7,7 +7,7 @@ content:
     label: "Startseite"
     type: file
     path: /index.html
-    format: html/frontmatter
+    format: frontmatter
     fields:
       - name: title
         label: "Hauptüberschrift"
