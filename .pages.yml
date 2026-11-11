@@ -21,3 +21,26 @@ content:
       - name: hero_image
         label: "Titelbild / Hauptbild"
         type: image
+
+      - name: body
+        label: "Haupttext der Seite"
+        type: rich-text
+
+  - name: test
+    label: "Test"
+    type: file
+    path: test.md
+    format: frontmatter
+
+    fields:
+      - name: title
+        label: "Titel"
+        type: string
+
+      - name: intro
+        label: "Intro"
+        type: textarea
+
+      - name: body
+        label: "Inhalt"
+        type: rich-text
