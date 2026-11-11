@@ -12,12 +12,11 @@ content:
       - name: title
         label: "Hauptüberschrift"
         type: string
+
       - name: intro
         label: "Einleitungstext"
         type: textarea
+
       - name: hero_image
         label: "Titelbild / Hauptbild"
         type: image
-      - name: body
-        label: "Haupttext der Seite"
-        type: rich-text
