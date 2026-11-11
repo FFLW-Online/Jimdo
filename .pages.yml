@@ -3,16 +3,12 @@ media:
   output: assets/images
 
 content:
-  - label: "Seiten & Veranstaltungen"
-    type: collection
-    path: ""
-    match: "*.html"
+  - name: startseite
+    label: "Startseite"
+    type: file
+    path: index.html
     format: html/frontmatter
-    exclude: ["index.html", "impressum.html", "datenschutz.html"]
     fields:
-      - label: "Titel der Seite"
-        name: title
-        type: string
-      - label: "Inhalt (Haupttext)"
-        name: body
+      - name: body
+        label: "Seiteninhalt"
         type: rich-text
