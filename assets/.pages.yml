@@ -3,11 +3,21 @@ media:
   output: assets/images
 
 content:
-  - label: "Seiten"
-    type: collection
-    path: ""
-    format: html
+  - name: startseite
+    label: "Startseite"
+    type: file
+    path: index.html
+    format: html/frontmatter
     fields:
-      - label: "Inhalt"
-        name: body
+      - name: title
+        label: "Hauptüberschrift"
+        type: string
+      - name: intro
+        label: "Einleitungstext"
+        type: textarea
+      - name: hero_image
+        label: "Titelbild / Hauptbild"
+        type: image
+      - name: body
+        label: "Haupttext der Seite"
         type: rich-text
