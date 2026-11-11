@@ -6,7 +6,7 @@ content:
   - name: startseite
     label: "Startseite"
     type: file
-    path: index.html
+    path: /index.html
     format: html/frontmatter
     fields:
       - name: title
