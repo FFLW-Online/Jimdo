@@ -21,7 +21,3 @@ content:
       - name: hero_image
         label: "Titelbild / Hauptbild"
         type: image
-
-      - name: body
-        label: "Haupttext der Seite"
-        type: rich-text
