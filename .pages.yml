@@ -7,8 +7,7 @@ content:
     label: "Startseite"
     type: file
     path: index.html
-    format: frontmatter
-
+    format: yaml-frontmatter
     fields:
       - name: title
         label: "Hauptüberschrift"
@@ -16,30 +15,32 @@ content:
 
       - name: intro
         label: "Einleitungstext"
-        type: textarea
+        type: text
 
       - name: hero_image
         label: "Titelbild / Hauptbild"
         type: image
 
       - name: body
-        label: "Haupttext der Seite"
+        label: "HTML-Inhalt der Seite"
         type: rich-text
+        options:
+          format: html
+          switcher: true
 
   - name: test
     label: "Test"
     type: file
     path: test.md
-    format: frontmatter
-
+    format: yaml-frontmatter
     fields:
       - name: title
         label: "Titel"
         type: string
 
       - name: intro
-        label: "Intro"
-        type: textarea
+        label: "Einleitung"
+        type: text
 
       - name: body
         label: "Inhalt"
