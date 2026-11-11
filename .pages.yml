@@ -9,6 +9,15 @@ content:
     path: index.html
     format: html/frontmatter
     fields:
+      - name: title
+        label: "Hauptüberschrift"
+        type: string
+      - name: intro
+        label: "Einleitungstext"
+        type: textarea
+      - name: hero_image
+        label: "Titelbild / Hauptbild"
+        type: image
       - name: body
-        label: "Seiteninhalt"
+        label: "Haupttext der Seite"
         type: rich-text
