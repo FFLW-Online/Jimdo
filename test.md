@@ -1,2 +1,6 @@
-title: BANANE intro: APFEL
+---
+title: BANANE
+intro: APFEL
+---
+
 Das ist ein Test.
