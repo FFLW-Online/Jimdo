@@ -1,0 +1,13 @@
+media:
+  input: assets/images
+  output: assets/images
+
+content:
+  - label: "Seiten"
+    type: collection
+    path: ""
+    format: html
+    fields:
+      - label: "Inhalt"
+        name: body
+        type: rich-text
