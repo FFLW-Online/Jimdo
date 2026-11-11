@@ -28,20 +28,27 @@ content:
           format: html
           switcher: true
 
-  - name: test
-    label: "Test"
+  - name: lernseite
+    label: "🧪 LERNSEITE – gefahrloser Test"
     type: file
-    path: test.md
+    path: pages-cms-lernseite.html
     format: yaml-frontmatter
     fields:
       - name: title
-        label: "Titel"
+        label: "Hauptüberschrift"
         type: string
 
       - name: intro
-        label: "Einleitung"
+        label: "Einleitungstext"
         type: text
 
+      - name: hero_image
+        label: "Titelbild / Hauptbild"
+        type: image
+
       - name: body
-        label: "Inhalt"
+        label: "HTML-Inhalt der Lernseite"
         type: rich-text
+        options:
+          format: html
+          switcher: true
