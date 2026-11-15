@@ -41,7 +41,6 @@ document.addEventListener("DOMContentLoaded", function () {
         translateBox.style.backgroundColor = "rgba(0, 0, 0, 0.2)";
         translateBox.style.borderBottom = "1px solid rgba(255, 255, 255, 0.15)";
         
-        // Auf Desktop ganz oben ins Menü, auf Mobil unter den Menü-Button setzen
         if (navList) {
           navContainer.insertBefore(translateBox, navList);
         } else {
@@ -56,17 +55,14 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch(error => console.error(error));
   }
 
-  // 4. GoatCounter Besucherzähler (Cookie-frei & DSGVO-konform)
-  // HIER DEINEN GOATCOUNTER-NAMEN EINTRAGEN (z.B. 'fflw' für fflw.goatcounter.com):
-  const goatCounterSite = "DEIN_GOATCOUNTER_CODE"; 
+  // 4. GoatCounter Besucherzähler für "fflw" (Cookie-frei & DSGVO-konform)
+  const goatCounterSite = "fflw"; 
   
-  if (goatCounterSite !== "DEIN_GOATCOUNTER_CODE") {
-    const gcScript = document.createElement("script");
-    gcScript.async = true;
-    gcScript.src = "//gc.zgo.at/count.js";
-    gcScript.setAttribute("data-goatcounter", `https://${goatCounterSite}.goatcounter.com/count`);
-    document.body.appendChild(gcScript);
-  }
+  const gcScript = document.createElement("script");
+  gcScript.async = true;
+  gcScript.src = "//gc.zgo.at/count.js";
+  gcScript.setAttribute("data-goatcounter", `https://${goatCounterSite}.goatcounter.com/count`);
+  document.body.appendChild(gcScript);
 });
 
 // Initialisierungsfunktion für Google Translate
