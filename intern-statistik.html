@@ -8,6 +8,19 @@
   <link rel="stylesheet" href="style.css">
   <script src="nav-loader.js" defer></script>
   <style>
+    /* Passwort-Sperre */
+    #auth-gate {
+      max-width: 400px; margin: 40px auto; padding: 25px;
+      background: #f4f7fb; border: 1px solid #ccd6e6; border-radius: 6px; text-align: center;
+    }
+    #auth-gate input {
+      width: 100%; padding: 10px; margin: 12px 0; border: 1px solid #999;
+      border-radius: 4px; font-size: 1rem; box-sizing: border-box;
+    }
+    #auth-error { color: #d9534f; font-weight: bold; display: none; margin-top: 8px; }
+    #protected-content { display: none; }
+
+    /* Statistik-Styling */
     .stats-controls { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
     .stats-btn {
       background: #004080; color: #fff; border: none; padding: 10px 16px;
@@ -33,72 +46,96 @@
 <body>
 
   <header class="site-header">
-    <img src="assets/images/logo.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
   </header>
 
   <div class="layout">
     <nav id="main-nav" class="side-nav" aria-label="Hauptnavigation"></nav>
 
     <main class="content">
-      <h1>Interne Besucher- &amp; Resonanz-Auswertung</h1>
-      <p>Diese Seite ist weder im Menü noch in der Sitemap verlinkt und dient der internen Auswertung von Öffentlichkeitsarbeit (Zeitungsartikel, städtisches Amtsblatt, Events).</p>
-
-      <!-- Zeitraum-Auswahl -->
-      <div class="stats-controls">
-        <button class="stats-btn active" onclick="loadDashboard('day', this)">Heute (Stunden)</button>
-        <button class="stats-btn" onclick="loadDashboard('week', this)">Letzte 7 Tage</button>
-        <button class="stats-btn" onclick="loadDashboard('month', this)">Letzte 30 Tage</button>
-        <button class="stats-btn" onclick="loadDashboard('year', this)">Gesamtjahr</button>
+      <!-- PASSWORT-ABFRAGE -->
+      <div id="auth-gate">
+        <h2>Interner Bereich (SA)</h2>
+        <p>Bitte Passwort eingeben, um die Besucherstatistik anzuzeigen:</p>
+        <form onsubmit="checkAccess(event)">
+          <input type="password" id="sa-password" placeholder="Passwort" required autofocus>
+          <button type="submit" class="stats-btn" style="width: 100%;">Freischalten</button>
+        </form>
+        <div id="auth-error">Falsches Passwort. Bitte erneut versuchen.</div>
       </div>
 
-      <!-- Kennzahlen-Karten -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>Zeitstrahl &amp; Kampagnen</h3>
-          <div class="number" id="total-views">–</div>
+      <!-- GESCHÜTZTER STATISTIK-INHALT -->
+      <div id="protected-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <h1 style="margin: 0;">Interne Besucher- &amp; Resonanz-Auswertung</h1>
+          <button class="stats-btn" style="background: #666; font-size: 0.85rem;" onclick="lockPage()">Sperren</button>
         </div>
-        <div class="stat-card">
-          <h3>Event-Tracking (Kunstnacht &amp; Co.)</h3>
-          <div class="number" id="peak-info" style="font-size: 1rem;"><code>?campaign=Eventname</code></div>
+        <p>Interne Auswertung von Öffentlichkeitsarbeit (Zeitungsartikel, städtisches Amtsblatt, Events).</p>
+
+        <!-- Zeitraum-Auswahl -->
+        <div class="stats-controls">
+          <button class="stats-btn active" onclick="loadDashboard('day', this)">Heute (Stunden)</button>
+          <button class="stats-btn" onclick="loadDashboard('week', this)">Letzte 7 Tage</button>
+          <button class="stats-btn" onclick="loadDashboard('month', this)">Letzte 30 Tage</button>
+          <button class="stats-btn" onclick="loadDashboard('year', this)">Gesamtjahr</button>
         </div>
+
+        <!-- Kennzahlen-Karten -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Zeitstrahl &amp; Kampagnen</h3>
+            <div class="number" id="total-views">–</div>
+          </div>
+          <div class="stat-card">
+            <h3>Event-Tracking (Kunstnacht &amp; Co.)</h3>
+            <div class="number" id="peak-info" style="font-size: 1rem;"><code>?campaign=Eventname</code></div>
+          </div>
+        </div>
+
+        <!-- Wochentags-Analyse (Peak-Finder) -->
+        <h2>Wochentags-Verteilung (Amtsblatt- &amp; Café-Check)</h2>
+        <p>Fokus-Tage rund um das städtische Info-Blatt (Donnerstag) und Treffen:</p>
+        <div id="weekday-chart"></div>
+
+        <!-- Zeitungsartikel & Ereignisse -->
+        <div class="event-box">
+          <h3>Presse- &amp; Event-Meilensteine (Notizen &amp; Kampagnen-Links)</h3>
+          <ul>
+            <li><strong>Regelmäßig Donnerstags:</strong> Erscheinen des städtischen Info-Blatts (<code>?campaign=Infoblatt-Stadt</code>).</li>
+            <li><strong>Sonder-Events (z. B. Kunstnacht Winnenden):</strong> Auf Flyern/QR-Codes einfach <code>?campaign=Kunstnacht-Winnenden</code> an die URL anhängen.</li>
+            <li><strong>15.11.2026:</strong> Start des neuen Layouts &amp; Statistik-Trackings.</li>
+          </ul>
+        </div>
+
+        <!-- Live-Auswertung der wichtigsten Unterseiten -->
+        <h2>Live-Aufrufe nach Unterseiten (Gesamt)</h2>
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Unterseite</th>
+              <th>Gesamtaufrufe</th>
+            </tr>
+          </thead>
+          <tbody id="pages-tbody">
+            <tr><td colspan="2">Lade Daten von GoatCounter...</td></tr>
+          </tbody>
+        </table>
       </div>
-
-      <!-- Wochentags-Analyse (Peak-Finder) -->
-      <h2>Wochentags-Verteilung (Amtsblatt- &amp; Café-Check)</h2>
-      <p>Fokus-Tage rund um das städtische Info-Blatt (Donnerstag) und Treffen:</p>
-      <div id="weekday-chart"></div>
-
-      <!-- Zeitungsartikel & Ereignisse -->
-      <div class="event-box">
-        <h3>Presse- &amp; Event-Meilensteine (Notizen &amp; Kampagnen-Links)</h3>
-        <ul>
-          <li><strong>Regelmäßig Donnerstags:</strong> Erscheinen des städtischen Info-Blatts (<code>?campaign=Infoblatt-Stadt</code>).</li>
-          <li><strong>Sonder-Events (z. B. Kunstnacht Winnenden):</strong> Auf Flyern/QR-Codes einfach <code>?campaign=Kunstnacht-Winnenden</code> an die URL anhängen.</li>
-          <li><strong>15.11.2026:</strong> Start des neuen Layouts &amp; Statistik-Trackings.</li>
-        </ul>
-      </div>
-
-      <!-- Live-Auswertung der wichtigsten Unterseiten -->
-      <h2>Live-Aufrufe nach Unterseiten (Gesamt)</h2>
-      <table class="stats-table">
-        <thead>
-          <tr>
-            <th>Unterseite</th>
-            <th>Gesamtaufrufe</th>
-          </tr>
-        </thead>
-        <tbody id="pages-tbody">
-          <tr><td colspan="2">Lade Daten von GoatCounter...</td></tr>
-        </tbody>
-      </table>
     </main>
   </div>
 
   <footer class="legal-footer">
-    Interne Auswertung | Nicht in der Sitemap gelistet
+    <a href="impressum.html">Impressum</a>
+    |
+    <a href="datenschutz.html">Datenschutz</a>
+    |
+    <a href="sitemap.html">Sitemap</a>
   </footer>
 
   <script>
+    const PASSWORT = "fflw2026";
     const GC_SITE = "fflw";
 
     const trackedPages = [
@@ -109,6 +146,30 @@
       { path: "/Jimdo/fflw-international.html", label: "ÜbersetzungsTool" },
       { path: "/Jimdo/aktuelle-angebote.html", label: "Aktuelle Angebote" }
     ];
+
+    function unlockDashboard() {
+      document.getElementById("auth-gate").style.display = "none";
+      document.getElementById("protected-content").style.display = "block";
+      loadPageCounts();
+      loadDashboard("day", document.querySelector(".stats-controls .stats-btn"));
+    }
+
+    function checkAccess(e) {
+      e.preventDefault();
+      const input = document.getElementById("sa-password").value;
+      if (input === PASSWORT) {
+        sessionStorage.setItem("fflw_sa_unlocked", "true");
+        document.getElementById("auth-error").style.display = "none";
+        unlockDashboard();
+      } else {
+        document.getElementById("auth-error").style.display = "block";
+      }
+    }
+
+    function lockPage() {
+      sessionStorage.removeItem("fflw_sa_unlocked");
+      location.reload();
+    }
 
     function loadPageCounts() {
       const tbody = document.getElementById("pages-tbody");
@@ -131,7 +192,7 @@
     }
 
     function loadDashboard(range, btn) {
-      document.querySelectorAll(".stats-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".stats-controls .stats-btn").forEach(b => b.classList.remove("active"));
       if (btn) btn.classList.add("active");
 
       const periodMap = { day: "day", week: "week", month: "month", year: "year" };
@@ -156,8 +217,9 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      loadPageCounts();
-      loadDashboard("day", document.querySelector(".stats-btn"));
+      if (sessionStorage.getItem("fflw_sa_unlocked") === "true") {
+        unlockDashboard();
+      }
     });
   </script>
 </body>
