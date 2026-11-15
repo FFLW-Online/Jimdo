@@ -1,16 +1,28 @@
 // Globale Funktion zum Wechseln oder Zurücksetzen der Sprache über die Flaggen
 function setLanguage(langCode) {
-  const domain = window.location.hostname;
+  const host = window.location.hostname;
+  const hostParts = host.split('.');
+  const rootDomain = hostParts.length > 1 ? '.' + hostParts.slice(-2).join('.') : host;
+
   if (langCode === "de") {
-    // Cookie löschen -> Zurück zum deutschen Original
-    document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=" + domain + ";";
+    // Alle denkbaren Cookie-Varianten auf Handy & Desktop radikal löschen
+    const paths = ["/", "/Jimdo", "/Jimdo/"];
+    const domains = ["", host, "." + host, rootDomain];
+
+    paths.forEach(p => {
+      domains.forEach(d => {
+        const domainStr = d ? `; domain=${d}` : "";
+        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${p}${domainStr};`;
+      });
+    });
   } else {
-    // Sitzungs-Cookie für die gewählte Sprache setzen (gilt für alle Unterseiten)
-    document.cookie = "googtrans=/de/" + langCode + "; path=/;";
-    document.cookie = "googtrans=/de/" + langCode + "; path=/; domain=" + domain + ";";
+    // Sitzungs-Cookie für die gewählte Sprache setzen
+    document.cookie = `googtrans=/de/${langCode}; path=/;`;
+    document.cookie = `googtrans=/de/${langCode}; path=/; domain=${host};`;
   }
-  window.location.href = "index.html";
+
+  // Sauberes Neuladen der Startseite erzwingen (umgeht Handy-Cache)
+  window.location.replace("index.html");
 }
 
 function googleTranslateElementInit() {
@@ -21,15 +33,23 @@ function googleTranslateElementInit() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Prüfen, ob aktuell eine Fremdsprache per Cookie aktiv ist
   const match = document.cookie.match(/(?:^|;\s*)googtrans=\/de\/([a-zA-Z-]+)/);
   const activeLang = match ? match[1] : null;
 
-  // CSS-Schutz: Verhindert, dass Google oben eine Leiste einblendet und das Handy-Menü verdeckt
+  // CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
   const hideBarStyle = document.createElement("style");
   hideBarStyle.textContent = `
-    .goog-te-banner-frame.skiptranslate, iframe.skiptranslate { display: none !important; }
+    .goog-te-banner-frame.skiptranslate,
+    iframe.skiptranslate,
+    #goog-gt-tt,
+    .goog-te-balloon-frame,
+    .VIpgJd-ZVi9od-aZ2wEe-wOHMyf {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
     body { top: 0 !important; }
+    .goog-text-highlight { background: none !important; box-shadow: none !important; }
   `;
   document.head.appendChild(hideBarStyle);
 
@@ -68,12 +88,23 @@ document.addEventListener("DOMContentLoaded", function () {
           });
         }
 
-        // 3. NUR wenn aktuell übersetzt wird: "🇩🇪 Deutsch"-Reset-Button ins Menü einfügen
+        // 3. NUR wenn aktuell übersetzt wird: "🇩🇪 Deutsch"-Reset-Button ganz oben ins Menü setzen
         if (activeLang && activeLang !== "de" && navList) {
           const resetLi = document.createElement("li");
-          resetLi.style.backgroundColor = "rgba(255, 255, 255, 0.15)";
-          resetLi.style.borderBottom = "1px solid rgba(255, 255, 255, 0.3)";
-          resetLi.innerHTML = `<a href="#" onclick="setLanguage('de'); return false;" class="notranslate" translate="no">🇩🇪 Deutsch (Original)</a>`;
+          resetLi.style.backgroundColor = "#1a237e";
+          resetLi.style.borderBottom = "2px solid #ffd700";
+
+          const resetLink = document.createElement("a");
+          resetLink.href = "index.html";
+          resetLink.className = "notranslate";
+          resetLink.setAttribute("translate", "no");
+          resetLink.textContent = "🇩🇪 Deutsch (Original)";
+          resetLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            setLanguage("de");
+          });
+
+          resetLi.appendChild(resetLink);
           navList.prepend(resetLi);
         }
       })
