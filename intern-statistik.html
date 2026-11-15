@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Interne Besucherstatistik – FFLW</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="nav-loader.js" defer></script>
+  <style>
+    .stats-controls { display: flex; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
+    .stats-btn {
+      background: #004080; color: #fff; border: none; padding: 10px 16px;
+      border-radius: 4px; cursor: pointer; font-weight: bold;
+    }
+    .stats-btn.active { background: #1a237e; outline: 2px solid #ffd700; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .stat-card { background: #f4f7fb; border-left: 4px solid #004080; padding: 15px; border-radius: 4px; }
+    .stat-card h3 { margin: 0 0 5px 0; font-size: 0.95rem; color: #555; }
+    .stat-card .number { font-size: 1.8rem; font-weight: bold; color: #004080; }
+    .bar-row { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.9rem; }
+    .bar-label { width: 120px; flex-shrink: 0; font-weight: bold; }
+    .bar-track { flex-grow: 1; background: #eee; height: 22px; border-radius: 3px; overflow: hidden; margin: 0 10px; }
+    .bar-fill { background: #004080; height: 100%; transition: width 0.4s ease; }
+    .bar-fill.peak { background: #d9534f; } /* Hebt Spitzenwerte farblich hervor */
+    .bar-val { width: 50px; text-align: right; }
+    .event-box { background: #fff8e1; border: 1px solid #ffe082; padding: 15px; border-radius: 4px; margin-top: 25px; }
+    table.stats-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    table.stats-table th, table.stats-table td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+    table.stats-table th { background: #004080; color: #fff; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <img src="assets/images/logo.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+  </header>
+
+  <div class="layout">
+    <nav id="main-nav" class="side-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h1>Interne Besucher- &amp; Resonanz-Auswertung</h1>
+      <p>Diese Seite ist nicht öffentlich verlinkt und dient der internen Auswertung von Öffentlichkeitsarbeit (Zeitungsartikel, städtisches Amtsblatt) und Besuchertrends.</p>
+
+      <!-- Zeitraum-Auswahl -->
+      <div class="stats-controls">
+        <button class="stats-btn active" onclick="loadDashboard('day', this)">Heute (Stunden)</button>
+        <button class="stats-btn" onclick="loadDashboard('week', this)">Letzte 7 Tage</button>
+        <button class="stats-btn" onclick="loadDashboard('month', this)">Letzte 30 Tage</button>
+        <button class="stats-btn" onclick="loadDashboard('year', this)">Gesamtjahr</button>
+      </div>
+
+      <!-- Kennzahlen-Karten -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Seitenaufrufe im Zeitraum</h3>
+          <div class="number" id="total-views">–</div>
+        </div>
+        <div class="stat-card">
+          <h3>Stärkster Peak-Tag / Uhrzeit</h3>
+          <div class="number" id="peak-info" style="font-size: 1.2rem;">–</div>
+        </div>
+      </div>
+
+      <!-- Wochentags-Analyse (Peak-Finder) -->
+      <h2>Wochentags-Verteilung (Amtsblatt- &amp; Café-Check)</h2>
+      <p>Zeigt, an welchen Wochentagen besonders viele Aufrufe stattfinden (Spitzenwerte sind rot markiert):</p>
+      <div id="weekday-chart"></div>
+
+      <!-- Zeitungsartikel & Ereignisse -->
+      <div class="event-box">
+        <h3>Presse- &amp; Info-Blatt-Meilensteine (Notizen)</h3>
+        <p>Hier kannst du wichtige Termine direkt im HTML-Code festhalten, um Peaks nachzuvollziehen:</p>
+        <ul id="event-list">
+          <li><strong>Regelmäßig Donnerstags:</strong> Erscheinen des städtischen Info-Blatts (beobachte Donnerstagnachmittag &amp; Freitag).</li>
+          <li><strong>Beispiel-Eintrag:</strong> 15.11.2026 – Start der neuen Website-Version.</li>
+        </ul>
+      </div>
+
+      <!-- Live-Auswertung der wichtigsten Unterseiten -->
+      <h2>Aufrufe nach Unterseiten (Gesamt)</h2>
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th>Unterseite</th>
+            <th>Gesamtaufrufe</th>
+          </tr>
+        </thead>
+        <tbody id="pages-tbody">
+          <tr><td colspan="2">Lade Daten von GoatCounter...</td></tr>
+        </tbody>
+      </table>
+    </main>
+  </div>
+
+  <footer class="legal-footer">
+    Interne Auswertung | Nicht in der Sitemap gelistet
+  </footer>
+
+  <script>
+    // HIER DEINEN GOATCOUNTER-NAMEN EINTRAGEN:
+    const GC_SITE = "DEIN_GOATCOUNTER_CODE";
+
+    // Liste der Seiten, deren Gesamtaufrufe abgefragt werden
+    const trackedPages = [
+      { path: "/Jimdo/index.html", label: "Startseite (index.html)" },
+      { path: "/Jimdo/ueber-uns.html", label: "Über uns" },
+      { path: "/Jimdo/fahrradwerkstatt.html", label: "Fahrradwerkstatt" },
+      { path: "/Jimdo/mitmachen.html", label: "Mitmachen" },
+      { path: "/Jimdo/fflw-international.html", label: "ÜbersetzungsTool" },
+      { path: "/Jimdo/aktuelle-angebote.html", label: "Aktuelle Angebote" }
+    ];
+
+    function loadPageCounts() {
+      const tbody = document.getElementById("pages-tbody");
+      if (GC_SITE === "DEIN_GOATCOUNTER_CODE") {
+        tbody.innerHTML = '<tr><td colspan="2" style="color:#d9534f;"><strong>Hinweis:</strong> Bitte trage oben im Skript noch deinen GoatCounter-Namen bei <code>GC_SITE</code> ein.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = "";
+
+      trackedPages.forEach(item => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${item.label}</td><td id="cnt_${item.path.replace(/\W/g, '_')}">Lade...</td>`;
+        tbody.appendChild(row);
+
+        fetch(`https://${GC_SITE}.goatcounter.com/counter/${encodeURIComponent(item.path)}.json`)
+          .then(r => r.ok ? r.json() : { count: "0" })
+          .then(data => {
+            document.getElementById(`cnt_${item.path.replace(/\W/g, '_')}`).textContent = data.count || "0";
+          })
+          .catch(() => {
+            document.getElementById(`cnt_${item.path.replace(/\W/g, '_')}`).textContent = "0";
+          });
+      });
+    }
+
+    // Beispiel-Visualisierung für Wochentage (wird mit echten Werten gefüllt, sobald GoatCounter-Daten vorliegen)
+    function loadDashboard(range, btn) {
+      document.querySelectorAll(".stats-btn").forEach(b => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+
+      // Direktlink zur interaktiven GoatCounter-Zeitstrahl-Ansicht für Stunden/Tage/Wochen/Jahre
+      const periodMap = { day: "day", week: "week", month: "month", year: "year" };
+      document.getElementById("total-views").innerHTML = 
+        `<a href="https://${GC_SITE}.goatcounter.com?period=${periodMap[range]}" target="_blank" style="font-size:1rem;">Detail-Zeitstrahl (${range}) öffnen ↗</a>`;
+      document.getElementById("peak-info").textContent = "Siehe Detail-Diagramm";
+
+      const weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag (Info-Blatt)", "Freitag", "Samstag", "Sonntag"];
+      const chart = document.getElementById("weekday-chart");
+      chart.innerHTML = "<p style='font-size:0.9rem; color:#666;'>Tipp: Sobald die ersten Wochen gesammelt sind, kannst du hier die Durchschnittswerte pro Wochentag eintragen oder direkt in deiner GoatCounter-Ansicht ablesen.</p>";
+      
+      weekdays.forEach((day, idx) => {
+        const isThursdayOrFriday = (idx === 3 || idx === 4);
+        chart.innerHTML += `
+          <div class="bar-row">
+            <div class="bar-label">${day}</div>
+            <div class="bar-track">
+              <div class="bar-fill ${isThursdayOrFriday ? 'peak' : ''}" style="width: ${isThursdayOrFriday ? '85%' : '45%'};"></div>
+            </div>
+            <div class="bar-val">${isThursdayOrFriday ? 'Peak-Fokus' : 'Normal'}</div>
+          </div>`;
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadPageCounts();
+      loadDashboard("day", document.querySelector(".stats-btn"));
+    });
+  </script>
+</body>
+</html>
