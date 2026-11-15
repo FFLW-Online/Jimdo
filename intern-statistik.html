@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Interne Besucherstatistik – FFLW</title>
+  <title>Vereinsinterna – FFLW</title>
   <link rel="stylesheet" href="style.css">
   <script src="nav-loader.js" defer></script>
   <style>
@@ -13,9 +13,16 @@
       max-width: 400px; margin: 40px auto; padding: 25px;
       background: #f4f7fb; border: 1px solid #ccd6e6; border-radius: 6px; text-align: center;
     }
-    #auth-gate input {
-      width: 100%; padding: 10px; margin: 12px 0; border: 1px solid #999;
+    .pw-wrapper {
+      position: relative; display: flex; align-items: center; margin: 14px 0;
+    }
+    .pw-wrapper input {
+      width: 100%; padding: 10px 42px 10px 10px; border: 1px solid #999;
       border-radius: 4px; font-size: 1rem; box-sizing: border-box;
+    }
+    .pw-toggle {
+      position: absolute; right: 8px; background: none; border: none;
+      cursor: pointer; font-size: 1.2rem; padding: 4px; color: #555;
     }
     #auth-error { color: #d9534f; font-weight: bold; display: none; margin-top: 8px; }
     #protected-content { display: none; }
@@ -55,13 +62,16 @@
     <nav id="main-nav" class="side-nav" aria-label="Hauptnavigation"></nav>
 
     <main class="content">
-      <!-- PASSWORT-ABFRAGE -->
+      <!-- NEUTRALE PASSWORT-ABFRAGE -->
       <div id="auth-gate">
-        <h2>Interner Bereich (SA)</h2>
-        <p>Bitte Passwort eingeben, um die Besucherstatistik anzuzeigen:</p>
+        <h2>Vereinsinterna</h2>
+        <p>Geschützter Bereich – bitte Zugangspasswort eingeben:</p>
         <form onsubmit="checkAccess(event)">
-          <input type="password" id="sa-password" placeholder="Passwort" required autofocus>
-          <button type="submit" class="stats-btn" style="width: 100%;">Freischalten</button>
+          <div class="pw-wrapper">
+            <input type="password" id="sa-password" placeholder="Passwort" required autofocus>
+            <button type="button" class="pw-toggle" onclick="togglePassword()" aria-label="Passwort anzeigen" title="Passwort anzeigen/verbergen">👁️</button>
+          </div>
+          <button type="submit" class="stats-btn" style="width: 100%;">Anmelden</button>
         </form>
         <div id="auth-error">Falsches Passwort. Bitte erneut versuchen.</div>
       </div>
@@ -146,6 +156,11 @@
       { path: "/Jimdo/fflw-international.html", label: "ÜbersetzungsTool" },
       { path: "/Jimdo/aktuelle-angebote.html", label: "Aktuelle Angebote" }
     ];
+
+    function togglePassword() {
+      const pwInput = document.getElementById("sa-password");
+      pwInput.type = pwInput.type === "password" ? "text" : "password";
+    }
 
     function unlockDashboard() {
       document.getElementById("auth-gate").style.display = "none";
