@@ -19,19 +19,60 @@ function setLanguage(langCode) {
     document.cookie = `googtrans=/de/${langCode}; path=/; domain=${host};`;
   }
 
-  window.location.replace("index.html");
+  // Eindeutiger Zeitstempel verhindert, dass der Handy-Browser die alte Cache-Version lädt
+  const targetUrl = langCode === "de" ? "index.html" : `index.html?lang=${langCode}`;
+  window.location.replace(targetUrl);
 }
 
+// Hilfsfunktion: Liest die aktuell per Cookie gesetzte Sprache aus
+function getActiveLanguage() {
+  const match = document.cookie.match(/(?:^|;\s*)googtrans=\/de\/([a-zA-Z-]+)/);
+  return match ? match[1] : null;
+}
+
+// Initialisiert Google Translate und erzwingt sofortige Übersetzung ohne Neuladen
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({
     pageLanguage: 'de',
     autoDisplay: false
   }, 'google_translate_hidden');
+
+  const targetLang = getActiveLanguage();
+  if (targetLang && targetLang !== "de") {
+    let attempts = 0;
+    const triggerInterval = setInterval(function () {
+      const combo = document.querySelector(".goog-te-combo");
+      attempts++;
+      if (combo) {
+        if (combo.value !== targetLang) {
+          combo.value = targetLang;
+          combo.dispatchEvent(new Event("change"));
+        }
+        clearInterval(triggerInterval);
+      } else if (attempts > 25) {
+        clearInterval(triggerInterval);
+      }
+    }, 200);
+  }
 }
 
+// Schützt vor eingefrorenem Handy-Cache beim Nutzen der Browser-Zurück-Taste
+window.addEventListener("pageshow", function (event) {
+  if (event.persisted) {
+    window.location.reload();
+  }
+});
+
 document.addEventListener("DOMContentLoaded", function () {
-  const match = document.cookie.match(/(?:^|;\s*)googtrans=\/de\/([a-zA-Z-]+)/);
-  const activeLang = match ? match[1] : null;
+  // Falls URL ?lang=xx mitbringt, Cookie sicherheitshalber sofort synchronisieren
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlLang = urlParams.get("lang");
+  if (urlLang && urlLang !== "de") {
+    document.cookie = `googtrans=/de/${urlLang}; path=/;`;
+    document.cookie = `googtrans=/de/${urlLang}; path=/; domain=${window.location.hostname};`;
+  }
+
+  const activeLang = getActiveLanguage();
 
   // CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
   const hideBarStyle = document.createElement("style");
@@ -108,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .catch(error => console.error(error));
   }
 
-  // 4. Google Translate nur im Hintergrund laden, wenn eine Sprache gewählt wurde
+  // 4. Google Translate im Hintergrund laden, wenn eine Sprache aktiv ist
   if (activeLang && activeLang !== "de") {
     const hiddenDiv = document.createElement("div");
     hiddenDiv.id = "google_translate_hidden";
@@ -134,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (legalFooter && !legalFooter.querySelector('a[href="intern-statistik.html"]')) {
     legalFooter.insertAdjacentHTML(
       "beforeend",
-      ' | <a href="intern-statistik.html" title="Interne Statistik-Analyse" style="opacity: 0.65;">SA</a>'
+      ' | <a href="intern-statistik.html" title="Vereinsinterna" style="opacity: 0.65;">SA</a>'
     );
   }
 });
