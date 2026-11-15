@@ -445,3 +445,8 @@ html, body {
     box-shadow: none;
   }
 }
+
+/* Anpassung für die obere Google-Übersetzungsleiste */
+body { top: 0 !important; }
+.goog-te-gadget { color: #ffffff !important; font-size: 0.85rem !important; }
+.goog-te-gadget select { padding: 4px; border-radius: 3px; width: 100%; margin-top: 4px; }
