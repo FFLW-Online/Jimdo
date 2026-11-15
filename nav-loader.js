@@ -5,7 +5,6 @@ function setLanguage(langCode) {
   const rootDomain = hostParts.length > 1 ? '.' + hostParts.slice(-2).join('.') : host;
 
   if (langCode === "de") {
-    // Alle denkbaren Cookie-Varianten auf Handy & Desktop radikal löschen
     const paths = ["/", "/Jimdo", "/Jimdo/"];
     const domains = ["", host, "." + host, rootDomain];
 
@@ -16,12 +15,10 @@ function setLanguage(langCode) {
       });
     });
   } else {
-    // Sitzungs-Cookie für die gewählte Sprache setzen
     document.cookie = `googtrans=/de/${langCode}; path=/;`;
     document.cookie = `googtrans=/de/${langCode}; path=/; domain=${host};`;
   }
 
-  // Sauberes Neuladen der Startseite erzwingen (umgeht Handy-Cache)
   window.location.replace("index.html");
 }
 
@@ -131,4 +128,13 @@ document.addEventListener("DOMContentLoaded", function () {
   gcScript.src = "//gc.zgo.at/count.js";
   gcScript.setAttribute("data-goatcounter", `https://${goatCounterSite}.goatcounter.com/count`);
   document.body.appendChild(gcScript);
+
+  // 6. Unauffälligen "SA"-Link in der Fußzeile neben Sitemap ergänzen
+  const legalFooter = document.querySelector(".legal-footer");
+  if (legalFooter && !legalFooter.querySelector('a[href="intern-statistik.html"]')) {
+    legalFooter.insertAdjacentHTML(
+      "beforeend",
+      ' | <a href="intern-statistik.html" title="Interne Statistik-Analyse" style="opacity: 0.65;">SA</a>'
+    );
+  }
 });
