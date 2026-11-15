@@ -19,11 +19,11 @@
     .stat-card h3 { margin: 0 0 5px 0; font-size: 0.95rem; color: #555; }
     .stat-card .number { font-size: 1.8rem; font-weight: bold; color: #004080; }
     .bar-row { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.9rem; }
-    .bar-label { width: 120px; flex-shrink: 0; font-weight: bold; }
+    .bar-label { width: 140px; flex-shrink: 0; font-weight: bold; }
     .bar-track { flex-grow: 1; background: #eee; height: 22px; border-radius: 3px; overflow: hidden; margin: 0 10px; }
     .bar-fill { background: #004080; height: 100%; transition: width 0.4s ease; }
-    .bar-fill.peak { background: #d9534f; } /* Hebt Spitzenwerte farblich hervor */
-    .bar-val { width: 50px; text-align: right; }
+    .bar-fill.peak { background: #d9534f; }
+    .bar-val { width: 85px; text-align: right; }
     .event-box { background: #fff8e1; border: 1px solid #ffe082; padding: 15px; border-radius: 4px; margin-top: 25px; }
     table.stats-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
     table.stats-table th, table.stats-table td { padding: 10px; border: 1px solid #ddd; text-align: left; }
@@ -41,7 +41,7 @@
 
     <main class="content">
       <h1>Interne Besucher- &amp; Resonanz-Auswertung</h1>
-      <p>Diese Seite ist nicht öffentlich verlinkt und dient der internen Auswertung von Öffentlichkeitsarbeit (Zeitungsartikel, städtisches Amtsblatt) und Besuchertrends.</p>
+      <p>Diese Seite ist weder im Menü noch in der Sitemap verlinkt und dient der internen Auswertung von Öffentlichkeitsarbeit (Zeitungsartikel, städtisches Amtsblatt, Events).</p>
 
       <!-- Zeitraum-Auswahl -->
       <div class="stats-controls">
@@ -54,32 +54,32 @@
       <!-- Kennzahlen-Karten -->
       <div class="stats-grid">
         <div class="stat-card">
-          <h3>Seitenaufrufe im Zeitraum</h3>
+          <h3>Zeitstrahl &amp; Kampagnen</h3>
           <div class="number" id="total-views">–</div>
         </div>
         <div class="stat-card">
-          <h3>Stärkster Peak-Tag / Uhrzeit</h3>
-          <div class="number" id="peak-info" style="font-size: 1.2rem;">–</div>
+          <h3>Event-Tracking (Kunstnacht &amp; Co.)</h3>
+          <div class="number" id="peak-info" style="font-size: 1rem;"><code>?campaign=Eventname</code></div>
         </div>
       </div>
 
       <!-- Wochentags-Analyse (Peak-Finder) -->
       <h2>Wochentags-Verteilung (Amtsblatt- &amp; Café-Check)</h2>
-      <p>Zeigt, an welchen Wochentagen besonders viele Aufrufe stattfinden (Spitzenwerte sind rot markiert):</p>
+      <p>Fokus-Tage rund um das städtische Info-Blatt (Donnerstag) und Treffen:</p>
       <div id="weekday-chart"></div>
 
       <!-- Zeitungsartikel & Ereignisse -->
       <div class="event-box">
-        <h3>Presse- &amp; Info-Blatt-Meilensteine (Notizen)</h3>
-        <p>Hier kannst du wichtige Termine direkt im HTML-Code festhalten, um Peaks nachzuvollziehen:</p>
-        <ul id="event-list">
-          <li><strong>Regelmäßig Donnerstags:</strong> Erscheinen des städtischen Info-Blatts (beobachte Donnerstagnachmittag &amp; Freitag).</li>
-          <li><strong>Beispiel-Eintrag:</strong> 15.11.2026 – Start der neuen Website-Version.</li>
+        <h3>Presse- &amp; Event-Meilensteine (Notizen &amp; Kampagnen-Links)</h3>
+        <ul>
+          <li><strong>Regelmäßig Donnerstags:</strong> Erscheinen des städtischen Info-Blatts (<code>?campaign=Infoblatt-Stadt</code>).</li>
+          <li><strong>Sonder-Events (z. B. Kunstnacht Winnenden):</strong> Auf Flyern/QR-Codes einfach <code>?campaign=Kunstnacht-Winnenden</code> an die URL anhängen.</li>
+          <li><strong>15.11.2026:</strong> Start des neuen Layouts &amp; Statistik-Trackings.</li>
         </ul>
       </div>
 
       <!-- Live-Auswertung der wichtigsten Unterseiten -->
-      <h2>Aufrufe nach Unterseiten (Gesamt)</h2>
+      <h2>Live-Aufrufe nach Unterseiten (Gesamt)</h2>
       <table class="stats-table">
         <thead>
           <tr>
@@ -99,10 +99,8 @@
   </footer>
 
   <script>
-    // HIER DEINEN GOATCOUNTER-NAMEN EINTRAGEN:
-    const GC_SITE = "DEIN_GOATCOUNTER_CODE";
+    const GC_SITE = "fflw";
 
-    // Liste der Seiten, deren Gesamtaufrufe abgefragt werden
     const trackedPages = [
       { path: "/Jimdo/index.html", label: "Startseite (index.html)" },
       { path: "/Jimdo/ueber-uns.html", label: "Über uns" },
@@ -114,10 +112,6 @@
 
     function loadPageCounts() {
       const tbody = document.getElementById("pages-tbody");
-      if (GC_SITE === "DEIN_GOATCOUNTER_CODE") {
-        tbody.innerHTML = '<tr><td colspan="2" style="color:#d9534f;"><strong>Hinweis:</strong> Bitte trage oben im Skript noch deinen GoatCounter-Namen bei <code>GC_SITE</code> ein.</td></tr>';
-        return;
-      }
       tbody.innerHTML = "";
 
       trackedPages.forEach(item => {
@@ -136,20 +130,17 @@
       });
     }
 
-    // Beispiel-Visualisierung für Wochentage (wird mit echten Werten gefüllt, sobald GoatCounter-Daten vorliegen)
     function loadDashboard(range, btn) {
       document.querySelectorAll(".stats-btn").forEach(b => b.classList.remove("active"));
       if (btn) btn.classList.add("active");
 
-      // Direktlink zur interaktiven GoatCounter-Zeitstrahl-Ansicht für Stunden/Tage/Wochen/Jahre
       const periodMap = { day: "day", week: "week", month: "month", year: "year" };
       document.getElementById("total-views").innerHTML = 
         `<a href="https://${GC_SITE}.goatcounter.com?period=${periodMap[range]}" target="_blank" style="font-size:1rem;">Detail-Zeitstrahl (${range}) öffnen ↗</a>`;
-      document.getElementById("peak-info").textContent = "Siehe Detail-Diagramm";
 
       const weekdays = ["Montag", "Dienstag", "Mittwoch", "Donnerstag (Info-Blatt)", "Freitag", "Samstag", "Sonntag"];
       const chart = document.getElementById("weekday-chart");
-      chart.innerHTML = "<p style='font-size:0.9rem; color:#666;'>Tipp: Sobald die ersten Wochen gesammelt sind, kannst du hier die Durchschnittswerte pro Wochentag eintragen oder direkt in deiner GoatCounter-Ansicht ablesen.</p>";
+      chart.innerHTML = "";
       
       weekdays.forEach((day, idx) => {
         const isThursdayOrFriday = (idx === 3 || idx === 4);
