@@ -9,13 +9,13 @@
   "theme_color": "#004080",
   "icons": [
     {
-      "src": "assets/images/logo-mit-text.png",
+      "src": "assets/logo-ffwl-neu-trans.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "assets/images/logo-mit-text.png",
+      "src": "assets/logo-ffwl-neu-trans.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
