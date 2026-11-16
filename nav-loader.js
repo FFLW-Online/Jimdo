@@ -30,6 +30,16 @@ function getActiveLanguage() {
   return match ? match[1] : null;
 }
 
+// Hilfsfunktion: Stößt Google Translate gezielt neu an (wichtig für nachträglich geöffnete Pop-ups auf Desktop)
+function retriggerGoogleTranslate(targetLang) {
+  if (!targetLang || targetLang === "de") return;
+  const combo = document.querySelector(".goog-te-combo");
+  if (combo) {
+    combo.value = targetLang;
+    combo.dispatchEvent(new Event("change"));
+  }
+}
+
 // Initialisiert Google Translate und erzwingt sofortige Übersetzung
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({
@@ -59,7 +69,10 @@ function googleTranslateElementInit() {
 // Hilfsfunktion: Lädt Google Translate erst, wenn Menü und Hinweis-Box im DOM stehen
 function startGoogleTranslate(activeLang) {
   if (!activeLang || activeLang === "de") return;
-  if (document.getElementById("google_translate_hidden")) return;
+  if (document.getElementById("google_translate_hidden")) {
+    retriggerGoogleTranslate(activeLang);
+    return;
+  }
 
   const hiddenDiv = document.createElement("div");
   hiddenDiv.id = "google_translate_hidden";
@@ -103,7 +116,7 @@ function openTranslationHelpDialog(activeLang) {
         </button>
         <button type="submit" id="fflw-help-submit-btn"
                 style="background: #004080; color: #ffffff; border: none; padding: 8px 18px; border-radius: 5px; font-weight: bold; font-size: 0.92rem; cursor: pointer;">
-          Senden
+          ✉️ Abschicken
         </button>
       </div>
 
@@ -115,7 +128,7 @@ function openTranslationHelpDialog(activeLang) {
           Bitte nutzen Sie diese Meldung <strong>nur, wenn die automatische Übersetzung nicht funktioniert</strong>.
         </p>
         <p style="margin: 0 0 12px 0; font-size: 0.88rem; color: #333;">
-          Einfach oben auf <strong>Senden</strong> drücken – wir sehen automatisch Sprache und Seite. Alle Felder darunter sind freiwillig.
+          Einfach oben auf <strong>✉️ Abschicken</strong> drücken – wir sehen automatisch Sprache und Seite. Alle Felder darunter sind freiwillig.
         </p>
 
         <!-- Unsichtbares Honigtopf-Feld gegen Bots -->
@@ -136,8 +149,8 @@ function openTranslationHelpDialog(activeLang) {
         <input type="email" id="fflw-help-email" placeholder="name@example.com"
                style="width: 100%; padding: 7px; border: 1px solid #bbb; border-radius: 5px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box; margin-bottom: 10px;">
 
-        <p style="margin: 0; font-size: 0.85rem; font-weight: bold; color: #004080; text-align: center;">
-          ↑ Bitte drücken Sie oben auf „Senden“.
+        <p style="margin: 0; font-size: 0.88rem; font-weight: bold; color: #004080; text-align: center;">
+          ↑ Bitte drücken Sie oben auf ✉️ Abschicken.
         </p>
       </div>
     </form>
@@ -145,6 +158,10 @@ function openTranslationHelpDialog(activeLang) {
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+
+  // Desktop-Fix: Google Translate gezielt auf das neu geöffnete Fenster anstoßen
+  setTimeout(() => retriggerGoogleTranslate(activeLang), 350);
+  setTimeout(() => retriggerGoogleTranslate(activeLang), 1100);
 
   const closeDialog = () => overlay.remove();
   document.getElementById("fflw-help-cancel-btn").addEventListener("click", closeDialog);
@@ -277,6 +294,11 @@ function showLanguageHintOnce(activeLang) {
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+
+  // Desktop-Fix: Google Translate gezielt auf das Hinweisfenster anstoßen
+  setTimeout(() => retriggerGoogleTranslate(activeLang), 400);
+  setTimeout(() => retriggerGoogleTranslate(activeLang), 1200);
+  setTimeout(() => retriggerGoogleTranslate(activeLang), 2500);
 
   const closeModal = () => overlay.remove();
 
