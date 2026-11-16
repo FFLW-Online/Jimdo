@@ -291,6 +291,86 @@ function showLanguageHintOnce(activeLang) {
   });
 }
 
+// PWA App-Installation (1-Klick-Banner für Android + Kurzhinweis für iPhone)
+let deferredInstallPrompt = null;
+
+window.addEventListener("beforeinstallprompt", function (e) {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  showPwaInstallBanner("android");
+});
+
+function showPwaInstallBanner(platform) {
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+  if (isStandalone) return;
+  if (localStorage.getItem("fflw_pwa_dismissed") === "true") return;
+  if (document.getElementById("fflw-pwa-banner")) return;
+
+  const banner = document.createElement("div");
+  banner.id = "fflw-pwa-banner";
+  banner.style.cssText = `
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 9998;
+    background: #003366; color: #ffffff; padding: 12px 16px;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.25);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-family: inherit; font-size: 0.9rem;
+  `;
+
+  if (platform === "android") {
+    banner.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="assets/logo-ffwl-neu-trans.png" alt="FFLW" style="width: 38px; height: 38px; border-radius: 8px; background: #fff; padding: 2px; object-fit: contain;">
+        <div>
+          <strong>FFLW als App speichern</strong><br>
+          <span style="font-size: 0.8rem; opacity: 0.9;">Direkt auf Ihren Startbildschirm legen</span>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
+        <button type="button" id="fflw-pwa-install-btn"
+                style="background: #ffd700; color: #002244; border: none; padding: 8px 14px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+          Installieren
+        </button>
+        <button type="button" id="fflw-pwa-close-btn" aria-label="Schließen"
+                style="background: transparent; color: #ffffff; border: none; font-size: 1.2rem; cursor: pointer; padding: 4px 8px;">
+          ✕
+        </button>
+      </div>
+    `;
+  } else {
+    banner.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="assets/logo-ffwl-neu-trans.png" alt="FFLW" style="width: 38px; height: 38px; border-radius: 8px; background: #fff; padding: 2px; object-fit: contain;">
+        <div style="line-height: 1.35;">
+          <strong>FFLW als App auf das iPhone legen:</strong><br>
+          <span style="font-size: 0.82rem;">Unten auf <strong>Teilen (⍗)</strong> und dann auf <strong>„Zum Home-Bildschirm“</strong> tippen.</span>
+        </div>
+      </div>
+      <button type="button" id="fflw-pwa-close-btn" aria-label="Schließen"
+              style="background: transparent; color: #ffffff; border: none; font-size: 1.2rem; cursor: pointer; padding: 4px 8px; flex-shrink: 0;">
+        ✕
+      </button>
+    `;
+  }
+
+  document.body.appendChild(banner);
+
+  document.getElementById("fflw-pwa-close-btn").addEventListener("click", function () {
+    localStorage.setItem("fflw_pwa_dismissed", "true");
+    banner.remove();
+  });
+
+  const installBtn = document.getElementById("fflw-pwa-install-btn");
+  if (installBtn) {
+    installBtn.addEventListener("click", async function () {
+      if (!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      banner.remove();
+    });
+  }
+}
+
 // Schützt vor eingefrorenem Handy-Cache beim Nutzen der Browser-Zurück-Taste
 window.addEventListener("pageshow", function (event) {
   if (event.persisted) {
@@ -343,12 +423,10 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(html => {
         navContainer.innerHTML = html;
 
-        // DocuSeal-Links prüfen, falls auch im Menü einer vorkommt
         navContainer.querySelectorAll('a[href*="docuseal.com"]').forEach(link => {
           link.href = cleanDocuSealUrl;
         });
 
-        // Aktuelle Seite im Menü markieren & übergeordnetes Sub-Menü öffnen
         const currentPath = window.location.pathname.split("/").pop() || "index.html";
         const links = navContainer.querySelectorAll("a");
 
@@ -363,7 +441,6 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         });
 
-        // Mobile-Menü Toggle (Ein-/Ausklappen)
         const toggleBtn = document.getElementById("menu-toggle");
         const navList = document.getElementById("nav-list");
 
@@ -373,7 +450,6 @@ document.addEventListener("DOMContentLoaded", function () {
           });
         }
 
-        // NUR wenn aktuell übersetzt wird: "🇩🇪 Deutsch"-Reset + Problem-Button oben ins Menü setzen
         if (activeLang && activeLang !== "de" && navList) {
           const helpLi = document.createElement("li");
           helpLi.style.backgroundColor = "#37474f";
@@ -407,7 +483,6 @@ document.addEventListener("DOMContentLoaded", function () {
           navList.prepend(resetLi);
         }
 
-        // 5. Einmaligen Hinweis einblenden & Übersetzung für Menü + Fenster starten
         showLanguageHintOnce(activeLang);
         startGoogleTranslate(activeLang);
       })
@@ -421,7 +496,7 @@ document.addEventListener("DOMContentLoaded", function () {
     startGoogleTranslate(activeLang);
   }
 
-  // 6. GoatCounter Besucherzähler für "fflw" (Cookie-frei & DSGVO-konform)
+  // 5. GoatCounter Besucherzähler für "fflw" (Cookie-frei & DSGVO-konform)
   const goatCounterSite = "fflw";
   const gcScript = document.createElement("script");
   gcScript.async = true;
@@ -429,12 +504,38 @@ document.addEventListener("DOMContentLoaded", function () {
   gcScript.setAttribute("data-goatcounter", `https://${goatCounterSite}.goatcounter.com/count`);
   document.body.appendChild(gcScript);
 
-  // 7. Unauffälligen "SA"-Link in der Fußzeile neben Sitemap ergänzen
+  // 6. Unauffälligen "SA"-Link in der Fußzeile neben Sitemap ergänzen
   const legalFooter = document.querySelector(".legal-footer");
   if (legalFooter && !legalFooter.querySelector('a[href="intern-statistik.html"]')) {
     legalFooter.insertAdjacentHTML(
       "beforeend",
       ' | <a href="intern-statistik.html" title="Vereinsinterna" style="opacity: 0.65;">SA</a>'
     );
+  }
+
+  // 7. PWA-Manifest, Apple-Icon und Service Worker zentral registrieren
+  if (!document.querySelector('link[rel="manifest"]')) {
+    const manifestLink = document.createElement("link");
+    manifestLink.rel = "manifest";
+    manifestLink.href = "manifest.json";
+    document.head.appendChild(manifestLink);
+  }
+
+  if (!document.querySelector('link[rel="apple-touch-icon"]')) {
+    const appleIcon = document.createElement("link");
+    appleIcon.rel = "apple-touch-icon";
+    appleIcon.href = "assets/logo-ffwl-neu-trans.png";
+    document.head.appendChild(appleIcon);
+  }
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(err => console.error("SW Fehler:", err));
+  }
+
+  // Auf iPhone/iPad (Safari) den kurzen Homescreen-Hinweis einblenden
+  const isIos = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  const isInStandaloneMode = window.navigator.standalone === true;
+  if (isIos && !isInStandaloneMode) {
+    setTimeout(() => showPwaInstallBanner("ios"), 2500);
   }
 });
