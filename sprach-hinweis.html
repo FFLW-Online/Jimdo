@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hinweis zur Sprachauswahl – FFLW</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    body {
+      margin: 0;
+      background-color: #f4f7f9;
+      color: #1a1a1a;
+      font-family: inherit;
+      line-height: 1.55;
+    }
+    .hint-container {
+      max-width: 640px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+    .hint-card {
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+      border-top: 6px solid #2e7d32;
+      overflow: hidden;
+    }
+    .hint-topbar {
+      background: #f4f7f4;
+      border-bottom: 1px solid #d5e2d5;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn-problem {
+      background: #fdecea;
+      color: #a61d24;
+      border: 1px solid #e57373;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      line-height: 1.25;
+      text-align: left;
+      cursor: pointer;
+    }
+    .btn-ok {
+      background: #2e7d32;
+      color: #ffffff;
+      border: none;
+      padding: 10px 26px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-ok:hover {
+      background: #1b5e20;
+    }
+    .hint-body {
+      padding: 24px 22px;
+    }
+    .hint-body h1 {
+      margin: 0 0 14px 0;
+      color: #2e7d32;
+      font-size: 1.35rem;
+    }
+    .hint-body p {
+      margin: 0 0 14px 0;
+      font-size: 1rem;
+    }
+    .de-badge {
+      background: #eef3fa;
+      padding: 2px 7px;
+      border-radius: 4px;
+      color: #1a237e;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .hint-info-box {
+      background: #f7f9fc;
+      border-left: 4px solid #004080;
+      padding: 12px 14px;
+      border-radius: 5px;
+      font-size: 0.92rem;
+      color: #333333;
+      margin-top: 16px;
+    }
+    .hint-footer-note {
+      margin-top: 18px;
+      text-align: center;
+      font-weight: bold;
+      color: #2e7d32;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="hint-container">
+    <div class="hint-card">
+      <div class="hint-topbar">
+        <button type="button" id="page-help-btn" class="btn-problem">
+          🌐 Probleme mit dem<br>Übersetzungstool
+        </button>
+        <a href="index.html" id="page-ok-btn" class="btn-ok">
+          OK →
+        </a>
+      </div>
+
+      <div class="hint-body">
+        <h1>Hinweis zur Sprachauswahl</h1>
+
+        <p>
+          Im Menü können Sie jederzeit über den Punkt
+          <span class="de-badge notranslate" translate="no">🇩🇪 Deutsch (Original)</span>
+          zur deutschen Originalsprache zurückkehren.
+        </p>
+
+        <p>
+          Wenn Sie in eine <strong>andere Sprache</strong> wechseln möchten, gehen Sie bitte zuerst über diesen Knopf zurück zu Deutsch und wählen Sie danach eine neue Flagge aus.
+        </p>
+
+        <div class="hint-info-box">
+          Funktioniert die automatische Übersetzung nicht richtig? Nur bei technischen Problemen nutzen Sie bitte den Knopf <strong>„Probleme mit dem Übersetzungstool“</strong> (oben oder im Menü).
+        </div>
+
+        <p class="hint-footer-note">
+          ↑ Bitte drücken Sie oben auf „OK →“, um zur Startseite zu gelangen.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const lang = (typeof getActiveLanguage === "function" && getActiveLanguage()) ||
+                   new URLSearchParams(window.location.search).get("lang") || "unbekannt";
+
+      const helpBtn = document.getElementById("page-help-btn");
+      if (helpBtn && typeof openTranslationHelpDialog === "function") {
+        helpBtn.addEventListener("click", function () {
+          openTranslationHelpDialog(lang);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
