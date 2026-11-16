@@ -72,7 +72,7 @@ function startGoogleTranslate(activeLang) {
   document.body.appendChild(gtScript);
 }
 
-// Öffnet das kompakte Hilfe-Dialogfenster (1-Klick-Versand + optionale Felder + Bot-Schutz)
+// Öffnet das Dialogfenster für Probleme mit dem Übersetzungstool (Buttons oben befestigt)
 function openTranslationHelpDialog(activeLang) {
   if (document.getElementById("fflw-help-dialog-overlay")) return;
 
@@ -81,52 +81,64 @@ function openTranslationHelpDialog(activeLang) {
   overlay.id = "fflw-help-dialog-overlay";
   overlay.style.cssText = `
     position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 100000; padding: 16px;
+    display: flex; align-items: flex-start; justify-content: center;
+    z-index: 100000; padding: 12px; box-sizing: border-box; overflow-y: auto;
   `;
 
   const modal = document.createElement("div");
   modal.style.cssText = `
     background: #ffffff; color: #1a1a1a; max-width: 440px; width: 100%;
-    border-radius: 8px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    border-top: 5px solid #d32f2f; font-family: inherit; line-height: 1.5;
+    margin-top: 10px; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    border-top: 5px solid #004080; font-family: inherit; line-height: 1.45;
   `;
 
   modal.innerHTML = `
-    <h3 style="margin: 0 0 8px 0; color: #b71c1c; font-size: 1.15rem;">
-      🆘 Hilfe anfordern
-    </h3>
-    <p style="margin: 0 0 14px 0; font-size: 0.92rem; color: #333;">
-      Sie können einfach direkt auf <strong>Senden</strong> drücken – wir sehen automatisch, welche Sprache und Seite geöffnet ist. Alle Felder darunter sind freiwillig.
-    </p>
-    <form id="fflw-help-form">
-      <!-- Unsichtbares Honigtopf-Feld gegen Bots -->
-      <div style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;" aria-hidden="true">
-        <label for="fflw-hp-website">Website</label>
-        <input type="text" id="fflw-hp-website" name="website" tabindex="-1" autocomplete="off">
-      </div>
-
-      <label for="fflw-help-msg" style="display: block; font-size: 0.88rem; font-weight: bold; margin-bottom: 4px;">
-        Optional: Nachricht in Ihrer Sprache
-      </label>
-      <textarea id="fflw-help-msg" rows="3" placeholder="..."
-                style="width: 100%; padding: 8px; border: 1px solid #bbb; border-radius: 5px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; margin-bottom: 12px;"></textarea>
-
-      <label for="fflw-help-email" style="display: block; font-size: 0.88rem; font-weight: bold; margin-bottom: 4px;">
-        Optional: Ihre E-Mail-Adresse für Rückfragen
-      </label>
-      <input type="email" id="fflw-help-email" placeholder="name@example.com"
-             style="width: 100%; padding: 8px; border: 1px solid #bbb; border-radius: 5px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; margin-bottom: 16px;">
-
-      <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+    <form id="fflw-help-form" style="margin: 0;">
+      <!-- Knopf-Leiste oben befestigt -->
+      <div style="position: sticky; top: 0; z-index: 2; padding: 10px 16px; background: #f0f4f9; border-bottom: 1px solid #d0dae8; display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
         <button type="button" id="fflw-help-cancel-btn"
-                style="background: #eeeeee; color: #333333; border: none; padding: 9px 16px; border-radius: 5px; font-weight: bold; font-size: 0.92rem; cursor: pointer;">
+                style="background: #e2e8f0; color: #333333; border: none; padding: 8px 14px; border-radius: 5px; font-weight: bold; font-size: 0.9rem; cursor: pointer;">
           Abbrechen
         </button>
         <button type="submit" id="fflw-help-submit-btn"
-                style="background: #d32f2f; color: #ffffff; border: none; padding: 9px 20px; border-radius: 5px; font-weight: bold; font-size: 0.95rem; cursor: pointer;">
+                style="background: #004080; color: #ffffff; border: none; padding: 8px 18px; border-radius: 5px; font-weight: bold; font-size: 0.92rem; cursor: pointer;">
           Senden
         </button>
+      </div>
+
+      <div style="padding: 16px 18px 18px 18px;">
+        <h3 style="margin: 0 0 8px 0; color: #004080; font-size: 1.05rem;">
+          🌐 Probleme mit dem Übersetzungstool
+        </h3>
+        <p style="margin: 0 0 10px 0; font-size: 0.88rem; color: #333; background: #f7f9fc; padding: 8px 10px; border-radius: 5px; border-left: 3px solid #004080;">
+          Bitte nutzen Sie diese Meldung <strong>nur, wenn die automatische Übersetzung nicht funktioniert</strong>.
+        </p>
+        <p style="margin: 0 0 12px 0; font-size: 0.88rem; color: #333;">
+          Einfach oben auf <strong>Senden</strong> drücken – wir sehen automatisch Sprache und Seite. Alle Felder darunter sind freiwillig.
+        </p>
+
+        <!-- Unsichtbares Honigtopf-Feld gegen Bots -->
+        <div style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;" aria-hidden="true">
+          <label for="fflw-hp-website">Website</label>
+          <input type="text" id="fflw-hp-website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <label for="fflw-help-msg" style="display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 3px;">
+          Optional: Was funktioniert bei der Übersetzung nicht?
+        </label>
+        <textarea id="fflw-help-msg" rows="2" placeholder="..."
+                  style="width: 100%; padding: 7px; border: 1px solid #bbb; border-radius: 5px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box; margin-bottom: 10px;"></textarea>
+
+        <label for="fflw-help-email" style="display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 3px;">
+          Optional: Ihre E-Mail-Adresse für Rückfragen
+        </label>
+        <input type="email" id="fflw-help-email" placeholder="name@example.com"
+               style="width: 100%; padding: 7px; border: 1px solid #bbb; border-radius: 5px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box; margin-bottom: 10px;">
+
+        <p style="margin: 0; font-size: 0.85rem; font-weight: bold; color: #004080; text-align: center;">
+          ↑ Bitte drücken Sie oben auf „Senden“.
+        </p>
       </div>
     </form>
   `;
@@ -159,8 +171,7 @@ function openTranslationHelpDialog(activeLang) {
       setTimeout(closeDialog, 1300);
     };
 
-    // 1. Harter Bot-Check (Honigtopf gefüllt, unter 2 Sek. abgeschickt oder Sitzungslimit > 2):
-    // Silent Drop -> Vorgaukeln von Erfolg, aber nichts versenden
+    // 1. Harter Bot-Check (Silent Drop)
     if (honeypotVal !== "" || elapsedMs < 2000 || sentCount >= 2) {
       setTimeout(showFakeOrRealSuccess, 400);
       return;
@@ -168,20 +179,19 @@ function openTranslationHelpDialog(activeLang) {
 
     sessionStorage.setItem("fflw_help_sent_count", String(sentCount + 1));
 
-    // 2. Verdächtige Merkmale prüfen (Links im Nachrichtentext -> Betreff markieren)
+    // 2. Verdächtige Merkmale prüfen
     const hasSuspiciousLinks = /(https?:\/\/|www\.|<a\s)/i.test(userMsg);
     const subjectPrefix = hasSuspiciousLinks ? "[SPAM-VERDACHT] " : "";
 
-    // 1-Klick-Übersetzungslink für das FFLW-Postfach generieren, falls Text eingegeben wurde
     const translateLink = userMsg
       ? `https://translate.google.com/?sl=auto&tl=de&text=${encodeURIComponent(userMsg)}&op=translate`
-      : "Keine Nachricht eingegeben (1-Klick-Notruf)";
+      : "Keine Nachricht eingegeben (1-Klick-Meldung)";
 
     const payload = {
-      _subject: `${subjectPrefix}Notruf Übersetzungstool (Sprache: ${activeLang})`,
+      _subject: `${subjectPrefix}Problem Übersetzungstool (Sprache: ${activeLang})`,
       _captcha: "false",
       _template: "table",
-      Meldung: "Hilfe-Knopf beim Übersetzungstool wurde ausgelöst.",
+      Meldung: "Technisches Problem beim Übersetzungstool wurde gemeldet.",
       Sprache: activeLang,
       Nachricht_Original: userMsg || "– (ohne Text ausgelöst) –",
       Auf_Deutsch_uebersetzen: translateLink,
@@ -208,7 +218,7 @@ function openTranslationHelpDialog(activeLang) {
   });
 }
 
-// Einmaliges schwebendes Hinweisfenster nach dem ersten Sprachwechsel
+// Einmaliges schwebendes Hinweisfenster nach dem ersten Sprachwechsel (Buttons oben befestigt)
 function showLanguageHintOnce(activeLang) {
   if (!activeLang || activeLang === "de") return;
   if (sessionStorage.getItem("fflw_i18n_hint_shown") === "true") return;
@@ -219,41 +229,49 @@ function showLanguageHintOnce(activeLang) {
   overlay.id = "fflw-lang-hint-overlay";
   overlay.style.cssText = `
     position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 99999; padding: 16px;
+    display: flex; align-items: flex-start; justify-content: center;
+    z-index: 99999; padding: 12px; box-sizing: border-box; overflow-y: auto;
   `;
 
   const modal = document.createElement("div");
   modal.style.cssText = `
     background: #ffffff; color: #1a1a1a; max-width: 440px; width: 100%;
-    border-radius: 8px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    border-top: 5px solid #004080; font-family: inherit; line-height: 1.5;
+    margin-top: 10px; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    border-top: 5px solid #004080; font-family: inherit; line-height: 1.45;
   `;
 
   modal.innerHTML = `
-    <h3 style="margin: 0 0 10px 0; color: #004080; font-size: 1.15rem;">
-      Hinweis zur Sprachauswahl
-    </h3>
-    <p style="margin: 0 0 10px 0; font-size: 0.95rem;">
-      Sie können im Menü jederzeit über den Punkt
-      <strong class="notranslate" translate="no" style="background: #eef3fa; padding: 2px 6px; border-radius: 4px; color: #1a237e;">🇩🇪 Deutsch (Original)</strong>
-      zur deutschen Originalsprache zurückkehren.
-    </p>
-    <p style="margin: 0 0 14px 0; font-size: 0.95rem;">
-      Wenn Sie in eine <strong>andere Sprache</strong> wechseln möchten, gehen Sie bitte zuerst über diesen Knopf zurück zu Deutsch und wählen Sie danach eine neue Flagge aus.
-    </p>
-    <p style="margin: 0 0 18px 0; font-size: 0.9rem; color: #444; background: #f7f9fc; padding: 10px; border-radius: 5px;">
-      Gibt es Schwierigkeiten mit der Übersetzung? Über den Hilfe-Knopf (hier oder oben im Menü) können Sie uns direkt benachrichtigen.
-    </p>
-    <div style="display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap;">
+    <!-- Knopf-Leiste ganz oben befestigt -->
+    <div style="position: sticky; top: 0; z-index: 2; padding: 8px 14px; background: #f0f4f9; border-bottom: 1px solid #d0dae8; display: flex; gap: 10px; justify-content: space-between; align-items: center;">
       <button type="button" id="fflw-hint-help-btn"
-              style="background: #fff3f3; color: #b71c1c; border: 1px solid #d32f2f; padding: 9px 14px; border-radius: 5px; font-weight: bold; font-size: 0.92rem; cursor: pointer;">
-        🆘 Help / Hilfe
+              style="background: #ffffff; color: #444444; border: 1px solid #b0bec5; padding: 5px 9px; border-radius: 5px; font-size: 0.72rem; line-height: 1.2; text-align: left; cursor: pointer; max-width: 210px;">
+        🌐 Probleme mit dem<br>Übersetzungstool
       </button>
       <button type="button" id="fflw-hint-ok-btn"
-              style="background: #004080; color: #ffffff; border: none; padding: 9px 20px; border-radius: 5px; font-weight: bold; font-size: 0.95rem; cursor: pointer;">
+              style="background: #004080; color: #ffffff; border: none; padding: 8px 22px; border-radius: 5px; font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;">
         OK
       </button>
+    </div>
+
+    <div style="padding: 16px 18px 18px 18px;">
+      <h3 style="margin: 0 0 8px 0; color: #004080; font-size: 1.08rem;">
+        Hinweis zur Sprachauswahl
+      </h3>
+      <p style="margin: 0 0 8px 0; font-size: 0.9rem;">
+        Im Menü können Sie jederzeit über
+        <strong class="notranslate" translate="no" style="background: #eef3fa; padding: 1px 5px; border-radius: 4px; color: #1a237e;">🇩🇪 Deutsch (Original)</strong>
+        zur deutschen Originalsprache zurückkehren.
+      </p>
+      <p style="margin: 0 0 10px 0; font-size: 0.9rem;">
+        Für eine <strong>andere Sprache</strong> gehen Sie bitte zuerst über diesen Knopf zurück zu Deutsch und wählen Sie danach eine neue Flagge aus.
+      </p>
+      <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: #444; background: #f7f9fc; padding: 8px; border-radius: 5px;">
+        Funktioniert die automatische Übersetzung nicht richtig? Nur bei technischen Problemen nutzen Sie bitte den Knopf <strong>„Probleme mit dem Übersetzungstool“</strong> (oben oder im Menü).
+      </p>
+      <p style="margin: 0; font-size: 0.88rem; font-weight: bold; color: #004080; text-align: center;">
+        ↑ Bitte drücken Sie oben auf den OK-Knopf.
+      </p>
     </div>
   `;
 
@@ -355,15 +373,16 @@ document.addEventListener("DOMContentLoaded", function () {
           });
         }
 
-        // NUR wenn aktuell übersetzt wird: "🇩🇪 Deutsch"-Reset + dauerhaften Hilfe-Knopf oben ins Menü setzen
+        // NUR wenn aktuell übersetzt wird: "🇩🇪 Deutsch"-Reset + Problem-Button oben ins Menü setzen
         if (activeLang && activeLang !== "de" && navList) {
           const helpLi = document.createElement("li");
-          helpLi.style.backgroundColor = "#7f1d1d";
+          helpLi.style.backgroundColor = "#37474f";
           helpLi.style.borderBottom = "2px solid #ffd700";
 
           const helpMenuLink = document.createElement("a");
           helpMenuLink.href = "#";
-          helpMenuLink.textContent = "🆘 Help / Hilfe";
+          helpMenuLink.style.cssText = "font-size: 0.78rem; line-height: 1.25; padding-top: 7px; padding-bottom: 7px;";
+          helpMenuLink.innerHTML = "🌐 Probleme mit dem<br>Übersetzungstool";
           helpMenuLink.addEventListener("click", function (e) {
             e.preventDefault();
             openTranslationHelpDialog(activeLang);
