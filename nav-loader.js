@@ -15,13 +15,13 @@ function setLanguage(langCode) {
       });
     });
     sessionStorage.removeItem("fflw_i18n_hint_shown");
+    window.location.replace("index.html");
   } else {
     document.cookie = `googtrans=/de/${langCode}; path=/;`;
     document.cookie = `googtrans=/de/${langCode}; path=/; domain=${host};`;
+    sessionStorage.setItem("fflw_i18n_hint_shown", "true");
+    window.location.replace(`sprach-hinweis.html?lang=${langCode}`);
   }
-
-  const targetUrl = langCode === "de" ? "index.html" : `index.html?lang=${langCode}`;
-  window.location.replace(targetUrl);
 }
 
 // Hilfsfunktion: Liest die aktuell per Cookie gesetzte Sprache aus
@@ -30,7 +30,7 @@ function getActiveLanguage() {
   return match ? match[1] : null;
 }
 
-// Erzwingt auf Desktop & Mobil eine echte Neu-Übersetzung dynamischer Pop-ups
+// Erzwingt auf Desktop & Mobil eine echte Neu-Übersetzung dynamischer Dialoge
 function forceGoogleTranslatePopup(targetLang) {
   if (!targetLang || targetLang === "de") return;
   const combo = document.querySelector(".goog-te-combo");
@@ -71,7 +71,7 @@ function googleTranslateElementInit() {
   }
 }
 
-// Hilfsfunktion: Lädt Google Translate erst, wenn Hinweis-Box & Menü im DOM stehen
+// Hilfsfunktion: Lädt Google Translate
 function startGoogleTranslate(activeLang) {
   if (!activeLang || activeLang === "de") return;
   if (document.getElementById("google_translate_hidden")) {
@@ -90,50 +90,18 @@ function startGoogleTranslate(activeLang) {
   document.body.appendChild(gtScript);
 }
 
-// Hilfsfunktion: Macht ein Overlay erst kurz als normalen Fluss-Block für Google Translate sichtbar
-// und hebt es direkt danach als echtes schwebendes Pop-up über alles andere (z-index Max)
-function mountTranslatableModal(overlay, activeLang) {
-  // Kurz als normaler Block ganz oben im body einfügen, damit Google Translate Desktop es nicht ignoriert
-  overlay.style.cssText = `
-    position: relative; width: 100%; background: #ffffff;
-    display: flex; align-items: flex-start; justify-content: center;
-    padding: 12px; box-sizing: border-box;
-  `;
-  document.body.prepend(overlay);
-
-  const switchToFixedOverlay = () => {
-    if (!document.body.contains(overlay)) return;
-    overlay.style.cssText = `
-      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
-      display: flex; align-items: flex-start; justify-content: center;
-      z-index: 2147483647; padding: 12px; box-sizing: border-box; overflow-y: auto;
-    `;
-  };
-
-  if (!activeLang || activeLang === "de") {
-    switchToFixedOverlay();
-    return;
-  }
-
-  // Warten, bis Google Translate mindestens einen Textknoten im Pop-up übersetzt hat (max. 1,8 Sek.)
-  let checks = 0;
-  const poll = setInterval(() => {
-    checks++;
-    const hasTranslatedFont = overlay.querySelector("font");
-    if (hasTranslatedFont || checks >= 18) {
-      clearInterval(poll);
-      switchToFixedOverlay();
-    }
-  }, 100);
-}
-
-// Öffnet das Dialogfenster für Probleme mit dem Übersetzungstool (Buttons oben befestigt)
+// Öffnet das Dialogfenster für Probleme mit dem Übersetzungstool
 function openTranslationHelpDialog(activeLang) {
   if (document.getElementById("fflw-help-dialog-overlay")) return;
 
   const openedAt = Date.now();
   const overlay = document.createElement("div");
   overlay.id = "fflw-help-dialog-overlay";
+  overlay.style.cssText = `
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
+    display: flex; align-items: flex-start; justify-content: center;
+    z-index: 2147483647; padding: 12px; box-sizing: border-box; overflow-y: auto;
+  `;
 
   const modal = document.createElement("div");
   modal.style.cssText = `
@@ -145,7 +113,6 @@ function openTranslationHelpDialog(activeLang) {
 
   modal.innerHTML = `
     <form id="fflw-help-form" style="margin: 0;">
-      <!-- Knopf-Leiste oben befestigt -->
       <div style="position: sticky; top: 0; z-index: 2; padding: 10px 16px; background: #f4f7f4; border-bottom: 1px solid #d5e2d5; display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
         <button type="button" id="fflw-help-cancel-btn"
                 style="background: #e2e8f0; color: #333333; border: none; padding: 8px 14px; border-radius: 5px; font-weight: bold; font-size: 0.9rem; cursor: pointer;">
@@ -168,7 +135,6 @@ function openTranslationHelpDialog(activeLang) {
           Einfach oben auf <strong>✉️ Abschicken</strong> drücken – wir sehen automatisch Sprache und Seite. Alle Felder darunter sind freiwillig.
         </p>
 
-        <!-- Unsichtbares Honigtopf-Feld gegen Bots -->
         <div style="position: absolute; left: -9999px; opacity: 0; pointer-events: none;" aria-hidden="true">
           <label for="fflw-hp-website">Website</label>
           <input type="text" id="fflw-hp-website" name="website" tabindex="-1" autocomplete="off">
@@ -194,9 +160,8 @@ function openTranslationHelpDialog(activeLang) {
   `;
 
   overlay.appendChild(modal);
-  mountTranslatableModal(overlay, activeLang);
+  document.body.appendChild(overlay);
 
-  // Desktop-Fix: Google Translate gezielt neu anstoßen
   setTimeout(() => forceGoogleTranslatePopup(activeLang), 150);
   setTimeout(() => forceGoogleTranslatePopup(activeLang), 750);
 
@@ -225,7 +190,6 @@ function openTranslationHelpDialog(activeLang) {
       setTimeout(closeDialog, 1300);
     };
 
-    // 1. Harter Bot-Check (Silent Drop)
     if (honeypotVal !== "" || elapsedMs < 2000 || sentCount >= 2) {
       setTimeout(showFakeOrRealSuccess, 400);
       return;
@@ -233,7 +197,6 @@ function openTranslationHelpDialog(activeLang) {
 
     sessionStorage.setItem("fflw_help_sent_count", String(sentCount + 1));
 
-    // 2. Verdächtige Merkmale prüfen
     const hasSuspiciousLinks = /(https?:\/\/|www\.|<a\s)/i.test(userMsg);
     const subjectPrefix = hasSuspiciousLinks ? "[SPAM-VERDACHT] " : "";
 
@@ -269,78 +232,6 @@ function openTranslationHelpDialog(activeLang) {
     })
       .then(() => showFakeOrRealSuccess())
       .catch(() => showFakeOrRealSuccess());
-  });
-}
-
-// Einmaliges schwebendes Hinweisfenster nach dem ersten Sprachwechsel (Buttons oben befestigt)
-function showLanguageHintOnce(activeLang) {
-  if (!activeLang || activeLang === "de") return;
-  if (sessionStorage.getItem("fflw_i18n_hint_shown") === "true") return;
-
-  sessionStorage.setItem("fflw_i18n_hint_shown", "true");
-
-  const overlay = document.createElement("div");
-  overlay.id = "fflw-lang-hint-overlay";
-
-  const modal = document.createElement("div");
-  modal.style.cssText = `
-    background: #ffffff; color: #1a1a1a; max-width: 440px; width: 100%;
-    margin-top: 8px; border-radius: 8px; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.45;
-  `;
-
-  modal.innerHTML = `
-    <!-- Knopf-Leiste ganz oben befestigt -->
-    <div style="position: sticky; top: 0; z-index: 2; padding: 8px 14px; background: #f4f7f4; border-bottom: 1px solid #d5e2d5; display: flex; gap: 10px; justify-content: space-between; align-items: center;">
-      <button type="button" id="fflw-hint-help-btn"
-              style="background: #fdecea; color: #a61d24; border: 1px solid #e57373; padding: 5px 9px; border-radius: 5px; font-size: 0.72rem; font-weight: bold; line-height: 1.2; text-align: left; cursor: pointer; max-width: 215px;">
-        🌐 Probleme mit dem<br>Übersetzungstool
-      </button>
-      <button type="button" id="fflw-hint-ok-btn"
-              style="background: #2e7d32; color: #ffffff; border: none; padding: 8px 22px; border-radius: 5px; font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;">
-        OK
-      </button>
-    </div>
-
-    <div style="padding: 16px 18px 18px 18px;">
-      <h3 style="margin: 0 0 8px 0; color: #2e7d32; font-size: 1.08rem;">
-        Hinweis zur Sprachauswahl
-      </h3>
-      <p style="margin: 0 0 8px 0; font-size: 0.9rem;">
-        Im Menü können Sie jederzeit über
-        <strong class="notranslate" translate="no" style="background: #eef3fa; padding: 1px 5px; border-radius: 4px; color: #1a237e;">🇩🇪 Deutsch (Original)</strong>
-        zur deutschen Originalsprache zurückkehren.
-      </p>
-      <p style="margin: 0 0 10px 0; font-size: 0.9rem;">
-        Für eine <strong>andere Sprache</strong> gehen Sie bitte zuerst über diesen Knopf zurück zu Deutsch und wählen Sie danach eine neue Flagge aus.
-      </p>
-      <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: #444; background: #f7f9fc; padding: 8px; border-radius: 5px;">
-        Funktioniert die automatische Übersetzung nicht richtig? Nur bei technischen Problemen nutzen Sie bitte den Knopf <strong>„Probleme mit dem Übersetzungstool“</strong> (oben oder im Menü).
-      </p>
-      <p style="margin: 0; font-size: 0.88rem; font-weight: bold; color: #2e7d32; text-align: center;">
-        ↑ Bitte drücken Sie oben auf den OK-Knopf.
-      </p>
-    </div>
-  `;
-
-  overlay.appendChild(modal);
-  mountTranslatableModal(overlay, activeLang);
-
-  // Desktop-Fix: Google Translate gezielt auf das Hinweisfenster anstoßen
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 500);
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 1300);
-
-  const closeModal = () => overlay.remove();
-
-  document.getElementById("fflw-hint-help-btn").addEventListener("click", function () {
-    closeModal();
-    openTranslationHelpDialog(activeLang);
-  });
-
-  document.getElementById("fflw-hint-ok-btn").addEventListener("click", closeModal);
-  overlay.addEventListener("click", function (e) {
-    if (e.target === overlay) closeModal();
   });
 }
 
@@ -432,6 +323,8 @@ window.addEventListener("pageshow", function (event) {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+
   // 1. URL-Parameter ?lang=xx sofort mit Cookie synchronisieren
   const urlParams = new URLSearchParams(window.location.search);
   const urlLang = urlParams.get("lang");
@@ -442,8 +335,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const activeLang = getActiveLanguage();
 
-  // 2. Hinweis-Fenster SOFORT vor Google Translate einhängen
-  showLanguageHintOnce(activeLang);
+  // 2. Beim allerersten Sprachaufruf (auch per QR-Code ?lang=xx) einmalig auf sprach-hinweis.html leiten
+  if (
+    activeLang &&
+    activeLang !== "de" &&
+    currentPage !== "sprach-hinweis.html" &&
+    sessionStorage.getItem("fflw_i18n_hint_shown") !== "true"
+  ) {
+    sessionStorage.setItem("fflw_i18n_hint_shown", "true");
+    window.location.replace(`sprach-hinweis.html?lang=${activeLang}`);
+    return;
+  }
 
   // 3. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
   const cleanDocuSealUrl = "https://docuseal.com/d/Mcvg84UEAD5aay";
@@ -483,11 +385,9 @@ document.addEventListener("DOMContentLoaded", function () {
           link.href = cleanDocuSealUrl;
         });
 
-        const currentPath = window.location.pathname.split("/").pop() || "index.html";
         const links = navContainer.querySelectorAll("a");
-
         links.forEach(link => {
-          if (link.getAttribute("href") === currentPath) {
+          if (link.getAttribute("href") === currentPage) {
             link.setAttribute("aria-current", "page");
             link.classList.add("active");
             const parentDetails = link.closest("details");
