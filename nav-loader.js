@@ -30,14 +30,20 @@ function getActiveLanguage() {
   return match ? match[1] : null;
 }
 
-// Hilfsfunktion: Stößt Google Translate gezielt neu an (wichtig für nachträglich geöffnete Pop-ups auf Desktop)
-function retriggerGoogleTranslate(targetLang) {
+// Erzwingt auf Desktop & Mobil eine echte Neu-Übersetzung dynamischer Pop-ups
+function forceGoogleTranslatePopup(targetLang) {
   if (!targetLang || targetLang === "de") return;
   const combo = document.querySelector(".goog-te-combo");
-  if (combo) {
+  if (!combo) return;
+
+  // Kurzer Reset auf leer, damit Google Translate neu eingefügte DOM-Knoten sicher scannt
+  combo.value = "";
+  combo.dispatchEvent(new Event("change"));
+
+  setTimeout(() => {
     combo.value = targetLang;
     combo.dispatchEvent(new Event("change"));
-  }
+  }, 60);
 }
 
 // Initialisiert Google Translate und erzwingt sofortige Übersetzung
@@ -66,11 +72,11 @@ function googleTranslateElementInit() {
   }
 }
 
-// Hilfsfunktion: Lädt Google Translate erst, wenn Menü und Hinweis-Box im DOM stehen
+// Hilfsfunktion: Lädt Google Translate erst, wenn Hinweis-Box & Menü im DOM stehen
 function startGoogleTranslate(activeLang) {
   if (!activeLang || activeLang === "de") return;
   if (document.getElementById("google_translate_hidden")) {
-    retriggerGoogleTranslate(activeLang);
+    forceGoogleTranslatePopup(activeLang);
     return;
   }
 
@@ -103,28 +109,28 @@ function openTranslationHelpDialog(activeLang) {
     background: #ffffff; color: #1a1a1a; max-width: 440px; width: 100%;
     margin-top: 10px; border-radius: 8px; overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    border-top: 5px solid #004080; font-family: inherit; line-height: 1.45;
+    border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.45;
   `;
 
   modal.innerHTML = `
     <form id="fflw-help-form" style="margin: 0;">
       <!-- Knopf-Leiste oben befestigt -->
-      <div style="position: sticky; top: 0; z-index: 2; padding: 10px 16px; background: #f0f4f9; border-bottom: 1px solid #d0dae8; display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+      <div style="position: sticky; top: 0; z-index: 2; padding: 10px 16px; background: #f4f7f4; border-bottom: 1px solid #d5e2d5; display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
         <button type="button" id="fflw-help-cancel-btn"
                 style="background: #e2e8f0; color: #333333; border: none; padding: 8px 14px; border-radius: 5px; font-weight: bold; font-size: 0.9rem; cursor: pointer;">
           Abbrechen
         </button>
         <button type="submit" id="fflw-help-submit-btn"
-                style="background: #004080; color: #ffffff; border: none; padding: 8px 18px; border-radius: 5px; font-weight: bold; font-size: 0.92rem; cursor: pointer;">
+                style="background: #2e7d32; color: #ffffff; border: none; padding: 8px 18px; border-radius: 5px; font-weight: bold; font-size: 0.92rem; cursor: pointer;">
           ✉️ Abschicken
         </button>
       </div>
 
       <div style="padding: 16px 18px 18px 18px;">
-        <h3 style="margin: 0 0 8px 0; color: #004080; font-size: 1.05rem;">
+        <h3 style="margin: 0 0 8px 0; color: #a61d24; font-size: 1.05rem;">
           🌐 Probleme mit dem Übersetzungstool
         </h3>
-        <p style="margin: 0 0 10px 0; font-size: 0.88rem; color: #333; background: #f7f9fc; padding: 8px 10px; border-radius: 5px; border-left: 3px solid #004080;">
+        <p style="margin: 0 0 10px 0; font-size: 0.88rem; color: #333; background: #fff8f8; padding: 8px 10px; border-radius: 5px; border-left: 3px solid #d32f2f;">
           Bitte nutzen Sie diese Meldung <strong>nur, wenn die automatische Übersetzung nicht funktioniert</strong>.
         </p>
         <p style="margin: 0 0 12px 0; font-size: 0.88rem; color: #333;">
@@ -149,7 +155,7 @@ function openTranslationHelpDialog(activeLang) {
         <input type="email" id="fflw-help-email" placeholder="name@example.com"
                style="width: 100%; padding: 7px; border: 1px solid #bbb; border-radius: 5px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box; margin-bottom: 10px;">
 
-        <p style="margin: 0; font-size: 0.88rem; font-weight: bold; color: #004080; text-align: center;">
+        <p style="margin: 0; font-size: 0.88rem; font-weight: bold; color: #2e7d32; text-align: center;">
           ↑ Bitte drücken Sie oben auf ✉️ Abschicken.
         </p>
       </div>
@@ -159,9 +165,9 @@ function openTranslationHelpDialog(activeLang) {
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
 
-  // Desktop-Fix: Google Translate gezielt auf das neu geöffnete Fenster anstoßen
-  setTimeout(() => retriggerGoogleTranslate(activeLang), 350);
-  setTimeout(() => retriggerGoogleTranslate(activeLang), 1100);
+  // Desktop-Fix: Google Translate gezielt neu anstoßen
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 150);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 800);
 
   const closeDialog = () => overlay.remove();
   document.getElementById("fflw-help-cancel-btn").addEventListener("click", closeDialog);
@@ -183,7 +189,7 @@ function openTranslationHelpDialog(activeLang) {
     submitBtn.textContent = "⏳ ...";
 
     const showFakeOrRealSuccess = () => {
-      submitBtn.style.background = "#2e7d32";
+      submitBtn.style.background = "#1b5e20";
       submitBtn.textContent = "✅ OK!";
       setTimeout(closeDialog, 1300);
     };
@@ -255,24 +261,24 @@ function showLanguageHintOnce(activeLang) {
     background: #ffffff; color: #1a1a1a; max-width: 440px; width: 100%;
     margin-top: 10px; border-radius: 8px; overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    border-top: 5px solid #004080; font-family: inherit; line-height: 1.45;
+    border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.45;
   `;
 
   modal.innerHTML = `
     <!-- Knopf-Leiste ganz oben befestigt -->
-    <div style="position: sticky; top: 0; z-index: 2; padding: 8px 14px; background: #f0f4f9; border-bottom: 1px solid #d0dae8; display: flex; gap: 10px; justify-content: space-between; align-items: center;">
+    <div style="position: sticky; top: 0; z-index: 2; padding: 8px 14px; background: #f4f7f4; border-bottom: 1px solid #d5e2d5; display: flex; gap: 10px; justify-content: space-between; align-items: center;">
       <button type="button" id="fflw-hint-help-btn"
-              style="background: #ffffff; color: #444444; border: 1px solid #b0bec5; padding: 5px 9px; border-radius: 5px; font-size: 0.72rem; line-height: 1.2; text-align: left; cursor: pointer; max-width: 210px;">
+              style="background: #fdecea; color: #a61d24; border: 1px solid #e57373; padding: 5px 9px; border-radius: 5px; font-size: 0.72rem; font-weight: bold; line-height: 1.2; text-align: left; cursor: pointer; max-width: 215px;">
         🌐 Probleme mit dem<br>Übersetzungstool
       </button>
       <button type="button" id="fflw-hint-ok-btn"
-              style="background: #004080; color: #ffffff; border: none; padding: 8px 22px; border-radius: 5px; font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;">
+              style="background: #2e7d32; color: #ffffff; border: none; padding: 8px 22px; border-radius: 5px; font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;">
         OK
       </button>
     </div>
 
     <div style="padding: 16px 18px 18px 18px;">
-      <h3 style="margin: 0 0 8px 0; color: #004080; font-size: 1.08rem;">
+      <h3 style="margin: 0 0 8px 0; color: #2e7d32; font-size: 1.08rem;">
         Hinweis zur Sprachauswahl
       </h3>
       <p style="margin: 0 0 8px 0; font-size: 0.9rem;">
@@ -286,7 +292,7 @@ function showLanguageHintOnce(activeLang) {
       <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: #444; background: #f7f9fc; padding: 8px; border-radius: 5px;">
         Funktioniert die automatische Übersetzung nicht richtig? Nur bei technischen Problemen nutzen Sie bitte den Knopf <strong>„Probleme mit dem Übersetzungstool“</strong> (oben oder im Menü).
       </p>
-      <p style="margin: 0; font-size: 0.88rem; font-weight: bold; color: #004080; text-align: center;">
+      <p style="margin: 0; font-size: 0.88rem; font-weight: bold; color: #2e7d32; text-align: center;">
         ↑ Bitte drücken Sie oben auf den OK-Knopf.
       </p>
     </div>
@@ -296,9 +302,8 @@ function showLanguageHintOnce(activeLang) {
   document.body.appendChild(overlay);
 
   // Desktop-Fix: Google Translate gezielt auf das Hinweisfenster anstoßen
-  setTimeout(() => retriggerGoogleTranslate(activeLang), 400);
-  setTimeout(() => retriggerGoogleTranslate(activeLang), 1200);
-  setTimeout(() => retriggerGoogleTranslate(activeLang), 2500);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 600);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 1600);
 
   const closeModal = () => overlay.remove();
 
@@ -411,13 +416,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const activeLang = getActiveLanguage();
 
-  // 2. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
+  // 2. Hinweis-Fenster SOFORT ins DOM setzen (vor Google Translate), damit Desktop-Browser es sofort miterfassen
+  showLanguageHintOnce(activeLang);
+
+  // 3. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
   const cleanDocuSealUrl = "https://docuseal.com/d/Mcvg84UEAD5aay";
   document.querySelectorAll('a[href*="docuseal.com"]').forEach(link => {
     link.href = cleanDocuSealUrl;
   });
 
-  // 3. CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
+  // 4. CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
   const hideBarStyle = document.createElement("style");
   hideBarStyle.textContent = `
     .goog-te-banner-frame.skiptranslate,
@@ -434,7 +442,7 @@ document.addEventListener("DOMContentLoaded", function () {
   `;
   document.head.appendChild(hideBarStyle);
 
-  // 4. Navigation laden, Hinweis-Box vorbereiten und Google Translate starten
+  // 5. Navigation laden und Google Translate starten
   const navContainer = document.getElementById("main-nav");
   if (navContainer) {
     fetch("nav.html")
@@ -474,7 +482,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (activeLang && activeLang !== "de" && navList) {
           const helpLi = document.createElement("li");
-          helpLi.style.backgroundColor = "#37474f";
+          helpLi.style.backgroundColor = "#8e1c24";
           helpLi.style.borderBottom = "2px solid #ffd700";
 
           const helpMenuLink = document.createElement("a");
@@ -505,20 +513,17 @@ document.addEventListener("DOMContentLoaded", function () {
           navList.prepend(resetLi);
         }
 
-        showLanguageHintOnce(activeLang);
         startGoogleTranslate(activeLang);
       })
       .catch(error => {
         console.error(error);
-        showLanguageHintOnce(activeLang);
         startGoogleTranslate(activeLang);
       });
   } else {
-    showLanguageHintOnce(activeLang);
     startGoogleTranslate(activeLang);
   }
 
-  // 5. GoatCounter Besucherzähler für "fflw" (Cookie-frei & DSGVO-konform)
+  // 6. GoatCounter Besucherzähler für "fflw" (Cookie-frei & DSGVO-konform)
   const goatCounterSite = "fflw";
   const gcScript = document.createElement("script");
   gcScript.async = true;
@@ -526,7 +531,7 @@ document.addEventListener("DOMContentLoaded", function () {
   gcScript.setAttribute("data-goatcounter", `https://${goatCounterSite}.goatcounter.com/count`);
   document.body.appendChild(gcScript);
 
-  // 6. Unauffälligen "SA"-Link in der Fußzeile neben Sitemap ergänzen
+  // 7. Unauffälligen "SA"-Link in der Fußzeile neben Sitemap ergänzen
   const legalFooter = document.querySelector(".legal-footer");
   if (legalFooter && !legalFooter.querySelector('a[href="intern-statistik.html"]')) {
     legalFooter.insertAdjacentHTML(
@@ -535,7 +540,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  // 7. PWA-Manifest, Apple-Icon und Service Worker zentral registrieren
+  // 8. PWA-Manifest, Apple-Icon und Service Worker zentral registrieren
   if (!document.querySelector('link[rel="manifest"]')) {
     const manifestLink = document.createElement("link");
     manifestLink.rel = "manifest";
