@@ -30,20 +30,24 @@ function getActiveLanguage() {
   return match ? match[1] : null;
 }
 
+// Hilfsfunktion: Findet einen regulären Seiten-Container (Google Translate ignoriert oft direkte body-Overlays auf Desktop)
+function getModalMountTarget() {
+  return document.querySelector("main") || document.getElementById("main-nav") || document.body;
+}
+
 // Erzwingt auf Desktop & Mobil eine echte Neu-Übersetzung dynamischer Pop-ups
 function forceGoogleTranslatePopup(targetLang) {
   if (!targetLang || targetLang === "de") return;
   const combo = document.querySelector(".goog-te-combo");
   if (!combo) return;
 
-  // Kurzer Reset auf leer, damit Google Translate neu eingefügte DOM-Knoten sicher scannt
   combo.value = "";
   combo.dispatchEvent(new Event("change"));
 
   setTimeout(() => {
     combo.value = targetLang;
     combo.dispatchEvent(new Event("change"));
-  }, 60);
+  }, 80);
 }
 
 // Initialisiert Google Translate und erzwingt sofortige Übersetzung
@@ -98,10 +102,12 @@ function openTranslationHelpDialog(activeLang) {
   const openedAt = Date.now();
   const overlay = document.createElement("div");
   overlay.id = "fflw-help-dialog-overlay";
+  overlay.className = "translate";
+  overlay.setAttribute("translate", "yes");
   overlay.style.cssText = `
     position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6);
     display: flex; align-items: flex-start; justify-content: center;
-    z-index: 100000; padding: 12px; box-sizing: border-box; overflow-y: auto;
+    z-index: 9500; padding: 12px; box-sizing: border-box; overflow-y: auto;
   `;
 
   const modal = document.createElement("div");
@@ -163,7 +169,7 @@ function openTranslationHelpDialog(activeLang) {
   `;
 
   overlay.appendChild(modal);
-  document.body.appendChild(overlay);
+  getModalMountTarget().appendChild(overlay);
 
   // Desktop-Fix: Google Translate gezielt neu anstoßen
   setTimeout(() => forceGoogleTranslatePopup(activeLang), 150);
@@ -250,10 +256,12 @@ function showLanguageHintOnce(activeLang) {
 
   const overlay = document.createElement("div");
   overlay.id = "fflw-lang-hint-overlay";
+  overlay.className = "translate";
+  overlay.setAttribute("translate", "yes");
   overlay.style.cssText = `
     position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55);
     display: flex; align-items: flex-start; justify-content: center;
-    z-index: 99999; padding: 12px; box-sizing: border-box; overflow-y: auto;
+    z-index: 9000; padding: 12px; box-sizing: border-box; overflow-y: auto;
   `;
 
   const modal = document.createElement("div");
@@ -299,7 +307,7 @@ function showLanguageHintOnce(activeLang) {
   `;
 
   overlay.appendChild(modal);
-  document.body.appendChild(overlay);
+  getModalMountTarget().appendChild(overlay);
 
   // Desktop-Fix: Google Translate gezielt auf das Hinweisfenster anstoßen
   setTimeout(() => forceGoogleTranslatePopup(activeLang), 600);
@@ -336,7 +344,7 @@ function showPwaInstallBanner(platform) {
   const banner = document.createElement("div");
   banner.id = "fflw-pwa-banner";
   banner.style.cssText = `
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 9998;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 8500;
     background: #003366; color: #ffffff; padding: 12px 16px;
     box-shadow: 0 -4px 15px rgba(0,0,0,0.25);
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -379,7 +387,7 @@ function showPwaInstallBanner(platform) {
     `;
   }
 
-  document.body.appendChild(banner);
+  getModalMountTarget().appendChild(banner);
 
   document.getElementById("fflw-pwa-close-btn").addEventListener("click", function () {
     localStorage.setItem("fflw_pwa_dismissed", "true");
@@ -416,16 +424,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const activeLang = getActiveLanguage();
 
-  // 2. Hinweis-Fenster SOFORT ins DOM setzen (vor Google Translate), damit Desktop-Browser es sofort miterfassen
-  showLanguageHintOnce(activeLang);
-
-  // 3. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
+  // 2. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
   const cleanDocuSealUrl = "https://docuseal.com/d/Mcvg84UEAD5aay";
   document.querySelectorAll('a[href*="docuseal.com"]').forEach(link => {
     link.href = cleanDocuSealUrl;
   });
 
-  // 4. CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
+  // 3. CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
   const hideBarStyle = document.createElement("style");
   hideBarStyle.textContent = `
     .goog-te-banner-frame.skiptranslate,
@@ -441,6 +446,9 @@ document.addEventListener("DOMContentLoaded", function () {
     .goog-text-highlight { background: none !important; box-shadow: none !important; }
   `;
   document.head.appendChild(hideBarStyle);
+
+  // 4. Hinweis-Fenster in den regulären Inhaltsbereich einhängen, bevor Google Translate startet
+  showLanguageHintOnce(activeLang);
 
   // 5. Navigation laden und Google Translate starten
   const navContainer = document.getElementById("main-nav");
