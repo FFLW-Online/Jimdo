@@ -30,11 +30,6 @@ function getActiveLanguage() {
   return match ? match[1] : null;
 }
 
-// Hilfsfunktion: Findet einen regulären Seiten-Container (Google Translate ignoriert oft direkte body-Overlays auf Desktop)
-function getModalMountTarget() {
-  return document.querySelector("main") || document.getElementById("main-nav") || document.body;
-}
-
 // Erzwingt auf Desktop & Mobil eine echte Neu-Übersetzung dynamischer Pop-ups
 function forceGoogleTranslatePopup(targetLang) {
   if (!targetLang || targetLang === "de") return;
@@ -95,6 +90,43 @@ function startGoogleTranslate(activeLang) {
   document.body.appendChild(gtScript);
 }
 
+// Hilfsfunktion: Macht ein Overlay erst kurz als normalen Fluss-Block für Google Translate sichtbar
+// und hebt es direkt danach als echtes schwebendes Pop-up über alles andere (z-index Max)
+function mountTranslatableModal(overlay, activeLang) {
+  // Kurz als normaler Block ganz oben im body einfügen, damit Google Translate Desktop es nicht ignoriert
+  overlay.style.cssText = `
+    position: relative; width: 100%; background: #ffffff;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 12px; box-sizing: border-box;
+  `;
+  document.body.prepend(overlay);
+
+  const switchToFixedOverlay = () => {
+    if (!document.body.contains(overlay)) return;
+    overlay.style.cssText = `
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
+      display: flex; align-items: flex-start; justify-content: center;
+      z-index: 2147483647; padding: 12px; box-sizing: border-box; overflow-y: auto;
+    `;
+  };
+
+  if (!activeLang || activeLang === "de") {
+    switchToFixedOverlay();
+    return;
+  }
+
+  // Warten, bis Google Translate mindestens einen Textknoten im Pop-up übersetzt hat (max. 1,8 Sek.)
+  let checks = 0;
+  const poll = setInterval(() => {
+    checks++;
+    const hasTranslatedFont = overlay.querySelector("font");
+    if (hasTranslatedFont || checks >= 18) {
+      clearInterval(poll);
+      switchToFixedOverlay();
+    }
+  }, 100);
+}
+
 // Öffnet das Dialogfenster für Probleme mit dem Übersetzungstool (Buttons oben befestigt)
 function openTranslationHelpDialog(activeLang) {
   if (document.getElementById("fflw-help-dialog-overlay")) return;
@@ -102,19 +134,12 @@ function openTranslationHelpDialog(activeLang) {
   const openedAt = Date.now();
   const overlay = document.createElement("div");
   overlay.id = "fflw-help-dialog-overlay";
-  overlay.className = "translate";
-  overlay.setAttribute("translate", "yes");
-  overlay.style.cssText = `
-    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6);
-    display: flex; align-items: flex-start; justify-content: center;
-    z-index: 9500; padding: 12px; box-sizing: border-box; overflow-y: auto;
-  `;
 
   const modal = document.createElement("div");
   modal.style.cssText = `
     background: #ffffff; color: #1a1a1a; max-width: 440px; width: 100%;
-    margin-top: 10px; border-radius: 8px; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    margin-top: 8px; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.45;
   `;
 
@@ -169,11 +194,11 @@ function openTranslationHelpDialog(activeLang) {
   `;
 
   overlay.appendChild(modal);
-  getModalMountTarget().appendChild(overlay);
+  mountTranslatableModal(overlay, activeLang);
 
   // Desktop-Fix: Google Translate gezielt neu anstoßen
   setTimeout(() => forceGoogleTranslatePopup(activeLang), 150);
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 800);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 750);
 
   const closeDialog = () => overlay.remove();
   document.getElementById("fflw-help-cancel-btn").addEventListener("click", closeDialog);
@@ -256,19 +281,12 @@ function showLanguageHintOnce(activeLang) {
 
   const overlay = document.createElement("div");
   overlay.id = "fflw-lang-hint-overlay";
-  overlay.className = "translate";
-  overlay.setAttribute("translate", "yes");
-  overlay.style.cssText = `
-    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55);
-    display: flex; align-items: flex-start; justify-content: center;
-    z-index: 9000; padding: 12px; box-sizing: border-box; overflow-y: auto;
-  `;
 
   const modal = document.createElement("div");
   modal.style.cssText = `
     background: #ffffff; color: #1a1a1a; max-width: 440px; width: 100%;
-    margin-top: 10px; border-radius: 8px; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    margin-top: 8px; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.45;
   `;
 
@@ -307,11 +325,11 @@ function showLanguageHintOnce(activeLang) {
   `;
 
   overlay.appendChild(modal);
-  getModalMountTarget().appendChild(overlay);
+  mountTranslatableModal(overlay, activeLang);
 
   // Desktop-Fix: Google Translate gezielt auf das Hinweisfenster anstoßen
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 600);
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 1600);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 500);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 1300);
 
   const closeModal = () => overlay.remove();
 
@@ -344,7 +362,7 @@ function showPwaInstallBanner(platform) {
   const banner = document.createElement("div");
   banner.id = "fflw-pwa-banner";
   banner.style.cssText = `
-    position: fixed; bottom: 0; left: 0; right: 0; z-index: 8500;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 2147483640;
     background: #003366; color: #ffffff; padding: 12px 16px;
     box-shadow: 0 -4px 15px rgba(0,0,0,0.25);
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -387,7 +405,7 @@ function showPwaInstallBanner(platform) {
     `;
   }
 
-  getModalMountTarget().appendChild(banner);
+  document.body.appendChild(banner);
 
   document.getElementById("fflw-pwa-close-btn").addEventListener("click", function () {
     localStorage.setItem("fflw_pwa_dismissed", "true");
@@ -424,13 +442,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const activeLang = getActiveLanguage();
 
-  // 2. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
+  // 2. Hinweis-Fenster SOFORT vor Google Translate einhängen
+  showLanguageHintOnce(activeLang);
+
+  // 3. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
   const cleanDocuSealUrl = "https://docuseal.com/d/Mcvg84UEAD5aay";
   document.querySelectorAll('a[href*="docuseal.com"]').forEach(link => {
     link.href = cleanDocuSealUrl;
   });
 
-  // 3. CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
+  // 4. CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
   const hideBarStyle = document.createElement("style");
   hideBarStyle.textContent = `
     .goog-te-banner-frame.skiptranslate,
@@ -446,9 +467,6 @@ document.addEventListener("DOMContentLoaded", function () {
     .goog-text-highlight { background: none !important; box-shadow: none !important; }
   `;
   document.head.appendChild(hideBarStyle);
-
-  // 4. Hinweis-Fenster in den regulären Inhaltsbereich einhängen, bevor Google Translate startet
-  showLanguageHintOnce(activeLang);
 
   // 5. Navigation laden und Google Translate starten
   const navContainer = document.getElementById("main-nav");
