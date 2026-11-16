@@ -19,7 +19,6 @@ function setLanguage(langCode) {
     document.cookie = `googtrans=/de/${langCode}; path=/; domain=${host};`;
   }
 
-  // Eindeutiger Zeitstempel verhindert, dass der Handy-Browser die alte Cache-Version lädt
   const targetUrl = langCode === "de" ? "index.html" : `index.html?lang=${langCode}`;
   window.location.replace(targetUrl);
 }
@@ -30,7 +29,7 @@ function getActiveLanguage() {
   return match ? match[1] : null;
 }
 
-// Initialisiert Google Translate und erzwingt sofortige Übersetzung ohne Neuladen
+// Initialisiert Google Translate und erzwingt sofortige Übersetzung
 function googleTranslateElementInit() {
   new google.translate.TranslateElement({
     pageLanguage: 'de',
@@ -49,11 +48,27 @@ function googleTranslateElementInit() {
           combo.dispatchEvent(new Event("change"));
         }
         clearInterval(triggerInterval);
-      } else if (attempts > 25) {
+      } else if (attempts > 30) {
         clearInterval(triggerInterval);
       }
     }, 200);
   }
+}
+
+// Hilfsfunktion: Lädt Google Translate erst, wenn das Menü bereits im DOM steht
+function startGoogleTranslate(activeLang) {
+  if (!activeLang || activeLang === "de") return;
+  if (document.getElementById("google_translate_hidden")) return;
+
+  const hiddenDiv = document.createElement("div");
+  hiddenDiv.id = "google_translate_hidden";
+  hiddenDiv.style.display = "none";
+  document.body.appendChild(hiddenDiv);
+
+  const gtScript = document.createElement("script");
+  gtScript.type = "text/javascript";
+  gtScript.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+  document.body.appendChild(gtScript);
 }
 
 // Schützt vor eingefrorenem Handy-Cache beim Nutzen der Browser-Zurück-Taste
@@ -64,7 +79,7 @@ window.addEventListener("pageshow", function (event) {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Falls URL ?lang=xx mitbringt, Cookie sicherheitshalber sofort synchronisieren
+  // 1. URL-Parameter ?lang=xx sofort mit Cookie synchronisieren
   const urlParams = new URLSearchParams(window.location.search);
   const urlLang = urlParams.get("lang");
   if (urlLang && urlLang !== "de") {
@@ -74,7 +89,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const activeLang = getActiveLanguage();
 
-  // CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
+  // 2. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
+  const cleanDocuSealUrl = "https://docuseal.com/d/Mcvg84UEAD5aay";
+  document.querySelectorAll('a[href*="docuseal.com"]').forEach(link => {
+    link.href = cleanDocuSealUrl;
+  });
+
+  // 3. CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
   const hideBarStyle = document.createElement("style");
   hideBarStyle.textContent = `
     .goog-te-banner-frame.skiptranslate,
@@ -91,6 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
   `;
   document.head.appendChild(hideBarStyle);
 
+  // 4. Navigation laden und erst DANACH Google Translate starten
   const navContainer = document.getElementById("main-nav");
   if (navContainer) {
     fetch("nav.html")
@@ -101,7 +123,12 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(html => {
         navContainer.innerHTML = html;
 
-        // 1. Aktuelle Seite im Menü markieren & übergeordnetes Sub-Menü öffnen
+        // DocuSeal-Links prüfen, falls auch im Menü einer vorkommt
+        navContainer.querySelectorAll('a[href*="docuseal.com"]').forEach(link => {
+          link.href = cleanDocuSealUrl;
+        });
+
+        // Aktuelle Seite im Menü markieren & übergeordnetes Sub-Menü öffnen
         const currentPath = window.location.pathname.split("/").pop() || "index.html";
         const links = navContainer.querySelectorAll("a");
 
@@ -116,7 +143,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         });
 
-        // 2. Mobile-Menü Toggle (Ein-/Ausklappen)
+        // Mobile-Menü Toggle (Ein-/Ausklappen)
         const toggleBtn = document.getElementById("menu-toggle");
         const navList = document.getElementById("nav-list");
 
@@ -126,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function () {
           });
         }
 
-        // 3. NUR wenn aktuell übersetzt wird: "🇩🇪 Deutsch"-Reset-Button ganz oben ins Menü setzen
+        // NUR wenn aktuell übersetzt wird: "🇩🇪 Deutsch"-Reset-Button ganz oben ins Menü setzen
         if (activeLang && activeLang !== "de" && navList) {
           const resetLi = document.createElement("li");
           resetLi.style.backgroundColor = "#1a237e";
@@ -145,21 +172,16 @@ document.addEventListener("DOMContentLoaded", function () {
           resetLi.appendChild(resetLink);
           navList.prepend(resetLi);
         }
+
+        // Jetzt, wo Menü + Seite komplett bereitstehen, Übersetzung starten
+        startGoogleTranslate(activeLang);
       })
-      .catch(error => console.error(error));
-  }
-
-  // 4. Google Translate im Hintergrund laden, wenn eine Sprache aktiv ist
-  if (activeLang && activeLang !== "de") {
-    const hiddenDiv = document.createElement("div");
-    hiddenDiv.id = "google_translate_hidden";
-    hiddenDiv.style.display = "none";
-    document.body.appendChild(hiddenDiv);
-
-    const gtScript = document.createElement("script");
-    gtScript.type = "text/javascript";
-    gtScript.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-    document.body.appendChild(gtScript);
+      .catch(error => {
+        console.error(error);
+        startGoogleTranslate(activeLang);
+      });
+  } else {
+    startGoogleTranslate(activeLang);
   }
 
   // 5. GoatCounter Besucherzähler für "fflw" (Cookie-frei & DSGVO-konform)
