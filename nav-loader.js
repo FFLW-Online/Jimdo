@@ -1,25 +1,23 @@
-// Hilfsfunktion: Setzt das Google-Translate-Cookie sauber auf allen Domain-Ebenen
+// Hilfsfunktion: Bereinigt und setzt das Google-Translate-Cookie sauber ohne Duplikate
 function applyGoogleTranslateCookie(langCode) {
   const host = window.location.hostname;
   const hostParts = host.split('.');
   const rootDomain = hostParts.length > 1 ? '.' + hostParts.slice(-2).join('.') : host;
 
-  if (!langCode || langCode === "de") {
-    const paths = ["/", "/Jimdo", "/Jimdo/"];
-    const domains = ["", host, "." + host, rootDomain];
-    paths.forEach(p => {
-      domains.forEach(d => {
-        const domainStr = d ? `; domain=${d}` : "";
-        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${p}${domainStr};`;
-      });
+  // Zuerst alle eventuell vorhandenen alten Cookies auf allen Ebenen löschen
+  const paths = ["/", "/Jimdo", "/Jimdo/"];
+  const domains = ["", host, "." + host, rootDomain];
+  paths.forEach(p => {
+    domains.forEach(d => {
+      const domainStr = d ? `; domain=${d}` : "";
+      document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=${p}${domainStr};`;
     });
-  } else {
+  });
+
+  // Danach nur ein einziges sauberes Cookie setzen
+  if (langCode && langCode !== "de") {
     document.cookie = `googtrans=/de/${langCode}; path=/;`;
-    if (host) {
-      document.cookie = `googtrans=/de/${langCode}; path=/; domain=${host};`;
-      document.cookie = `googtrans=/de/${langCode}; path=/; domain=.${host};`;
-    }
-    if (rootDomain && rootDomain !== host) {
+    if (rootDomain && rootDomain.startsWith(".")) {
       document.cookie = `googtrans=/de/${langCode}; path=/; domain=${rootDomain};`;
     }
   }
@@ -39,20 +37,14 @@ function getActiveLanguage() {
 
 // Globale Funktion zum Wechseln oder Zurücksetzen der Sprache über die Flaggen
 function setLanguage(langCode) {
-  const isMobile = window.innerWidth <= 768;
-
   if (langCode === "de") {
     applyGoogleTranslateCookie("de");
     sessionStorage.removeItem("fflw_i18n_hint_shown");
     window.location.replace("index.html");
   } else {
     applyGoogleTranslateCookie(langCode);
-    if (isMobile) {
-      window.location.replace(`index.html?lang=${langCode}#googtrans(de|${langCode})`);
-    } else {
-      sessionStorage.setItem("fflw_i18n_hint_shown", "true");
-      window.location.replace(`sprach-hinweis.html?lang=${langCode}#googtrans(de|${langCode})`);
-    }
+    // Einheitlich für Desktop & Handy: direkt auf index.html mit URL-Parameter & Hash wechseln
+    window.location.replace(`index.html?lang=${langCode}#googtrans(de|${langCode})`);
   }
 }
 
@@ -62,22 +54,45 @@ function forceGoogleTranslatePopup(targetLang) {
   const combo = document.querySelector(".goog-te-combo");
   if (!combo) return;
 
-  combo.value = "";
-  combo.dispatchEvent(new Event("change"));
+  combo.value = targetLang;
+  combo.dispatchEvent(new Event("change", { bubbles: true }));
+}
 
-  setTimeout(() => {
-    combo.value = targetLang;
-    combo.dispatchEvent(new Event("change"));
-  }, 120);
+// Zeigt einen Fallback-Balken, falls ein Browser/Adblocker translate.google.com blockiert
+function showTranslateBlockedFallback(targetLang) {
+  if (document.getElementById("fflw-gt-blocked-bar")) return;
+
+  const fallbackUrl = `https://translate.google.com/translate?sl=de&tl=${encodeURIComponent(targetLang)}&u=${encodeURIComponent(window.location.href)}`;
+  const bar = document.createElement("div");
+  bar.id = "fflw-gt-blocked-bar";
+  bar.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0; z-index: 2147483647;
+    background: #fff3cd; color: #333; border-bottom: 2px solid #ffb300;
+    padding: 10px 16px; display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: center; gap: 12px; font-family: inherit; font-size: 0.9rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  `;
+  bar.innerHTML = `
+    <span>⚠️ Ihr Browser blockiert das eingebettete Übersetzungstool.</span>
+    <a href="${fallbackUrl}" target="_blank" rel="noopener"
+       style="background: #2e7d32; color: #fff; text-decoration: none; padding: 6px 14px; border-radius: 5px; font-weight: bold;">
+      🌐 Seite direkt über Google Translate öffnen
+    </a>
+    <button type="button" id="fflw-gt-blocked-close"
+            style="background: transparent; border: none; font-size: 1.1rem; cursor: pointer; color: #555;">✕</button>
+  `;
+  document.body.appendChild(bar);
+  document.getElementById("fflw-gt-blocked-close").addEventListener("click", () => bar.remove());
 }
 
 // Globaler Callback für Google Translate (explizit an window gebunden)
 window.googleTranslateElementInit = function () {
   const targetLang = getActiveLanguage();
 
+  // WICHTIG: Kein includedLanguages einschränken, damit Google Translate auf dem Desktop
+  // zuverlässig das echte <select class="goog-te-combo"> aufbaut!
   new google.translate.TranslateElement({
     pageLanguage: 'de',
-    includedLanguages: targetLang && targetLang !== "de" ? targetLang : undefined,
     autoDisplay: false
   }, 'google_translate_hidden');
 
@@ -91,19 +106,23 @@ window.googleTranslateElementInit = function () {
 
       attempts++;
 
-      if (combo && combo.options && combo.options.length > 0 && !isTranslated) {
+      if (combo && combo.options && combo.options.length > 1 && !isTranslated) {
         combo.value = targetLang;
-        combo.dispatchEvent(new Event("change"));
+        combo.dispatchEvent(new Event("change", { bubbles: true }));
       }
 
-      if (isTranslated || attempts > 40) {
+      if (isTranslated) {
+        clearInterval(triggerInterval);
+        // Falls das Hinweis-Pop-up schon offen ist, sicherstellen, dass es mitübersetzt wird
+        setTimeout(() => forceGoogleTranslatePopup(targetLang), 150);
+      } else if (attempts > 40) {
         clearInterval(triggerInterval);
       }
     }, 250);
   }
 };
 
-// Hilfsfunktion: Lädt Google Translate (ohne display:none + mit #googtrans-Anker für Desktop)
+// Hilfsfunktion: Lädt Google Translate (sichtbar im Render-Baum, aber außerhalb des Viewports)
 function startGoogleTranslate(activeLang) {
   if (!activeLang || activeLang === "de") return;
 
@@ -119,19 +138,21 @@ function startGoogleTranslate(activeLang) {
 
   const hiddenDiv = document.createElement("div");
   hiddenDiv.id = "google_translate_hidden";
-  hiddenDiv.style.cssText = "position: absolute; left: -9999px; top: 0; width: 1px; height: 1px; overflow: hidden;";
+  hiddenDiv.style.cssText = "position: fixed; left: -9999px; top: 0; width: 200px; height: 40px; opacity: 0.01; pointer-events: none;";
   document.body.appendChild(hiddenDiv);
 
   const gtScript = document.createElement("script");
   gtScript.type = "text/javascript";
   gtScript.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+  gtScript.onerror = function () {
+    showTranslateBlockedFallback(activeLang);
+  };
   document.body.appendChild(gtScript);
 }
 
-// Schwebendes Hinweisfenster NUR für Mobilgeräte (Handy)
-function showMobileLanguageHintOnce(activeLang) {
+// Einheitliches, einmaliges Hinweis-Pop-up für Desktop UND Mobilgeräte
+function showLanguageHintOnce(activeLang) {
   if (!activeLang || activeLang === "de") return;
-  if (window.innerWidth > 768) return;
   if (sessionStorage.getItem("fflw_i18n_hint_shown") === "true") return;
 
   sessionStorage.setItem("fflw_i18n_hint_shown", "true");
@@ -140,46 +161,46 @@ function showMobileLanguageHintOnce(activeLang) {
   overlay.id = "fflw-lang-hint-overlay";
   overlay.style.cssText = `
     position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
-    display: flex; align-items: flex-start; justify-content: center;
-    z-index: 2147483647; padding: 12px; box-sizing: border-box; overflow-y: auto;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2147483647; padding: 16px; box-sizing: border-box; overflow-y: auto;
   `;
 
   const modal = document.createElement("div");
   modal.style.cssText = `
-    background: #ffffff; color: #1a1a1a; max-width: 440px; width: 100%;
-    margin-top: 8px; border-radius: 8px; overflow: hidden;
+    background: #ffffff; color: #1a1a1a; max-width: 480px; width: 100%;
+    border-radius: 8px; overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.45;
+    border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.5;
   `;
 
   modal.innerHTML = `
-    <div style="position: sticky; top: 0; z-index: 2; padding: 8px 14px; background: #f4f7f4; border-bottom: 1px solid #d5e2d5; display: flex; gap: 10px; justify-content: space-between; align-items: center;">
+    <div style="position: sticky; top: 0; z-index: 2; padding: 10px 14px; background: #f4f7f4; border-bottom: 1px solid #d5e2d5; display: flex; gap: 10px; justify-content: space-between; align-items: center;">
       <button type="button" id="fflw-hint-help-btn"
-              style="background: #fdecea; color: #a61d24; border: 1px solid #e57373; padding: 5px 9px; border-radius: 5px; font-size: 0.72rem; font-weight: bold; line-height: 1.2; text-align: left; cursor: pointer; max-width: 215px;">
+              style="background: #fdecea; color: #a61d24; border: 1px solid #e57373; padding: 6px 10px; border-radius: 5px; font-size: 0.76rem; font-weight: bold; line-height: 1.25; text-align: left; cursor: pointer; max-width: 230px;">
         🌐 Probleme mit dem<br>Übersetzungstool
       </button>
       <button type="button" id="fflw-hint-ok-btn"
-              style="background: #2e7d32; color: #ffffff; border: none; padding: 8px 22px; border-radius: 5px; font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;">
+              style="background: #2e7d32; color: #ffffff; border: none; padding: 8px 24px; border-radius: 5px; font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;">
         OK
       </button>
     </div>
 
-    <div style="padding: 16px 18px 18px 18px;">
-      <h3 style="margin: 0 0 8px 0; color: #2e7d32; font-size: 1.08rem;">
+    <div style="padding: 18px 20px 20px 20px;">
+      <h3 style="margin: 0 0 10px 0; color: #2e7d32; font-size: 1.12rem;">
         Hinweis zur Sprachauswahl
       </h3>
-      <p style="margin: 0 0 8px 0; font-size: 0.9rem;">
+      <p style="margin: 0 0 10px 0; font-size: 0.92rem;">
         Im Menü können Sie jederzeit über
-        <strong class="notranslate" translate="no" style="background: #eef3fa; padding: 1px 5px; border-radius: 4px; color: #1a237e;">🇩🇪 Deutsch (Original)</strong>
+        <strong class="notranslate" translate="no" style="background: #eef3fa; padding: 1px 6px; border-radius: 4px; color: #1a237e;">🇩🇪 Deutsch (Original)</strong>
         zur deutschen Originalsprache zurückkehren.
       </p>
-      <p style="margin: 0 0 10px 0; font-size: 0.9rem;">
+      <p style="margin: 0 0 12px 0; font-size: 0.92rem;">
         Für eine <strong>andere Sprache</strong> gehen Sie bitte zuerst über diesen Knopf zurück zu Deutsch und wählen Sie danach eine neue Flagge aus.
       </p>
-      <p style="margin: 0 0 12px 0; font-size: 0.85rem; color: #444; background: #f7f9fc; padding: 8px; border-radius: 5px;">
+      <p style="margin: 0 0 14px 0; font-size: 0.86rem; color: #444; background: #f7f9fc; padding: 9px 10px; border-radius: 5px;">
         Funktioniert die automatische Übersetzung nicht richtig? Nur bei technischen Problemen nutzen Sie bitte den Knopf <strong>„Probleme mit dem Übersetzungstool“</strong> (oben oder im Menü).
       </p>
-      <p style="margin: 0; font-size: 0.88rem; font-weight: bold; color: #2e7d32; text-align: center;">
+      <p style="margin: 0; font-size: 0.9rem; font-weight: bold; color: #2e7d32; text-align: center;">
         ↑ Bitte drücken Sie oben auf den OK-Knopf.
       </p>
     </div>
@@ -187,6 +208,10 @@ function showMobileLanguageHintOnce(activeLang) {
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+
+  // Nach dem Einfügen ins DOM Google Translate kurz anstoßen, falls die Hauptseite schon übersetzt ist
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 350);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 1100);
 
   const closeModal = () => overlay.remove();
 
@@ -210,14 +235,14 @@ function openTranslationHelpDialog(activeLang) {
   overlay.id = "fflw-help-dialog-overlay";
   overlay.style.cssText = `
     position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
-    display: flex; align-items: flex-start; justify-content: center;
-    z-index: 2147483647; padding: 12px; box-sizing: border-box; overflow-y: auto;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2147483647; padding: 16px; box-sizing: border-box; overflow-y: auto;
   `;
 
   const modal = document.createElement("div");
   modal.style.cssText = `
-    background: #ffffff; color: #1a1a1a; max-width: 440px; width: 100%;
-    margin-top: 8px; border-radius: 8px; overflow: hidden;
+    background: #ffffff; color: #1a1a1a; max-width: 460px; width: 100%;
+    border-radius: 8px; overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.45;
   `;
@@ -435,32 +460,22 @@ window.addEventListener("pageshow", function (event) {
 
 document.addEventListener("DOMContentLoaded", function () {
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
-  const isMobile = window.innerWidth <= 768;
 
   // 1. URL-Parameter ?lang=xx sofort mit Cookie synchronisieren
   const activeLang = getActiveLanguage();
   if (activeLang && activeLang !== "de") {
     applyGoogleTranslateCookie(activeLang);
+    // Einheitliches Pop-up für Desktop & Handy einmalig anzeigen
+    showLanguageHintOnce(activeLang);
   }
 
-  // 2. Weiche für den ersten Sprachaufruf:
-  if (activeLang && activeLang !== "de") {
-    if (!isMobile && currentPage !== "sprach-hinweis.html" && sessionStorage.getItem("fflw_i18n_hint_shown") !== "true") {
-      sessionStorage.setItem("fflw_i18n_hint_shown", "true");
-      window.location.replace(`sprach-hinweis.html?lang=${activeLang}#googtrans(de|${activeLang})`);
-      return;
-    } else if (isMobile) {
-      showMobileLanguageHintOnce(activeLang);
-    }
-  }
-
-  // 3. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
+  // 2. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
   const cleanDocuSealUrl = "https://docuseal.com/d/Mcvg84UEAD5aay";
   document.querySelectorAll('a[href*="docuseal.com"]').forEach(link => {
     link.href = cleanDocuSealUrl;
   });
 
-  // 4. CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
+  // 3. CSS-Schutz: Blockiert die obere Google-Leiste UND das Bewertungs-Popup
   const hideBarStyle = document.createElement("style");
   hideBarStyle.textContent = `
     .goog-te-banner-frame.skiptranslate,
@@ -477,7 +492,7 @@ document.addEventListener("DOMContentLoaded", function () {
   `;
   document.head.appendChild(hideBarStyle);
 
-  // 5. Navigation laden und Google Translate starten
+  // 4. Navigation laden und Google Translate starten
   const navContainer = document.getElementById("main-nav");
   if (navContainer) {
     fetch("nav.html")
@@ -556,7 +571,7 @@ document.addEventListener("DOMContentLoaded", function () {
     startGoogleTranslate(activeLang);
   }
 
-  // 6. GoatCounter Besucherzähler für "fflw" (Cookie-frei & DSGVO-konform)
+  // 5. GoatCounter Besucherzähler für "fflw" (Cookie-frei & DSGVO-konform)
   const goatCounterSite = "fflw";
   const gcScript = document.createElement("script");
   gcScript.async = true;
@@ -564,7 +579,7 @@ document.addEventListener("DOMContentLoaded", function () {
   gcScript.setAttribute("data-goatcounter", `https://${goatCounterSite}.goatcounter.com/count`);
   document.body.appendChild(gcScript);
 
-  // 7. Unauffälligen "SA"-Link in der Fußzeile neben Sitemap ergänzen
+  // 6. Unauffälligen "SA"-Link in der Fußzeile neben Sitemap ergänzen
   const legalFooter = document.querySelector(".legal-footer");
   if (legalFooter && !legalFooter.querySelector('a[href="intern-statistik.html"]')) {
     legalFooter.insertAdjacentHTML(
@@ -573,7 +588,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  // 8. PWA-Manifest, Apple-Icon und Service Worker zentral registrieren
+  // 7. PWA-Manifest, Apple-Icon und Service Worker zentral registrieren
   if (!document.querySelector('link[rel="manifest"]')) {
     const manifestLink = document.createElement("link");
     manifestLink.rel = "manifest";
