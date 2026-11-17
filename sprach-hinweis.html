@@ -3,13 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hinweis zur Sprachauswahl – FFLW</title>
+  <title>Hinweis zur Sprachauswahl – Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
   <link rel="stylesheet" href="assets/style.css">
   <script>
-    // Falls ein Handy-Nutzer hier landet: direkt auf index.html leiten (dort erscheint das mobile Pop-up)
-    if (window.innerWidth <= 768) {
-      window.location.replace("index.html" + window.location.search);
-    }
+    (function () {
+      // 1. Handy-Nutzer direkt auf index.html leiten (dort erscheint das mobile Pop-up)
+      if (window.innerWidth <= 768) {
+        window.location.replace("index.html" + window.location.search + window.location.hash);
+        return;
+      }
+      // 2. Zielsprache aus ?lang=xx auslesen und sofort als #googtrans(de|xx) setzen,
+      //    BEVOR Google Translate geladen wird (der zuverlässigste Trigger für Desktop-Browser)
+      var params = new URLSearchParams(window.location.search);
+      var lang = params.get("lang");
+      if (lang && lang !== "de" && !window.location.hash.includes("googtrans")) {
+        window.location.hash = "googtrans(de|" + lang + ")";
+      }
+    })();
   </script>
   <style>
     body {
@@ -146,7 +156,7 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const lang = (typeof getActiveLanguage === "function" && getActiveLanguage()) ||
-                   new URLSearchParams(window.location.search).get("lang") || "unbekannt";
+                   new URLSearchParams(window.location.search).get("lang") || "en";
 
       const helpBtn = document.getElementById("page-help-btn");
       if (helpBtn && typeof openTranslationHelpDialog === "function") {
