@@ -191,6 +191,13 @@ function showLanguageHintOnce(activeLang) {
     cursor: pointer; vertical-align: baseline;
   `;
 
+  const inlineOkBtnStyle = `
+    display: inline-block; background: #2e7d32; color: #ffffff;
+    border: none; padding: 2px 9px; border-radius: 4px;
+    font-weight: bold; font-size: 0.88rem; cursor: pointer;
+    vertical-align: baseline;
+  `;
+
   modal.innerHTML = `
     <div style="position: sticky; top: 0; z-index: 2; padding: 10px 14px; background: #f4f7f4; border-bottom: 1px solid #d5e2d5; display: flex; gap: 10px; justify-content: space-between; align-items: center;">
       <button type="button" id="fflw-hint-help-btn"
@@ -208,22 +215,18 @@ function showLanguageHintOnce(activeLang) {
         Hinweis zur Sprachauswahl
       </h3>
       <p style="margin: 0 0 10px 0; font-size: 0.92rem;">
-        Sie können jederzeit hier
-        (<a href="index.html" class="fflw-hint-de-reset notranslate" translate="no" style="${deBtnStyle}">🇩🇪 Deutsch (Original)</a>)
-        oder auch im Menü zurück zum Original-Text in deutscher Sprache gelangen.
+        Aus technischen Gründen können Sie immer nur von "Deutsch" in eine andere Sprache wechseln.
       </p>
       <p style="margin: 0 0 12px 0; font-size: 0.92rem;">
-        Aus technischen Gründen können Sie immer nur von
-        (<a href="index.html" class="fflw-hint-de-reset notranslate" translate="no" style="${deBtnStyle}">🇩🇪 Deutsch (Original)</a>)
-        in eine andere Sprache wechseln. Also jetzt von Ihrer gewählten Sprache in eine andere Sprache wechseln funktioniert nur, wenn Sie zuerst wieder
-        (<a href="index.html" class="fflw-hint-de-reset notranslate" translate="no" style="${deBtnStyle}">🇩🇪 Deutsch (Original)</a>)
-        wählen.
+        Falls Sie jetzt auch noch eine andere Sprache als die vorher gewählte ausprobieren möchten, dann müssen Sie zuerst wieder "Deutsch" auswählen.
+        Das können Sie entweder hier (<a href="index.html" class="fflw-hint-de-reset notranslate" translate="no" style="${deBtnStyle}">🇩🇪 Deutsch (Original)</a>) oder im Menü machen.
       </p>
       <p style="margin: 0 0 14px 0; font-size: 0.86rem; color: #444; background: #f7f9fc; padding: 9px 10px; border-radius: 5px;">
         Funktioniert die automatische Übersetzung nicht richtig? Nur bei technischen Problemen nutzen Sie bitte den Knopf <strong>„Probleme mit dem Übersetzungstool“</strong> (oben oder im Menü).
       </p>
       <p style="margin: 0; font-size: 0.9rem; font-weight: bold; color: #2e7d32; text-align: center;">
-        ↑ Bitte drücken Sie oben auf den OK-Knopf.
+        Um jetzt die Webseite in Ihrer gewünschten Sprache anzusehen, drücken Sie bitte oben auf den
+        <button type="button" id="fflw-hint-ok-inline-btn" style="${inlineOkBtnStyle}">OK</button>-Knopf ↑
       </p>
     </div>
   `;
@@ -251,6 +254,7 @@ function showLanguageHintOnce(activeLang) {
   });
 
   document.getElementById("fflw-hint-ok-btn").addEventListener("click", closeModal);
+  document.getElementById("fflw-hint-ok-inline-btn").addEventListener("click", closeModal);
   overlay.addEventListener("click", function (e) {
     if (e.target === overlay) closeModal();
   });
