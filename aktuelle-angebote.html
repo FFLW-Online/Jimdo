@@ -21,11 +21,19 @@
     <main class="content">
       <h2>Aktuelle Angebote</h2>
 
-      <!-- Sprachauswahl: Übersetzt genau diese Seite direkt vor Ort -->
-      <div style="margin: 14px 0 22px 0; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; display: inline-block;">
-        <span style="font-weight: bold; margin-right: 8px;">🌐 Sprache / Translate:</span>
-        <div id="google_translate_element" style="display: inline-block; vertical-align: middle;"></div>
-      </div>
+      <!-- Sprachenknopf: verlinkt exakt auf eure Sprachauswahl (fflw-international.html) -->
+      <p style="margin: 14px 0 22px 0;">
+        <a href="fflw-international.html"
+           style="display: inline-flex; align-items: center; gap: 10px; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+           <span>🌐 Sprache wählen / ÜbersetzungsTool</span>
+           <span class="flag-carousel-inline" title="Viele Sprachen unterstützt">
+             <span class="flag-track-inline">
+               <span>🇩🇪</span><span>🇺🇦</span><span>🇬🇧</span><span>🇸🇾</span><span>🇦🇫</span><span>🇹🇷</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
+               <span>🇩🇪</span><span>🇺🇦</span><span>🇬🇧</span><span>🇸🇾</span><span>🇦🇫</span><span>🇹🇷</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
+             </span>
+           </span>
+        </a>
+      </p>
 
       <p>
         Hier findest du unsere aktuell verfügbaren Möbelstücke. Alle angezeigten Artikel sind noch frei und können direkt von dir reserviert werden.
@@ -127,17 +135,6 @@
     |
     <a href="sitemap.html">Sitemap</a>
   </footer>
-
-  <!-- Google Translate Skript für die Live-Übersetzung direkt auf dieser Seite -->
-  <script>
-    function googleTranslateElementInit() {
-      new google.translate.TranslateElement({
-        pageLanguage: 'de',
-        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
-      }, 'google_translate_element');
-    }
-  </script>
-  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
   <script src="nav-loader.js"></script>
 </body>
