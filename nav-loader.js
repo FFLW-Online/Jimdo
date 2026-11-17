@@ -23,13 +23,21 @@ function applyGoogleTranslateCookie(langCode) {
   }
 }
 
-// Hilfsfunktion: Liest die aktuell per URL, Hash oder Cookie gesetzte Sprache aus
-function getActiveLanguage() {
+// Prüft, ob in der aktuellen URL (Parameter oder Hash) ausdrücklich eine Fremdsprache angefordert wurde
+function getExplicitUrlLanguage() {
   const urlLang = new URLSearchParams(window.location.search).get("lang");
   if (urlLang && urlLang !== "de") return urlLang;
 
   const hashMatch = window.location.hash.match(/googtrans\(de\|([a-zA-Z-]+)\)/);
   if (hashMatch && hashMatch[1] !== "de") return hashMatch[1];
+
+  return null;
+}
+
+// Hilfsfunktion: Liest die aktuell per URL, Hash oder Cookie gesetzte Sprache aus
+function getActiveLanguage() {
+  const explicitLang = getExplicitUrlLanguage();
+  if (explicitLang) return explicitLang;
 
   const cookieMatch = document.cookie.match(/(?:^|;\s*)googtrans=\/de\/([a-zA-Z-]+)/);
   return cookieMatch ? cookieMatch[1] : null;
@@ -40,10 +48,11 @@ function setLanguage(langCode) {
   if (langCode === "de") {
     applyGoogleTranslateCookie("de");
     sessionStorage.removeItem("fflw_i18n_hint_shown");
+    sessionStorage.removeItem("fflw_gt_blocked_dismissed");
     window.location.replace("index.html");
   } else {
     applyGoogleTranslateCookie(langCode);
-    // Einheitlich für Desktop & Handy: direkt auf index.html mit URL-Parameter & Hash wechseln
+    sessionStorage.removeItem("fflw_gt_blocked_dismissed");
     window.location.replace(`index.html?lang=${langCode}#googtrans(de|${langCode})`);
   }
 }
@@ -58,8 +67,11 @@ function forceGoogleTranslatePopup(targetLang) {
   combo.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
-// Zeigt einen Fallback-Balken, falls ein Browser/Adblocker translate.google.com blockiert
+// Zeigt einen Fallback-Balken NUR dann, wenn der Nutzer aktiv eine Sprache gewählt hat UND der Browser blockiert
 function showTranslateBlockedFallback(targetLang) {
+  if (!targetLang || targetLang === "de") return;
+  if (!getExplicitUrlLanguage()) return; // Niemals auf normalen deutschen Seiten anzeigen!
+  if (sessionStorage.getItem("fflw_gt_blocked_dismissed") === "true") return;
   if (document.getElementById("fflw-gt-blocked-bar")) return;
 
   const fallbackUrl = `https://translate.google.com/translate?sl=de&tl=${encodeURIComponent(targetLang)}&u=${encodeURIComponent(window.location.href)}`;
@@ -73,7 +85,7 @@ function showTranslateBlockedFallback(targetLang) {
     box-shadow: 0 2px 10px rgba(0,0,0,0.15);
   `;
   bar.innerHTML = `
-    <span>⚠️ Ihr Browser blockiert das eingebettete Übersetzungstool.</span>
+    <span>⚠️ Ihr Netzwerk/Browser blockiert das eingebettete Übersetzungstool.</span>
     <a href="${fallbackUrl}" target="_blank" rel="noopener"
        style="background: #2e7d32; color: #fff; text-decoration: none; padding: 6px 14px; border-radius: 5px; font-weight: bold;">
       🌐 Seite direkt über Google Translate öffnen
@@ -82,15 +94,16 @@ function showTranslateBlockedFallback(targetLang) {
             style="background: transparent; border: none; font-size: 1.1rem; cursor: pointer; color: #555;">✕</button>
   `;
   document.body.appendChild(bar);
-  document.getElementById("fflw-gt-blocked-close").addEventListener("click", () => bar.remove());
+  document.getElementById("fflw-gt-blocked-close").addEventListener("click", () => {
+    sessionStorage.setItem("fflw_gt_blocked_dismissed", "true");
+    bar.remove();
+  });
 }
 
 // Globaler Callback für Google Translate (explizit an window gebunden)
 window.googleTranslateElementInit = function () {
   const targetLang = getActiveLanguage();
 
-  // WICHTIG: Kein includedLanguages einschränken, damit Google Translate auf dem Desktop
-  // zuverlässig das echte <select class="goog-te-combo"> aufbaut!
   new google.translate.TranslateElement({
     pageLanguage: 'de',
     autoDisplay: false
@@ -113,7 +126,6 @@ window.googleTranslateElementInit = function () {
 
       if (isTranslated) {
         clearInterval(triggerInterval);
-        // Falls das Hinweis-Pop-up schon offen ist, sicherstellen, dass es mitübersetzt wird
         setTimeout(() => forceGoogleTranslatePopup(targetLang), 150);
       } else if (attempts > 40) {
         clearInterval(triggerInterval);
@@ -126,7 +138,6 @@ window.googleTranslateElementInit = function () {
 function startGoogleTranslate(activeLang) {
   if (!activeLang || activeLang === "de") return;
 
-  // Offiziellen Google-Translate-Hash setzen, falls noch nicht in der URL
   if (!window.location.hash.includes(`googtrans(de|${activeLang})`)) {
     history.replaceState(null, "", `${window.location.pathname}${window.location.search}#googtrans(de|${activeLang})`);
   }
@@ -173,6 +184,13 @@ function showLanguageHintOnce(activeLang) {
     border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.5;
   `;
 
+  const deBtnStyle = `
+    display: inline-block; background: #1a237e; color: #ffffff;
+    border: 1px solid #0d145a; padding: 2px 8px; border-radius: 4px;
+    font-weight: bold; font-size: 0.88rem; text-decoration: none;
+    cursor: pointer; vertical-align: baseline;
+  `;
+
   modal.innerHTML = `
     <div style="position: sticky; top: 0; z-index: 2; padding: 10px 14px; background: #f4f7f4; border-bottom: 1px solid #d5e2d5; display: flex; gap: 10px; justify-content: space-between; align-items: center;">
       <button type="button" id="fflw-hint-help-btn"
@@ -190,12 +208,16 @@ function showLanguageHintOnce(activeLang) {
         Hinweis zur Sprachauswahl
       </h3>
       <p style="margin: 0 0 10px 0; font-size: 0.92rem;">
-        Im Menü können Sie jederzeit über
-        <strong class="notranslate" translate="no" style="background: #eef3fa; padding: 1px 6px; border-radius: 4px; color: #1a237e;">🇩🇪 Deutsch (Original)</strong>
-        zur deutschen Originalsprache zurückkehren.
+        Sie können jederzeit hier
+        (<a href="index.html" class="fflw-hint-de-reset notranslate" translate="no" style="${deBtnStyle}">🇩🇪 Deutsch (Original)</a>)
+        oder auch im Menü zurück zum Original-Text in deutscher Sprache gelangen.
       </p>
       <p style="margin: 0 0 12px 0; font-size: 0.92rem;">
-        Für eine <strong>andere Sprache</strong> gehen Sie bitte zuerst über diesen Knopf zurück zu Deutsch und wählen Sie danach eine neue Flagge aus.
+        Aus technischen Gründen können Sie immer nur von
+        (<a href="index.html" class="fflw-hint-de-reset notranslate" translate="no" style="${deBtnStyle}">🇩🇪 Deutsch (Original)</a>)
+        in eine andere Sprache wechseln. Also jetzt von Ihrer gewählten Sprache in eine andere Sprache wechseln funktioniert nur, wenn Sie zuerst wieder
+        (<a href="index.html" class="fflw-hint-de-reset notranslate" translate="no" style="${deBtnStyle}">🇩🇪 Deutsch (Original)</a>)
+        wählen.
       </p>
       <p style="margin: 0 0 14px 0; font-size: 0.86rem; color: #444; background: #f7f9fc; padding: 9px 10px; border-radius: 5px;">
         Funktioniert die automatische Übersetzung nicht richtig? Nur bei technischen Problemen nutzen Sie bitte den Knopf <strong>„Probleme mit dem Übersetzungstool“</strong> (oben oder im Menü).
@@ -209,11 +231,19 @@ function showLanguageHintOnce(activeLang) {
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
 
-  // Nach dem Einfügen ins DOM Google Translate kurz anstoßen, falls die Hauptseite schon übersetzt ist
   setTimeout(() => forceGoogleTranslatePopup(activeLang), 350);
   setTimeout(() => forceGoogleTranslatePopup(activeLang), 1100);
 
   const closeModal = () => overlay.remove();
+
+  // Alle eingebetteten "🇩🇪 Deutsch (Original)"-Buttons direkt klickbar machen
+  modal.querySelectorAll(".fflw-hint-de-reset").forEach(btn => {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      closeModal();
+      setLanguage("de");
+    });
+  });
 
   document.getElementById("fflw-hint-help-btn").addEventListener("click", function () {
     closeModal();
@@ -461,12 +491,16 @@ window.addEventListener("pageshow", function (event) {
 document.addEventListener("DOMContentLoaded", function () {
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
-  // 1. URL-Parameter ?lang=xx sofort mit Cookie synchronisieren
+  // 1. Sprache prüfen: Wenn weder URL-Parameter noch Hash eine Sprache verlangen,
+  //    aber noch ein altes Cookie herumliegt, beim direkten Aufruf ohne Sprachwahl sauber bleiben
+  const explicitLang = getExplicitUrlLanguage();
   const activeLang = getActiveLanguage();
+
   if (activeLang && activeLang !== "de") {
     applyGoogleTranslateCookie(activeLang);
-    // Einheitliches Pop-up für Desktop & Handy einmalig anzeigen
-    showLanguageHintOnce(activeLang);
+    if (explicitLang) {
+      showLanguageHintOnce(activeLang);
+    }
   }
 
   // 2. Alle DocuSeal-Links auf allen Unterseiten automatisch auf die saubere Vorlage setzen
