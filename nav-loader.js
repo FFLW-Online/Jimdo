@@ -23,6 +23,33 @@ function applyGoogleTranslateCookie(langCode) {
   }
 }
 
+// Merkt sich beim Öffnen der Sprachauswahl (fflw-international.html) die Herkunftsseite für den direkten Rücksprung
+(function rememberReturnPage() {
+  const currentFile = window.location.pathname.split("/").pop() || "index.html";
+  if (currentFile !== "fflw-international.html") return;
+
+  const params = new URLSearchParams(window.location.search);
+  let ret = params.get("return");
+
+  if (!ret && document.referrer) {
+    try {
+      const refUrl = new URL(document.referrer);
+      if (refUrl.origin === window.location.origin) {
+        const refFile = refUrl.pathname.split("/").pop();
+        if (refFile && refFile !== "fflw-international.html") {
+          ret = refFile;
+        }
+      }
+    } catch (e) {
+      // Referrer ignorieren, falls nicht parsbar
+    }
+  }
+
+  if (ret && /^[a-zA-Z0-9._-]+\.html$/.test(ret)) {
+    sessionStorage.setItem("fflw_return_page", ret);
+  }
+})();
+
 // Prüft, ob in der aktuellen URL (Parameter oder Hash) ausdrücklich eine Fremdsprache angefordert wurde
 function getExplicitUrlLanguage() {
   const urlLang = new URLSearchParams(window.location.search).get("lang");
@@ -45,15 +72,21 @@ function getActiveLanguage() {
 
 // Globale Funktion zum Wechseln oder Zurücksetzen der Sprache über die Flaggen
 function setLanguage(langCode) {
+  const storedReturn = sessionStorage.getItem("fflw_return_page");
+  const targetPage = (storedReturn && /^[a-zA-Z0-9._-]+\.html$/.test(storedReturn))
+    ? storedReturn
+    : "index.html";
+  sessionStorage.removeItem("fflw_return_page");
+
   if (langCode === "de") {
     applyGoogleTranslateCookie("de");
     sessionStorage.removeItem("fflw_i18n_hint_shown");
     sessionStorage.removeItem("fflw_gt_blocked_dismissed");
-    window.location.replace("index.html");
+    window.location.replace(targetPage);
   } else {
     applyGoogleTranslateCookie(langCode);
     sessionStorage.removeItem("fflw_gt_blocked_dismissed");
-    window.location.replace(`index.html?lang=${langCode}#googtrans(de|${langCode})`);
+    window.location.replace(`${targetPage}?lang=${langCode}#googtrans(de|${langCode})`);
   }
 }
 
