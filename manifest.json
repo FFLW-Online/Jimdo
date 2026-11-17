@@ -1,12 +1,12 @@
 {
-  "name": "Freundeskreis Flüchtlinge Leutenbach & Winnenden",
+  "name": "Freundeskreis Leutenbach-Winnenden",
   "short_name": "FFLW",
-  "description": "Informationen, Angebote und Hilfe in Ihrer Sprache",
+  "description": "Freundeskreis für Flüchtlinge Leutenbach-Winnenden",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#004080",
+  "theme_color": "#003366",
   "icons": [
     {
       "src": "assets/logo-ffwl-neu-trans.png",
