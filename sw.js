@@ -1,11 +1,15 @@
-self.addEventListener("install", function () {
+const CACHE_NAME = "fflw-pwa-v1";
+
+self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-self.addEventListener("activate", function (event) {
+self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener("fetch", function () {
-  // Lässt alle Anfragen normal über das Netz laufen (immer aktuelle Vereinsinfos)
+self.addEventListener("fetch", (event) => {
+  event.respondWith(
+    fetch(event.request).catch(() => caches.match(event.request))
+  );
 });
