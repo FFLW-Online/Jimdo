@@ -36,31 +36,79 @@
       </p>
 
       <p>
-        Hier findest du unsere aktuell verfügbaren Möbelstücke. Alle angezeigten Artikel sind noch frei und können direkt von dir reserviert werden.
+        Hier findest du unsere aktuell verfügbaren Möbelstücke. Alle angezeigten Artikel sind noch frei und können direkt hier auf dieser Seite reserviert werden.
       </p>
 
       <p><strong>So funktioniert die Reservierung:</strong></p>
       <ol>
-        <li>Schaue dir unten die aktuellen Möbel und Beschreibungen in deiner Sprache an (oder öffne direkt die Angebotsliste über den Button).</li>
-        <li>Klicke auf den Button <strong>„👉 Zu den aktuellen Möbeln &amp; zur Reservierung“</strong> und trage oben deine Kontaktdaten ein.</li>
-        <li>Setze bei den gewünschten Artikeln direkt unter dem Bild ein Häkchen bei <strong>„▲ Diesen Artikel darüber reservieren (Klick auf das Kästchen links)“</strong>.</li>
-        <li>Klicke ganz unten auf <strong>„Senden“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
+        <li>Setze bei den gewünschten Möbeln direkt unter dem Foto ein Häkchen bei <strong>„Diesen Artikel reservieren“</strong>.</li>
+        <li>Trage ganz unten deine Kontaktdaten ein (Name und Telefonnummer oder E-Mail).</li>
+        <li>Klicke auf <strong>„Verbindlich reservieren“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
       </ol>
 
-      <!-- Weißer Button direkt zum Google-Formular -->
-      <p style="margin: 24px 0 24px 0;">
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLScDH_cTOZzhdNUn7arkNPouY7vChfOUY_MUZ-OHpObkYg6YCA/viewform?usp=header"
-           target="_blank"
-           rel="noopener"
-           style="display: inline-block; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 12px 22px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-           👉 Zu den aktuellen Möbeln &amp; zur Reservierung
-        </a>
-      </p>
-
-      <!-- Live-Vorschau der aktuellen Angebote (wird von eurem eigenen ÜbersetzungsTool komplett mitübersetzt!) -->
-      <div id="fflw-angebote-galerie" style="margin-top: 28px;">
-        <p id="fflw-angebote-status" style="opacity: 0.85;">⏳ Aktuelle Möbel-Vorschau wird geladen …</p>
+      <!-- Live-Galerie der verfügbaren Möbel -->
+      <div id="fflw-angebote-galerie" style="margin-top: 24px;">
+        <p id="fflw-angebote-status" style="opacity: 0.9;">⏳ Aktuelle Möbel werden geladen …</p>
       </div>
+
+      <!-- Direktes Reservierungsformular (wird vollständig vom ÜbersetzungsTool in alle Sprachen übersetzt) -->
+      <form id="fflw-reservierungs-form" style="display: none; margin-top: 30px; padding: 20px; border: 2px solid #ffffff; border-radius: 8px; background: rgba(255,255,255,0.08);">
+        <h3 style="margin-top: 0;">Kontaktdaten &amp; Reservierung absenden</h3>
+
+        <p id="fflw-auswahl-info" style="font-weight: bold; background: rgba(0,0,0,0.25); padding: 10px 12px; border-radius: 6px;">
+          Ausgewählte Artikel: 0
+        </p>
+
+        <div style="margin-bottom: 14px;">
+          <label for="fflw-res-name" style="display: block; font-weight: bold; margin-bottom: 4px;">
+            Dein Name (Vor- und Nachname) *
+          </label>
+          <input type="text" id="fflw-res-name" required
+                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <label for="fflw-res-telefon" style="display: block; font-weight: bold; margin-bottom: 4px;">
+            Telefonnummer / WhatsApp *
+          </label>
+          <input type="tel" id="fflw-res-telefon"
+                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <label for="fflw-res-email" style="display: block; font-weight: bold; margin-bottom: 4px;">
+            E-Mail-Adresse (falls vorhanden)
+          </label>
+          <input type="email" id="fflw-res-email"
+                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <label for="fflw-res-lieferung" style="display: block; font-weight: bold; margin-bottom: 4px;">
+            Abholung oder Lieferung?
+          </label>
+          <select id="fflw-res-lieferung"
+                  style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+            <option value="Ich kann selbst abholen">Ich kann selbst abholen</option>
+            <option value="Ich brauche Hilfe beim Transport (Lieferung)">Ich brauche Hilfe beim Transport (Lieferung)</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <label for="fflw-res-bemerkung" style="display: block; font-weight: bold; margin-bottom: 4px;">
+            Adresse / Ort oder kurze Nachricht (optional)
+          </label>
+          <textarea id="fflw-res-bemerkung" rows="3"
+                    style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;"></textarea>
+        </div>
+
+        <div id="fflw-res-feedback" style="margin-bottom: 14px; font-weight: bold;"></div>
+
+        <button type="submit" id="fflw-res-submit"
+                style="background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.25);">
+          ✅ Verbindlich reservieren
+        </button>
+      </form>
     </main>
   </div>
 
@@ -135,83 +183,181 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
-      const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScDH_cTOZzhdNUn7arkNPouY7vChfOUY_MUZ-OHpObkYg6YCA/viewform?usp=header";
       const container = document.getElementById("fflw-angebote-galerie");
-      const statusEl = document.getElementById("fflw-angebote-status");
+      const formEl = document.getElementById("fflw-reservierungs-form");
+      const auswahlInfoEl = document.getElementById("fflw-auswahl-info");
+      const feedbackEl = document.getElementById("fflw-res-feedback");
+      const submitBtn = document.getElementById("fflw-res-submit");
 
-      if (!container || !WEB_APP_URL) {
-        if (statusEl) statusEl.remove();
-        return;
+      function retranslate(targetEl) {
+        const activeLang = typeof getActiveLanguage === "function" ? getActiveLanguage() : null;
+        if (activeLang && activeLang !== "de" && typeof forceGoogleTranslatePopup === "function") {
+          setTimeout(() => forceGoogleTranslatePopup(activeLang, targetEl), 300);
+          setTimeout(() => forceGoogleTranslatePopup(activeLang, targetEl), 1100);
+        }
       }
 
-      fetch(WEB_APP_URL)
-        .then(res => res.json())
-        .then(data => {
-          if (!data || !data.ok || !Array.isArray(data.items)) {
-            if (statusEl) statusEl.remove();
-            return;
-          }
+      function updateAuswahlCounter() {
+        const checked = container.querySelectorAll('input[type="checkbox"]:checked');
+        auswahlInfoEl.textContent = "Ausgewählte Artikel: " + checked.length;
+        retranslate(auswahlInfoEl);
+      }
 
-          if (data.items.length === 0) {
-            container.innerHTML = "<p><strong>Aktuell sind alle Möbel vergeben.</strong> Schau bitte bald wieder vorbei!</p>";
-            return;
-          }
-
-          container.innerHTML = "";
-          data.items.forEach(item => {
-            const card = document.createElement("article");
-            card.style.cssText = "border: 1px solid rgba(255,255,255,0.28); border-radius: 8px; padding: 16px; margin-bottom: 22px; background: rgba(255,255,255,0.06);";
-
-            const title = document.createElement("h3");
-            title.style.marginTop = "0";
-            title.textContent = item.titel;
-            card.appendChild(title);
-
-            if (item.bilder && item.bilder.length > 0) {
-              const imgWrap = document.createElement("div");
-              imgWrap.style.cssText = "display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0;";
-              item.bilder.forEach(src => {
-                const img = document.createElement("img");
-                img.src = src;
-                img.alt = item.titel;
-                img.loading = "lazy";
-                img.style.cssText = "max-width: 100%; max-height: 280px; border-radius: 6px; object-fit: contain; background: #ffffff;";
-                img.onerror = function () {
-                  this.remove();
-                };
-                imgWrap.appendChild(img);
-              });
-              card.appendChild(imgWrap);
+      function ladeAngebote() {
+        fetch(WEB_APP_URL)
+          .then(res => res.json())
+          .then(data => {
+            if (!data || !data.ok || !Array.isArray(data.items)) {
+              container.innerHTML = "<p>Die Angebote konnten gerade nicht geladen werden. Bitte lade die Seite neu.</p>";
+              retranslate(container);
+              return;
             }
 
-            if (item.beschreibung) {
-              const desc = document.createElement("p");
-              desc.style.whiteSpace = "pre-line";
-              desc.textContent = item.beschreibung;
-              card.appendChild(desc);
+            if (data.items.length === 0) {
+              container.innerHTML = "<p><strong>Aktuell sind keine freien Möbelstücke verfügbar.</strong> Schau bitte bald wieder vorbei!</p>";
+              formEl.style.display = "none";
+              retranslate(container);
+              return;
             }
 
-            const btn = document.createElement("a");
-            btn.href = FORM_URL;
-            btn.target = "_blank";
-            btn.rel = "noopener";
-            btn.style.cssText = "display: inline-block; margin-top: 8px; background-color: #ffffff; color: #111111; padding: 8px 16px; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 5px;";
-            btn.textContent = "👉 Diesen Artikel im Formular reservieren";
-            card.appendChild(btn);
+            container.innerHTML = "";
+            data.items.forEach((item, idx) => {
+              const card = document.createElement("article");
+              card.style.cssText = "border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; padding: 16px; margin-bottom: 22px; background: rgba(255,255,255,0.06);";
 
-            container.appendChild(card);
+              const title = document.createElement("h3");
+              title.style.marginTop = "0";
+              title.textContent = item.pfad;
+              card.appendChild(title);
+
+              if (item.bilder && item.bilder.length > 0) {
+                const imgWrap = document.createElement("div");
+                imgWrap.style.cssText = "display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0;";
+                item.bilder.forEach(b => {
+                  const img = document.createElement("img");
+                  img.src = b.url;
+                  img.alt = item.pfad;
+                  img.loading = "lazy";
+                  img.style.cssText = "max-width: 100%; max-height: 300px; border-radius: 6px; object-fit: contain; background: #ffffff;";
+                  img.onerror = function () {
+                    if (b.fallback && this.src !== b.fallback) {
+                      this.src = b.fallback;
+                    } else {
+                      this.remove();
+                    }
+                  };
+                  imgWrap.appendChild(img);
+                });
+                card.appendChild(imgWrap);
+              }
+
+              if (item.beschreibung) {
+                const desc = document.createElement("p");
+                desc.style.whiteSpace = "pre-line";
+                desc.textContent = item.beschreibung;
+                card.appendChild(desc);
+              }
+
+              const checkLabel = document.createElement("label");
+              checkLabel.htmlFor = "fflw-item-check-" + idx;
+              checkLabel.style.cssText = "display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 14px; background: #ffffff; color: #111111; border-radius: 6px; font-weight: bold; cursor: pointer;";
+
+              const checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              checkbox.id = "fflw-item-check-" + idx;
+              checkbox.value = item.pfad;
+              checkbox.style.cssText = "width: 20px; height: 20px; cursor: pointer;";
+              checkbox.addEventListener("change", updateAuswahlCounter);
+
+              const labelText = document.createElement("span");
+              labelText.textContent = "Diesen Artikel reservieren";
+
+              checkLabel.appendChild(checkbox);
+              checkLabel.appendChild(labelText);
+              card.appendChild(checkLabel);
+
+              container.appendChild(card);
+            });
+
+            formEl.style.display = "block";
+            updateAuswahlCounter();
+            retranslate(document.querySelector("main.content"));
+          })
+          .catch(() => {
+            container.innerHTML = "<p>Verbindungsfehler beim Laden der Möbel. Bitte lade die Seite kurz neu.</p>";
+            retranslate(container);
           });
+      }
 
-          // Falls eine Fremdsprache aktiv ist, nachgeladene Karten sofort mitübersetzen lassen
-          const activeLang = typeof getActiveLanguage === "function" ? getActiveLanguage() : null;
-          if (activeLang && activeLang !== "de" && typeof forceGoogleTranslatePopup === "function") {
-            setTimeout(() => forceGoogleTranslatePopup(activeLang, container), 400);
-            setTimeout(() => forceGoogleTranslatePopup(activeLang, container), 1400);
-          }
+      formEl.addEventListener("submit", function (e) {
+        e.preventDefault();
+        feedbackEl.textContent = "";
+
+        const ausgewaehlte = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+        const name = document.getElementById("fflw-res-name").value.trim();
+        const telefon = document.getElementById("fflw-res-telefon").value.trim();
+        const email = document.getElementById("fflw-res-email").value.trim();
+        const lieferung = document.getElementById("fflw-res-lieferung").value;
+        const bemerkung = document.getElementById("fflw-res-bemerkung").value.trim();
+
+        if (ausgewaehlte.length === 0) {
+          feedbackEl.style.color = "#ffdddd";
+          feedbackEl.textContent = "Bitte wähle oben mindestens ein Möbelstück aus.";
+          retranslate(feedbackEl);
+          return;
+        }
+
+        if (!name || (!telefon && !email)) {
+          feedbackEl.style.color = "#ffdddd";
+          feedbackEl.textContent = "Bitte trage deinen Namen und deine Telefonnummer oder E-Mail ein.";
+          retranslate(feedbackEl);
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "⏳ Wird reserviert …";
+        retranslate(submitBtn);
+
+        fetch(WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            name: name,
+            telefon: telefon,
+            email: email,
+            lieferung: lieferung,
+            bemerkung: bemerkung,
+            artikel: ausgewaehlte
+          })
         })
-        .catch(() => {
-          if (statusEl) statusEl.remove();
-        });
+          .then(res => res.json())
+          .then(resp => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "✅ Verbindlich reservieren";
+
+            if (resp && resp.ok) {
+              formEl.innerHTML = `
+                <h3 style="margin-top: 0;">✅ Vielen Dank, ${name}!</h3>
+                <p>Deine Reservierung wurde erfolgreich gespeichert. Wir melden uns in Kürze bei dir wegen der Abholung oder Lieferung.</p>
+              `;
+              retranslate(formEl);
+              ladeAngebote();
+            } else {
+              feedbackEl.style.color = "#ffdddd";
+              feedbackEl.textContent = (resp && resp.error) ? resp.error : "Fehler beim Reservieren. Bitte versuche es noch einmal.";
+              retranslate(feedbackEl);
+            }
+          })
+          .catch(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "✅ Verbindlich reservieren";
+            feedbackEl.style.color = "#ffdddd";
+            feedbackEl.textContent = "Netzwerkfehler beim Senden. Bitte prüfe deine Verbindung und versuche es erneut.";
+            retranslate(feedbackEl);
+          });
+      });
+
+      ladeAngebote();
     });
   </script>
 </body>
