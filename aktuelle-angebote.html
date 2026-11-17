@@ -20,12 +20,43 @@
     
     <main class="content">
       <h2>Aktuelle Angebote</h2>
-      
+
+      <!-- Sprachauswahl: Übersetzt genau diese Seite direkt vor Ort -->
+      <div style="margin: 14px 0 22px 0; padding: 10px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; display: inline-block;">
+        <span style="font-weight: bold; margin-right: 8px;">🌐 Sprache / Translate:</span>
+        <div id="google_translate_element" style="display: inline-block; vertical-align: middle;"></div>
+      </div>
+
       <p>
-        Aktuell haben wir leider keine Angebote vorliegen.
+        Hier findest du unsere aktuell verfügbaren Möbelstücke. Alle angezeigten Artikel sind noch frei und können direkt von dir reserviert werden.
       </p>
-      <p>
-        Schau bitte einfach zu einem späteren Zeitpunkt wieder vorbei oder nimm direkt Kontakt mit uns auf!
+
+      <p><strong>So funktioniert die Reservierung:</strong></p>
+      <ol>
+        <li>Öffne unsere aktuelle Angebotsliste über den Button unten.</li>
+        <li>Trage oben deine Kontaktdaten ein, damit wir dich für die Abholung oder Lieferung erreichen können.</li>
+        <li>Scrolle durch die Fotos und setze bei den gewünschten Möbeln direkt unter dem Bild ein Häkchen bei <strong>„▲ Diesen Artikel darüber reservieren (Klick auf das Kästchen links)“</strong>.</li>
+        <li>Klicke ganz unten auf <strong>„Senden“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
+      </ol>
+
+      <!-- Weißer Button zum Google-Formular -->
+      <p style="margin: 26px 0 18px 0;">
+        <a href="https://forms.gle/K34E1DXVCTmrdnqC8"
+           target="_blank"
+           rel="noopener"
+           style="display: inline-block; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 12px 22px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+           👉 Zu den aktuellen Möbeln &amp; zur Reservierung
+        </a>
+      </p>
+
+      <!-- Direkt übersetztes Formular als zusätzlicher Link in Weiß -->
+      <p style="font-size: 0.95em;">
+        🌐 <a href="https://translate.google.com/translate?sl=de&tl=en&u=https%3A%2F%2Fforms.gle%2FK34E1DXVCTmrdnqC8"
+              target="_blank"
+              rel="noopener"
+              style="color: #ffffff; text-decoration: underline;">
+           Angebotsliste &amp; Formular direkt in einer anderen Sprache öffnen (Translate form)
+        </a>
       </p>
     </main>
   </div>
@@ -97,6 +128,17 @@
     <a href="sitemap.html">Sitemap</a>
   </footer>
 
-<script src="nav-loader.js"></script>
+  <!-- Google Translate Skript für die Live-Übersetzung direkt auf dieser Seite -->
+  <script>
+    function googleTranslateElementInit() {
+      new google.translate.TranslateElement({
+        pageLanguage: 'de',
+        layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+      }, 'google_translate_element');
+    }
+  </script>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+  <script src="nav-loader.js"></script>
 </body>
 </html>
