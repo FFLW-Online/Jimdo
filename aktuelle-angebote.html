@@ -41,16 +41,15 @@
 
       <p><strong>So funktioniert die Reservierung:</strong></p>
       <ol>
-        <li>Öffne unsere aktuelle Angebotsliste über den Button unten.</li>
-        <li>Trage oben deine Kontaktdaten ein, damit wir dich für die Abholung oder Lieferung erreichen können.</li>
-        <li>Scrolle durch die Fotos und setze bei den gewünschten Möbeln direkt unter dem Bild ein Häkchen bei <strong>„▲ Diesen Artikel darüber reservieren (Klick auf das Kästchen links)“</strong>.</li>
+        <li>Schaue dir unten die aktuellen Möbel und Beschreibungen in deiner Sprache an (oder öffne direkt die Angebotsliste über den Button).</li>
+        <li>Klicke auf den Button <strong>„👉 Zu den aktuellen Möbeln &amp; zur Reservierung“</strong> und trage oben deine Kontaktdaten ein.</li>
+        <li>Setze bei den gewünschten Artikeln direkt unter dem Bild ein Häkchen bei <strong>„▲ Diesen Artikel darüber reservieren (Klick auf das Kästchen links)“</strong>.</li>
         <li>Klicke ganz unten auf <strong>„Senden“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
       </ol>
 
-      <!-- Weißer Button zum Google-Formular (übernimmt automatisch die gewählte Seitensprache) -->
-      <p style="margin: 26px 0 18px 0;">
-        <a id="fflw-forms-direct-btn"
-           href="https://docs.google.com/forms/d/e/1FAIpQLScDH_cTOZzhdNUn7arkNPouY7vChfOUY_MUZ-OHpObkYg6YCA/viewform?usp=header"
+      <!-- Weißer Button direkt zum Google-Formular -->
+      <p style="margin: 24px 0 24px 0;">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScDH_cTOZzhdNUn7arkNPouY7vChfOUY_MUZ-OHpObkYg6YCA/viewform?usp=header"
            target="_blank"
            rel="noopener"
            style="display: inline-block; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 12px 22px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
@@ -58,16 +57,10 @@
         </a>
       </p>
 
-      <!-- Direkt übersetztes Formular als zusätzlicher Link in Weiß -->
-      <p style="font-size: 0.95em;">
-        🌐 <a id="fflw-forms-translate-link"
-              href="https://translate.google.com/translate?sl=de&amp;tl=en&amp;u=https%3A%2F%2Fdocs.google.com%2Fforms%2Fd%2Fe%2F1FAIpQLScDH_cTOZzhdNUn7arkNPouY7vChfOUY_MUZ-OHpObkYg6YCA%2Fviewform%3Fusp%3Dheader"
-              target="_blank"
-              rel="noopener"
-              style="color: #ffffff; text-decoration: underline;">
-           Angebotsliste &amp; Formular übersetzt öffnen (Translate form)
-        </a>
-      </p>
+      <!-- Live-Vorschau der aktuellen Angebote (wird von eurem eigenen ÜbersetzungsTool komplett mitübersetzt!) -->
+      <div id="fflw-angebote-galerie" style="margin-top: 28px;">
+        <p id="fflw-angebote-status" style="opacity: 0.85;">⏳ Aktuelle Möbel-Vorschau wird geladen …</p>
+      </div>
     </main>
   </div>
 
@@ -141,22 +134,84 @@
   <script src="nav-loader.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const directBtn = document.getElementById("fflw-forms-direct-btn");
-      const translateLink = document.getElementById("fflw-forms-translate-link");
-      if (!directBtn || !translateLink) return;
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLScDH_cTOZzhdNUn7arkNPouY7vChfOUY_MUZ-OHpObkYg6YCA/viewform?usp=header";
+      const container = document.getElementById("fflw-angebote-galerie");
+      const statusEl = document.getElementById("fflw-angebote-status");
 
-      const rawFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLScDH_cTOZzhdNUn7arkNPouY7vChfOUY_MUZ-OHpObkYg6YCA/viewform?usp=header";
-      const activeLang = (typeof getActiveLanguage === "function" && getActiveLanguage()) || "de";
-      const targetLang = activeLang !== "de" ? activeLang : "en";
-      const translatedFormUrl = `https://translate.google.com/translate?sl=de&tl=${encodeURIComponent(targetLang)}&u=${encodeURIComponent(rawFormUrl)}`;
-
-      // Unterer Zusatzlink nutzt immer die aktuell gewählte Sprache (oder Englisch als Standard)
-      translateLink.href = translatedFormUrl;
-
-      // Wenn der Besucher bereits eine Fremdsprache gewählt hat, öffnet auch der Hauptbutton das Formular direkt in dieser Sprache
-      if (activeLang && activeLang !== "de") {
-        directBtn.href = translatedFormUrl;
+      if (!container || !WEB_APP_URL) {
+        if (statusEl) statusEl.remove();
+        return;
       }
+
+      fetch(WEB_APP_URL)
+        .then(res => res.json())
+        .then(data => {
+          if (!data || !data.ok || !Array.isArray(data.items)) {
+            if (statusEl) statusEl.remove();
+            return;
+          }
+
+          if (data.items.length === 0) {
+            container.innerHTML = "<p><strong>Aktuell sind alle Möbel vergeben.</strong> Schau bitte bald wieder vorbei!</p>";
+            return;
+          }
+
+          container.innerHTML = "";
+          data.items.forEach(item => {
+            const card = document.createElement("article");
+            card.style.cssText = "border: 1px solid rgba(255,255,255,0.28); border-radius: 8px; padding: 16px; margin-bottom: 22px; background: rgba(255,255,255,0.06);";
+
+            const title = document.createElement("h3");
+            title.style.marginTop = "0";
+            title.textContent = item.titel;
+            card.appendChild(title);
+
+            if (item.bilder && item.bilder.length > 0) {
+              const imgWrap = document.createElement("div");
+              imgWrap.style.cssText = "display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0;";
+              item.bilder.forEach(src => {
+                const img = document.createElement("img");
+                img.src = src;
+                img.alt = item.titel;
+                img.loading = "lazy";
+                img.style.cssText = "max-width: 100%; max-height: 280px; border-radius: 6px; object-fit: contain; background: #ffffff;";
+                img.onerror = function () {
+                  this.remove();
+                };
+                imgWrap.appendChild(img);
+              });
+              card.appendChild(imgWrap);
+            }
+
+            if (item.beschreibung) {
+              const desc = document.createElement("p");
+              desc.style.whiteSpace = "pre-line";
+              desc.textContent = item.beschreibung;
+              card.appendChild(desc);
+            }
+
+            const btn = document.createElement("a");
+            btn.href = FORM_URL;
+            btn.target = "_blank";
+            btn.rel = "noopener";
+            btn.style.cssText = "display: inline-block; margin-top: 8px; background-color: #ffffff; color: #111111; padding: 8px 16px; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 5px;";
+            btn.textContent = "👉 Diesen Artikel im Formular reservieren";
+            card.appendChild(btn);
+
+            container.appendChild(card);
+          });
+
+          // Falls eine Fremdsprache aktiv ist, nachgeladene Karten sofort mitübersetzen lassen
+          const activeLang = typeof getActiveLanguage === "function" ? getActiveLanguage() : null;
+          if (activeLang && activeLang !== "de" && typeof forceGoogleTranslatePopup === "function") {
+            setTimeout(() => forceGoogleTranslatePopup(activeLang, container), 400);
+            setTimeout(() => forceGoogleTranslatePopup(activeLang, container), 1400);
+          }
+        })
+        .catch(() => {
+          if (statusEl) statusEl.remove();
+        });
     });
   </script>
 </body>
