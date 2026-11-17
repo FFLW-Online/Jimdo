@@ -57,14 +57,22 @@ function setLanguage(langCode) {
   }
 }
 
-// Erzwingt auf Desktop & Mobil eine echte Neu-Übersetzung dynamischer Dialoge
-function forceGoogleTranslatePopup(targetLang) {
+// Erzwingt auf Desktop & Mobil eine echte Neu-Übersetzung dynamischer Dialoge (nur falls noch unübersetzt)
+function forceGoogleTranslatePopup(targetLang, containerEl) {
   if (!targetLang || targetLang === "de") return;
   const combo = document.querySelector(".goog-te-combo");
   if (!combo) return;
 
-  combo.value = targetLang;
+  // Wenn Google Translate in diesem Container bereits <font>-Tags erzeugt hat, nicht stören
+  if (containerEl && containerEl.querySelector("font")) return;
+
+  combo.value = "";
   combo.dispatchEvent(new Event("change", { bubbles: true }));
+
+  requestAnimationFrame(() => {
+    combo.value = targetLang;
+    combo.dispatchEvent(new Event("change", { bubbles: true }));
+  });
 }
 
 // Zeigt einen Fallback-Balken NUR dann, wenn der Nutzer aktiv eine Sprache gewählt hat UND der Browser blockiert
@@ -126,7 +134,10 @@ window.googleTranslateElementInit = function () {
 
       if (isTranslated) {
         clearInterval(triggerInterval);
-        setTimeout(() => forceGoogleTranslatePopup(targetLang), 150);
+        const hintOverlay = document.getElementById("fflw-lang-hint-overlay");
+        if (hintOverlay) {
+          setTimeout(() => forceGoogleTranslatePopup(targetLang, hintOverlay), 200);
+        }
       } else if (attempts > 40) {
         clearInterval(triggerInterval);
       }
@@ -143,7 +154,7 @@ function startGoogleTranslate(activeLang) {
   }
 
   if (document.getElementById("google_translate_hidden")) {
-    forceGoogleTranslatePopup(activeLang);
+    forceGoogleTranslatePopup(activeLang, document.getElementById("fflw-lang-hint-overlay"));
     return;
   }
 
@@ -172,14 +183,16 @@ function showLanguageHintOnce(activeLang) {
   overlay.id = "fflw-lang-hint-overlay";
   overlay.style.cssText = `
     position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 2147483647; padding: 16px; box-sizing: border-box; overflow-y: auto;
+    display: block; z-index: 2147483647;
+    padding: 10px 12px 24px 12px; box-sizing: border-box;
+    overflow-y: auto; overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   `;
 
   const modal = document.createElement("div");
   modal.style.cssText = `
     background: #ffffff; color: #1a1a1a; max-width: 480px; width: 100%;
-    border-radius: 8px; overflow: hidden;
+    margin: min(4vh, 32px) auto 16px auto; border-radius: 8px; overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.5;
   `;
@@ -233,9 +246,10 @@ function showLanguageHintOnce(activeLang) {
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+  overlay.scrollTop = 0;
 
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 350);
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 1100);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang, modal), 450);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang, modal), 1300);
 
   const closeModal = () => overlay.remove();
 
@@ -269,14 +283,16 @@ function openTranslationHelpDialog(activeLang) {
   overlay.id = "fflw-help-dialog-overlay";
   overlay.style.cssText = `
     position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 2147483647; padding: 16px; box-sizing: border-box; overflow-y: auto;
+    display: block; z-index: 2147483647;
+    padding: 10px 12px 24px 12px; box-sizing: border-box;
+    overflow-y: auto; overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   `;
 
   const modal = document.createElement("div");
   modal.style.cssText = `
     background: #ffffff; color: #1a1a1a; max-width: 460px; width: 100%;
-    border-radius: 8px; overflow: hidden;
+    margin: min(4vh, 32px) auto 16px auto; border-radius: 8px; overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.4);
     border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.45;
   `;
@@ -331,9 +347,10 @@ function openTranslationHelpDialog(activeLang) {
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+  overlay.scrollTop = 0;
 
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 250);
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 1000);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang, modal), 350);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang, modal), 1100);
 
   const closeDialog = () => overlay.remove();
   document.getElementById("fflw-help-cancel-btn").addEventListener("click", closeDialog);
@@ -495,8 +512,8 @@ window.addEventListener("pageshow", function (event) {
 document.addEventListener("DOMContentLoaded", function () {
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
-  // 1. Sprache prüfen: Wenn weder URL-Parameter noch Hash eine Sprache verlangen,
-  //    aber noch ein altes Cookie herumliegt, beim direkten Aufruf ohne Sprachwahl sauber bleiben
+  // 1. Sprache prüfen: Wenn URL-Parameter oder Hash eine Sprache verlangen,
+  //    Cookie synchronisieren und Hinweis-Pop-up einmalig öffnen
   const explicitLang = getExplicitUrlLanguage();
   const activeLang = getActiveLanguage();
 
