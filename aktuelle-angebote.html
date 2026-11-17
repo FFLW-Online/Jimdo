@@ -21,9 +21,9 @@
     <main class="content">
       <h2>Aktuelle Angebote</h2>
 
-      <!-- Sprachenknopf: verlinkt exakt auf eure Sprachauswahl (fflw-international.html) -->
+      <!-- Sprachenknopf: verlinkt auf fflw-international.html und springt direkt auf aktuelle-angebote.html zurück -->
       <p style="margin: 14px 0 22px 0;">
-        <a href="fflw-international.html"
+        <a href="fflw-international.html?return=aktuelle-angebote.html"
            style="display: inline-flex; align-items: center; gap: 10px; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
            <span>🌐 Sprache wählen / ÜbersetzungsTool</span>
            <span class="flag-carousel-inline" title="Viele Sprachen unterstützt">
@@ -47,9 +47,10 @@
         <li>Klicke ganz unten auf <strong>„Senden“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
       </ol>
 
-      <!-- Weißer Button zum Google-Formular -->
+      <!-- Weißer Button zum Google-Formular (übernimmt automatisch die gewählte Seitensprache) -->
       <p style="margin: 26px 0 18px 0;">
-        <a href="https://forms.gle/K34E1DXVCTmrdnqC8"
+        <a id="fflw-forms-direct-btn"
+           href="https://docs.google.com/forms/d/e/1FAIpQLScDH_cTOZzhdNUn7arkNPouY7vChfOUY_MUZ-OHpObkYg6YCA/viewform?usp=header"
            target="_blank"
            rel="noopener"
            style="display: inline-block; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 12px 22px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
@@ -59,11 +60,12 @@
 
       <!-- Direkt übersetztes Formular als zusätzlicher Link in Weiß -->
       <p style="font-size: 0.95em;">
-        🌐 <a href="https://translate.google.com/translate?sl=de&tl=en&u=https%3A%2F%2Fforms.gle%2FK34E1DXVCTmrdnqC8"
+        🌐 <a id="fflw-forms-translate-link"
+              href="https://translate.google.com/translate?sl=de&amp;tl=en&amp;u=https%3A%2F%2Fdocs.google.com%2Fforms%2Fd%2Fe%2F1FAIpQLScDH_cTOZzhdNUn7arkNPouY7vChfOUY_MUZ-OHpObkYg6YCA%2Fviewform%3Fusp%3Dheader"
               target="_blank"
               rel="noopener"
               style="color: #ffffff; text-decoration: underline;">
-           Angebotsliste &amp; Formular direkt in einer anderen Sprache öffnen (Translate form)
+           Angebotsliste &amp; Formular übersetzt öffnen (Translate form)
         </a>
       </p>
     </main>
@@ -137,5 +139,25 @@
   </footer>
 
   <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const directBtn = document.getElementById("fflw-forms-direct-btn");
+      const translateLink = document.getElementById("fflw-forms-translate-link");
+      if (!directBtn || !translateLink) return;
+
+      const rawFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLScDH_cTOZzhdNUn7arkNPouY7vChfOUY_MUZ-OHpObkYg6YCA/viewform?usp=header";
+      const activeLang = (typeof getActiveLanguage === "function" && getActiveLanguage()) || "de";
+      const targetLang = activeLang !== "de" ? activeLang : "en";
+      const translatedFormUrl = `https://translate.google.com/translate?sl=de&tl=${encodeURIComponent(targetLang)}&u=${encodeURIComponent(rawFormUrl)}`;
+
+      // Unterer Zusatzlink nutzt immer die aktuell gewählte Sprache (oder Englisch als Standard)
+      translateLink.href = translatedFormUrl;
+
+      // Wenn der Besucher bereits eine Fremdsprache gewählt hat, öffnet auch der Hauptbutton das Formular direkt in dieser Sprache
+      if (activeLang && activeLang !== "de") {
+        directBtn.href = translatedFormUrl;
+      }
+    });
+  </script>
 </body>
 </html>
