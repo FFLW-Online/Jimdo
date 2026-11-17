@@ -17,11 +17,24 @@ function applyGoogleTranslateCookie(langCode) {
     document.cookie = `googtrans=/de/${langCode}; path=/;`;
     if (host) {
       document.cookie = `googtrans=/de/${langCode}; path=/; domain=${host};`;
+      document.cookie = `googtrans=/de/${langCode}; path=/; domain=.${host};`;
     }
     if (rootDomain && rootDomain !== host) {
       document.cookie = `googtrans=/de/${langCode}; path=/; domain=${rootDomain};`;
     }
   }
+}
+
+// Hilfsfunktion: Liest die aktuell per URL, Hash oder Cookie gesetzte Sprache aus
+function getActiveLanguage() {
+  const urlLang = new URLSearchParams(window.location.search).get("lang");
+  if (urlLang && urlLang !== "de") return urlLang;
+
+  const hashMatch = window.location.hash.match(/googtrans\(de\|([a-zA-Z-]+)\)/);
+  if (hashMatch && hashMatch[1] !== "de") return hashMatch[1];
+
+  const cookieMatch = document.cookie.match(/(?:^|;\s*)googtrans=\/de\/([a-zA-Z-]+)/);
+  return cookieMatch ? cookieMatch[1] : null;
 }
 
 // Globale Funktion zum Wechseln oder Zurücksetzen der Sprache über die Flaggen
@@ -35,23 +48,12 @@ function setLanguage(langCode) {
   } else {
     applyGoogleTranslateCookie(langCode);
     if (isMobile) {
-      // Handy: direkt zur Startseite -> dort erscheint das gewohnte mobile Pop-up
-      window.location.replace(`index.html?lang=${langCode}`);
+      window.location.replace(`index.html?lang=${langCode}#googtrans(de|${langCode})`);
     } else {
-      // Desktop: einmalig zur vollflächigen Hinweis-Seite
       sessionStorage.setItem("fflw_i18n_hint_shown", "true");
-      window.location.replace(`sprach-hinweis.html?lang=${langCode}`);
+      window.location.replace(`sprach-hinweis.html?lang=${langCode}#googtrans(de|${langCode})`);
     }
   }
-}
-
-// Hilfsfunktion: Liest die aktuell per Cookie oder URL gesetzte Sprache aus
-function getActiveLanguage() {
-  const urlLang = new URLSearchParams(window.location.search).get("lang");
-  if (urlLang && urlLang !== "de") return urlLang;
-
-  const match = document.cookie.match(/(?:^|;\s*)googtrans=\/de\/([a-zA-Z-]+)/);
-  return match ? match[1] : null;
 }
 
 // Erzwingt auf Desktop & Mobil eine echte Neu-Übersetzung dynamischer Dialoge
@@ -66,17 +68,19 @@ function forceGoogleTranslatePopup(targetLang) {
   setTimeout(() => {
     combo.value = targetLang;
     combo.dispatchEvent(new Event("change"));
-  }, 100);
+  }, 120);
 }
 
-// Initialisiert Google Translate und überwacht aktiv, ob Desktop wirklich übersetzt hat
-function googleTranslateElementInit() {
+// Globaler Callback für Google Translate (explizit an window gebunden)
+window.googleTranslateElementInit = function () {
+  const targetLang = getActiveLanguage();
+
   new google.translate.TranslateElement({
     pageLanguage: 'de',
+    includedLanguages: targetLang && targetLang !== "de" ? targetLang : undefined,
     autoDisplay: false
   }, 'google_translate_hidden');
 
-  const targetLang = getActiveLanguage();
   if (targetLang && targetLang !== "de") {
     let attempts = 0;
     const triggerInterval = setInterval(function () {
@@ -87,21 +91,27 @@ function googleTranslateElementInit() {
 
       attempts++;
 
-      if (combo && !isTranslated) {
+      if (combo && combo.options && combo.options.length > 0 && !isTranslated) {
         combo.value = targetLang;
         combo.dispatchEvent(new Event("change"));
       }
 
-      if (isTranslated || attempts > 35) {
+      if (isTranslated || attempts > 40) {
         clearInterval(triggerInterval);
       }
     }, 250);
   }
-}
+};
 
-// Hilfsfunktion: Lädt Google Translate
+// Hilfsfunktion: Lädt Google Translate (ohne display:none + mit #googtrans-Anker für Desktop)
 function startGoogleTranslate(activeLang) {
   if (!activeLang || activeLang === "de") return;
+
+  // Offiziellen Google-Translate-Hash setzen, falls noch nicht in der URL
+  if (!window.location.hash.includes(`googtrans(de|${activeLang})`)) {
+    history.replaceState(null, "", `${window.location.pathname}${window.location.search}#googtrans(de|${activeLang})`);
+  }
+
   if (document.getElementById("google_translate_hidden")) {
     forceGoogleTranslatePopup(activeLang);
     return;
@@ -109,7 +119,7 @@ function startGoogleTranslate(activeLang) {
 
   const hiddenDiv = document.createElement("div");
   hiddenDiv.id = "google_translate_hidden";
-  hiddenDiv.style.display = "none";
+  hiddenDiv.style.cssText = "position: absolute; left: -9999px; top: 0; width: 1px; height: 1px; overflow: hidden;";
   document.body.appendChild(hiddenDiv);
 
   const gtScript = document.createElement("script");
@@ -121,7 +131,7 @@ function startGoogleTranslate(activeLang) {
 // Schwebendes Hinweisfenster NUR für Mobilgeräte (Handy)
 function showMobileLanguageHintOnce(activeLang) {
   if (!activeLang || activeLang === "de") return;
-  if (window.innerWidth > 768) return; // Auf Desktop läuft stattdessen sprach-hinweis.html
+  if (window.innerWidth > 768) return;
   if (sessionStorage.getItem("fflw_i18n_hint_shown") === "true") return;
 
   sessionStorage.setItem("fflw_i18n_hint_shown", "true");
@@ -263,8 +273,8 @@ function openTranslationHelpDialog(activeLang) {
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
 
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 200);
-  setTimeout(() => forceGoogleTranslatePopup(activeLang), 900);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 250);
+  setTimeout(() => forceGoogleTranslatePopup(activeLang), 1000);
 
   const closeDialog = () => overlay.remove();
   document.getElementById("fflw-help-cancel-btn").addEventListener("click", closeDialog);
@@ -428,21 +438,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const isMobile = window.innerWidth <= 768;
 
   // 1. URL-Parameter ?lang=xx sofort mit Cookie synchronisieren
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlLang = urlParams.get("lang");
-  if (urlLang && urlLang !== "de") {
-    applyGoogleTranslateCookie(urlLang);
+  const activeLang = getActiveLanguage();
+  if (activeLang && activeLang !== "de") {
+    applyGoogleTranslateCookie(activeLang);
   }
 
-  const activeLang = getActiveLanguage();
-
   // 2. Weiche für den ersten Sprachaufruf:
-  //    - Desktop: einmalig auf sprach-hinweis.html leiten
-  //    - Handy: schwebendes Pop-up auf der aktuellen Seite einblenden
   if (activeLang && activeLang !== "de") {
     if (!isMobile && currentPage !== "sprach-hinweis.html" && sessionStorage.getItem("fflw_i18n_hint_shown") !== "true") {
       sessionStorage.setItem("fflw_i18n_hint_shown", "true");
-      window.location.replace(`sprach-hinweis.html?lang=${activeLang}`);
+      window.location.replace(`sprach-hinweis.html?lang=${activeLang}#googtrans(de|${activeLang})`);
       return;
     } else if (isMobile) {
       showMobileLanguageHintOnce(activeLang);
@@ -538,7 +543,7 @@ document.addEventListener("DOMContentLoaded", function () {
             setLanguage("de");
           });
           resetLi.appendChild(resetLink);
-          navList.prepend(resetLink.parentElement);
+          navList.prepend(resetLi);
         }
 
         startGoogleTranslate(activeLang);
