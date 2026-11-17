@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Aktuelle Angebote - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    @keyframes fflw-sanduhr-drehen {
+      0%   { transform: rotate(0deg); }
+      45%  { transform: rotate(180deg); }
+      50%  { transform: rotate(180deg); }
+      95%  { transform: rotate(360deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .fflw-sanduhr {
+      display: inline-block;
+      font-style: normal;
+      animation: fflw-sanduhr-drehen 2.2s ease-in-out infinite;
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -41,21 +55,29 @@
 
       <p><strong>So funktioniert die Reservierung:</strong></p>
       <ol>
-        <li>Setze bei den gewünschten Möbeln direkt unter dem Foto ein Häkchen bei <strong>„Diesen Artikel reservieren“</strong>.</li>
+        <li>Setze bei den gewünschten Möbeln direkt unter dem Foto ein Häkchen bei <strong>„▲ Diesen Artikel darüber reservieren“</strong>.</li>
         <li>Trage ganz unten deine Kontaktdaten ein (Name und Telefonnummer oder E-Mail).</li>
-        <li>Klicke auf <strong>„Verbindlich reservieren“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
+        <li>Klicke auf <strong>„✅ Verbindlich reservieren“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
       </ol>
+
+      <!-- Deutlicher Geduldshinweis (wird in alle Sprachen mitübersetzt) -->
+      <div style="margin: 18px 0 22px 0; padding: 12px 16px; border-left: 5px solid #ffd700; background: rgba(255, 215, 0, 0.14); border-radius: 6px; font-weight: bold;">
+        ⏳ Geduld, Geduld – das Laden der Bilder kann eventuell sogar 1–2 Minuten dauern.
+      </div>
 
       <!-- Live-Galerie der verfügbaren Möbel -->
       <div id="fflw-angebote-galerie" style="margin-top: 24px;">
-        <p id="fflw-angebote-status" style="opacity: 0.9;">⏳ Aktuelle Möbel werden geladen …</p>
+        <div id="fflw-angebote-status" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">
+          <span class="fflw-sanduhr" aria-hidden="true" style="font-size: 1.5rem;">⏳</span>
+          <span>Aktuelle Möbel werden geladen … (Geduld, Geduld – das Laden der Bilder kann eventuell sogar 1–2 Minuten dauern)</span>
+        </div>
       </div>
 
       <!-- Direktes Reservierungsformular (wird vollständig vom ÜbersetzungsTool in alle Sprachen übersetzt) -->
-      <form id="fflw-reservierungs-form" style="display: none; margin-top: 30px; padding: 20px; border: 2px solid #ffffff; border-radius: 8px; background: rgba(255,255,255,0.08);">
+      <form id="fflw-reservierungs-form" style="display: none; margin-top: 34px; padding: 22px; border: 2px solid #ffffff; border-radius: 8px; background: rgba(255,255,255,0.08);">
         <h3 style="margin-top: 0;">Kontaktdaten &amp; Reservierung absenden</h3>
 
-        <p id="fflw-auswahl-info" style="font-weight: bold; background: rgba(0,0,0,0.25); padding: 10px 12px; border-radius: 6px;">
+        <p id="fflw-auswahl-info" style="font-weight: bold; background: rgba(0,0,0,0.28); padding: 10px 12px; border-radius: 6px;">
           Ausgewählte Artikel: 0
         </p>
 
@@ -105,7 +127,7 @@
         <div id="fflw-res-feedback" style="margin-bottom: 14px; font-weight: bold;"></div>
 
         <button type="submit" id="fflw-res-submit"
-                style="background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.25);">
+                style="display: inline-flex; align-items: center; gap: 8px; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.25);">
           ✅ Verbindlich reservieren
         </button>
       </form>
@@ -204,11 +226,28 @@
       }
 
       function ladeAngebote() {
-        fetch(WEB_APP_URL)
-          .then(res => res.json())
-          .then(data => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 120000);
+
+        fetch(WEB_APP_URL + "?t=" + Date.now(), {
+          method: "GET",
+          redirect: "follow",
+          signal: controller.signal
+        })
+          .then(res => {
+            clearTimeout(timeoutId);
+            return res.text();
+          })
+          .then(text => {
+            let data = null;
+            try {
+              data = JSON.parse(text);
+            } catch (e) {
+              throw new Error("Antwort war kein JSON (bitte Web-App-Zugriff auf 'Jeder' prüfen).");
+            }
+
             if (!data || !data.ok || !Array.isArray(data.items)) {
-              container.innerHTML = "<p>Die Angebote konnten gerade nicht geladen werden. Bitte lade die Seite neu.</p>";
+              container.innerHTML = "<p>Die Angebote konnten gerade nicht geladen werden (" + (data && data.error ? data.error : "unbekannter Fehler") + ").</p>";
               retranslate(container);
               return;
             }
@@ -221,9 +260,22 @@
             }
 
             container.innerHTML = "";
+            const gesamt = data.items.length;
+
             data.items.forEach((item, idx) => {
+              if (idx > 0) {
+                const hr = document.createElement("hr");
+                hr.style.cssText = "border: 0; height: 4px; background: rgba(255,255,255,0.65); border-radius: 2px; margin: 34px 0 18px 0;";
+                container.appendChild(hr);
+              }
+
+              const headerBar = document.createElement("div");
+              headerBar.style.cssText = "background: rgba(255,255,255,0.18); border-left: 5px solid #ffffff; padding: 6px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 0.9rem; font-weight: bold; letter-spacing: 0.02em;";
+              headerBar.textContent = (idx === 0 ? "Verfügbare Möbel" : "Nächster Artikel") + " (" + (idx + 1) + " / " + gesamt + ")";
+              container.appendChild(headerBar);
+
               const card = document.createElement("article");
-              card.style.cssText = "border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; padding: 16px; margin-bottom: 22px; background: rgba(255,255,255,0.06);";
+              card.style.cssText = "border: 2px solid rgba(255,255,255,0.45); border-radius: 8px; padding: 16px; background: rgba(255,255,255,0.07);";
 
               const title = document.createElement("h3");
               title.style.marginTop = "0";
@@ -260,7 +312,7 @@
 
               const checkLabel = document.createElement("label");
               checkLabel.htmlFor = "fflw-item-check-" + idx;
-              checkLabel.style.cssText = "display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 14px; background: #ffffff; color: #111111; border-radius: 6px; font-weight: bold; cursor: pointer;";
+              checkLabel.style.cssText = "display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 14px; background: #ffffff; color: #111111; border-radius: 6px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);";
 
               const checkbox = document.createElement("input");
               checkbox.type = "checkbox";
@@ -270,7 +322,7 @@
               checkbox.addEventListener("change", updateAuswahlCounter);
 
               const labelText = document.createElement("span");
-              labelText.textContent = "Diesen Artikel reservieren";
+              labelText.textContent = "▲ Diesen Artikel darüber reservieren";
 
               checkLabel.appendChild(checkbox);
               checkLabel.appendChild(labelText);
@@ -279,12 +331,17 @@
               container.appendChild(card);
             });
 
+            const endHr = document.createElement("hr");
+            endHr.style.cssText = "border: 0; height: 4px; background: rgba(255,255,255,0.65); border-radius: 2px; margin: 34px 0 0 0;";
+            container.appendChild(endHr);
+
             formEl.style.display = "block";
             updateAuswahlCounter();
             retranslate(document.querySelector("main.content"));
           })
-          .catch(() => {
-            container.innerHTML = "<p>Verbindungsfehler beim Laden der Möbel. Bitte lade die Seite kurz neu.</p>";
+          .catch(err => {
+            clearTimeout(timeoutId);
+            container.innerHTML = "<p><strong>Hinweis:</strong> Die Möbel-Liste konnte nicht geladen werden (" + err.message + "). Bitte lade die Seite kurz neu.</p>";
             retranslate(container);
           });
       }
@@ -315,11 +372,12 @@
         }
 
         submitBtn.disabled = true;
-        submitBtn.textContent = "⏳ Wird reserviert …";
+        submitBtn.innerHTML = '<span class="fflw-sanduhr" aria-hidden="true">⏳</span> <span>Wird reserviert …</span>';
         retranslate(submitBtn);
 
         fetch(WEB_APP_URL, {
           method: "POST",
+          redirect: "follow",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({
             name: name,
@@ -330,8 +388,9 @@
             artikel: ausgewaehlte
           })
         })
-          .then(res => res.json())
-          .then(resp => {
+          .then(res => res.text())
+          .then(text => {
+            const resp = JSON.parse(text);
             submitBtn.disabled = false;
             submitBtn.textContent = "✅ Verbindlich reservieren";
 
