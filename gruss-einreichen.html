@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Videogruß hochladen – Freundeskreis Leutenbach-Winnenden</title>
+  <style>
+    :root {
+      --primary: #1f5c4d;
+      --primary-light: #e9f3f0;
+      --accent: #d97724;
+      --bg: #f6f8f7;
+      --card: #ffffff;
+      --text: #1f2933;
+      --muted: #52606d;
+      --border: #d9e2ec;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      background: var(--card);
+      border-bottom: 3px solid var(--primary);
+      padding: 16px 20px;
+      text-align: center;
+    }
+    header img {
+      max-height: 68px;
+      width: auto;
+    }
+    header .sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    main {
+      max-width: 620px;
+      margin: 28px auto;
+      padding: 0 16px 48px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.45rem;
+      color: var(--primary);
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin: 16px 0 6px;
+    }
+    input[type="text"], textarea, input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      background: #fff;
+    }
+    textarea { min-height: 95px; resize: vertical; }
+    .hint {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    button {
+      margin-top: 22px;
+      width: 100%;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--primary);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #9fb3c8;
+      cursor: not-allowed;
+    }
+    .status {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 10px;
+      display: none;
+      font-weight: 500;
+    }
+    .status.ok { display: block; background: #e3f9e5; color: #1f5c2e; border: 1px solid #a3d9a5; }
+    .status.err { display: block; background: #ffe3e3; color: #8a1f1f; border: 1px solid #f8b4b4; }
+    .status.wait { display: block; background: var(--primary-light); color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="images/logo.png" alt="Freundeskreis Leutenbach-Winnenden" onerror="this.style.display='none'">
+  <div class="sub">Freundeskreis Leutenbach-Winnenden · Geheime Überraschung</div>
+</header>
+
+<main>
+  <div class="card">
+    <h1>🎬 Videogruß für Birgid einreichen</h1>
+    <p>Bitte verrate es nicht weiter – wir sammeln persönliche Videogrüße und liebe Worte zum Abschied.</p>
+
+    <form id="uploadForm">
+      <label for="absender">Dein Name / Eure Familie *</label>
+      <input type="text" id="absender" required placeholder="z. B. Familie Al-Mansoor oder Maria & Peter">
+
+      <label for="videoDatei">Videogruß (oder Foto) auswählen *</label>
+      <input type="file" id="videoDatei" accept="video/*,image/*" required>
+      <div class="hint">Tipp: Handy bitte quer halten und kurz (ca. 15–45 Sekunden, max. 40 MB) aufnehmen.</div>
+
+      <label for="nachricht">Kurzer schriftlicher Gruß dazu (optional)</label>
+      <textarea id="nachricht" placeholder="Danke für deine Hilfe und alles Gute bei deinen Kindern!"></textarea>
+
+      <button type="submit" id="submitBtn">Videogruß jetzt absenden</button>
+    </form>
+
+    <div id="statusBox" class="status"></div>
+  </div>
+</main>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2PjaMEug9ZDqMS3Sd1YDf0ptCgr5ytt2EeWfmjrFqYKabVXfhHyI-v-wotjE9sTJycA/exec";
+
+  document.getElementById("uploadForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById("submitBtn");
+    const statusBox = document.getElementById("statusBox");
+    const fileInput = document.getElementById("videoDatei");
+    const file = fileInput.files[0];
+
+    if (!file) return;
+    if (file.size > 45 * 1024 * 1024) {
+      statusBox.className = "status err";
+      statusBox.textContent = "Das Video ist leider größer als 45 MB. Bitte etwas kürzer aufnehmen oder direkt per WhatsApp schicken.";
+      return;
+    }
+
+    btn.disabled = true;
+    statusBox.className = "status wait";
+    statusBox.textContent = "⏳ Video wird hochgeladen – bitte Seite kurz geöffnet lassen...";
+
+    const reader = new FileReader();
+    reader.onload = async function() {
+      const base64Data = reader.result.split(",")[1];
+      const payload = {
+        absender: document.getElementById("absender").value,
+        nachricht: document.getElementById("nachricht").value,
+        fileName: file.name,
+        mimeType: file.type,
+        fileBase64: base64Data
+      };
+
+      try {
+        const res = await fetch(SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.ok) {
+          statusBox.className = "status ok";
+          statusBox.textContent = "✅ Herzlichen Dank! Dein Videogruß ist sicher angekommen.";
+          document.getElementById("uploadForm").reset();
+        } else {
+          throw new Error(result.error || "Unbekannter Fehler");
+        }
+      } catch (err) {
+        statusBox.className = "status err";
+        statusBox.textContent = "Fehler beim Hochladen: " + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+</script>
+
+</body>
+</html>
