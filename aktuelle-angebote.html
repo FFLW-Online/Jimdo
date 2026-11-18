@@ -65,7 +65,7 @@
         ⏳ Geduld, Geduld – das Laden der Bilder kann eventuell sogar 1–2 Minuten dauern.
       </div>
 
-      <!-- Live-Galerie der verfügbaren Möbel (kurzer Ladetext ohne Wiederholung) -->
+      <!-- Live-Galerie der verfügbaren Möbel -->
       <div id="fflw-angebote-galerie" style="margin-top: 24px;">
         <div id="fflw-angebote-status" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">
           <span class="fflw-sanduhr" aria-hidden="true" style="font-size: 1.5rem;">⏳</span>
@@ -81,13 +81,14 @@
           Ausgewählte Artikel: 0
         </p>
 
-        <!-- Optionaler Zahlencode-Schutz (wird über ZUGANGS_CODE unten gesteuert) -->
+        <!-- Zugangscode + automatische Artikelbegrenzung -->
         <div id="fflw-code-box" style="display: none; margin-bottom: 16px; padding: 12px 14px; border-radius: 6px; background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;">
           <label for="fflw-res-code" style="display: block; font-weight: bold; margin-bottom: 4px;">
             Zugangscode (Zahl vom Freundeskreis) *
           </label>
-          <input type="text" id="fflw-res-code" inputmode="numeric" autocomplete="off"
-                 style="width: 140px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+          <input type="text" id="fflw-res-code" autocomplete="off"
+                 style="width: 160px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+          <div id="fflw-code-limit-hinweis" style="margin-top: 6px; font-size: 0.9rem; font-weight: bold; color: #ffd700;"></div>
         </div>
 
         <div style="margin-bottom: 14px;">
@@ -139,9 +140,9 @@
 
         <div id="fflw-res-feedback" style="margin-bottom: 14px; font-weight: bold;"></div>
 
-        <!-- Kompletter grüner Knopf ohne verwirrendes Häkchen-Symbol -->
+        <!-- Kompletter grüner Knopf -->
         <button type="submit" id="fflw-res-submit"
-                style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background-color: #2e7d32; color: #ffffff; border: 2px solid #ffffff; padding: 14px 28px; font-size: 17px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.3);">
+                style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; background-color: #2e7d32; color: #ffffff; border: 2px solid #ffffff; padding: 14px 28px; font-size: 17px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.3);">
           Verbindlich reservieren
         </button>
       </form>
@@ -219,17 +220,22 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       // =========================================================================
-      // EINSTELLUNG FÜR ZUGANGSCODE (Bot- und Zugriffsschutz):
-      // Hier einfach deine gewünschte Zahl eintragen (z. B. "11").
-      // Wenn du keinen Code abfragen willst, einfach leer lassen: ""
+      // EINSTELLUNGEN FÜR ZUGANGSCODE & ARTIKEL-BEGRENZUNG:
+      // 1) ZUGANGS_CODE: Deine Basis-Zahl (z. B. "11"). Leer "" = Schutz aus.
+      // 2) STANDARD_MAX_ARTIKEL: Wie viele Artikel man mit "11" wählen darf (z. B. 2).
+      //    TRICK: Gibst du jemandem "11-4", darf diese Person 4 Artikel wählen!
+      //           Gibst du jemandem "11-1", darf diese Person nur 1 Artikel wählen!
+      //           (0 = keine Begrenzung)
       // =========================================================================
       const ZUGANGS_CODE = "11";
+      const STANDARD_MAX_ARTIKEL = 2;
 
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
       const container = document.getElementById("fflw-angebote-galerie");
       const formEl = document.getElementById("fflw-reservierungs-form");
       const codeBoxEl = document.getElementById("fflw-code-box");
       const codeInputEl = document.getElementById("fflw-res-code");
+      const codeLimitHinweisEl = document.getElementById("fflw-code-limit-hinweis");
       const auswahlInfoEl = document.getElementById("fflw-auswahl-info");
       const feedbackEl = document.getElementById("fflw-res-feedback");
       const submitBtn = document.getElementById("fflw-res-submit");
@@ -237,6 +243,24 @@
       if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
         codeBoxEl.style.display = "block";
         codeInputEl.required = true;
+      }
+
+      // Prüft den eingegebenen Zugangscode und liefert { gueltig, maxArtikel }
+      function pruefeZugangsCode() {
+        const basis = (ZUGANGS_CODE || "").trim();
+        if (!basis) {
+          return { gueltig: true, maxArtikel: STANDARD_MAX_ARTIKEL };
+        }
+        const eingabe = codeInputEl.value.trim();
+        if (eingabe === basis) {
+          return { gueltig: true, maxArtikel: STANDARD_MAX_ARTIKEL };
+        }
+        // Trick: Format "11-3" erlaubt 3 Artikel, "11-1" erlaubt 1 Artikel
+        const match = eingabe.match(/^([a-zA-Z0-9]+)-(\d+)$/);
+        if (match && match[1] === basis) {
+          return { gueltig: true, maxArtikel: parseInt(match[2], 10) };
+        }
+        return { gueltig: false, maxArtikel: STANDARD_MAX_ARTIKEL };
       }
 
       function retranslate(targetEl) {
@@ -248,9 +272,57 @@
       }
 
       function updateAuswahlCounter() {
-        const checked = container.querySelectorAll('input[type="checkbox"]:checked');
-        auswahlInfoEl.textContent = "Ausgewählte Artikel: " + checked.length;
+        const allBoxes = Array.from(container.querySelectorAll('input[type="checkbox"]'));
+        const checked = allBoxes.filter(cb => cb.checked);
+        const codeStatus = pruefeZugangsCode();
+        const limit = codeStatus.maxArtikel;
+
+        if (limit > 0) {
+          auswahlInfoEl.textContent = "Ausgewählte Artikel: " + checked.length + " (maximal " + limit + " erlaubt)";
+          // Sperrt übrige Checkboxen, sobald das Limit erreicht ist
+          const limitErreicht = checked.length >= limit;
+          allBoxes.forEach(cb => {
+            if (!cb.checked) {
+              cb.disabled = limitErreicht;
+              if (cb.parentElement) {
+                cb.parentElement.style.opacity = limitErreicht ? "0.45" : "1";
+                cb.parentElement.style.cursor = limitErreicht ? "not-allowed" : "pointer";
+              }
+            }
+          });
+        } else {
+          auswahlInfoEl.textContent = "Ausgewählte Artikel: " + checked.length;
+          allBoxes.forEach(cb => {
+            cb.disabled = false;
+            if (cb.parentElement) {
+              cb.parentElement.style.opacity = "1";
+              cb.parentElement.style.cursor = "pointer";
+            }
+          });
+        }
+
+        if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
+          if (codeStatus.gueltig && limit > 0) {
+            codeLimitHinweisEl.textContent = "✓ Code gültig: Du kannst bis zu " + limit + " Artikel reservieren.";
+          } else if (codeStatus.gueltig) {
+            codeLimitHinweisEl.textContent = "✓ Code gültig.";
+          } else {
+            codeLimitHinweisEl.textContent = "";
+          }
+          retranslate(codeLimitHinweisEl);
+        }
+
         retranslate(auswahlInfoEl);
+      }
+
+      codeInputEl.addEventListener("input", updateAuswahlCounter);
+
+      // Erzeugt einen kräftigen, unübersehbaren Trennbalken zwischen Artikeln
+      function createTrennBalken() {
+        const balken = document.createElement("div");
+        balken.setAttribute("aria-hidden", "true");
+        balken.style.cssText = "display: block; width: 100%; height: 8px; background-color: #ffd700; border-radius: 4px; margin: 42px 0 26px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.35);";
+        return balken;
       }
 
       function ladeAngebote() {
@@ -291,15 +363,13 @@
             const gesamt = data.items.length;
 
             data.items.forEach((item, idx) => {
-              // Klarer HTML-Trennbalken (<hr>) zwischen den Artikeln
+              // Deutlicher gelber Trennbalken vor jedem weiteren Artikel
               if (idx > 0) {
-                const hr = document.createElement("hr");
-                hr.style.cssText = "border: 0; height: 6px; background: #ffffff; border-radius: 3px; margin: 38px 0 24px 0; opacity: 0.85;";
-                container.appendChild(hr);
+                container.appendChild(createTrennBalken());
               }
 
               const headerBar = document.createElement("div");
-              headerBar.style.cssText = "background: rgba(255,255,255,0.18); border-left: 5px solid #ffffff; padding: 6px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 0.9rem; font-weight: bold; letter-spacing: 0.02em;";
+              headerBar.style.cssText = "background: rgba(255,255,255,0.18); border-left: 5px solid #ffd700; padding: 6px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 0.9rem; font-weight: bold; letter-spacing: 0.02em;";
               headerBar.textContent = (idx === 0 ? "Verfügbare Möbel" : "Nächster Artikel") + " (" + (idx + 1) + " / " + gesamt + ")";
               container.appendChild(headerBar);
 
@@ -361,9 +431,7 @@
             });
 
             // Trennbalken vor dem Kontaktdaten-Formular
-            const endHr = document.createElement("hr");
-            endHr.style.cssText = "border: 0; height: 6px; background: #ffffff; border-radius: 3px; margin: 38px 0 0 0; opacity: 0.85;";
-            container.appendChild(endHr);
+            container.appendChild(createTrennBalken());
 
             formEl.style.display = "block";
             updateAuswahlCounter();
@@ -380,15 +448,13 @@
         e.preventDefault();
         feedbackEl.textContent = "";
 
-        if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
-          const eingegebenerCode = codeInputEl.value.trim();
-          if (eingegebenerCode !== ZUGANGS_CODE.trim()) {
-            feedbackEl.style.color = "#ffdddd";
-            feedbackEl.textContent = "Der eingegebene Zugangscode stimmt nicht. Bitte gib die Zahl ein, die du vom Freundeskreis erhalten hast.";
-            retranslate(feedbackEl);
-            codeInputEl.focus();
-            return;
-          }
+        const codeStatus = pruefeZugangsCode();
+        if (!codeStatus.gueltig) {
+          feedbackEl.style.color = "#ffdddd";
+          feedbackEl.textContent = "Der eingegebene Zugangscode stimmt nicht. Bitte gib die Zahl ein, die du vom Freundeskreis erhalten hast.";
+          retranslate(feedbackEl);
+          codeInputEl.focus();
+          return;
         }
 
         const ausgewaehlte = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
@@ -405,6 +471,13 @@
           return;
         }
 
+        if (codeStatus.maxArtikel > 0 && ausgewaehlte.length > codeStatus.maxArtikel) {
+          feedbackEl.style.color = "#ffdddd";
+          feedbackEl.textContent = "Mit deinem Zugangscode kannst du maximal " + codeStatus.maxArtikel + " Artikel auswählen.";
+          retranslate(feedbackEl);
+          return;
+        }
+
         if (!name || (!telefon && !email)) {
           feedbackEl.style.color = "#ffdddd";
           feedbackEl.textContent = "Bitte trage deinen Namen und entweder deine Telefonnummer oder deine E-Mail-Adresse ein.";
@@ -413,7 +486,7 @@
         }
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="fflw-sanduhr" aria-hidden="true">⏳</span> <span>Wird reserviert …</span>';
+        submitBtn.innerHTML = '<span class="fflw-sanduhr" aria-hidden="true">⏳</span> <span>Wird reserviert … (kann auch a bissle dauern)</span>';
         retranslate(submitBtn);
 
         fetch(WEB_APP_URL, {
