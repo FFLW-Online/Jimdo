@@ -14,7 +14,6 @@
       --fflw-bg: #f2f8f7;
       --fflw-warm: #e08a3c;
       --jugendstil-gold: #c8963e;
-      --jugendstil-gold-light: #e5be73;
       --card: #ffffff;
       --text: #1b332f;
       --muted: #4b6863;
@@ -39,7 +38,6 @@
       padding: 68px 14px 44px;
     }
 
-    /* Hauptkarte im Jugendstil-Rahmen */
     .main-wrap {
       width: 100%;
       max-width: 650px;
@@ -216,7 +214,6 @@
       line-height: 1.5;
     }
 
-    /* Absende-Knopf mit unserem Logo & 3D-Raumdrehung */
     button#submitBtn {
       margin-top: 24px;
       width: 100%;
@@ -268,7 +265,6 @@
       transform-style: preserve-3d;
     }
 
-    /* 3D-Drehung in den Raum hinein während des Hochladens */
     .spin-3d-space {
       animation: spinInSpace 2.2s infinite linear;
     }
@@ -281,7 +277,6 @@
       100% { transform: perspective(400px) rotateY(360deg) scale(1); }
     }
 
-    /* Prozent-Fortschrittsbalken */
     .progress-bar-wrap {
       display: none;
       width: 100%;
@@ -332,7 +327,6 @@
 
 <div class="main-wrap">
   <div class="form-card">
-    <!-- Jugendstil-Logo-Emblem im oberen Rahmen -->
     <div class="jugendstil-crest">
       <div class="crest-wing left">❧ ✿</div>
       <div class="crest-medallion">
@@ -386,6 +380,8 @@
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2PjaMEug9ZDqMS3Sd1YDf0ptCgr5ytt2EeWfmjrFqYKabVXfhHyI-v-wotjE9sTJycA/exec";
   const MAX_SEKUNDEN = 123;
   const MAX_MB = 250;
+  // 8 MB Häppchen (muss ein Vielfaches von 256 KB für Google Drive sein)
+  const CHUNK_SIZE = 8 * 1024 * 1024;
 
   let videoZuLang = false;
 
@@ -444,16 +440,17 @@
     btnLogo.classList.add("spin-3d-space");
     btnText.textContent = "Upload wird vorbereitet...";
     progressWrap.style.display = "block";
-    progressFill.style.width = "5%";
+    progressFill.style.width = "3%";
 
+    const totalMB = (file.size / (1024 * 1024)).toFixed(1);
     statusBox.className = "status wait";
-    statusBox.innerHTML = "<strong>Dein Videogruß wird übertragen...</strong><br>Bitte diese Seite geöffnet lassen und das Handy kurz nicht sperren.";
+    statusBox.innerHTML = "<strong>Dein Gruß (" + totalMB + " MB) wird übertragen...</strong><br>Bitte diese Seite geöffnet lassen und den Bildschirm kurz nicht sperren.";
 
     try {
       const initRes = await fetch(SCRIPT_URL, {
         method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
+          origin: window.location.origin,
           absender: document.getElementById("absender").value,
           nachricht: document.getElementById("nachricht").value,
           fileName: file.name,
@@ -465,13 +462,13 @@
         throw new Error(initData.error || "Upload konnte nicht gestartet werden.");
       }
 
-      await uploadDirectToDrive(initData.uploadUrl, file, function(percent) {
+      await uploadInChunks(initData.uploadUrl, file, function(percent) {
         progressFill.style.width = percent + "%";
         btnText.textContent = "Wird hochgeladen (" + percent + "%)...";
       });
 
       statusBox.className = "status ok";
-      statusBox.innerHTML = "✅ <strong>Herzlichen Dank!</strong> Dein Videogruß ist vollständig angekommen und erscheint sofort auf der Überraschungsseite.";
+      statusBox.innerHTML = "✅ <strong>Herzlichen Dank!</strong> Dein Gruß ist vollständig angekommen und erscheint sofort auf der Überraschungsseite.";
       document.getElementById("uploadForm").reset();
       document.getElementById("durationWarn").style.display = "none";
     } catch (err) {
@@ -485,33 +482,74 @@
     }
   });
 
-  function uploadDirectToDrive(uploadUrl, file, onProgress) {
-    return new Promise((resolve, reject) => {
+  async function uploadInChunks(uploadUrl, file, onProgress) {
+    const totalSize = file.size;
+    let offset = 0;
+
+    while (offset < totalSize) {
+      const end = Math.min(offset + CHUNK_SIZE, totalSize);
+      const chunk = file.slice(offset, end);
+      const contentRange = "bytes " + offset + "-" + (end - 1) + "/" + totalSize;
+
+      let attempt = 0;
+      let chunkDone = false;
+
+      while (!chunkDone && attempt < 3) {
+        attempt++;
+        try {
+          const status = await sendSingleChunk(uploadUrl, chunk, file.type || "video/mp4", contentRange, function(loadedInChunk) {
+            const totalLoaded = offset + loadedInChunk;
+            const pct = Math.max(3, Math.min(99, Math.round((totalLoaded / totalSize) * 100)));
+            onProgress(pct);
+          });
+
+          if (status === 200 || status === 201) {
+            onProgress(100);
+            return;
+          } else if (status === 308) {
+            chunkDone = true;
+            offset = end;
+          } else {
+            throw new Error("Google Drive Status " + status);
+          }
+        } catch (err) {
+          if (attempt >= 3) {
+            throw new Error("Verbindung bei " + Math.round((offset / totalSize) * 100) + "% unterbrochen – bitte erneut versuchen.");
+          }
+          // Kurz warten und dasselbe 8-MB-Häppchen erneut senden
+          await new Promise(function(r) { setTimeout(r, 1500); });
+        }
+      }
+    }
+  }
+
+  function sendSingleChunk(uploadUrl, chunk, mimeType, contentRange, onChunkProgress) {
+    return new Promise(function(resolve, reject) {
       const xhr = new XMLHttpRequest();
       xhr.open("PUT", uploadUrl, true);
-      xhr.setRequestHeader("Content-Type", file.type || "video/mp4");
+      xhr.setRequestHeader("Content-Type", mimeType);
+      xhr.setRequestHeader("Content-Range", contentRange);
+      xhr.timeout = 45000;
 
       xhr.upload.onprogress = function(e) {
         if (e.lengthComputable) {
-          const pct = Math.max(5, Math.min(99, Math.round((e.loaded / e.total) * 100)));
-          onProgress(pct);
+          onChunkProgress(e.loaded);
         }
       };
 
       xhr.onload = function() {
-        if (xhr.status === 200 || xhr.status === 201) {
-          onProgress(100);
-          resolve();
-        } else {
-          reject(new Error("Google Drive Antwort: " + xhr.status));
-        }
+        resolve(xhr.status);
       };
 
       xhr.onerror = function() {
-        reject(new Error("Netzwerkverbindung unterbrochen – bitte erneut versuchen."));
+        reject(new Error("Netzwerkfehler"));
       };
 
-      xhr.send(file);
+      xhr.ontimeout = function() {
+        reject(new Error("Zeitüberschreitung"));
+      };
+
+      xhr.send(chunk);
     });
   }
 </script>
