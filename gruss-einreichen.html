@@ -11,7 +11,8 @@
       --fflw-teal-dark: #004d40;
       --fflw-teal-mid: #26a69a;
       --fflw-teal-soft: #e0f2f1;
-      --fflw-mint-bg: #f1f8f6;
+      --fflw-bg: #f2f8f7;
+      --fflw-warm: #e08a3c;
       --jugendstil-gold: #c8963e;
       --card: #ffffff;
       --text: #1b332f;
@@ -23,59 +24,73 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--fflw-mint-bg);
+      background-color: var(--fflw-bg);
       background-image:
-        radial-gradient(circle at 12% 18%, rgba(38, 166, 154, 0.11) 0%, transparent 32%),
-        radial-gradient(circle at 88% 82%, rgba(0, 121, 107, 0.11) 0%, transparent 36%);
+        radial-gradient(circle at 10% 15%, rgba(38, 166, 154, 0.13) 0%, transparent 35%),
+        radial-gradient(circle at 90% 85%, rgba(0, 121, 107, 0.13) 0%, transparent 38%),
+        radial-gradient(circle at 85% 12%, rgba(224, 138, 60, 0.09) 0%, transparent 30%);
       color: var(--text);
       line-height: 1.55;
     }
 
-    .art-nouveau-page {
-      max-width: 680px;
-      margin: 22px auto 48px;
-      padding: 12px;
-    }
-
-    .art-nouveau-frame {
-      position: relative;
-      background: var(--card);
-      border: 3px solid var(--fflw-teal);
-      border-radius: 26px 6px 26px 6px;
-      padding: 32px 24px 38px;
-      box-shadow:
-        0 0 0 6px var(--fflw-teal-soft),
-        0 0 0 8px var(--jugendstil-gold),
-        0 14px 36px rgba(0, 77, 64, 0.15);
-    }
-
-    .fflw-header {
+    /* Freundeskreis-Kopfbereich (ohne Menü, damit es geheim bleibt) */
+    .site-header {
+      background: linear-gradient(135deg, var(--fflw-teal-dark) 0%, var(--fflw-teal) 60%, var(--fflw-teal-mid) 100%);
+      color: #fff;
+      padding: 18px 16px 22px;
       text-align: center;
-      margin-bottom: 20px;
+      border-bottom: 4px solid var(--jugendstil-gold);
+      box-shadow: 0 4px 16px rgba(0, 77, 64, 0.18);
     }
 
-    .logo-medallion {
+    .header-logo-wrap {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(145deg, #ffffff, var(--fflw-teal-soft));
-      border: 2px solid var(--fflw-teal);
-      box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--jugendstil-gold);
-      border-radius: 44px 12px 44px 12px;
-      padding: 12px 24px;
-      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.96);
+      padding: 10px 22px;
+      border-radius: 36px 10px 36px 10px;
+      border: 2px solid var(--jugendstil-gold);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+      margin-bottom: 8px;
     }
 
-    .logo-medallion img {
-      max-height: 70px;
+    .header-logo-wrap img {
+      max-height: 68px;
       width: auto;
+      display: block;
     }
 
-    .brand-title {
+    .site-header .org-name {
       font-family: Georgia, serif;
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       font-weight: bold;
-      color: var(--fflw-teal-dark);
+      letter-spacing: 0.02em;
+    }
+
+    .site-header .org-sub {
+      font-size: 0.88rem;
+      opacity: 0.92;
+      margin-top: 2px;
+    }
+
+    /* Hauptkarte im verspielten Freundeskreis-Rahmen */
+    .main-wrap {
+      max-width: 660px;
+      margin: 26px auto 52px;
+      padding: 0 14px;
+    }
+
+    .form-card {
+      position: relative;
+      background: var(--card);
+      border: 2.5px solid var(--fflw-teal);
+      border-radius: 26px 8px 26px 8px;
+      padding: 30px 24px 36px;
+      box-shadow:
+        0 0 0 5px var(--fflw-teal-soft),
+        0 0 0 7px var(--jugendstil-gold),
+        0 12px 32px rgba(0, 77, 64, 0.13);
     }
 
     .floral-divider {
@@ -83,8 +98,8 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      margin: 14px auto 20px;
-      max-width: 380px;
+      margin: 8px auto 18px;
+      max-width: 340px;
     }
     .floral-divider span.line {
       flex: 1;
@@ -95,7 +110,7 @@
     h1 {
       font-family: Georgia, serif;
       font-weight: normal;
-      margin-top: 0;
+      margin: 0 0 6px;
       font-size: 1.55rem;
       color: var(--fflw-teal-dark);
       text-align: center;
@@ -104,7 +119,7 @@
     .intro {
       text-align: center;
       color: var(--muted);
-      margin-bottom: 22px;
+      margin: 0 0 18px;
     }
 
     label {
@@ -118,13 +133,20 @@
       width: 100%;
       padding: 12px;
       border: 1.5px solid var(--fflw-teal-mid);
-      border-radius: 12px 4px 12px 4px;
+      border-radius: 14px 4px 14px 4px;
       font-size: 1rem;
       font-family: inherit;
       background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    textarea { min-height: 95px; resize: vertical; }
+    input[type="text"]:focus, textarea:focus, input[type="file"]:focus {
+      outline: none;
+      border-color: var(--fflw-teal-dark);
+      box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.2);
+    }
+
+    textarea { min-height: 92px; resize: vertical; }
 
     .hint {
       font-size: 0.88rem;
@@ -145,41 +167,72 @@
       line-height: 1.5;
     }
 
+    /* Absende-Knopf mit unserem Logo & 3D-Raumdrehung */
     button#submitBtn {
       margin-top: 24px;
       width: 100%;
-      padding: 15px 18px;
+      padding: 13px 18px;
       font-size: 1.08rem;
       font-weight: 700;
       color: #fff;
       background: linear-gradient(135deg, var(--fflw-teal), var(--fflw-teal-dark));
       border: 2px solid var(--jugendstil-gold);
-      border-radius: 16px 4px 16px 4px;
+      border-radius: 18px 5px 18px 5px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 12px;
+      box-shadow: 0 4px 14px rgba(0, 77, 64, 0.22);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button#submitBtn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0, 77, 64, 0.28);
     }
 
     button#submitBtn:disabled {
-      background: linear-gradient(135deg, #5c7d78, #44615d);
+      background: linear-gradient(135deg, #1b5e54, #0f3d36);
       cursor: wait;
     }
 
-    .hourglass-spin {
-      display: inline-block;
-      font-size: 1.25rem;
-      animation: flipHourglass 1.6s infinite ease-in-out;
+    .btn-logo-stage {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      background: #ffffff;
+      border-radius: 50%;
+      padding: 4px;
+      border: 1.5px solid var(--jugendstil-gold);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      perspective: 500px;
+      flex-shrink: 0;
     }
 
-    @keyframes flipHourglass {
-      0% { transform: rotate(0deg); }
-      45% { transform: rotate(180deg); }
-      55% { transform: rotate(180deg); }
-      100% { transform: rotate(360deg); }
+    .btn-logo-stage img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transform-style: preserve-3d;
     }
 
+    /* 3D-Drehung in den Raum hinein während des Hochladens */
+    .spin-3d-space {
+      animation: spinInSpace 2.2s infinite linear;
+    }
+
+    @keyframes spinInSpace {
+      0%   { transform: perspective(400px) rotateY(0deg) scale(1); }
+      25%  { transform: perspective(400px) rotateY(90deg) scale(1.12); }
+      50%  { transform: perspective(400px) rotateY(180deg) scale(1); }
+      75%  { transform: perspective(400px) rotateY(270deg) scale(0.92); }
+      100% { transform: perspective(400px) rotateY(360deg) scale(1); }
+    }
+
+    /* Prozent-Fortschrittsbalken */
     .progress-bar-wrap {
       display: none;
       width: 100%;
@@ -194,7 +247,7 @@
     .progress-bar-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, var(--fflw-teal), var(--jugendstil-gold));
+      background: linear-gradient(90deg, var(--fflw-teal), var(--fflw-warm), var(--jugendstil-gold));
       border-radius: 99px;
       transition: width 0.2s ease;
     }
@@ -214,22 +267,22 @@
 </head>
 <body>
 
-<div class="art-nouveau-page">
-  <div class="art-nouveau-frame">
+<header class="site-header">
+  <div class="header-logo-wrap">
+    <img src="assets/logo-ffwl-neu-trans.png" alt="Freundeskreis Leutenbach-Winnenden">
+  </div>
+  <div class="org-name">Freundeskreis Leutenbach-Winnenden</div>
+  <div class="org-sub">Gemeinsam helfen · Miteinander verbinden</div>
+</header>
 
-    <header class="fflw-header">
-      <div class="logo-medallion" id="logoWrapper">
-        <img id="fflwLogo" src="images/logo.png" alt="Freundeskreis Leutenbach-Winnenden">
-      </div>
-      <div class="brand-title">Freundeskreis Asyl Leutenbach · Winnenden</div>
-      <div class="floral-divider">
-        <span class="line"></span>
-        <span style="color:#c8963e; font-size:1.2rem;">❦ ✿ ❦</span>
-        <span class="line"></span>
-      </div>
-    </header>
-
+<div class="main-wrap">
+  <div class="form-card">
     <h1>🎬 Videogruß für Birgid einreichen</h1>
+    <div class="floral-divider">
+      <span class="line"></span>
+      <span style="color:#c8963e; font-size:1.15rem;">❦ ✿ ❦</span>
+      <span class="line"></span>
+    </div>
     <p class="intro">Bitte verrate es nicht weiter – wir sammeln persönliche Videogrüße und liebe Worte zum Abschied.</p>
 
     <form id="uploadForm">
@@ -245,7 +298,9 @@
       <textarea id="nachricht" placeholder="Danke für deine Hilfe und alles Gute bei deinen Kindern!"></textarea>
 
       <button type="submit" id="submitBtn">
-        <span id="btnIcon">📤</span>
+        <span class="btn-logo-stage">
+          <img id="btnLogo" src="assets/logo-ffwl-neu-trans.png" alt="">
+        </span>
         <span id="btnText">Videogruß jetzt absenden</span>
       </button>
 
@@ -255,36 +310,16 @@
     </form>
 
     <div id="statusBox" class="status"></div>
-
   </div>
 </div>
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2PjaMEug9ZDqMS3Sd1YDf0ptCgr5ytt2EeWfmjrFqYKabVXfhHyI-v-wotjE9sTJycA/exec";
-  const MAX_SEKUNDEN = 123; // 2 Minuten (inkl. 3 Sek. Toleranz)
+  const MAX_SEKUNDEN = 123;
   const MAX_MB = 250;
 
   let videoZuLang = false;
 
-  (function loadFflwLogo() {
-    const img = document.getElementById("fflwLogo");
-    const candidates = [
-      "images/logo.png", "img/logo.png", "logo.png",
-      "images/fflw-logo.png", "img/fflw-logo.png",
-      "images/logo.jpg", "logo.jpg", "images/logo.svg"
-    ];
-    let idx = 0;
-    img.onerror = function() {
-      idx++;
-      if (idx < candidates.length) {
-        img.src = candidates[idx];
-      } else {
-        document.getElementById("logoWrapper").style.display = "none";
-      }
-    };
-  })();
-
-  // Videodauer sofort nach Auswahl prüfen
   document.getElementById("videoDatei").addEventListener("change", function() {
     const warnBox = document.getElementById("durationWarn");
     warnBox.style.display = "none";
@@ -321,7 +356,7 @@
   document.getElementById("uploadForm").addEventListener("submit", async function(e) {
     e.preventDefault();
     const btn = document.getElementById("submitBtn");
-    const btnIcon = document.getElementById("btnIcon");
+    const btnLogo = document.getElementById("btnLogo");
     const btnText = document.getElementById("btnText");
     const progressWrap = document.getElementById("progressWrap");
     const progressFill = document.getElementById("progressFill");
@@ -336,18 +371,17 @@
       return;
     }
 
+    // Knopf aktivieren & Logo im 3D-Raum drehen lassen
     btn.disabled = true;
-    btnIcon.className = "hourglass-spin";
-    btnIcon.textContent = "⏳";
+    btnLogo.classList.add("spin-3d-space");
     btnText.textContent = "Upload wird vorbereitet...";
     progressWrap.style.display = "block";
     progressFill.style.width = "5%";
 
     statusBox.className = "status wait";
-    statusBox.innerHTML = "<strong>⏳ Dein Videogruß wird übertragen...</strong><br>Bitte diese Seite geöffnet lassen und das Handy kurz nicht sperren.";
+    statusBox.innerHTML = "<strong>Dein Videogruß wird übertragen...</strong><br>Bitte diese Seite geöffnet lassen und das Handy kurz nicht sperren.";
 
     try {
-      // Schritt 1: Upload-Session über Apps Script anfordern (nur Metadaten, winzig & blitzschnell)
       const initRes = await fetch(SCRIPT_URL, {
         method: "POST",
         body: JSON.stringify({
@@ -362,7 +396,6 @@
         throw new Error(initData.error || "Upload konnte nicht gestartet werden.");
       }
 
-      // Schritt 2: Video direkt mit echtem Prozentbalken in Google Drive hochladen
       await uploadDirectToDrive(initData.uploadUrl, file, function(percent) {
         progressFill.style.width = percent + "%";
         btnText.textContent = "Wird hochgeladen (" + percent + "%)...";
@@ -377,8 +410,7 @@
       statusBox.textContent = "Fehler beim Hochladen: " + err.message;
     } finally {
       btn.disabled = false;
-      btnIcon.className = "";
-      btnIcon.textContent = "📤";
+      btnLogo.classList.remove("spin-3d-space");
       btnText.textContent = "Videogruß jetzt absenden";
       progressWrap.style.display = "none";
     }
