@@ -4,117 +4,244 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Videogruß hochladen – Freundeskreis Leutenbach-Winnenden</title>
+  <title>Videogruß einreichen – Freundeskreis Leutenbach-Winnenden</title>
   <style>
     :root {
-      --primary: #1f5c4d;
-      --primary-light: #e9f3f0;
-      --accent: #d97724;
-      --bg: #f6f8f7;
+      --fflw-teal: #00796b;
+      --fflw-teal-dark: #004d40;
+      --fflw-teal-mid: #26a69a;
+      --fflw-teal-soft: #e0f2f1;
+      --fflw-mint-bg: #f1f8f6;
+      --jugendstil-gold: #c8963e;
       --card: #ffffff;
-      --text: #1f2933;
-      --muted: #52606d;
-      --border: #d9e2ec;
+      --text: #1b332f;
+      --muted: #4b6863;
     }
+
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
+      background-color: var(--fflw-mint-bg);
+      background-image:
+        radial-gradient(circle at 12% 18%, rgba(38, 166, 154, 0.11) 0%, transparent 32%),
+        radial-gradient(circle at 88% 82%, rgba(0, 121, 107, 0.11) 0%, transparent 36%);
       color: var(--text);
-      line-height: 1.5;
+      line-height: 1.55;
     }
-    header {
+
+    .art-nouveau-page {
+      max-width: 680px;
+      margin: 22px auto 48px;
+      padding: 12px;
+    }
+
+    .art-nouveau-frame {
+      position: relative;
       background: var(--card);
-      border-bottom: 3px solid var(--primary);
-      padding: 16px 20px;
-      text-align: center;
+      border: 3px solid var(--fflw-teal);
+      border-radius: 26px 6px 26px 6px;
+      padding: 32px 24px 38px;
+      box-shadow:
+        0 0 0 6px var(--fflw-teal-soft),
+        0 0 0 8px var(--jugendstil-gold),
+        0 14px 36px rgba(0, 77, 64, 0.15);
     }
-    header img {
-      max-height: 68px;
+
+    .fflw-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo-medallion {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #ffffff, var(--fflw-teal-soft));
+      border: 2px solid var(--fflw-teal);
+      box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--jugendstil-gold);
+      border-radius: 44px 12px 44px 12px;
+      padding: 12px 24px;
+      margin-bottom: 10px;
+    }
+
+    .logo-medallion img {
+      max-height: 70px;
       width: auto;
     }
-    header .sub {
-      font-size: 0.9rem;
-      color: var(--muted);
-      margin-top: 4px;
+
+    .brand-title {
+      font-family: Georgia, serif;
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: var(--fflw-teal-dark);
     }
-    main {
-      max-width: 620px;
-      margin: 28px auto;
-      padding: 0 16px 48px;
+
+    .floral-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 14px auto 20px;
+      max-width: 380px;
     }
-    .card {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 24px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.06);
-      border: 1px solid var(--border);
+    .floral-divider span.line {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--fflw-teal), var(--jugendstil-gold), var(--fflw-teal), transparent);
     }
+
     h1 {
+      font-family: Georgia, serif;
+      font-weight: normal;
       margin-top: 0;
-      font-size: 1.45rem;
-      color: var(--primary);
+      font-size: 1.55rem;
+      color: var(--fflw-teal-dark);
+      text-align: center;
     }
+
+    .intro {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
     label {
       display: block;
       font-weight: 600;
+      color: var(--fflw-teal-dark);
       margin: 16px 0 6px;
     }
+
     input[type="text"], textarea, input[type="file"] {
       width: 100%;
       padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border: 1.5px solid var(--fflw-teal-mid);
+      border-radius: 12px 4px 12px 4px;
       font-size: 1rem;
       font-family: inherit;
       background: #fff;
     }
+
     textarea { min-height: 95px; resize: vertical; }
+
     .hint {
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       color: var(--muted);
-      margin-top: 4px;
+      margin-top: 6px;
     }
-    button {
-      margin-top: 22px;
+
+    .duration-warn {
+      display: none;
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: #fff8e6;
+      border: 1px solid var(--jugendstil-gold);
+      border-radius: 10px;
+      color: #7c5818;
+      font-size: 0.9rem;
+    }
+
+    /* Absende-Knopf mit Sanduhr-Animation */
+    button#submitBtn {
+      margin-top: 24px;
       width: 100%;
-      padding: 14px;
-      font-size: 1.05rem;
+      padding: 15px 18px;
+      font-size: 1.08rem;
       font-weight: 700;
       color: #fff;
-      background: var(--primary);
-      border: none;
-      border-radius: 10px;
+      background: linear-gradient(135deg, var(--fflw-teal), var(--fflw-teal-dark));
+      border: 2px solid var(--jugendstil-gold);
+      border-radius: 16px 4px 16px 4px;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s ease, transform 0.1s ease;
     }
-    button:disabled {
-      background: #9fb3c8;
-      cursor: not-allowed;
+
+    button#submitBtn:hover:not(:disabled) {
+      transform: translateY(-1px);
     }
+
+    button#submitBtn:disabled {
+      background: linear-gradient(135deg, #5c7d78, #44615d);
+      border-color: var(--jugendstil-gold);
+      cursor: wait;
+    }
+
+    .hourglass-spin {
+      display: inline-block;
+      font-size: 1.25rem;
+      animation: flipHourglass 1.6s infinite ease-in-out;
+    }
+
+    @keyframes flipHourglass {
+      0% { transform: rotate(0deg); }
+      45% { transform: rotate(180deg); }
+      55% { transform: rotate(180deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Animierter Fortschrittsbalken während des Uploads */
+    .progress-bar-wrap {
+      display: none;
+      width: 100%;
+      height: 8px;
+      background: var(--fflw-teal-soft);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 12px;
+      border: 1px solid var(--fflw-teal-mid);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 35%;
+      background: linear-gradient(90deg, var(--fflw-teal), var(--jugendstil-gold), var(--fflw-teal));
+      border-radius: 99px;
+      animation: slideProgress 1.5s infinite ease-in-out;
+    }
+
+    @keyframes slideProgress {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(300%); }
+    }
+
     .status {
       margin-top: 16px;
-      padding: 14px;
-      border-radius: 10px;
+      padding: 15px;
+      border-radius: 12px;
       display: none;
       font-weight: 500;
+      line-height: 1.5;
     }
-    .status.ok { display: block; background: #e3f9e5; color: #1f5c2e; border: 1px solid #a3d9a5; }
-    .status.err { display: block; background: #ffe3e3; color: #8a1f1f; border: 1px solid #f8b4b4; }
-    .status.wait { display: block; background: var(--primary-light); color: var(--primary); }
+    .status.ok { display: block; background: var(--fflw-teal-soft); color: var(--fflw-teal-dark); border: 1.5px solid var(--fflw-teal); }
+    .status.err { display: block; background: #ffe3e3; color: #8a1f1f; border: 1.5px solid #f8b4b4; }
+    .status.wait { display: block; background: #fdf8ee; color: #7c5818; border: 1.5px solid var(--jugendstil-gold); }
   </style>
 </head>
 <body>
 
-<header>
-  <img src="images/logo.png" alt="Freundeskreis Leutenbach-Winnenden" onerror="this.style.display='none'">
-  <div class="sub">Freundeskreis Leutenbach-Winnenden · Geheime Überraschung</div>
-</header>
+<div class="art-nouveau-page">
+  <div class="art-nouveau-frame">
 
-<main>
-  <div class="card">
+    <header class="fflw-header">
+      <div class="logo-medallion" id="logoWrapper">
+        <img id="fflwLogo" src="images/logo.png" alt="Freundeskreis Leutenbach-Winnenden">
+      </div>
+      <div class="brand-title">Freundeskreis Asyl Leutenbach · Winnenden</div>
+      <div class="floral-divider">
+        <span class="line"></span>
+        <span style="color:#c8963e; font-size:1.2rem;">❦ ✿ ❦</span>
+        <span class="line"></span>
+      </div>
+    </header>
+
     <h1>🎬 Videogruß für Birgid einreichen</h1>
-    <p>Bitte verrate es nicht weiter – wir sammeln persönliche Videogrüße und liebe Worte zum Abschied.</p>
+    <p class="intro">Bitte verrate es nicht weiter – wir sammeln persönliche Videogrüße und liebe Worte zum Abschied.</p>
 
     <form id="uploadForm">
       <label for="absender">Dein Name / Eure Familie *</label>
@@ -122,38 +249,112 @@
 
       <label for="videoDatei">Videogruß (oder Foto) auswählen *</label>
       <input type="file" id="videoDatei" accept="video/*,image/*" required>
-      <div class="hint">Tipp: Handy bitte quer halten und kurz (ca. 15–45 Sekunden, max. 40 MB) aufnehmen.</div>
+      <div class="hint">Tipp: Handy bitte quer halten – <strong>maximal 2 Minuten</strong> aufnehmen.</div>
+      <div id="durationWarn" class="duration-warn"></div>
 
       <label for="nachricht">Kurzer schriftlicher Gruß dazu (optional)</label>
       <textarea id="nachricht" placeholder="Danke für deine Hilfe und alles Gute bei deinen Kindern!"></textarea>
 
-      <button type="submit" id="submitBtn">Videogruß jetzt absenden</button>
+      <button type="submit" id="submitBtn">
+        <span id="btnIcon">📤</span>
+        <span id="btnText">Videogruß jetzt absenden</span>
+      </button>
+
+      <div id="progressWrap" class="progress-bar-wrap">
+        <div class="progress-bar-fill"></div>
+      </div>
     </form>
 
     <div id="statusBox" class="status"></div>
+
   </div>
-</main>
+</div>
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2PjaMEug9ZDqMS3Sd1YDf0ptCgr5ytt2EeWfmjrFqYKabVXfhHyI-v-wotjE9sTJycA/exec";
+  const MAX_MB = 95; // Richtwert für bis zu 2 Minuten Handy-Video
+
+  (function loadFflwLogo() {
+    const img = document.getElementById("fflwLogo");
+    const candidates = [
+      "images/logo.png",
+      "img/logo.png",
+      "logo.png",
+      "images/fflw-logo.png",
+      "img/fflw-logo.png",
+      "images/logo.jpg",
+      "logo.jpg",
+      "images/logo.svg"
+    ];
+    let idx = 0;
+    img.onerror = function() {
+      idx++;
+      if (idx < candidates.length) {
+        img.src = candidates[idx];
+      } else {
+        document.getElementById("logoWrapper").style.display = "none";
+      }
+    };
+  })();
+
+  // Videolänge direkt nach der Auswahl sanft prüfen
+  document.getElementById("videoDatei").addEventListener("change", function() {
+    const warnBox = document.getElementById("durationWarn");
+    warnBox.style.display = "none";
+    const file = this.files[0];
+    if (!file) return;
+
+    const sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > MAX_MB) {
+      warnBox.style.display = "block";
+      warnBox.textContent = "⚠️ Diese Datei ist mit " + Math.round(sizeMB) + " MB leider zu groß. Bitte nimm das Video etwas kürzer auf (maximal 2 Minuten) oder schicke es uns direkt per WhatsApp.";
+      return;
+    }
+
+    if (file.type.startsWith("video/")) {
+      const tempVideo = document.createElement("video");
+      tempVideo.preload = "metadata";
+      tempVideo.onloadedmetadata = function() {
+        window.URL.revokeObjectURL(tempVideo.src);
+        if (tempVideo.duration > 125) {
+          const min = Math.floor(tempVideo.duration / 60);
+          const sec = Math.round(tempVideo.duration % 60);
+          warnBox.style.display = "block";
+          warnBox.textContent = "ℹ️ Dein Video ist " + min + ":" + (sec < 10 ? "0" : "") + sec + " Min. lang (empfohlen sind max. 2 Minuten). Das Hochladen kann einen Moment dauern – falls es abbricht, bitte etwas kürzer aufnehmen.";
+        }
+      };
+      tempVideo.src = URL.createObjectURL(file);
+    }
+  });
 
   document.getElementById("uploadForm").addEventListener("submit", async function(e) {
     e.preventDefault();
     const btn = document.getElementById("submitBtn");
+    const btnIcon = document.getElementById("btnIcon");
+    const btnText = document.getElementById("btnText");
+    const progressWrap = document.getElementById("progressWrap");
     const statusBox = document.getElementById("statusBox");
     const fileInput = document.getElementById("videoDatei");
     const file = fileInput.files[0];
 
     if (!file) return;
-    if (file.size > 45 * 1024 * 1024) {
+
+    const sizeMB = file.size / (1024 * 1024);
+    if (sizeMB > MAX_MB) {
       statusBox.className = "status err";
-      statusBox.textContent = "Das Video ist leider größer als 45 MB. Bitte etwas kürzer aufnehmen oder direkt per WhatsApp schicken.";
+      statusBox.textContent = "Dein Video ist leider etwas zu lang (" + Math.round(sizeMB) + " MB). Bitte kürze es auf maximal 2 Minuten und versuche es nochmal – oder schicke es uns direkt per WhatsApp.";
       return;
     }
 
+    // Knopf auf Sanduhr umschalten
     btn.disabled = true;
+    btnIcon.className = "hourglass-spin";
+    btnIcon.textContent = "⏳";
+    btnText.textContent = "Wird hochgeladen – bitte warten...";
+    progressWrap.style.display = "block";
+
     statusBox.className = "status wait";
-    statusBox.textContent = "⏳ Video wird hochgeladen – bitte Seite kurz geöffnet lassen...";
+    statusBox.innerHTML = "<strong>⏳ Dein Videogruß wird gerade übertragen...</strong><br>Je nach Videolänge (bis 2 Minuten) kann das 15–45 Sekunden dauern. Bitte diese Seite geöffnet lassen und das Handy kurz nicht sperren.";
 
     const reader = new FileReader();
     reader.onload = async function() {
@@ -174,16 +375,21 @@
         const result = await res.json();
         if (result.ok) {
           statusBox.className = "status ok";
-          statusBox.textContent = "✅ Herzlichen Dank! Dein Videogruß ist sicher angekommen.";
+          statusBox.innerHTML = "✅ <strong>Herzlichen Dank!</strong> Dein Videogruß ist sicher angekommen und wird Birgid eine riesige Freude machen.";
           document.getElementById("uploadForm").reset();
+          document.getElementById("durationWarn").style.display = "none";
         } else {
           throw new Error(result.error || "Unbekannter Fehler");
         }
       } catch (err) {
         statusBox.className = "status err";
-        statusBox.textContent = "Fehler beim Hochladen: " + err.message;
+        statusBox.textContent = "Das Video war für die Übertragung leider etwas zu groß oder die Verbindung wurde unterbrochen. Bitte versuche es mit einem etwas kürzeren Video (unter 2 Minuten) nochmal oder schicke es uns per WhatsApp.";
       } finally {
         btn.disabled = false;
+        btnIcon.className = "";
+        btnIcon.textContent = "📤";
+        btnText.textContent = "Videogruß jetzt absenden";
+        progressWrap.style.display = "none";
       }
     };
     reader.readAsDataURL(file);
