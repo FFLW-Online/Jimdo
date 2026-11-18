@@ -18,6 +18,47 @@
       font-style: normal;
       animation: fflw-sanduhr-drehen 2.2s ease-in-out infinite;
     }
+    .fflw-artikel-karte {
+      margin-bottom: 18px;
+    }
+    .fflw-bilder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin: 14px 0;
+    }
+    .fflw-bilder-grid img {
+      width: 100%;
+      max-height: 360px;
+      object-fit: contain;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+    .fflw-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-top: 10px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .fflw-checkbox-label:hover {
+      background: rgba(255, 215, 0, 0.18);
+      border-color: #ffd700;
+    }
+    .fflw-checkbox-label input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      accent-color: #2e7d32;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -72,6 +113,23 @@
           <span>Bilder werden geladen …</span>
         </div>
       </div>
+
+      <!-- Geheimer Handy-Master-Bereich (öffnet sich nur bei Eingabe des Master-Codes) -->
+      <section id="fflw-master-panel" style="display: none; margin-top: 28px; padding: 20px; border: 3px solid #ffd700; border-radius: 10px; background: rgba(20, 28, 36, 0.96); color: #ffffff; box-shadow: 0 6px 20px rgba(0,0,0,0.45);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,215,0,0.4); padding-bottom: 12px; margin-bottom: 16px;">
+          <h3 style="margin: 0; color: #ffd700;">🔑 Handy-Master: Reservierte Möbel freigeben</h3>
+          <button type="button" id="fflw-master-close" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+            Schließen ✕
+          </button>
+        </div>
+
+        <p style="font-size: 0.92rem; margin-top: 0; color: #e0e0e0;">
+          Tippe bei einem stornierten Möbelstück auf <strong>„↺ Wieder freigeben“</strong> – es wird sofort aus <em>Reserviert</em> zurück in <em>Aktuelle Angebote</em> verschoben.
+        </p>
+
+        <div id="fflw-master-status" style="font-weight: bold; margin-bottom: 12px; color: #ffd700;"></div>
+        <div id="fflw-master-liste" style="display: flex; flex-direction: column; gap: 14px;"></div>
+      </section>
 
       <!-- Direktes Reservierungsformular -->
       <form id="fflw-reservierungs-form" style="display: none; margin-top: 34px; padding: 22px; border: 2px solid #ffffff; border-radius: 8px; background: rgba(255,255,255,0.08);">
@@ -220,15 +278,18 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       // =========================================================================
-      // EINSTELLUNGEN FÜR ZUGANGSCODE & ARTIKEL-BEGRENZUNG:
+      // EINSTELLUNGEN FÜR ZUGANGSCODE, MASTER-CODE & ARTIKEL-BEGRENZUNG:
       // 1) ZUGANGS_CODE: Deine Basis-Zahl (z. B. "11"). Leer "" = Schutz aus.
       // 2) STANDARD_MAX_ARTIKEL: Wie viele Artikel man mit "11" wählen darf (z. B. 2).
       //    TRICK: Gibst du jemandem "11-4", darf diese Person 4 Artikel wählen!
       //           Gibst du jemandem "11-1", darf diese Person nur 1 Artikel wählen!
       //           (0 = keine Begrenzung)
+      // 3) MASTER_ADMIN_CODE: Geheimer Code zum Öffnen des Handy-Master-Bereichs
+      //    (muss exakt mit MASTER_ADMIN_CODE im Google Apps Script übereinstimmen!)
       // =========================================================================
       const ZUGANGS_CODE = "11";
       const STANDARD_MAX_ARTIKEL = 2;
+      const MASTER_ADMIN_CODE = "FFLW-99";
 
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
       const container = document.getElementById("fflw-angebote-galerie");
@@ -239,6 +300,11 @@
       const auswahlInfoEl = document.getElementById("fflw-auswahl-info");
       const feedbackEl = document.getElementById("fflw-res-feedback");
       const submitBtn = document.getElementById("fflw-res-submit");
+
+      const masterPanelEl = document.getElementById("fflw-master-panel");
+      const masterListeEl = document.getElementById("fflw-master-liste");
+      const masterStatusEl = document.getElementById("fflw-master-status");
+      const masterCloseBtn = document.getElementById("fflw-master-close");
 
       if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
         codeBoxEl.style.display = "block";
@@ -279,7 +345,6 @@
 
         if (limit > 0) {
           auswahlInfoEl.textContent = "Ausgewählte Artikel: " + checked.length + " (maximal " + limit + " erlaubt)";
-          // Sperrt übrige Checkboxen, sobald das Limit erreicht ist
           const limitErreicht = checked.length >= limit;
           allBoxes.forEach(cb => {
             if (!cb.checked) {
@@ -315,7 +380,120 @@
         retranslate(auswahlInfoEl);
       }
 
-      codeInputEl.addEventListener("input", updateAuswahlCounter);
+      // =========================================================================
+      // HANDY-MASTER-BEREICH: SCHLIESSEN, LADEN & 1-KLICK-FREIGABE
+      // =========================================================================
+      masterCloseBtn.addEventListener("click", function () {
+        masterPanelEl.style.display = "none";
+        codeInputEl.value = "";
+        updateAuswahlCounter();
+      });
+
+      function ladeReservierteFuerMaster(code) {
+        masterPanelEl.style.display = "block";
+        masterStatusEl.textContent = "⏳ Lade reservierte Möbel aus Google Drive …";
+        masterListeEl.innerHTML = "";
+        masterPanelEl.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        fetch(WEB_APP_URL, {
+          method: "POST",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "admin_list",
+            masterCode: code
+          })
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (!data.ok) {
+              masterStatusEl.textContent = "❌ " + (data.error || "Zugriff verweigert.");
+              return;
+            }
+            if (!data.items || data.items.length === 0) {
+              masterStatusEl.textContent = "✓ Aktuell liegen keine reservierten Möbel im Privat-Ordner.";
+              return;
+            }
+
+            masterStatusEl.textContent = "Gefundene Reservierungen: " + data.items.length;
+
+            data.items.forEach(item => {
+              const karte = document.createElement("div");
+              karte.style.cssText = "display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.25);";
+
+              const imgHtml = item.bildUrl
+                ? `<img src="${item.bildUrl}" alt="" style="width: 84px; height: 84px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc; flex-shrink: 0;">`
+                : `<div style="width: 84px; height: 84px; display: flex; align-items: center; justify-content: center; background: #333; border-radius: 6px; font-size: 28px; flex-shrink: 0;">🪑</div>`;
+
+              karte.innerHTML = `
+                ${imgHtml}
+                <div style="flex: 1; min-width: 190px;">
+                  <div style="font-size: 1.05rem; font-weight: bold; color: #ffffff;">${item.artikelName}</div>
+                  <div style="font-size: 0.9rem; color: #ffd700; margin-top: 3px;">Reserviert für: <strong>${item.empfaenger}</strong></div>
+                  <div style="font-size: 0.82rem; color: #cccccc; margin-top: 2px;">Datum: ${item.datum}</div>
+                </div>
+                <button type="button" class="fflw-release-btn"
+                        style="background-color: #2e7d32; color: #ffffff; border: 2px solid #ffffff; padding: 10px 16px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                  ↺ Wieder freigeben
+                </button>
+              `;
+
+              const btn = karte.querySelector(".fflw-release-btn");
+              btn.addEventListener("click", function () {
+                if (!confirm("Möchtest du „" + item.artikelName + "“ (reserviert für " + item.empfaenger + ") wirklich wieder freigeben?")) {
+                  return;
+                }
+                btn.disabled = true;
+                btn.textContent = "⏳ Wird freigegeben …";
+                btn.style.backgroundColor = "#666";
+
+                fetch(WEB_APP_URL, {
+                  method: "POST",
+                  redirect: "follow",
+                  headers: { "Content-Type": "text/plain;charset=utf-8" },
+                  body: JSON.stringify({
+                    action: "admin_release",
+                    masterCode: code,
+                    ordnerId: item.id
+                  })
+                })
+                  .then(r => r.json())
+                  .then(resData => {
+                    if (resData.ok) {
+                      karte.style.borderColor = "#4caf50";
+                      karte.style.background = "rgba(46, 125, 50, 0.25)";
+                      btn.textContent = "✓ Wieder online!";
+                      btn.style.backgroundColor = "#1b5e20";
+                      ladeAngebote();
+                    } else {
+                      alert("Fehler: " + (resData.error || "Unbekannt"));
+                      btn.disabled = false;
+                      btn.textContent = "↺ Wieder freigeben";
+                      btn.style.backgroundColor = "#2e7d32";
+                    }
+                  })
+                  .catch(err => {
+                    alert("Verbindungsfehler: " + err.message);
+                    btn.disabled = false;
+                    btn.textContent = "↺ Wieder freigeben";
+                    btn.style.backgroundColor = "#2e7d32";
+                  });
+              });
+
+              masterListeEl.appendChild(karte);
+            });
+          })
+          .catch(err => {
+            masterStatusEl.textContent = "❌ Verbindungsfehler: " + err.message;
+          });
+      }
+
+      codeInputEl.addEventListener("input", function () {
+        updateAuswahlCounter();
+        if (MASTER_ADMIN_CODE && codeInputEl.value.trim() === MASTER_ADMIN_CODE) {
+          ladeReservierteFuerMaster(MASTER_ADMIN_CODE);
+        }
+      });
 
       // Erzeugt einen kräftigen, unübersehbaren Trennbalken zwischen Artikeln
       function createTrennBalken() {
@@ -325,6 +503,9 @@
         return balken;
       }
 
+      // =========================================================================
+      // GALERIE AUS GOOGLE DRIVE LADEN
+      // =========================================================================
       function ladeAngebote() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 120000);
@@ -360,134 +541,127 @@
             }
 
             container.innerHTML = "";
-            const gesamt = data.items.length;
 
-            data.items.forEach((item, idx) => {
-              // Deutlicher gelber Trennbalken vor jedem weiteren Artikel
-              if (idx > 0) {
+            data.items.forEach((item, index) => {
+              if (index > 0) {
                 container.appendChild(createTrennBalken());
               }
 
-              const headerBar = document.createElement("div");
-              headerBar.style.cssText = "background: rgba(255,255,255,0.18); border-left: 5px solid #ffd700; padding: 6px 12px; margin-bottom: 10px; border-radius: 4px; font-size: 0.9rem; font-weight: bold; letter-spacing: 0.02em;";
-              headerBar.textContent = (idx === 0 ? "Verfügbare Möbel" : "Nächster Artikel") + " (" + (idx + 1) + " / " + gesamt + ")";
-              container.appendChild(headerBar);
+              const karte = document.createElement("article");
+              karte.className = "fflw-artikel-karte";
 
-              const card = document.createElement("article");
-              card.style.cssText = "border: 2px solid rgba(255,255,255,0.45); border-radius: 8px; padding: 16px; background: rgba(255,255,255,0.07);";
+              const titel = document.createElement("h3");
+              titel.style.margin = "0 0 8px 0";
+              titel.textContent = item.pfad;
+              karte.appendChild(titel);
 
-              const title = document.createElement("h3");
-              title.style.marginTop = "0";
-              title.textContent = item.pfad;
-              card.appendChild(title);
-
-              if (item.bilder && item.bilder.length > 0) {
-                const imgWrap = document.createElement("div");
-                imgWrap.style.cssText = "display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0;";
-                item.bilder.forEach(b => {
-                  const img = document.createElement("img");
-                  img.src = b.url;
-                  img.alt = item.pfad;
-                  img.loading = "lazy";
-                  img.style.cssText = "max-width: 100%; max-height: 300px; border-radius: 6px; object-fit: contain; background: #ffffff;";
-                  img.onerror = function () {
-                    if (b.fallback && this.src !== b.fallback) {
-                      this.src = b.fallback;
-                    } else {
-                      this.remove();
-                    }
-                  };
-                  imgWrap.appendChild(img);
-                });
-                card.appendChild(imgWrap);
+              if (item.beschreibung && item.beschreibung.trim() !== "") {
+                const beschr = document.createElement("p");
+                beschr.style.cssText = "white-space: pre-line; margin: 6px 0 12px 0; padding: 10px 12px; background: rgba(255,255,255,0.08); border-radius: 6px;";
+                beschr.textContent = item.beschreibung;
+                karte.appendChild(beschr);
               }
 
-              if (item.beschreibung) {
-                const desc = document.createElement("p");
-                desc.style.whiteSpace = "pre-line";
-                desc.textContent = item.beschreibung;
-                card.appendChild(desc);
-              }
+              const grid = document.createElement("div");
+              grid.className = "fflw-bilder-grid";
 
-              const checkLabel = document.createElement("label");
-              checkLabel.htmlFor = "fflw-item-check-" + idx;
-              checkLabel.style.cssText = "display: inline-flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 14px; background: #ffffff; color: #111111; border-radius: 6px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);";
+              (item.bilder || []).forEach((b, bIdx) => {
+                const img = document.createElement("img");
+                img.src = b.url;
+                img.alt = item.pfad + " (Bild " + (bIdx + 1) + ")";
+                img.loading = "lazy";
+                img.onerror = function () {
+                  if (b.fallback && this.src !== b.fallback) {
+                    this.src = b.fallback;
+                  }
+                };
+                grid.appendChild(img);
+              });
+              karte.appendChild(grid);
 
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-              checkbox.id = "fflw-item-check-" + idx;
-              checkbox.value = item.pfad;
-              checkbox.style.cssText = "width: 20px; height: 20px; cursor: pointer;";
-              checkbox.addEventListener("change", updateAuswahlCounter);
+              const label = document.createElement("label");
+              label.className = "fflw-checkbox-label";
 
-              const labelText = document.createElement("span");
-              labelText.textContent = "▲ Diesen Artikel darüber reservieren";
+              const cb = document.createElement("input");
+              cb.type = "checkbox";
+              cb.value = item.pfad;
+              cb.addEventListener("change", updateAuswahlCounter);
 
-              checkLabel.appendChild(checkbox);
-              checkLabel.appendChild(labelText);
-              card.appendChild(checkLabel);
+              const span = document.createElement("span");
+              span.textContent = "▲ Diesen Artikel darüber reservieren";
 
-              container.appendChild(card);
+              label.appendChild(cb);
+              label.appendChild(span);
+              karte.appendChild(label);
+
+              container.appendChild(karte);
             });
-
-            // Trennbalken vor dem Kontaktdaten-Formular
-            container.appendChild(createTrennBalken());
 
             formEl.style.display = "block";
             updateAuswahlCounter();
-            retranslate(document.querySelector("main.content"));
+            retranslate(container);
+            retranslate(formEl);
           })
           .catch(err => {
             clearTimeout(timeoutId);
-            container.innerHTML = "<p><strong>Hinweis:</strong> Die Möbel-Liste konnte nicht geladen werden (" + err.message + "). Bitte lade die Seite kurz neu.</p>";
+            const grund = err.name === "AbortError"
+              ? "Zeitüberschreitung beim Laden der Bilder (bitte Seite neu laden)."
+              : err.message;
+            container.innerHTML = "<p><strong>Fehler beim Laden der Angebote:</strong> " + grund + "</p>";
             retranslate(container);
           });
       }
 
+      // =========================================================================
+      // RESERVIERUNG ABSENDEN
+      // =========================================================================
       formEl.addEventListener("submit", function (e) {
         e.preventDefault();
         feedbackEl.textContent = "";
+        feedbackEl.style.color = "#ffffff";
 
         const codeStatus = pruefeZugangsCode();
         if (!codeStatus.gueltig) {
-          feedbackEl.style.color = "#ffdddd";
-          feedbackEl.textContent = "Der eingegebene Zugangscode stimmt nicht. Bitte gib die Zahl ein, die du vom Freundeskreis erhalten hast.";
-          retranslate(feedbackEl);
+          feedbackEl.style.color = "#ff8a80";
+          feedbackEl.textContent = "❌ Bitte gib den gültigen Zugangscode vom Freundeskreis ein.";
           codeInputEl.focus();
+          retranslate(feedbackEl);
           return;
         }
 
-        const ausgewaehlte = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
+        const gewaehlteArtikel = Array.from(container.querySelectorAll('input[type="checkbox"]:checked'))
+          .map(cb => cb.value);
+
+        if (gewaehlteArtikel.length === 0) {
+          feedbackEl.style.color = "#ff8a80";
+          feedbackEl.textContent = "❌ Bitte wähle oben mindestens ein Möbelstück durch Häkchen aus.";
+          retranslate(feedbackEl);
+          return;
+        }
+
+        if (codeStatus.maxArtikel > 0 && gewaehlteArtikel.length > codeStatus.maxArtikel) {
+          feedbackEl.style.color = "#ff8a80";
+          feedbackEl.textContent = "❌ Mit deinem Code kannst du maximal " + codeStatus.maxArtikel + " Artikel auswählen.";
+          retranslate(feedbackEl);
+          return;
+        }
+
         const name = document.getElementById("fflw-res-name").value.trim();
         const telefon = document.getElementById("fflw-res-telefon").value.trim();
         const email = document.getElementById("fflw-res-email").value.trim();
         const lieferung = document.getElementById("fflw-res-lieferung").value;
         const bemerkung = document.getElementById("fflw-res-bemerkung").value.trim();
 
-        if (ausgewaehlte.length === 0) {
-          feedbackEl.style.color = "#ffdddd";
-          feedbackEl.textContent = "Bitte wähle oben mindestens ein Möbelstück aus.";
-          retranslate(feedbackEl);
-          return;
-        }
-
-        if (codeStatus.maxArtikel > 0 && ausgewaehlte.length > codeStatus.maxArtikel) {
-          feedbackEl.style.color = "#ffdddd";
-          feedbackEl.textContent = "Mit deinem Zugangscode kannst du maximal " + codeStatus.maxArtikel + " Artikel auswählen.";
-          retranslate(feedbackEl);
-          return;
-        }
-
         if (!name || (!telefon && !email)) {
-          feedbackEl.style.color = "#ffdddd";
-          feedbackEl.textContent = "Bitte trage deinen Namen und entweder deine Telefonnummer oder deine E-Mail-Adresse ein.";
+          feedbackEl.style.color = "#ff8a80";
+          feedbackEl.textContent = "❌ Bitte gib deinen Namen sowie Telefonnummer oder E-Mail-Adresse an.";
           retranslate(feedbackEl);
           return;
         }
 
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="fflw-sanduhr" aria-hidden="true">⏳</span> <span>Wird reserviert … (kann auch a bissle dauern)</span>';
-        retranslate(submitBtn);
+        submitBtn.style.backgroundColor = "#666666";
+        submitBtn.textContent = "⏳ Reservierung wird gespeichert …";
 
         fetch(WEB_APP_URL, {
           method: "POST",
@@ -499,37 +673,34 @@
             email: email,
             lieferung: lieferung,
             bemerkung: bemerkung,
-            artikel: ausgewaehlte
+            artikel: gewaehlteArtikel
           })
         })
-          .then(res => res.text())
-          .then(text => {
-            const resp = JSON.parse(text);
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Verbindlich reservieren";
-
-            if (resp && resp.ok) {
-              formEl.innerHTML = `
-                <h3 style="margin-top: 0;">Vielen Dank, ${name}!</h3>
-                <p>Deine Reservierung wurde erfolgreich gespeichert. Wir melden uns in Kürze bei dir wegen der Abholung oder Lieferung.</p>
-              `;
-              retranslate(formEl);
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.ok) {
+              feedbackEl.style.color = "#a5d6a7";
+              feedbackEl.textContent = "✅ Vielen Dank! Deine Auswahl (" + gewaehlteArtikel.join(", ") + ") wurde verbindlich für dich reserviert. Wir melden uns in Kürze bei dir!";
+              formEl.reset();
               ladeAngebote();
             } else {
-              feedbackEl.style.color = "#ffdddd";
-              feedbackEl.textContent = (resp && resp.error) ? resp.error : "Fehler beim Reservieren. Bitte versuche es noch einmal.";
-              retranslate(feedbackEl);
+              feedbackEl.style.color = "#ff8a80";
+              feedbackEl.textContent = "❌ Fehler: " + (data && data.error ? data.error : "Reservierung konnte nicht gespeichert werden.");
             }
           })
-          .catch(() => {
+          .catch(err => {
+            feedbackEl.style.color = "#ff8a80";
+            feedbackEl.textContent = "❌ Verbindungsfehler beim Absenden: " + err.message;
+          })
+          .finally(() => {
             submitBtn.disabled = false;
+            submitBtn.style.backgroundColor = "#2e7d32";
             submitBtn.textContent = "Verbindlich reservieren";
-            feedbackEl.style.color = "#ffdddd";
-            feedbackEl.textContent = "Netzwerkfehler beim Senden. Bitte prüfe deine Verbindung und versuche es erneut.";
             retranslate(feedbackEl);
           });
       });
 
+      // Startet beim Öffnen der Seite
       ladeAngebote();
     });
   </script>
