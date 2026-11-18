@@ -57,29 +57,38 @@
       <ol>
         <li>Setze bei den gewünschten Möbeln direkt unter dem Foto ein Häkchen bei <strong>„▲ Diesen Artikel darüber reservieren“</strong>.</li>
         <li>Trage ganz unten deine Kontaktdaten ein (Name und Telefonnummer oder E-Mail).</li>
-        <li>Klicke auf <strong>„✅ Verbindlich reservieren“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
+        <li>Klicke auf den grünen Knopf <strong>„Verbindlich reservieren“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
       </ol>
 
-      <!-- Deutlicher Geduldshinweis (wird in alle Sprachen mitübersetzt) -->
+      <!-- Einmaliger Geduldshinweis -->
       <div style="margin: 18px 0 22px 0; padding: 12px 16px; border-left: 5px solid #ffd700; background: rgba(255, 215, 0, 0.14); border-radius: 6px; font-weight: bold;">
         ⏳ Geduld, Geduld – das Laden der Bilder kann eventuell sogar 1–2 Minuten dauern.
       </div>
 
-      <!-- Live-Galerie der verfügbaren Möbel -->
+      <!-- Live-Galerie der verfügbaren Möbel (kurzer Ladetext ohne Wiederholung) -->
       <div id="fflw-angebote-galerie" style="margin-top: 24px;">
         <div id="fflw-angebote-status" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">
           <span class="fflw-sanduhr" aria-hidden="true" style="font-size: 1.5rem;">⏳</span>
-          <span>Aktuelle Möbel werden geladen … (Geduld, Geduld – das Laden der Bilder kann eventuell sogar 1–2 Minuten dauern)</span>
+          <span>Bilder werden geladen …</span>
         </div>
       </div>
 
-      <!-- Direktes Reservierungsformular (wird vollständig vom ÜbersetzungsTool in alle Sprachen übersetzt) -->
+      <!-- Direktes Reservierungsformular -->
       <form id="fflw-reservierungs-form" style="display: none; margin-top: 34px; padding: 22px; border: 2px solid #ffffff; border-radius: 8px; background: rgba(255,255,255,0.08);">
         <h3 style="margin-top: 0;">Kontaktdaten &amp; Reservierung absenden</h3>
 
         <p id="fflw-auswahl-info" style="font-weight: bold; background: rgba(0,0,0,0.28); padding: 10px 12px; border-radius: 6px;">
           Ausgewählte Artikel: 0
         </p>
+
+        <!-- Optionaler Zahlencode-Schutz (wird über ZUGANGS_CODE unten gesteuert) -->
+        <div id="fflw-code-box" style="display: none; margin-bottom: 16px; padding: 12px 14px; border-radius: 6px; background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;">
+          <label for="fflw-res-code" style="display: block; font-weight: bold; margin-bottom: 4px;">
+            Zugangscode (Zahl vom Freundeskreis) *
+          </label>
+          <input type="text" id="fflw-res-code" inputmode="numeric" autocomplete="off"
+                 style="width: 140px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+        </div>
 
         <div style="margin-bottom: 14px;">
           <label for="fflw-res-name" style="display: block; font-weight: bold; margin-bottom: 4px;">
@@ -89,9 +98,13 @@
                  style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
         </div>
 
+        <p style="margin: 14px 0 8px 0; font-size: 0.92rem; font-weight: bold;">
+          Bitte mindestens eines der beiden Kontaktfelder ausfüllen *:
+        </p>
+
         <div style="margin-bottom: 14px;">
           <label for="fflw-res-telefon" style="display: block; font-weight: bold; margin-bottom: 4px;">
-            Telefonnummer / WhatsApp *
+            Telefonnummer / WhatsApp
           </label>
           <input type="tel" id="fflw-res-telefon"
                  style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
@@ -99,7 +112,7 @@
 
         <div style="margin-bottom: 14px;">
           <label for="fflw-res-email" style="display: block; font-weight: bold; margin-bottom: 4px;">
-            E-Mail-Adresse (falls vorhanden)
+            E-Mail-Adresse
           </label>
           <input type="email" id="fflw-res-email"
                  style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
@@ -126,9 +139,10 @@
 
         <div id="fflw-res-feedback" style="margin-bottom: 14px; font-weight: bold;"></div>
 
+        <!-- Kompletter grüner Knopf ohne verwirrendes Häkchen-Symbol -->
         <button type="submit" id="fflw-res-submit"
-                style="display: inline-flex; align-items: center; gap: 8px; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.25);">
-          ✅ Verbindlich reservieren
+                style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background-color: #2e7d32; color: #ffffff; border: 2px solid #ffffff; padding: 14px 28px; font-size: 17px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.3);">
+          Verbindlich reservieren
         </button>
       </form>
     </main>
@@ -204,12 +218,26 @@
   <script src="nav-loader.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
+      // =========================================================================
+      // EINSTELLUNG FÜR ZUGANGSCODE (Bot- und Zugriffsschutz):
+      // Hier einfach deine gewünschte Zahl eintragen (z. B. "11").
+      // Wenn du keinen Code abfragen willst, einfach leer lassen: ""
+      // =========================================================================
+      const ZUGANGS_CODE = "11";
+
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
       const container = document.getElementById("fflw-angebote-galerie");
       const formEl = document.getElementById("fflw-reservierungs-form");
+      const codeBoxEl = document.getElementById("fflw-code-box");
+      const codeInputEl = document.getElementById("fflw-res-code");
       const auswahlInfoEl = document.getElementById("fflw-auswahl-info");
       const feedbackEl = document.getElementById("fflw-res-feedback");
       const submitBtn = document.getElementById("fflw-res-submit");
+
+      if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
+        codeBoxEl.style.display = "block";
+        codeInputEl.required = true;
+      }
 
       function retranslate(targetEl) {
         const activeLang = typeof getActiveLanguage === "function" ? getActiveLanguage() : null;
@@ -263,9 +291,10 @@
             const gesamt = data.items.length;
 
             data.items.forEach((item, idx) => {
+              // Klarer HTML-Trennbalken (<hr>) zwischen den Artikeln
               if (idx > 0) {
                 const hr = document.createElement("hr");
-                hr.style.cssText = "border: 0; height: 4px; background: rgba(255,255,255,0.65); border-radius: 2px; margin: 34px 0 18px 0;";
+                hr.style.cssText = "border: 0; height: 6px; background: #ffffff; border-radius: 3px; margin: 38px 0 24px 0; opacity: 0.85;";
                 container.appendChild(hr);
               }
 
@@ -331,8 +360,9 @@
               container.appendChild(card);
             });
 
+            // Trennbalken vor dem Kontaktdaten-Formular
             const endHr = document.createElement("hr");
-            endHr.style.cssText = "border: 0; height: 4px; background: rgba(255,255,255,0.65); border-radius: 2px; margin: 34px 0 0 0;";
+            endHr.style.cssText = "border: 0; height: 6px; background: #ffffff; border-radius: 3px; margin: 38px 0 0 0; opacity: 0.85;";
             container.appendChild(endHr);
 
             formEl.style.display = "block";
@@ -350,6 +380,17 @@
         e.preventDefault();
         feedbackEl.textContent = "";
 
+        if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
+          const eingegebenerCode = codeInputEl.value.trim();
+          if (eingegebenerCode !== ZUGANGS_CODE.trim()) {
+            feedbackEl.style.color = "#ffdddd";
+            feedbackEl.textContent = "Der eingegebene Zugangscode stimmt nicht. Bitte gib die Zahl ein, die du vom Freundeskreis erhalten hast.";
+            retranslate(feedbackEl);
+            codeInputEl.focus();
+            return;
+          }
+        }
+
         const ausgewaehlte = Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value);
         const name = document.getElementById("fflw-res-name").value.trim();
         const telefon = document.getElementById("fflw-res-telefon").value.trim();
@@ -366,7 +407,7 @@
 
         if (!name || (!telefon && !email)) {
           feedbackEl.style.color = "#ffdddd";
-          feedbackEl.textContent = "Bitte trage deinen Namen und deine Telefonnummer oder E-Mail ein.";
+          feedbackEl.textContent = "Bitte trage deinen Namen und entweder deine Telefonnummer oder deine E-Mail-Adresse ein.";
           retranslate(feedbackEl);
           return;
         }
@@ -392,11 +433,11 @@
           .then(text => {
             const resp = JSON.parse(text);
             submitBtn.disabled = false;
-            submitBtn.textContent = "✅ Verbindlich reservieren";
+            submitBtn.textContent = "Verbindlich reservieren";
 
             if (resp && resp.ok) {
               formEl.innerHTML = `
-                <h3 style="margin-top: 0;">✅ Vielen Dank, ${name}!</h3>
+                <h3 style="margin-top: 0;">Vielen Dank, ${name}!</h3>
                 <p>Deine Reservierung wurde erfolgreich gespeichert. Wir melden uns in Kürze bei dir wegen der Abholung oder Lieferung.</p>
               `;
               retranslate(formEl);
@@ -409,7 +450,7 @@
           })
           .catch(() => {
             submitBtn.disabled = false;
-            submitBtn.textContent = "✅ Verbindlich reservieren";
+            submitBtn.textContent = "Verbindlich reservieren";
             feedbackEl.style.color = "#ffdddd";
             feedbackEl.textContent = "Netzwerkfehler beim Senden. Bitte prüfe deine Verbindung und versuche es erneut.";
             retranslate(feedbackEl);
