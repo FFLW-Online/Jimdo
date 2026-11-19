@@ -64,7 +64,7 @@
       display: block;
       width: 100%;
       height: 8px;
-      background: linear-gradient(90deg, var(--primary-color, #1b5e20), var(--accent-color, #2e7d32), var(--primary-color, #1b5e20));
+      background: linear-gradient(90deg, var(--primary-color, #004080), var(--accent-color, #d97706), var(--primary-color, #004080));
       border: 1px solid rgba(255, 255, 255, 0.45);
       border-radius: 4px;
       margin: 42px 0 26px 0;
@@ -90,7 +90,7 @@
       <!-- Sprachenknopf -->
       <p style="margin: 14px 0 22px 0;">
         <a href="fflw-international.html?return=aktuelle-angebote.html"
-           style="display: inline-flex; align-items: center; gap: 10px; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+           style="display: inline-flex; align-items: center; gap: 10px; background-color: #ffffff; color: #111111; border: 2px solid #004080; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.12);">
            <span>🌐 Sprache wählen / ÜbersetzungsTool</span>
            <span class="flag-carousel-inline" title="Viele Sprachen unterstützt">
              <span class="flag-track-inline">
@@ -101,8 +101,8 @@
         </a>
       </p>
 
-      <!-- Fairness- & Maß-Appell statt starrer Artikelbegrenzung -->
-      <div style="margin: 16px 0 22px 0; padding: 16px 18px; border-left: 6px solid #4caf50; background: rgba(255, 255, 255, 0.12); border-radius: 8px;">
+      <!-- Fairness- & Maß-Appell -->
+      <div style="margin: 16px 0 22px 0; padding: 16px 18px; border-left: 6px solid #4caf50; background: #f4f8f4; border-radius: 8px;">
         <p style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: bold;">
           🤝 Eine herzliche Bitte vorab (Fairness &amp; Maß):
         </p>
@@ -124,19 +124,19 @@
       </ol>
 
       <!-- Einmaliger Geduldshinweis -->
-      <div style="margin: 18px 0 22px 0; padding: 12px 16px; border-left: 5px solid #ffd700; background: rgba(255, 215, 0, 0.14); border-radius: 6px; font-weight: bold;">
+      <div style="margin: 18px 0 22px 0; padding: 12px 16px; border-left: 5px solid #d97706; background: #fffbeb; border-radius: 6px; font-weight: bold;">
         ⏳ Geduld, Geduld – das Laden der Bilder kann eventuell sogar 1–2 Minuten dauern.
       </div>
 
       <!-- Live-Galerie der verfügbaren Möbel -->
       <div id="fflw-angebote-galerie" style="margin-top: 24px;">
-        <div id="fflw-angebote-status" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">
+        <div id="fflw-angebote-status" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 8px; background: #f4f8fc; border: 1px solid #c5d7eb; font-weight: bold;">
           <span class="fflw-sanduhr" aria-hidden="true" style="font-size: 1.5rem;">⏳</span>
           <span>Bilder werden geladen …</span>
         </div>
       </div>
 
-      <!-- Geheimer Handy-Master-Bereich (öffnet sich nur bei Eingabe des Master-Codes) -->
+      <!-- Geheimer Handy-Master-Bereich für Warenhaus-Wiederfreigabe -->
       <section id="fflw-master-panel" style="display: none; margin-top: 28px; padding: 20px; border: 3px solid #ffd700; border-radius: 10px; background: rgba(20, 28, 36, 0.96); color: #ffffff; box-shadow: 0 6px 20px rgba(0,0,0,0.45);">
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,215,0,0.4); padding-bottom: 12px; margin-bottom: 14px;">
           <h3 style="margin: 0; color: #ffd700;">🔑 Handy-Master: Reservierte Möbel freigeben</h3>
@@ -149,7 +149,6 @@
           Tippe bei einem Stück auf <strong>„↺ Wieder freigeben“</strong> (du kannst danach direkt beim nächsten weitermachen) – oder nutze den Knopf für alle auf einmal. Dauer: ca. <strong>2–4 Sek.</strong> pro Stück (bzw. <strong>5–12 Sek.</strong> für alle).
         </p>
 
-        <!-- Knopf: ALLE auf einmal wieder freigeben -->
         <div id="fflw-master-alle-box" style="display: none; margin-bottom: 16px;">
           <button type="button" id="fflw-master-alle-btn"
                   style="width: 100%; background-color: #d84315; color: #ffffff; border: 2px solid #ffd700; padding: 12px 18px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.35);">
@@ -162,21 +161,21 @@
       </section>
 
       <!-- Direktes Reservierungsformular -->
-      <form id="fflw-reservierungs-form" style="display: none; margin-top: 34px; padding: 22px; border: 2px solid #ffffff; border-radius: 8px; background: rgba(255,255,255,0.08);">
+      <form id="fflw-reservierungs-form" style="display: none; margin-top: 34px; padding: 22px; border: 2px solid #004080; border-radius: 8px; background: #f4f8fc;">
         <h3 style="margin-top: 0;">Kontaktdaten &amp; Reservierung absenden</h3>
 
-        <p id="fflw-auswahl-info" style="font-weight: bold; background: rgba(0,0,0,0.28); padding: 10px 12px; border-radius: 6px;">
+        <p id="fflw-auswahl-info" style="font-weight: bold; background: #e1ecf8; color: #004080; padding: 10px 12px; border-radius: 6px;">
           Ausgewählte Artikel: 0
         </p>
 
-        <!-- Zugangscode (ohne starre Stückzahl-Begrenzung) -->
-        <div id="fflw-code-box" style="display: none; margin-bottom: 16px; padding: 12px 14px; border-radius: 6px; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.45);">
+        <!-- Zugangscode (wird live aus Google Drive zugangscode.txt geladen) -->
+        <div id="fflw-code-box" style="display: none; margin-bottom: 16px; padding: 12px 14px; border-radius: 6px; background: #ffffff; border: 1px solid #c5d7eb;">
           <label for="fflw-res-code" style="display: block; font-weight: bold; margin-bottom: 4px;">
             Zugangscode (Zahl vom Freundeskreis) *
           </label>
           <input type="text" id="fflw-res-code" autocomplete="off"
-                 style="width: 160px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
-          <div id="fflw-code-limit-hinweis" style="margin-top: 6px; font-size: 0.9rem; font-weight: bold; color: #a5d6a7;"></div>
+                 style="width: 160px; padding: 10px; border-radius: 5px; border: 1px solid #888; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+          <div id="fflw-code-limit-hinweis" style="margin-top: 6px; font-size: 0.9rem; font-weight: bold; color: #2e7d32;"></div>
         </div>
 
         <div style="margin-bottom: 14px;">
@@ -184,7 +183,7 @@
             Dein Name (Vor- und Nachname) *
           </label>
           <input type="text" id="fflw-res-name" required
-                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #888; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
         </div>
 
         <p style="margin: 14px 0 8px 0; font-size: 0.92rem; font-weight: bold;">
@@ -196,7 +195,7 @@
             Telefonnummer / WhatsApp
           </label>
           <input type="tel" id="fflw-res-telefon"
-                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #888; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
         </div>
 
         <div style="margin-bottom: 14px;">
@@ -204,7 +203,7 @@
             E-Mail-Adresse
           </label>
           <input type="email" id="fflw-res-email"
-                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #888; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
         </div>
 
         <div style="margin-bottom: 14px;">
@@ -212,7 +211,7 @@
             Abholung oder Lieferung?
           </label>
           <select id="fflw-res-lieferung"
-                  style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
+                  style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #888; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
             <option value="Ich kann selbst abholen">Ich kann selbst abholen</option>
             <option value="Ich brauche Hilfe beim Transport (Lieferung)">Ich brauche Hilfe beim Transport (Lieferung)</option>
           </select>
@@ -223,14 +222,13 @@
             Adresse / Ort oder kurze Nachricht (optional)
           </label>
           <textarea id="fflw-res-bemerkung" rows="3"
-                    style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;"></textarea>
+                    style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #888; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;"></textarea>
         </div>
 
         <div id="fflw-res-feedback" style="margin-bottom: 14px; font-weight: bold;"></div>
 
-        <!-- Kompletter grüner Knopf -->
         <button type="submit" id="fflw-res-submit"
-                style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; background-color: #2e7d32; color: #ffffff; border: 2px solid #ffffff; padding: 14px 28px; font-size: 17px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.3);">
+                style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; background-color: #2e7d32; color: #ffffff; border: 2px solid #1b5e20; padding: 14px 28px; font-size: 17px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.2);">
           Verbindlich reservieren
         </button>
       </form>
@@ -307,17 +305,13 @@
   <script src="nav-loader.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // =========================================================================
-      // EINSTELLUNGEN:
-      // 1) ZUGANGS_CODE: Basis-Zahl (z. B. "11"). Leer "" = Schutz aus.
-      //    Keine starre Artikelbegrenzung mehr (Fairness-Appell steht oben).
-      // 2) MASTER_ADMIN_CODE: Geheimer Code zum Öffnen des Handy-Master-Bereichs.
-      //    Groß- und Kleinschreibung ist egal!
-      // =========================================================================
-      const ZUGANGS_CODE = "11";
       const MASTER_ADMIN_CODE = "FFLW-99";
-
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+
+      let aktuellerZugangsCode = "11";
+      let livePulsTimer = null;
+      let isSubmitting = false;
+
       const container = document.getElementById("fflw-angebote-galerie");
       const formEl = document.getElementById("fflw-reservierungs-form");
       const codeBoxEl = document.getElementById("fflw-code-box");
@@ -336,14 +330,21 @@
 
       let aktiverMasterCode = "";
 
-      if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
-        codeBoxEl.style.display = "block";
-        codeInputEl.required = true;
+      function aktualisiereCodeBoxSichtbarkeit(codeWert) {
+        aktuellerZugangsCode = String(codeWert || "").trim();
+        if (aktuellerZugangsCode !== "") {
+          codeBoxEl.style.display = "block";
+          codeInputEl.required = true;
+        } else {
+          codeBoxEl.style.display = "none";
+          codeInputEl.required = false;
+        }
       }
 
-      // Prüft den eingegebenen Zugangscode (Groß-/Kleinschreibung egal, keine Stückzahl-Sperre)
+      aktualisiereCodeBoxSichtbarkeit(aktuellerZugangsCode);
+
       function istZugangsCodeGueltig() {
-        const basis = (ZUGANGS_CODE || "").trim().toLowerCase();
+        const basis = (aktuellerZugangsCode || "").trim().toLowerCase();
         if (!basis) return true;
         const eingabe = codeInputEl.value.trim().toLowerCase();
         return eingabe === basis;
@@ -363,11 +364,11 @@
       }
 
       function updateAuswahlCounter() {
-        const allBoxes = Array.from(container.querySelectorAll('input[type="checkbox"]'));
+        const allBoxes = Array.from(container.querySelectorAll('input[type="checkbox"]:not(:disabled)'));
         const checked = allBoxes.filter(cb => cb.checked);
         auswahlInfoEl.textContent = "Ausgewählte Artikel: " + checked.length;
 
-        if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
+        if (aktuellerZugangsCode && aktuellerZugangsCode.trim() !== "") {
           if (istZugangsCodeGueltig()) {
             codeLimitHinweisEl.textContent = "✓ Code gültig.";
           } else {
@@ -446,7 +447,7 @@
 
               const btn = karte.querySelector(".fflw-release-btn");
               btn.addEventListener("click", function () {
-                if (!confirm("Möchtest du „" + item.artikelName + "“ (reserviert für " + item.empfaenger + ") wirklich wieder freigeben?")) {
+                if (!confirm("Möchtest du „" + item.artikelName + "“ (reserviert für " + item.empfaenger + ") wirklich wieder freigegeben?")) {
                   return;
                 }
                 btn.disabled = true;
@@ -556,12 +557,62 @@
         updateAuswahlCounter();
       });
 
-      // Erzeugt den Trennbalken im Stil/Farbton des Freundeskreis-Logos
       function createTrennBalken() {
         const balken = document.createElement("div");
         balken.className = "fflw-logo-trennbalken";
         balken.setAttribute("aria-hidden", "true");
         return balken;
+      }
+
+      // =========================================================================
+      // ECHTZEIT-PULS & SOFORT-AUSGRAUEN WEGGESCHNAPPTER ARTIKEL (alle 12 Sek.)
+      // =========================================================================
+      function markiereArtikelAlsReserviert(pfad) {
+        const karten = Array.from(container.querySelectorAll(".fflw-artikel-karte"));
+        karten.forEach(karte => {
+          if (karte.getAttribute("data-pfad") === pfad && !karte.classList.contains("fflw-bereits-reserviert")) {
+            karte.classList.add("fflw-bereits-reserviert");
+            const cb = karte.querySelector('input[type="checkbox"]');
+            if (cb) {
+              cb.checked = false;
+              cb.disabled = true;
+            }
+            const banner = document.createElement("div");
+            banner.className = "fflw-reserviert-banner";
+            banner.textContent = "⛔ Gerade eben von jemand anderem reserviert";
+            karte.prepend(banner);
+          }
+        });
+        updateAuswahlCounter();
+      }
+
+      function starteEchtzeitPuls() {
+        if (livePulsTimer) clearInterval(livePulsTimer);
+        livePulsTimer = setInterval(() => {
+          if (document.hidden || isSubmitting) return;
+          const karten = Array.from(container.querySelectorAll(".fflw-artikel-karte:not(.fflw-bereits-reserviert)"));
+          if (karten.length === 0) return;
+
+          fetch(WEB_APP_URL + "?t=" + Date.now(), {
+            method: "GET",
+            redirect: "follow"
+          })
+            .then(r => r.json())
+            .then(data => {
+              if (!data || !data.ok || !Array.isArray(data.items)) return;
+              if (typeof data.zugangscode === "string") {
+                aktualisiereCodeBoxSichtbarkeit(data.zugangscode);
+              }
+              const nochFreiePfade = new Set(data.items.map(i => i.pfad));
+              karten.forEach(karte => {
+                const pfad = karte.getAttribute("data-pfad");
+                if (pfad && !nochFreiePfade.has(pfad)) {
+                  markiereArtikelAlsReserviert(pfad);
+                }
+              });
+            })
+            .catch(() => {});
+        }, 12000);
       }
 
       // =========================================================================
@@ -594,6 +645,10 @@
               return;
             }
 
+            if (typeof data.zugangscode === "string") {
+              aktualisiereCodeBoxSichtbarkeit(data.zugangscode);
+            }
+
             if (data.items.length === 0) {
               container.innerHTML = "<p><strong>Aktuell sind keine freien Möbelstücke verfügbar.</strong> Schau bitte bald wieder vorbei!</p>";
               formEl.style.display = "none";
@@ -610,6 +665,7 @@
 
               const karte = document.createElement("article");
               karte.className = "fflw-artikel-karte";
+              karte.setAttribute("data-pfad", item.pfad);
 
               const titel = document.createElement("h3");
               titel.style.margin = "0 0 8px 0";
@@ -618,7 +674,7 @@
 
               if (item.beschreibung && item.beschreibung.trim() !== "") {
                 const beschr = document.createElement("p");
-                beschr.style.cssText = "white-space: pre-line; margin: 6px 0 12px 0; padding: 10px 12px; background: rgba(255,255,255,0.08); border-radius: 6px;";
+                beschr.style.cssText = "white-space: pre-line; margin: 6px 0 12px 0; padding: 10px 12px; background: #f4f8fc; border-radius: 6px;";
                 beschr.textContent = item.beschreibung;
                 karte.appendChild(beschr);
               }
@@ -662,6 +718,7 @@
             updateAuswahlCounter();
             retranslate(container);
             retranslate(formEl);
+            starteEchtzeitPuls();
           })
           .catch(err => {
             clearTimeout(timeoutId);
@@ -674,12 +731,14 @@
       }
 
       // =========================================================================
-      // RESERVIERUNG ABSENDEN (blitzschnell in 2-3 Sek.)
+      // RESERVIERUNG ABSENDEN MIT DOPPELKLICK-SPERRE & TEIL-RESERVIERUNGS-INFO
       // =========================================================================
       formEl.addEventListener("submit", function (e) {
         e.preventDefault();
+        if (isSubmitting) return;
+
         feedbackEl.textContent = "";
-        feedbackEl.style.color = "#ffffff";
+        feedbackEl.style.color = "#111111";
 
         if (istMasterCode(codeInputEl.value)) {
           const c = codeInputEl.value.trim();
@@ -689,19 +748,19 @@
         }
 
         if (!istZugangsCodeGueltig()) {
-          feedbackEl.style.color = "#ff8a80";
+          feedbackEl.style.color = "#b71c1c";
           feedbackEl.textContent = "❌ Bitte gib den gültigen Zugangscode vom Freundeskreis ein.";
           codeInputEl.focus();
           retranslate(feedbackEl);
           return;
         }
 
-        const gewaehlteArtikel = Array.from(container.querySelectorAll('input[type="checkbox"]:checked'))
+        const gewaehlteArtikel = Array.from(container.querySelectorAll('input[type="checkbox"]:checked:not(:disabled)'))
           .map(cb => cb.value);
 
         if (gewaehlteArtikel.length === 0) {
-          feedbackEl.style.color = "#ff8a80";
-          feedbackEl.textContent = "❌ Bitte wähle oben mindestens ein Möbelstück durch Häkchen aus.";
+          feedbackEl.style.color = "#b71c1c";
+          feedbackEl.textContent = "❌ Bitte wähle oben mindestens ein verfügbares Möbelstück durch Häkchen aus.";
           retranslate(feedbackEl);
           return;
         }
@@ -713,15 +772,16 @@
         const bemerkung = document.getElementById("fflw-res-bemerkung").value.trim();
 
         if (!name || (!telefon && !email)) {
-          feedbackEl.style.color = "#ff8a80";
+          feedbackEl.style.color = "#b71c1c";
           feedbackEl.textContent = "❌ Bitte gib deinen Namen sowie Telefonnummer oder E-Mail-Adresse an.";
           retranslate(feedbackEl);
           return;
         }
 
+        isSubmitting = true;
         submitBtn.disabled = true;
         submitBtn.style.backgroundColor = "#666666";
-        submitBtn.textContent = "⏳ Reservierung wird gespeichert …";
+        submitBtn.textContent = "⏳ Wird reserviert – bitte kurz warten …";
 
         fetch(WEB_APP_URL, {
           method: "POST",
@@ -739,20 +799,37 @@
           .then(res => res.json())
           .then(data => {
             if (data && data.ok) {
-              feedbackEl.style.color = "#a5d6a7";
-              feedbackEl.textContent = "✅ Vielen Dank! Deine Auswahl (" + gewaehlteArtikel.join(", ") + ") wurde verbindlich für dich reserviert. Wir melden uns in Kürze bei dir!";
-              formEl.reset();
-              ladeAngebote();
+              const resListe = Array.isArray(data.reserviertePfade) ? data.reserviertePfade : [];
+              const verpasstListe = Array.isArray(data.verpasstePfade) ? data.verpasstePfade : [];
+
+              verpasstListe.forEach(p => markiereArtikelAlsReserviert(p));
+
+              if (resListe.length > 0 && verpasstListe.length === 0) {
+                feedbackEl.style.color = "#1b5e20";
+                feedbackEl.textContent = "✅ Vielen Dank! Deine Auswahl (" + resListe.join(", ") + ") wurde verbindlich für dich reserviert. Wir melden uns in Kürze bei dir!";
+                formEl.reset();
+                ladeAngebote();
+              } else if (resListe.length > 0 && verpasstListe.length > 0) {
+                feedbackEl.style.color = "#b45309";
+                feedbackEl.textContent = "⚠️ Teilweise reserviert: „" + resListe.join(", ") + "“ wurde für dich reserviert! Leider war bei „" + verpasstListe.join(", ") + "“ jemand Sekunden schneller.";
+                formEl.reset();
+                ladeAngebote();
+              } else {
+                feedbackEl.style.color = "#b71c1c";
+                feedbackEl.textContent = "⛔ Leider war gerade jemand ein paar Sekunden schneller: „" + verpasstListe.join(", ") + "“ wurde soeben reserviert.";
+                ladeAngebote();
+              }
             } else {
-              feedbackEl.style.color = "#ff8a80";
+              feedbackEl.style.color = "#b71c1c";
               feedbackEl.textContent = "❌ Fehler: " + (data && data.error ? data.error : "Reservierung konnte nicht gespeichert werden.");
             }
           })
           .catch(err => {
-            feedbackEl.style.color = "#ff8a80";
+            feedbackEl.style.color = "#b71c1c";
             feedbackEl.textContent = "❌ Verbindungsfehler beim Absenden: " + err.message;
           })
           .finally(() => {
+            isSubmitting = false;
             submitBtn.disabled = false;
             submitBtn.style.backgroundColor = "#2e7d32";
             submitBtn.textContent = "Verbindlich reservieren";
