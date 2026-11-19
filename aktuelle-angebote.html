@@ -163,20 +163,20 @@
         <div id="fflw-master-status" style="font-weight: bold; margin-bottom: 12px; color: #ffd700;"></div>
         <div id="fflw-master-liste" style="display: flex; flex-direction: column; gap: 14px;"></div>
 
-        <!-- Neuer Master-Abschnitt: Eingereichte Spenden prüfen, Exklusiv-Link kopieren oder öffentlich freischalten -->
+        <!-- Neuer Master-Abschnitt: Eingereichte Spenden (gruppiert nach Anbieter / Wohnung) -->
         <div style="margin-top: 24px; padding-top: 18px; border-top: 2px solid rgba(255, 215, 0, 0.45);">
           <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-            <h3 style="margin: 0; color: #a5d6a7;">📥 Eingereichte Spenden prüfen &amp; freischalten</h3>
+            <h3 style="margin: 0; color: #a5d6a7;">📥 Eingereichte Spenden (nach Anbieter / Wohnung)</h3>
             <button type="button" id="fflw-master-spenden-reload"
                     style="background: rgba(255,255,255,0.16); color: #fff; border: 1px solid #a5d6a7; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">
               ↻ Liste aktualisieren
             </button>
           </div>
           <p style="font-size: 0.9rem; margin: 0 0 12px 0; color: #e0e0e0;">
-            Neu eingereichte Möbel aus <code>moebel-abgeben.html</code>: Mit <strong>1 Klick öffentlich freischalten</strong> oder bei Notsituationen / späterem Datum vorab den <strong>Exklusiv-Link</strong> per WhatsApp verschicken.
+            Sortiert nach <strong>Anbieter / Wohnung</strong> und darunter die einzelnen Möbelstücke. Du kannst <strong>einzelne Stücke</strong> oder die <strong>ganze Wohnung auf einmal</strong> freischalten bzw. als Exklusiv-Link für Notsituationen kopieren.
           </p>
           <div id="fflw-master-spenden-status" style="font-weight: bold; margin-bottom: 10px; color: #a5d6a7;"></div>
-          <div id="fflw-master-spenden-liste" style="display: flex; flex-direction: column; gap: 14px;"></div>
+          <div id="fflw-master-spenden-liste" style="display: flex; flex-direction: column; gap: 16px;"></div>
         </div>
       </section>
 
@@ -386,7 +386,7 @@
       }
 
       function updateAuswahlCounter() {
-        const allBoxes = Array.from(container.querySelectorAll('input[type="checkbox"]'));
+        const allBoxes = Array.from(document.querySelectorAll('#fflw-angebote-galerie input[type="checkbox"], #fflw-exklusiv-vorschau input[type="checkbox"]'));
         const checked = allBoxes.filter(cb => cb.checked);
         auswahlInfoEl.textContent = "Ausgewählte Artikel: " + checked.length;
 
@@ -495,7 +495,7 @@
                       btn.style.backgroundColor = "#1b5e20";
                       masterStatusEl.textContent = "✓ „" + item.artikelName + "“ ist wieder frei. Du kannst direkt beim nächsten Stück weitermachen.";
                       pruefeExklusivVorschau();
-                      ladeAngebote();
+      ladeAngebote();
                     } else {
                       alert("Fehler: " + (resData.error || "Unbekannt"));
                       btn.disabled = false;
@@ -598,6 +598,18 @@
         });
       }
 
+      function kopiereLinkInZwischenablage(link, hinweisText) {
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(link).then(() => {
+            alert(hinweisText + "\n\n" + link);
+          }).catch(() => {
+            prompt(hinweisText, link);
+          });
+        } else {
+          prompt(hinweisText, link);
+        }
+      }
+
       function ladeEingereichteSpendenFuerMaster(code) {
         masterSpendenStatusEl.textContent = "⏳ Lade eingereichte Spenden aus _Eingang_Pruefung …";
         masterSpendenListeEl.innerHTML = "";
@@ -610,77 +622,73 @@
               masterSpendenStatusEl.textContent = "❌ " + (data.error || "Fehler beim Laden.");
               return;
             }
-            const list = data.pending || [];
-            if (list.length === 0) {
+            const groups = data.groups || [];
+            if (groups.length === 0) {
               masterSpendenStatusEl.textContent = "✓ Aktuell liegen keine ungeprüften Spenden im Eingangs-Ordner.";
               return;
             }
-            masterSpendenStatusEl.textContent = "Neue Spenden im Eingang: " + list.length;
+            masterSpendenStatusEl.textContent = "Anbieter / Wohnungen im Eingang: " + groups.length;
 
-            list.forEach(item => {
-              const m = item.meta || {};
-              const karte = document.createElement("div");
-              karte.style.cssText = "display: flex; flex-wrap: wrap; align-items: flex-start; gap: 14px; padding: 14px; border-radius: 8px; background: rgba(255,255,255,0.09); border: 1px solid rgba(165,214,167,0.45);";
+            const baseUrl = window.location.origin + window.location.pathname;
 
-              const imgUrl = (item.images && item.images.length) ? item.images[0] : "";
-              const imgHtml = imgUrl
-                ? `<img src="${imgUrl}" alt="" style="width: 90px; height: 90px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc; flex-shrink: 0;">`
-                : `<div style="width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; background: #333; border-radius: 6px; font-size: 28px; flex-shrink: 0;">📦</div>`;
+            groups.forEach(group => {
+              const am = group.meta || {};
+              const anbieterBox = document.createElement("div");
+              anbieterBox.style.cssText = "padding: 14px; border-radius: 10px; background: rgba(255,255,255,0.08); border: 2px solid rgba(165,214,167,0.55);";
 
-              const masseText = m.kategorie === "grossmoebel"
-                ? ` (${m.breite || "?"}×${m.hoehe || "?"}×${m.tiefe || "?"} cm)`
-                : " (Kleinteil)";
-              const verfuegbarBadge = (m.verfuegbarAb && m.verfuegbarAb !== "Ab sofort")
-                ? `<span style="background:#ffb300; color:#111; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Erst ab: ${m.verfuegbarAb}</span>`
+              const verfuegbarBadge = (am.verfuegbarAb && am.verfuegbarAb !== "Ab sofort")
+                ? `<span style="background:#ffb300; color:#111; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Erst ab: ${am.verfuegbarAb}</span>`
                 : `<span style="background:#2e7d32; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Ab sofort</span>`;
-              const telefonBadge = m.entryMode === "phone"
-                ? ` <span style="background:#0288d1; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Telefon (${m.helferName || "Team"})</span>`
+              const telefonBadge = am.entryMode === "phone"
+                ? ` <span style="background:#0288d1; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Telefon (${am.helferName || "Team"})</span>`
                 : "";
 
-              const baseUrl = window.location.origin + window.location.pathname;
-              const exklusivLink = `${baseUrl}?vorschau=${encodeURIComponent(item.folderId)}`;
+              const anbieterExklusivLink = `${baseUrl}?vorschau=${encodeURIComponent(group.anbieterFolderId)}`;
 
-              karte.innerHTML = `
-                ${imgHtml}
-                <div style="flex: 1; min-width: 210px;">
-                  <div style="margin-bottom: 5px;">${verfuegbarBadge}${telefonBadge} <span style="font-size:0.82rem; color:#ffd700;">Frist: ${m.abholFrist || "offen"}</span></div>
-                  <div style="font-size: 1.05rem; font-weight: bold; color: #ffffff;">${m.titel || item.folderName}${masseText}</div>
-                  <div style="font-size: 0.88rem; color: #e0e0e0; margin-top: 4px; line-height: 1.4;">
-                    Spender: <strong>${m.spenderName || "-"}</strong> (${m.spenderTelefon || "-"})<br>
-                    Ort: ${m.strasse || ""}, ${m.plzOrt || ""} | ${m.stockwerk || ""} (${m.aufzug || ""})<br>
-                    Zwischenlager: ${m.zwischenlager || "Nein"} | Mithilfe: ${m.mithilfe || "-"}
+              anbieterBox.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:10px; margin-bottom:12px;">
+                  <div>
+                    <div style="margin-bottom:4px;">${verfuegbarBadge}${telefonBadge} <span style="font-size:0.82rem; color:#ffd700;">Frist: ${am.abholFrist || "offen"}</span></div>
+                    <div style="font-size:1.1rem; font-weight:bold; color:#ffffff;">🏠 Anbieter: ${am.spenderName || group.anbieterFolderName} (${am.plzOrt || ""})</div>
+                    <div style="font-size:0.86rem; color:#dcdcdc; margin-top:3px; line-height:1.4;">
+                      Tel: <strong>${am.spenderTelefon || "-"}</strong> | Adresse: ${am.strasse || ""}, ${am.plzOrt || ""}<br>
+                      Stockwerk: ${am.stockwerk || ""} (${am.aufzug || ""}) | Zwischenlager: ${am.zwischenlager || "Nein"}<br>
+                      Mithilfe: ${am.mithilfe || "-"}
+                    </div>
                   </div>
-                  <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
-                    <button type="button" class="fflw-pub-btn"
-                            style="background-color: #2e7d32; color: #ffffff; border: 2px solid #ffffff; padding: 8px 14px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;">
-                      ✓ Öffentlich freischalten (1 Klick)
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <button type="button" class="fflw-pub-all-btn"
+                            style="background-color:#2e7d32; color:#fff; border:2px solid #fff; padding:8px 12px; font-size:13px; font-weight:bold; border-radius:6px; cursor:pointer;">
+                      ✓ Alle ${group.items.length} Teile dieser Wohnung freischalten
                     </button>
-                    <button type="button" class="fflw-link-btn"
-                            style="background-color: #1565c0; color: #ffffff; border: 1px solid #90caf9; padding: 8px 14px; font-size: 14px; font-weight: bold; border-radius: 6px; cursor: pointer;">
-                      🔗 Exklusiv-Link (Notsituation)
-                    </button>
-                    <button type="button" class="fflw-arch-btn"
-                            style="background-color: #616161; color: #ffffff; border: 1px solid #bdbdbd; padding: 8px 12px; font-size: 13px; border-radius: 6px; cursor: pointer;">
-                      Archivieren
+                    <button type="button" class="fflw-link-all-btn"
+                            style="background-color:#1565c0; color:#fff; border:1px solid #90caf9; padding:7px 12px; font-size:13px; font-weight:bold; border-radius:6px; cursor:pointer;">
+                      🔗 Exklusiv-Link für ganze Wohnung
                     </button>
                   </div>
                 </div>
+                <div class="fflw-anbieter-items" style="display:flex; flex-direction:column; gap:10px;"></div>
               `;
 
-              karte.querySelector(".fflw-pub-btn").addEventListener("click", function () {
-                if (!confirm("Möchtest du „" + (m.titel || item.folderName) + "“ jetzt öffentlich freischalten?")) return;
+              anbieterBox.querySelector(".fflw-pub-all-btn").addEventListener("click", function () {
+                if (!confirm("Alle " + group.items.length + " Möbelstücke von " + (am.spenderName || group.anbieterFolderName) + " jetzt öffentlich freischalten?")) return;
                 this.disabled = true;
                 this.textContent = "⏳ Wird freigeschaltet …";
                 fetch(WEB_APP_URL, {
                   method: "POST",
                   redirect: "follow",
                   headers: { "Content-Type": "text/plain;charset=utf-8" },
-                  body: JSON.stringify({ action: "publishDonationItem", masterCode: aktiverMasterCode, folderId: item.folderId })
+                  body: JSON.stringify({
+                    action: "publishDonationItem",
+                    masterCode: aktiverMasterCode,
+                    folderId: group.anbieterFolderId,
+                    isWholeProvider: true
+                  })
                 })
                   .then(r => r.json())
                   .then(res => {
                     if (res.ok || res.success) {
-                      karte.remove();
+                      anbieterBox.remove();
                       ladeAngebote();
                     } else {
                       alert("Fehler: " + (res.error || "Unbekannt"));
@@ -688,29 +696,108 @@
                   });
               });
 
-              karte.querySelector(".fflw-link-btn").addEventListener("click", function () {
-                if (navigator.clipboard) {
-                  navigator.clipboard.writeText(exklusivLink).then(() => {
-                    alert("Exklusiv-Vorschaulink kopiert! Du kannst ihn jetzt per WhatsApp/Signal an die Familie senden:\n\n" + exklusivLink);
-                  });
-                } else {
-                  prompt("Exklusiv-Vorschaulink kopieren:", exklusivLink);
-                }
+              anbieterBox.querySelector(".fflw-link-all-btn").addEventListener("click", function () {
+                kopiereLinkInZwischenablage(
+                  anbieterExklusivLink,
+                  "Exklusiv-Link für die ganze Wohnung kopiert! Per WhatsApp/Signal senden:"
+                );
               });
 
-              karte.querySelector(".fflw-arch-btn").addEventListener("click", function () {
-                if (!confirm("Diesen Eintrag wirklich ins Archiv verschieben (nicht veröffentlichen)?")) return;
-                fetch(WEB_APP_URL, {
-                  method: "POST",
-                  redirect: "follow",
-                  headers: { "Content-Type": "text/plain;charset=utf-8" },
-                  body: JSON.stringify({ action: "archiveDonationItem", masterCode: aktiverMasterCode, folderId: item.folderId })
-                })
-                  .then(r => r.json())
-                  .then(() => karte.remove());
+              const itemsHost = anbieterBox.querySelector(".fflw-anbieter-items");
+              group.items.forEach(item => {
+                const m = item.meta || {};
+                const row = document.createElement("div");
+                row.style.cssText = "display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:10px; border-radius:8px; background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.18);";
+
+                const imgUrl = (item.images && item.images.length) ? item.images[0] : "";
+                const imgHtml = imgUrl
+                  ? `<img src="${imgUrl}" alt="" style="width:74px; height:74px; object-fit:cover; border-radius:6px; border:1px solid #ccc; flex-shrink:0;">`
+                  : `<div style="width:74px; height:74px; display:flex; align-items:center; justify-content:center; background:#333; border-radius:6px; font-size:24px; flex-shrink:0;">📦</div>`;
+
+                const masseText = m.kategorie === "grossmoebel"
+                  ? ` (${m.breite || "?"}×${m.hoehe || "?"}×${m.tiefe || "?"} cm)`
+                  : " (Kleinteil)";
+                const einzelLink = `${baseUrl}?vorschau=${encodeURIComponent(item.folderId)}`;
+
+                row.innerHTML = `
+                  ${imgHtml}
+                  <div style="flex:1; min-width:180px;">
+                    <div style="font-weight:bold; color:#fff;">${m.titel || item.folderName}${masseText}</div>
+                    <div style="font-size:0.84rem; color:#ccc;">Zerlegbar: ${m.zerlegbar || "-"}</div>
+                  </div>
+                  <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                    <button type="button" class="fflw-one-pub"
+                            style="background:#2e7d32; color:#fff; border:1px solid #fff; padding:6px 10px; font-size:13px; font-weight:bold; border-radius:5px; cursor:pointer;">
+                      ✓ Einzeln freischalten
+                    </button>
+                    <button type="button" class="fflw-one-link"
+                            style="background:#1565c0; color:#fff; border:1px solid #90caf9; padding:6px 10px; font-size:13px; border-radius:5px; cursor:pointer;">
+                      🔗 Einzel-Link
+                    </button>
+                    <button type="button" class="fflw-one-arch"
+                            style="background:#616161; color:#fff; border:1px solid #bdbdbd; padding:6px 9px; font-size:12px; border-radius:5px; cursor:pointer;">
+                      Archiv
+                    </button>
+                  </div>
+                `;
+
+                row.querySelector(".fflw-one-pub").addEventListener("click", function () {
+                  if (!confirm("Möchtest du „" + (m.titel || item.folderName) + "“ jetzt öffentlich freischalten?")) return;
+                  this.disabled = true;
+                  this.textContent = "⏳ …";
+                  fetch(WEB_APP_URL, {
+                    method: "POST",
+                    redirect: "follow",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                      action: "publishDonationItem",
+                      masterCode: aktiverMasterCode,
+                      folderId: item.folderId,
+                      isWholeProvider: false
+                    })
+                  })
+                    .then(r => r.json())
+                    .then(res => {
+                      if (res.ok || res.success) {
+                        row.remove();
+                        if (!itemsHost.children.length) anbieterBox.remove();
+                        ladeAngebote();
+                      } else {
+                        alert("Fehler: " + (res.error || "Unbekannt"));
+                      }
+                    });
+                });
+
+                row.querySelector(".fflw-one-link").addEventListener("click", function () {
+                  kopiereLinkInZwischenablage(
+                    einzelLink,
+                    "Exklusiv-Link für dieses Einzelstück kopiert! Per WhatsApp/Signal senden:"
+                  );
+                });
+
+                row.querySelector(".fflw-one-arch").addEventListener("click", function () {
+                  if (!confirm("Dieses Möbelstück wirklich ins Archiv verschieben?")) return;
+                  fetch(WEB_APP_URL, {
+                    method: "POST",
+                    redirect: "follow",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({
+                      action: "archiveDonationItem",
+                      masterCode: aktiverMasterCode,
+                      folderId: item.folderId
+                    })
+                  })
+                    .then(r => r.json())
+                    .then(() => {
+                      row.remove();
+                      if (!itemsHost.children.length) anbieterBox.remove();
+                    });
+                });
+
+                itemsHost.appendChild(row);
               });
 
-              masterSpendenListeEl.appendChild(karte);
+              masterSpendenListeEl.appendChild(anbieterBox);
             });
           })
           .catch(err => {
@@ -732,51 +819,61 @@
         })
           .then(r => r.json())
           .then(data => {
-            if (!data.success || !data.previewOffer) {
-              exklusivVorschauEl.innerHTML = "<p>Dieser persönliche Vorschaulink ist nicht mehr verfügbar (möglicherweise wurde das Möbelstück bereits vergeben).</p>";
+            const items = data.previewItems || [];
+            if (!data.success || items.length === 0) {
+              exklusivVorschauEl.innerHTML = "<p>Dieser persönliche Vorschaulink ist nicht mehr verfügbar (möglicherweise wurden die Möbel bereits vergeben).</p>";
               return;
             }
-            const item = data.previewOffer;
             exklusivVorschauEl.innerHTML = "";
 
             const badge = document.createElement("div");
-            badge.style.cssText = "font-weight: bold; color: #ffd700; margin-bottom: 6px; font-size: 1.05rem;";
-            badge.textContent = "⭐ Persönliche Exklusiv-Vorschau für dich vorab:";
+            badge.style.cssText = "font-weight: bold; color: #ffd700; margin-bottom: 10px; font-size: 1.08rem;";
+            badge.textContent = "⭐ Persönliche Exklusiv-Vorschau für dich vorab (" + items.length + " Position/en):";
             exklusivVorschauEl.appendChild(badge);
 
-            const titel = document.createElement("h3");
-            titel.style.margin = "0 0 8px 0";
-            titel.textContent = item.folderName;
-            exklusivVorschauEl.appendChild(titel);
+            items.forEach((item, idx) => {
+              if (idx > 0) {
+                exklusivVorschauEl.appendChild(createTrennBalken());
+              }
+              const card = document.createElement("div");
+              card.style.marginBottom = "12px";
 
-            if (item.description) {
-              const p = document.createElement("p");
-              p.style.cssText = "white-space: pre-line; margin: 6px 0 12px 0; padding: 10px 12px; background: rgba(255,255,255,0.08); border-radius: 6px;";
-              p.textContent = item.description;
-              exklusivVorschauEl.appendChild(p);
-            }
+              const titel = document.createElement("h3");
+              titel.style.margin = "0 0 8px 0";
+              titel.textContent = item.folderName;
+              card.appendChild(titel);
 
-            const grid = document.createElement("div");
-            grid.className = "fflw-bilder-grid";
-            (item.images || []).forEach(src => {
-              const img = document.createElement("img");
-              img.src = src;
-              grid.appendChild(img);
+              if (item.description) {
+                const p = document.createElement("p");
+                p.style.cssText = "white-space: pre-line; margin: 6px 0 12px 0; padding: 10px 12px; background: rgba(255,255,255,0.08); border-radius: 6px;";
+                p.textContent = item.description;
+                card.appendChild(p);
+              }
+
+              const grid = document.createElement("div");
+              grid.className = "fflw-bilder-grid";
+              (item.images || []).forEach(src => {
+                const img = document.createElement("img");
+                img.src = src;
+                grid.appendChild(img);
+              });
+              card.appendChild(grid);
+
+              const label = document.createElement("label");
+              label.className = "fflw-checkbox-label";
+              const cb = document.createElement("input");
+              cb.type = "checkbox";
+              cb.value = "[VORSCHAU:" + item.folderId + "] " + item.folderName;
+              cb.checked = items.length === 1;
+              cb.addEventListener("change", updateAuswahlCounter);
+              const span = document.createElement("span");
+              span.textContent = "▲ Dieses Exklusiv-Möbelstück oben auswählen & unten anfragen";
+              label.appendChild(cb);
+              label.appendChild(span);
+              card.appendChild(label);
+
+              exklusivVorschauEl.appendChild(card);
             });
-            exklusivVorschauEl.appendChild(grid);
-
-            const label = document.createElement("label");
-            label.className = "fflw-checkbox-label";
-            const cb = document.createElement("input");
-            cb.type = "checkbox";
-            cb.value = "[VORSCHAU:" + item.folderId + "] " + item.folderName;
-            cb.checked = true;
-            cb.addEventListener("change", updateAuswahlCounter);
-            const span = document.createElement("span");
-            span.textContent = "▲ Dieses Exklusiv-Möbelstück oben auswählen & unten anfragen";
-            label.appendChild(cb);
-            label.appendChild(span);
-            exklusivVorschauEl.appendChild(label);
 
             formEl.style.display = "block";
             updateAuswahlCounter();
@@ -914,7 +1011,7 @@
           return;
         }
 
-        const gewaehlteArtikel = Array.from(container.querySelectorAll('input[type="checkbox"]:checked'))
+        const gewaehlteArtikel = Array.from(document.querySelectorAll('#fflw-angebote-galerie input[type="checkbox"]:checked, #fflw-exklusiv-vorschau input[type="checkbox"]:checked'))
           .map(cb => cb.value);
 
         if (gewaehlteArtikel.length === 0) {
