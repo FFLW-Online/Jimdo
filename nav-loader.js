@@ -96,7 +96,6 @@ function forceGoogleTranslatePopup(targetLang, containerEl) {
   const combo = document.querySelector(".goog-te-combo");
   if (!combo) return;
 
-  // Wenn Google Translate in diesem Container bereits <font>-Tags erzeugt hat, nicht stören
   if (containerEl && containerEl.querySelector("font")) return;
 
   combo.value = "";
@@ -111,7 +110,7 @@ function forceGoogleTranslatePopup(targetLang, containerEl) {
 // Zeigt einen Fallback-Balken NUR dann, wenn der Nutzer aktiv eine Sprache gewählt hat UND der Browser blockiert
 function showTranslateBlockedFallback(targetLang) {
   if (!targetLang || targetLang === "de") return;
-  if (!getExplicitUrlLanguage()) return; // Niemals auf normalen deutschen Seiten anzeigen!
+  if (!getExplicitUrlLanguage()) return;
   if (sessionStorage.getItem("fflw_gt_blocked_dismissed") === "true") return;
   if (document.getElementById("fflw-gt-blocked-bar")) return;
 
@@ -286,7 +285,6 @@ function showLanguageHintOnce(activeLang) {
 
   const closeModal = () => overlay.remove();
 
-  // Alle eingebetteten "🇩🇪 Deutsch (Original)"-Buttons direkt klickbar machen
   modal.querySelectorAll(".fflw-hint-de-reset").forEach(btn => {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
@@ -542,8 +540,57 @@ window.addEventListener("pageshow", function (event) {
   }
 });
 
+// Baut das globale Flaggen-Laufband direkt unter dem Logo auf und hält die Header-Höhe aktuell
+function initGlobalFlagBarAndStickyOffset(currentPage) {
+  const siteHeader = document.querySelector(".site-header");
+  if (!siteHeader) return;
+
+  // Globales Flaggen-Laufband direkt unter dem Logo einfügen (auf allen Seiten außer der Sprachwahl selbst)
+  if (currentPage !== "fflw-international.html" && !siteHeader.querySelector(".global-flag-bar")) {
+    const flags = [
+      "🇦🇱", "🇸🇦", "🇹🇷", "🇺🇦", "🇷🇺", "🇮🇷", "🇦🇫", "🇪🇷", "🇸🇴",
+      "🇬🇧", "🇫🇷", "🇪🇸", "🇮🇹", "🇷🇴", "🇧🇬", "🇵🇱", "🇮🇳", "🇵🇰",
+      "🇸🇾", "🇮🇶", "🇽🇰", "🇬🇷", "🇭🇷", "🇷🇸", "🇳🇬", "🇬🇲", "🇩🇪"
+    ];
+    const flagSpans = flags.map(f => `<span>${f}</span>`).join("");
+
+    const flagBar = document.createElement("a");
+    flagBar.href = `fflw-international.html?return=${encodeURIComponent(currentPage)}`;
+    flagBar.className = "global-flag-bar notranslate";
+    flagBar.setAttribute("translate", "no");
+    flagBar.setAttribute("aria-label", "Sprache wählen / Translate page");
+    flagBar.innerHTML = `
+      <div class="global-flag-marquee" aria-hidden="true">
+        <div class="global-flag-track">
+          ${flagSpans}${flagSpans}
+        </div>
+      </div>
+      <span class="global-flag-cta">🌐 Sprache / Language ▸</span>
+    `;
+    siteHeader.appendChild(flagBar);
+  }
+
+  // Exakte Höhe des Headers messen, damit das linke Desktop-Menü immer nahtlos darunter klebt
+  const updateHeaderOffset = () => {
+    const h = siteHeader.offsetHeight;
+    if (h > 0) {
+      document.documentElement.style.setProperty("--header-offset", `${h + 12}px`);
+    }
+  };
+
+  updateHeaderOffset();
+  window.addEventListener("resize", updateHeaderOffset);
+  if ("ResizeObserver" in window) {
+    const ro = new ResizeObserver(updateHeaderOffset);
+    ro.observe(siteHeader);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
+
+  // 0. Globales Flaggen-Laufband direkt unter dem Logo & Sticky-Menü-Abstand aktivieren
+  initGlobalFlagBarAndStickyOffset(currentPage);
 
   // 1. Sprache prüfen: Wenn URL-Parameter oder Hash eine Sprache verlangen,
   //    Cookie synchronisieren und Hinweis-Pop-up einmalig öffnen
@@ -603,13 +650,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const links = navContainer.querySelectorAll("a");
         links.forEach(link => {
-          if (link.getAttribute("href") === currentPage) {
+          const href = link.getAttribute("href");
+          if (href === currentPage) {
             link.setAttribute("aria-current", "page");
             link.classList.add("active");
             const parentDetails = link.closest("details");
             if (parentDetails) {
               parentDetails.setAttribute("open", "");
             }
+          }
+          // Auch dem Menü-Link zu fflw-international.html den Rücksprung-Parameter mitgeben
+          if (href === "fflw-international.html" && currentPage !== "fflw-international.html") {
+            link.setAttribute("href", `fflw-international.html?return=${encodeURIComponent(currentPage)}`);
           }
         });
 
