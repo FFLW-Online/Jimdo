@@ -518,7 +518,6 @@ function setLanguage(langCode) {
 
   if (langCode === "de") {
     applyGoogleTranslateCookie("de");
-    sessionStorage.removeItem("fflw_i18n_hint_shown");
     sessionStorage.removeItem("fflw_gt_blocked_dismissed");
     window.location.replace(targetPage);
   } else {
@@ -601,10 +600,6 @@ window.googleTranslateElementInit = function () {
 
       if (isTranslated) {
         clearInterval(triggerInterval);
-        const hintOverlay = document.getElementById("fflw-lang-hint-overlay");
-        if (hintOverlay) {
-          setTimeout(() => forceGoogleTranslatePopup(targetLang, hintOverlay), 200);
-        }
       } else if (attempts > 40) {
         clearInterval(triggerInterval);
       }
@@ -620,7 +615,6 @@ function startGoogleTranslate(activeLang) {
   }
 
   if (document.getElementById("google_translate_hidden")) {
-    forceGoogleTranslatePopup(activeLang, document.getElementById("fflw-lang-hint-overlay"));
     return;
   }
 
@@ -636,106 +630,6 @@ function startGoogleTranslate(activeLang) {
     showTranslateBlockedFallback(activeLang);
   };
   document.body.appendChild(gtScript);
-}
-
-function showLanguageHintOnce(activeLang) {
-  if (!activeLang || activeLang === "de") return;
-  if (sessionStorage.getItem("fflw_i18n_hint_shown") === "true") return;
-
-  sessionStorage.setItem("fflw_i18n_hint_shown", "true");
-
-  const overlay = document.createElement("div");
-  overlay.id = "fflw-lang-hint-overlay";
-  overlay.style.cssText = `
-    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
-    display: block; z-index: 2147483647;
-    padding: 10px 12px 24px 12px; box-sizing: border-box;
-    overflow-y: auto; overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-  `;
-
-  const modal = document.createElement("div");
-  modal.style.cssText = `
-    background: #ffffff; color: #1a1a1a; max-width: 480px; width: 100%;
-    margin: min(4vh, 32px) auto 16px auto; border-radius: 8px; overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    border-top: 5px solid #2e7d32; font-family: inherit; line-height: 1.5;
-  `;
-
-  const deBtnStyle = `
-    display: inline-block; background: #1a237e; color: #ffffff;
-    border: 1px solid #0d145a; padding: 2px 8px; border-radius: 4px;
-    font-weight: bold; font-size: 0.88rem; text-decoration: none;
-    cursor: pointer; vertical-align: baseline;
-  `;
-
-  const inlineOkBtnStyle = `
-    display: inline-block; background: #2e7d32; color: #ffffff;
-    border: none; padding: 2px 9px; border-radius: 4px;
-    font-weight: bold; font-size: 0.88rem; cursor: pointer;
-    vertical-align: baseline;
-  `;
-
-  modal.innerHTML = `
-    <div style="position: sticky; top: 0; z-index: 2; padding: 10px 14px; background: #f4f7f4; border-bottom: 1px solid #d5e2d5; display: flex; gap: 10px; justify-content: space-between; align-items: center;">
-      <button type="button" id="fflw-hint-help-btn"
-              style="background: #fdecea; color: #a61d24; border: 1px solid #e57373; padding: 6px 10px; border-radius: 5px; font-size: 0.76rem; font-weight: bold; line-height: 1.25; text-align: left; cursor: pointer; max-width: 230px;">
-        🌐 Probleme mit dem<br>Übersetzungstool
-      </button>
-      <button type="button" id="fflw-hint-ok-btn"
-              style="background: #2e7d32; color: #ffffff; border: none; padding: 8px 24px; border-radius: 5px; font-weight: bold; font-size: 0.95rem; cursor: pointer; flex-shrink: 0;">
-        OK
-      </button>
-    </div>
-
-    <div style="padding: 18px 20px 20px 20px;">
-      <h3 style="margin: 0 0 10px 0; color: #2e7d32; font-size: 1.12rem;">
-        Hinweis zur Sprachauswahl
-      </h3>
-      <p style="margin: 0 0 10px 0; font-size: 0.92rem;">
-        Aus technischen Gründen können Sie immer nur von "Deutsch" in eine andere Sprache wechseln.
-      </p>
-      <p style="margin: 0 0 12px 0; font-size: 0.92rem;">
-        Falls Sie jetzt auch noch eine andere Sprache als die vorher gewählte ausprobieren möchten, dann müssen Sie zuerst wieder "Deutsch" auswählen.
-        Das können Sie entweder hier (<a href="index.html" class="fflw-hint-de-reset notranslate" translate="no" style="${deBtnStyle}">🇩🇪 Deutsch (Original)</a>) oder im Menü machen.
-      </p>
-      <p style="margin: 0 0 14px 0; font-size: 0.86rem; color: #444; background: #f7f9fc; padding: 9px 10px; border-radius: 5px;">
-        Funktioniert die automatische Übersetzung nicht richtig? Nur bei technischen Problemen nutzen Sie bitte den Knopf <strong>„Probleme mit dem Übersetzungstool“</strong> (oben oder im Menü).
-      </p>
-      <p style="margin: 0; font-size: 0.9rem; font-weight: bold; color: #2e7d32; text-align: center;">
-        Um jetzt die Webseite in Ihrer gewünschten Sprache anzusehen, drücken Sie bitte oben auf den
-        <button type="button" id="fflw-hint-ok-inline-btn" style="${inlineOkBtnStyle}">OK</button>-Knopf ↑
-      </p>
-    </div>
-  `;
-
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
-  overlay.scrollTop = 0;
-
-  setTimeout(() => forceGoogleTranslatePopup(activeLang, modal), 450);
-  setTimeout(() => forceGoogleTranslatePopup(activeLang, modal), 1300);
-
-  const closeModal = () => overlay.remove();
-
-  modal.querySelectorAll(".fflw-hint-de-reset").forEach(btn => {
-    btn.addEventListener("click", function (e) {
-      e.preventDefault();
-      closeModal();
-      setLanguage("de");
-    });
-  });
-
-  document.getElementById("fflw-hint-help-btn").addEventListener("click", function () {
-    closeModal();
-    openTranslationHelpDialog(activeLang);
-  });
-
-  document.getElementById("fflw-hint-ok-btn").addEventListener("click", closeModal);
-  document.getElementById("fflw-hint-ok-inline-btn").addEventListener("click", closeModal);
-  overlay.addEventListener("click", function (e) {
-    if (e.target === overlay) closeModal();
-  });
 }
 
 function openTranslationHelpDialog(activeLang) {
@@ -982,17 +876,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // 1. Sprache prüfen
-  let explicitLang = null;
   let activeLang = null;
   try {
-    explicitLang = getExplicitUrlLanguage();
     activeLang = getActiveLanguage();
 
     if (activeLang && activeLang !== "de") {
       applyGoogleTranslateCookie(activeLang);
-      if (explicitLang) {
-        showLanguageHintOnce(activeLang);
-      }
     }
   } catch (err) {
     console.error("Sprach-Init Fehler:", err);
