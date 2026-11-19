@@ -1,10 +1,455 @@
-// Hilfsfunktion: Bereinigt und setzt das Google-Translate-Cookie sauber ohne Duplikate
+const FFLW_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+const FFLW_GLOBAL_MASTER_CODE = "FFLW-99";
+const FFLW_STATUS_CACHE_KEY = "fflw_site_status_cache_v1";
+
+// ============================================================================
+// 1. KLICK-SYMBOLE (ZEIGEHÄNDE MIT KREISWELLEN) & STOPP-HÄNDE-SVG
+// ============================================================================
+function getFflwTapHandSvg(direction, styleVariant) {
+  const isRightMirror = direction === "right";
+  const transformAttr = isRightMirror ? 'transform="scale(-1, 1)" style="transform-origin: center;"' : "";
+  const handFill = styleVariant === "B" ? "#ffffff" : "#004080";
+  const waveStroke = styleVariant === "B" ? "#ffd700" : "#d97706";
+
+  if (styleVariant === "B") {
+    return `
+      <svg width="34" height="24" viewBox="0 0 38 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g ${transformAttr}>
+          <!-- Hand zeigt nach rechts -->
+          <rect x="4" y="10" width="12" height="11" rx="4" fill="${handFill}"/>
+          <rect x="13" y="11.5" width="12" height="3.6" rx="1.8" fill="${handFill}"/>
+          <rect x="12" y="15.5" width="7" height="2.6" rx="1.3" fill="${handFill}" opacity="0.85"/>
+          <rect x="11" y="18.5" width="6" height="2.4" rx="1.2" fill="${handFill}" opacity="0.75"/>
+          <!-- Klick-Kreisring & Richtungsbogen an der Fingerspitze -->
+          <circle cx="27" cy="13.3" r="3.5" fill="none" stroke="${waveStroke}" stroke-width="1.8" class="fflw-wave-ring"/>
+          <path d="M31 9 L35 13.3 L31 17.6" fill="none" stroke="${waveStroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+      </svg>
+    `;
+  }
+
+  // Stil A (Standard) & Stil C: Zeigehand mit konzentrischen Radar-Kreiswellen an der Fingerspitze
+  return `
+    <svg width="36" height="26" viewBox="0 0 38 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g ${transformAttr}>
+        <!-- Stilisierte Hand mit ausgestrecktem Zeigefinger nach rechts -->
+        <rect x="3" y="10" width="12" height="11" rx="4.5" fill="${handFill}"/>
+        <rect x="8" y="6.5" width="4" height="6" rx="2" fill="${handFill}"/>
+        <rect x="12" y="11" width="13" height="3.8" rx="1.9" fill="${handFill}"/>
+        <rect x="11" y="15.2" width="7.5" height="2.6" rx="1.3" fill="${handFill}" opacity="0.82"/>
+        <rect x="10" y="18.2" width="6.5" height="2.5" rx="1.25" fill="${handFill}" opacity="0.7"/>
+        <!-- Konzentrische Klick-Kreiswellen an der Fingerspitze -->
+        <path d="M27.5 9.2 A 5 5 0 0 1 27.5 16.8" fill="none" stroke="${waveStroke}" stroke-width="2" stroke-linecap="round" class="fflw-wave-ring"/>
+        <path d="M31 6.5 A 8.5 8.5 0 0 1 31 19.5" fill="none" stroke="${waveStroke}" stroke-width="1.8" stroke-linecap="round" opacity="0.75" class="fflw-wave-ring"/>
+      </g>
+    </svg>
+  `;
+}
+
+function getFflwMaintenanceSvg() {
+  return `
+    <svg width="154" height="114" viewBox="0 0 150 110" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kurze Pause – zwei Stopp-Hände in den Vereinsfarben">
+      <circle cx="75" cy="55" r="48" fill="#e6eff8" stroke="#004080" stroke-width="3"/>
+      <!-- Linke erhobene Hand (Handfläche nach vorne = Stopp) in Blau -->
+      <g transform="translate(33, 23)">
+        <rect x="10" y="24" width="24" height="24" rx="8" fill="#004080"/>
+        <rect x="6" y="14" width="5" height="16" rx="2.5" fill="#004080"/>
+        <rect x="12" y="7" width="5" height="21" rx="2.5" fill="#004080"/>
+        <rect x="18" y="4" width="5" height="23" rx="2.5" fill="#004080"/>
+        <rect x="24" y="7" width="5" height="20" rx="2.5" fill="#004080"/>
+        <rect x="30" y="13" width="5" height="15" rx="2.5" fill="#004080"/>
+        <path d="M13 33 Q22 30 30 35" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- Rechte erhobene Hand (Handfläche nach vorne = Stopp) in Gold/Amber -->
+      <g transform="translate(76, 23)">
+        <rect x="10" y="24" width="24" height="24" rx="8" fill="#d97706"/>
+        <rect x="9" y="13" width="5" height="15" rx="2.5" fill="#d97706"/>
+        <rect x="15" y="7" width="5" height="20" rx="2.5" fill="#d97706"/>
+        <rect x="21" y="4" width="5" height="23" rx="2.5" fill="#d97706"/>
+        <rect x="27" y="7" width="5" height="21" rx="2.5" fill="#d97706"/>
+        <rect x="33" y="14" width="5" height="16" rx="2.5" fill="#d97706"/>
+        <path d="M14 35 Q22 30 31 33" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </g>
+      <!-- Trauriger Smiley in den Vereinsfarben -->
+      <circle cx="75" cy="87" r="13" fill="#ffffff" stroke="#004080" stroke-width="2.5"/>
+      <circle cx="71" cy="84" r="1.6" fill="#004080"/>
+      <circle cx="79" cy="84" r="1.6" fill="#004080"/>
+      <path d="M70 92 Q75 88 80 92" stroke="#d97706" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    </svg>
+  `;
+}
+
+// ============================================================================
+// 2. ZENTRALES STATUS-MANAGEMENT (WARTUNG & FLAGGENBAND-STIL)
+// ============================================================================
+function getCachedSiteStatus() {
+  try {
+    const raw = sessionStorage.getItem(FFLW_STATUS_CACHE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        return {
+          wartungSeiten: Array.isArray(parsed.wartungSeiten) ? parsed.wartungSeiten : [],
+          flaggenStil: ["A", "B", "C", "OFF"].includes(parsed.flaggenStil) ? parsed.flaggenStil : "A",
+          zugangscode: typeof parsed.zugangscode === "string" ? parsed.zugangscode : "11"
+        };
+      }
+    }
+  } catch (e) {}
+  return { wartungSeiten: [], flaggenStil: "A", zugangscode: "11" };
+}
+
+function setCachedSiteStatus(statusObj) {
+  try {
+    sessionStorage.setItem(FFLW_STATUS_CACHE_KEY, JSON.stringify(statusObj));
+  } catch (e) {}
+}
+
+function renderGlobalFlagBar(currentPage, flaggenStil) {
+  const siteHeader = document.querySelector(".site-header");
+  if (!siteHeader) return;
+
+  const existing = siteHeader.querySelector(".global-flag-bar");
+  if (existing) existing.remove();
+
+  if (currentPage === "fflw-international.html" || flaggenStil === "OFF") {
+    return;
+  }
+
+  const stil = ["A", "B", "C"].includes(flaggenStil) ? flaggenStil : "A";
+  const flags = [
+    "🇦🇱", "🇸🇦", "🇹🇷", "🇺🇦", "🇷🇺", "🇮🇷", "🇦🇫", "🇪🇷", "🇸🇴",
+    "🇬🇧", "🇫🇷", "🇪🇸", "🇮🇹", "🇷🇴", "🇧🇬", "🇵🇱", "🇮🇳", "🇵🇰",
+    "🇸🇾", "🇮🇶", "🇽🇰", "🇬🇷", "🇭🇷", "🇷🇸", "🇳🇬", "🇬🇲", "🇩🇪"
+  ];
+  const flagSpans = flags.map(f => `<span>${f}</span>`).join("");
+
+  const flagBar = document.createElement("a");
+  flagBar.href = `fflw-international.html?return=${encodeURIComponent(currentPage)}`;
+  flagBar.className = `global-flag-bar style-${stil} notranslate`;
+  flagBar.setAttribute("translate", "no");
+  flagBar.setAttribute("aria-label", "Sprache wählen / Translate page");
+  flagBar.title = "Sprache wählen / Translate";
+  flagBar.innerHTML = `
+    <span class="global-flag-hand" aria-hidden="true">${getFflwTapHandSvg("left", stil)}</span>
+    <div class="global-flag-marquee" aria-hidden="true">
+      <div class="global-flag-track">
+        ${flagSpans}${flagSpans}
+      </div>
+    </div>
+    <span class="global-flag-hand" aria-hidden="true">${getFflwTapHandSvg("right", stil)}</span>
+  `;
+  siteHeader.appendChild(flagBar);
+}
+
+function updateStickyHeaderOffset() {
+  const siteHeader = document.querySelector(".site-header");
+  if (!siteHeader) return;
+  const h = siteHeader.offsetHeight;
+  if (h > 0) {
+    document.documentElement.style.setProperty("--header-offset", `${h + 12}px`);
+  }
+}
+
+let fflwOriginalMainHtml = null;
+
+function applyMaintenanceStateToPage(currentPage, wartungSeiten) {
+  const protectedLegal = ["impressum.html", "datenschutz.html"];
+  if (protectedLegal.includes(currentPage)) return;
+
+  const mainContent = document.querySelector("main.content");
+  if (!mainContent) return;
+
+  if (fflwOriginalMainHtml === null) {
+    fflwOriginalMainHtml = mainContent.innerHTML;
+  }
+
+  const liste = Array.isArray(wartungSeiten) ? wartungSeiten : [];
+  const isBlocked = liste.includes("*") || liste.includes(currentPage);
+
+  if (isBlocked) {
+    if (!mainContent.querySelector(".fflw-maintenance-card")) {
+      mainContent.innerHTML = `
+        <div class="fflw-maintenance-card">
+          ${getFflwMaintenanceSvg()}
+          <h2>Kurze Pause – Seite gerade in Wartung</h2>
+          <p>Wir aktualisieren hier gerade die Inhalte und Angebote. Bitte schau in Kürze wieder vorbei!</p>
+          <p style="font-size: 0.92rem; color: #555555;">
+            In dringenden Fällen erreichst du uns jederzeit per E-Mail an
+            <a href="mailto:Kontakt@freundeleuwi.org" style="color: #004080; font-weight: bold;">Kontakt@freundeleuwi.org</a>.
+          </p>
+          ${currentPage !== "index.html" ? `
+            <p style="margin-top: 18px; margin-bottom: 0;">
+              <a href="index.html" style="display: inline-block; background: #004080; color: #ffffff; text-decoration: none; padding: 9px 18px; border-radius: 6px; font-weight: bold;">
+                Zur Startseite
+              </a>
+            </p>
+          ` : ""}
+        </div>
+      `;
+    }
+  } else if (mainContent.querySelector(".fflw-maintenance-card") && fflwOriginalMainHtml !== null) {
+    mainContent.innerHTML = fflwOriginalMainHtml;
+  }
+}
+
+function syncGlobalSiteStatus(currentPage) {
+  const cached = getCachedSiteStatus();
+  renderGlobalFlagBar(currentPage, cached.flaggenStil);
+  applyMaintenanceStateToPage(currentPage, cached.wartungSeiten);
+  updateStickyHeaderOffset();
+
+  fetch(`${FFLW_WEB_APP_URL}?action=site_status&t=${Date.now()}`, {
+    method: "GET",
+    redirect: "follow"
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (!data || !data.ok) return;
+      const fresh = {
+        wartungSeiten: Array.isArray(data.wartungSeiten) ? data.wartungSeiten : [],
+        flaggenStil: ["A", "B", "C", "OFF"].includes(data.flaggenStil) ? data.flaggenStil : "A",
+        zugangscode: typeof data.zugangscode === "string" ? data.zugangscode : "11"
+      };
+      setCachedSiteStatus(fresh);
+      renderGlobalFlagBar(currentPage, fresh.flaggenStil);
+      applyMaintenanceStateToPage(currentPage, fresh.wartungSeiten);
+      updateStickyHeaderOffset();
+    })
+    .catch(() => {
+      // Bei Offline-/Netzwerkproblem bleibt der letzte Stand erhalten
+    });
+}
+
+// ============================================================================
+// 3. GLOBALES HANDY-MASTER-FENSTER (VON JEDER SEITE AUS ÖFFENBAR)
+// ============================================================================
+function openGlobalMasterModal(currentPage) {
+  if (document.getElementById("fflw-global-master-overlay")) return;
+
+  const eingabe = prompt("Bitte Master-Code eingeben:");
+  if (!eingabe || eingabe.trim().toLowerCase() !== FFLW_GLOBAL_MASTER_CODE.toLowerCase()) {
+    if (eingabe !== null) alert("Falscher Master-Code.");
+    return;
+  }
+  const verifiedCode = eingabe.trim();
+
+  const overlay = document.createElement("div");
+  overlay.id = "fflw-global-master-overlay";
+  overlay.style.cssText = `
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.72);
+    z-index: 2147483647; overflow-y: auto; padding: 14px;
+    box-sizing: border-box; -webkit-overflow-scrolling: touch;
+  `;
+
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    background: #141c24; color: #ffffff; max-width: 560px; width: 100%;
+    margin: 12px auto 30px auto; border-radius: 12px; overflow: hidden;
+    border: 3px solid #ffd700; box-shadow: 0 12px 35px rgba(0,0,0,0.55);
+    font-family: Arial, sans-serif;
+  `;
+
+  modal.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: #004080; border-bottom: 2px solid #ffd700;">
+      <strong style="font-size: 1.08rem; color: #ffd700;">⚙️ FFLW Webseiten-Steuerung</strong>
+      <button type="button" id="fflw-gm-close" style="background: rgba(255,255,255,0.18); color: #fff; border: 1px solid #fff; padding: 5px 11px; border-radius: 6px; font-weight: bold; cursor: pointer;">✕</button>
+    </div>
+
+    <div style="padding: 18px;">
+      <div id="fflw-gm-status" style="margin-bottom: 14px; font-weight: bold; color: #ffd700;">⏳ Lade aktuelle Einstellungen aus Google Drive …</div>
+
+      <!-- BEREICH 1: FLAGGEN-LAUFBAND UNTER DEM LOGO -->
+      <div style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+        <div style="font-weight: bold; color: #ffd700; margin-bottom: 8px;">🌐 Flaggen-Laufband unter dem Logo</div>
+        <div id="fflw-gm-flag-btns" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <button type="button" data-stil="A" class="fflw-gm-flag-opt" style="padding: 9px; border-radius: 6px; border: 2px solid #888; background: #222; color: #fff; font-weight: bold; cursor: pointer;">Stil A (Radar-Wellen)</button>
+          <button type="button" data-stil="B" class="fflw-gm-flag-opt" style="padding: 9px; border-radius: 6px; border: 2px solid #888; background: #222; color: #fff; font-weight: bold; cursor: pointer;">Stil B (3D-Chip)</button>
+          <button type="button" data-stil="C" class="fflw-gm-flag-opt" style="padding: 9px; border-radius: 6px; border: 2px solid #888; background: #222; color: #fff; font-weight: bold; cursor: pointer;">Stil C (Minimalistisch)</button>
+          <button type="button" data-stil="OFF" class="fflw-gm-flag-opt" style="padding: 9px; border-radius: 6px; border: 2px solid #888; background: #222; color: #fff; font-weight: bold; cursor: pointer;">Ausgeblendet</button>
+        </div>
+      </div>
+
+      <!-- BEREICH 2: WARENHAUS-ZUGANGSCODE -->
+      <div style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+        <div style="font-weight: bold; color: #ffd700; margin-bottom: 6px;">🔑 Warenhaus-Zugangscode (aktuelle-angebote.html)</div>
+        <div style="font-size: 0.85rem; color: #ccc; margin-bottom: 8px;">Leer lassen = Zugangscode-Abfrage deaktiviert.</div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="fflw-gm-code-input" placeholder="z. B. 11" style="flex: 1; padding: 9px 11px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff;">
+        </div>
+      </div>
+
+      <!-- BEREICH 3: WARTUNGSMODUS FÜR SEITEN (1-KLICK) -->
+      <div style="background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 14px; margin-bottom: 18px;">
+        <div style="font-weight: bold; color: #ffd700; margin-bottom: 8px;">🛑 Wartungsmodus (Stopp-Hände-Sperre)</div>
+        <div id="fflw-gm-pages-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 270px; overflow-y: auto; padding-right: 4px;"></div>
+      </div>
+
+      <button type="button" id="fflw-gm-save" style="width: 100%; background: #2e7d32; color: #fff; border: 2px solid #fff; padding: 13px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
+        💾 Einstellungen jetzt speichern
+      </button>
+    </div>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  const closeOverlay = () => overlay.remove();
+  document.getElementById("fflw-gm-close").addEventListener("click", closeOverlay);
+  overlay.addEventListener("click", e => { if (e.target === overlay) closeOverlay(); });
+
+  let selectedStil = "A";
+  let blockedPagesSet = new Set();
+
+  function refreshFlagButtonsUI() {
+    modal.querySelectorAll(".fflw-gm-flag-opt").forEach(btn => {
+      const isSel = btn.getAttribute("data-stil") === selectedStil;
+      btn.style.background = isSel ? "#004080" : "#222";
+      btn.style.borderColor = isSel ? "#ffd700" : "#666";
+      btn.style.color = isSel ? "#ffd700" : "#ffffff";
+    });
+  }
+
+  modal.querySelectorAll(".fflw-gm-flag-opt").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedStil = btn.getAttribute("data-stil");
+      refreshFlagButtonsUI();
+    });
+  });
+
+  // Seitenliste aus dem geladenen Menü (#nav-list) auslesen + "Komplette Webseite"
+  function buildPagesListUI() {
+    const pagesContainer = document.getElementById("fflw-gm-pages-list");
+    pagesContainer.innerHTML = "";
+
+    const eintraege = [
+      { file: "*", label: "🚨 KOMPLETTE WEBSEITE (alle Seiten sperren)" },
+      { file: "aktuelle-angebote.html", label: "🛋️ Virtuelles Warenhaus: Aktuelle Angebote" }
+    ];
+
+    document.querySelectorAll("#nav-list a").forEach(a => {
+      const rawHref = (a.getAttribute("href") || "").split("?")[0].split("#")[0].trim();
+      const text = a.textContent.replace(/\s+/g, " ").trim();
+      if (rawHref && rawHref.endsWith(".html") && !eintraege.some(e => e.file === rawHref)) {
+        eintraege.push({ file: rawHref, label: `${text} (${rawHref})` });
+      }
+    });
+
+    eintraege.forEach(item => {
+      const isBlocked = blockedPagesSet.has(item.file);
+      const row = document.createElement("button");
+      row.type = "button";
+      row.style.cssText = `
+        display: flex; justify-content: space-between; align-items: center; gap: 10px;
+        width: 100%; text-align: left; padding: 9px 12px; border-radius: 6px;
+        border: 1px solid ${isBlocked ? "#ff8a80" : "rgba(255,255,255,0.25)"};
+        background: ${isBlocked ? "rgba(183, 28, 28, 0.45)" : "rgba(255,255,255,0.06)"};
+        color: #ffffff; cursor: pointer; font-size: 0.9rem;
+      `;
+      row.innerHTML = `
+        <span style="flex: 1;">${item.label}</span>
+        <span style="flex-shrink: 0; font-weight: bold; padding: 3px 8px; border-radius: 4px; background: ${isBlocked ? "#d32f2f" : "#2e7d32"};">
+          ${isBlocked ? "🛑 GESPERRT" : "✓ Aktiv"}
+        </span>
+      `;
+      row.addEventListener("click", () => {
+        if (blockedPagesSet.has(item.file)) {
+          blockedPagesSet.delete(item.file);
+        } else {
+          blockedPagesSet.add(item.file);
+        }
+        buildPagesListUI();
+      });
+      pagesContainer.appendChild(row);
+    });
+  }
+
+  // Aktuellen Stand live aus Drive laden
+  fetch(`${FFLW_WEB_APP_URL}?action=site_status&t=${Date.now()}`, {
+    method: "GET",
+    redirect: "follow"
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (!data || !data.ok) {
+        document.getElementById("fflw-gm-status").textContent = "❌ Fehler beim Laden.";
+        return;
+      }
+      selectedStil = data.flaggenStil || "A";
+      blockedPagesSet = new Set(Array.isArray(data.wartungSeiten) ? data.wartungSeiten : []);
+      document.getElementById("fflw-gm-code-input").value = data.zugangscode || "";
+      document.getElementById("fflw-gm-status").textContent = "✓ Aktueller Stand geladen. Änderungen unten speichern:";
+      refreshFlagButtonsUI();
+      buildPagesListUI();
+    })
+    .catch(err => {
+      document.getElementById("fflw-gm-status").textContent = "❌ Verbindungsfehler: " + err.message;
+    });
+
+  // Speichern
+  document.getElementById("fflw-gm-save").addEventListener("click", function () {
+    const saveBtn = this;
+    const statusEl = document.getElementById("fflw-gm-status");
+    const neuerCode = document.getElementById("fflw-gm-code-input").value.trim();
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "⏳ Wird in Google Drive gespeichert …";
+
+    fetch(FFLW_WEB_APP_URL, {
+      method: "POST",
+      redirect: "follow",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "save_site_status",
+        masterCode: verifiedCode,
+        flaggenStil: selectedStil,
+        wartungSeiten: Array.from(blockedPagesSet),
+        zugangscode: neuerCode
+      })
+    })
+      .then(r => r.json())
+      .then(res => {
+        if (res && res.ok) {
+          const fresh = {
+            wartungSeiten: res.wartungSeiten || [],
+            flaggenStil: res.flaggenStil || "A",
+            zugangscode: res.zugangscode || ""
+          };
+          setCachedSiteStatus(fresh);
+          renderGlobalFlagBar(currentPage, fresh.flaggenStil);
+          applyMaintenanceStateToPage(currentPage, fresh.wartungSeiten);
+          updateStickyHeaderOffset();
+
+          statusEl.textContent = "✅ Gespeichert und sofort auf der gesamten Webseite aktiv!";
+          saveBtn.style.background = "#1b5e20";
+          saveBtn.textContent = "✅ Gespeichert!";
+          setTimeout(() => {
+            saveBtn.disabled = false;
+            saveBtn.style.background = "#2e7d32";
+            saveBtn.textContent = "💾 Einstellungen jetzt speichern";
+          }, 1800);
+        } else {
+          alert("Fehler: " + (res && res.error ? res.error : "Unbekannt"));
+          saveBtn.disabled = false;
+          saveBtn.textContent = "💾 Einstellungen jetzt speichern";
+        }
+      })
+      .catch(err => {
+        alert("Verbindungsfehler: " + err.message);
+        saveBtn.disabled = false;
+        saveBtn.textContent = "💾 Einstellungen jetzt speichern";
+      });
+  });
+}
+
+// ============================================================================
+// 4. GOOGLE TRANSLATE, POPUPS & PWA
+// ============================================================================
 function applyGoogleTranslateCookie(langCode) {
   const host = window.location.hostname;
   const hostParts = host.split('.');
   const rootDomain = hostParts.length > 1 ? '.' + hostParts.slice(-2).join('.') : host;
 
-  // Zuerst alle eventuell vorhandenen alten Cookies auf allen Ebenen löschen
   const paths = ["/", "/Jimdo", "/Jimdo/"];
   const domains = ["", host, "." + host, rootDomain];
   paths.forEach(p => {
@@ -14,7 +459,6 @@ function applyGoogleTranslateCookie(langCode) {
     });
   });
 
-  // Danach nur ein einziges sauberes Cookie setzen
   if (langCode && langCode !== "de") {
     document.cookie = `googtrans=/de/${langCode}; path=/;`;
     if (rootDomain && rootDomain.startsWith(".")) {
@@ -23,7 +467,6 @@ function applyGoogleTranslateCookie(langCode) {
   }
 }
 
-// Merkt sich beim Öffnen der Sprachauswahl (fflw-international.html) die Herkunftsseite für den direkten Rücksprung
 (function rememberReturnPage() {
   const currentFile = window.location.pathname.split("/").pop() || "index.html";
   if (currentFile !== "fflw-international.html") return;
@@ -40,9 +483,7 @@ function applyGoogleTranslateCookie(langCode) {
           ret = refFile;
         }
       }
-    } catch (e) {
-      // Referrer ignorieren, falls nicht parsbar
-    }
+    } catch (e) {}
   }
 
   if (ret && /^[a-zA-Z0-9._-]+\.html$/.test(ret)) {
@@ -50,7 +491,6 @@ function applyGoogleTranslateCookie(langCode) {
   }
 })();
 
-// Prüft, ob in der aktuellen URL (Parameter oder Hash) ausdrücklich eine Fremdsprache angefordert wurde
 function getExplicitUrlLanguage() {
   const urlLang = new URLSearchParams(window.location.search).get("lang");
   if (urlLang && urlLang !== "de") return urlLang;
@@ -61,7 +501,6 @@ function getExplicitUrlLanguage() {
   return null;
 }
 
-// Hilfsfunktion: Liest die aktuell per URL, Hash oder Cookie gesetzte Sprache aus
 function getActiveLanguage() {
   const explicitLang = getExplicitUrlLanguage();
   if (explicitLang) return explicitLang;
@@ -70,7 +509,6 @@ function getActiveLanguage() {
   return cookieMatch ? cookieMatch[1] : null;
 }
 
-// Globale Funktion zum Wechseln oder Zurücksetzen der Sprache über die Flaggen
 function setLanguage(langCode) {
   const storedReturn = sessionStorage.getItem("fflw_return_page");
   const targetPage = (storedReturn && /^[a-zA-Z0-9._-]+\.html$/.test(storedReturn))
@@ -90,7 +528,6 @@ function setLanguage(langCode) {
   }
 }
 
-// Erzwingt auf Desktop & Mobil eine echte Neu-Übersetzung dynamischer Dialoge (nur falls noch unübersetzt)
 function forceGoogleTranslatePopup(targetLang, containerEl) {
   if (!targetLang || targetLang === "de") return;
   const combo = document.querySelector(".goog-te-combo");
@@ -107,7 +544,6 @@ function forceGoogleTranslatePopup(targetLang, containerEl) {
   });
 }
 
-// Zeigt einen Fallback-Balken NUR dann, wenn der Nutzer aktiv eine Sprache gewählt hat UND der Browser blockiert
 function showTranslateBlockedFallback(targetLang) {
   if (!targetLang || targetLang === "de") return;
   if (!getExplicitUrlLanguage()) return;
@@ -140,7 +576,6 @@ function showTranslateBlockedFallback(targetLang) {
   });
 }
 
-// Globaler Callback für Google Translate (explizit an window gebunden)
 window.googleTranslateElementInit = function () {
   const targetLang = getActiveLanguage();
 
@@ -177,7 +612,6 @@ window.googleTranslateElementInit = function () {
   }
 };
 
-// Hilfsfunktion: Lädt Google Translate (sichtbar im Render-Baum, aber außerhalb des Viewports)
 function startGoogleTranslate(activeLang) {
   if (!activeLang || activeLang === "de") return;
 
@@ -204,7 +638,6 @@ function startGoogleTranslate(activeLang) {
   document.body.appendChild(gtScript);
 }
 
-// Einheitliches, einmaliges Hinweis-Pop-up für Desktop UND Mobilgeräte
 function showLanguageHintOnce(activeLang) {
   if (!activeLang || activeLang === "de") return;
   if (sessionStorage.getItem("fflw_i18n_hint_shown") === "true") return;
@@ -305,7 +738,6 @@ function showLanguageHintOnce(activeLang) {
   });
 }
 
-// Öffnet das Dialogfenster für Probleme mit dem Übersetzungstool
 function openTranslationHelpDialog(activeLang) {
   if (document.getElementById("fflw-help-dialog-overlay")) return;
 
@@ -453,7 +885,6 @@ function openTranslationHelpDialog(activeLang) {
   });
 }
 
-// PWA App-Installation (1-Klick-Banner für Android + Kurzhinweis für iPhone)
 let deferredInstallPrompt = null;
 
 window.addEventListener("beforeinstallprompt", function (e) {
@@ -533,67 +964,24 @@ function showPwaInstallBanner(platform) {
   }
 }
 
-// Schützt vor eingefrorenem Handy-Cache beim Nutzen der Browser-Zurück-Taste
 window.addEventListener("pageshow", function (event) {
   if (event.persisted) {
     window.location.reload();
   }
 });
 
-// Baut das globale Flaggen-Laufband direkt unter dem Logo auf und hält die Header-Höhe aktuell
-function initGlobalFlagBarAndStickyOffset(currentPage) {
-  const siteHeader = document.querySelector(".site-header");
-  if (!siteHeader) return;
-
-  // Globales Flaggen-Laufband direkt unter dem Logo einfügen (auf allen Seiten außer der Sprachwahl selbst)
-  if (currentPage !== "fflw-international.html" && !siteHeader.querySelector(".global-flag-bar")) {
-    const flags = [
-      "🇦🇱", "🇸🇦", "🇹🇷", "🇺🇦", "🇷🇺", "🇮🇷", "🇦🇫", "🇪🇷", "🇸🇴",
-      "🇬🇧", "🇫🇷", "🇪🇸", "🇮🇹", "🇷🇴", "🇧🇬", "🇵🇱", "🇮🇳", "🇵🇰",
-      "🇸🇾", "🇮🇶", "🇽🇰", "🇬🇷", "🇭🇷", "🇷🇸", "🇳🇬", "🇬🇲", "🇩🇪"
-    ];
-    const flagSpans = flags.map(f => `<span>${f}</span>`).join("");
-
-    const flagBar = document.createElement("a");
-    flagBar.href = `fflw-international.html?return=${encodeURIComponent(currentPage)}`;
-    flagBar.className = "global-flag-bar notranslate";
-    flagBar.setAttribute("translate", "no");
-    flagBar.setAttribute("aria-label", "Sprache wählen / Translate page");
-    flagBar.innerHTML = `
-      <div class="global-flag-marquee" aria-hidden="true">
-        <div class="global-flag-track">
-          ${flagSpans}${flagSpans}
-        </div>
-      </div>
-      <span class="global-flag-cta">🌐 Sprache / Language ▸</span>
-    `;
-    siteHeader.appendChild(flagBar);
-  }
-
-  // Exakte Höhe des Headers messen, damit das linke Desktop-Menü immer nahtlos darunter klebt
-  const updateHeaderOffset = () => {
-    const h = siteHeader.offsetHeight;
-    if (h > 0) {
-      document.documentElement.style.setProperty("--header-offset", `${h + 12}px`);
-    }
-  };
-
-  updateHeaderOffset();
-  window.addEventListener("resize", updateHeaderOffset);
-  if ("ResizeObserver" in window) {
-    const ro = new ResizeObserver(updateHeaderOffset);
-    ro.observe(siteHeader);
-  }
-}
-
 document.addEventListener("DOMContentLoaded", function () {
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
-  // 0. Globales Flaggen-Laufband direkt unter dem Logo & Sticky-Menü-Abstand aktivieren
-  initGlobalFlagBarAndStickyOffset(currentPage);
+  // 0. Globales Flaggen-Laufband, Sticky-Header-Höhe & globale Wartungs-Sperre aktivieren
+  syncGlobalSiteStatus(currentPage);
+  window.addEventListener("resize", updateStickyHeaderOffset);
+  const siteHeader = document.querySelector(".site-header");
+  if (siteHeader && "ResizeObserver" in window) {
+    new ResizeObserver(updateStickyHeaderOffset).observe(siteHeader);
+  }
 
-  // 1. Sprache prüfen: Wenn URL-Parameter oder Hash eine Sprache verlangen,
-  //    Cookie synchronisieren und Hinweis-Pop-up einmalig öffnen
+  // 1. Sprache prüfen
   let explicitLang = null;
   let activeLang = null;
   try {
@@ -659,7 +1047,6 @@ document.addEventListener("DOMContentLoaded", function () {
               parentDetails.setAttribute("open", "");
             }
           }
-          // Auch dem Menü-Link zu fflw-international.html den Rücksprung-Parameter mitgeben
           if (href === "fflw-international.html" && currentPage !== "fflw-international.html") {
             link.setAttribute("href", `fflw-international.html?return=${encodeURIComponent(currentPage)}`);
           }
@@ -725,13 +1112,29 @@ document.addEventListener("DOMContentLoaded", function () {
   gcScript.setAttribute("data-goatcounter", `https://${goatCounterSite}.goatcounter.com/count`);
   document.body.appendChild(gcScript);
 
-  // 6. Unauffälligen "SA"-Link in der Fußzeile neben Sitemap ergänzen
+  // 6. Unauffälligen "SA"-Link & globalen Master-Schalter "⚙" in der Fußzeile ergänzen
   const legalFooter = document.querySelector(".legal-footer");
-  if (legalFooter && !legalFooter.querySelector('a[href="intern-statistik.html"]')) {
-    legalFooter.insertAdjacentHTML(
-      "beforeend",
-      ' | <a href="intern-statistik.html" title="Vereinsinterna" style="opacity: 0.65;">SA</a>'
-    );
+  if (legalFooter) {
+    if (!legalFooter.querySelector('a[href="intern-statistik.html"]')) {
+      legalFooter.insertAdjacentHTML(
+        "beforeend",
+        ' | <a href="intern-statistik.html" title="Vereinsinterna" style="opacity: 0.65;">SA</a>'
+      );
+    }
+    if (!legalFooter.querySelector("#fflw-global-master-trigger")) {
+      const trigger = document.createElement("a");
+      trigger.id = "fflw-global-master-trigger";
+      trigger.href = "#";
+      trigger.title = "Webseiten-Steuerung (Master)";
+      trigger.style.cssText = "opacity: 0.55; margin-left: 6px; text-decoration: none;";
+      trigger.textContent = "⚙";
+      trigger.addEventListener("click", function (e) {
+        e.preventDefault();
+        openGlobalMasterModal(currentPage);
+      });
+      legalFooter.appendChild(document.createTextNode(" | "));
+      legalFooter.appendChild(trigger);
+    }
   }
 
   // 7. PWA-Manifest, Apple-Icon und Service Worker zentral registrieren
@@ -753,7 +1156,6 @@ document.addEventListener("DOMContentLoaded", function () {
     navigator.serviceWorker.register("./sw.js").catch(err => console.error("SW Fehler:", err));
   }
 
-  // Auf iPhone/iPad (Safari) den kurzen Homescreen-Hinweis einblenden
   const isIos = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
   const isInStandaloneMode = window.navigator.standalone === true;
   if (isIos && !isInStandaloneMode) {
