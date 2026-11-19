@@ -76,7 +76,7 @@
     <main class="content">
       <h2>Aktuelle Angebote</h2>
 
-      <!-- Sprachenknopf: verlinkt auf fflw-international.html und springt direkt auf aktuelle-angebote.html zurück -->
+      <!-- Sprachenknopf -->
       <p style="margin: 14px 0 22px 0;">
         <a href="fflw-international.html?return=aktuelle-angebote.html"
            style="display: inline-flex; align-items: center; gap: 10px; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
@@ -116,16 +116,24 @@
 
       <!-- Geheimer Handy-Master-Bereich (öffnet sich nur bei Eingabe des Master-Codes) -->
       <section id="fflw-master-panel" style="display: none; margin-top: 28px; padding: 20px; border: 3px solid #ffd700; border-radius: 10px; background: rgba(20, 28, 36, 0.96); color: #ffffff; box-shadow: 0 6px 20px rgba(0,0,0,0.45);">
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,215,0,0.4); padding-bottom: 12px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,215,0,0.4); padding-bottom: 12px; margin-bottom: 14px;">
           <h3 style="margin: 0; color: #ffd700;">🔑 Handy-Master: Reservierte Möbel freigeben</h3>
           <button type="button" id="fflw-master-close" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">
             Schließen ✕
           </button>
         </div>
 
-        <p style="font-size: 0.92rem; margin-top: 0; color: #e0e0e0;">
-          Tippe bei einem stornierten Möbelstück auf <strong>„↺ Wieder freigeben“</strong> – es wird sofort aus <em>Reserviert</em> zurück in <em>Aktuelle Angebote</em> verschoben.
+        <p style="font-size: 0.92rem; margin: 0 0 12px 0; color: #e0e0e0;">
+          Tippe bei einem Stück auf <strong>„↺ Wieder freigeben“</strong> (du kannst danach direkt beim nächsten weitermachen) – oder nutze den Knopf für alle auf einmal. Dauer: ca. <strong>2–4 Sek.</strong> pro Stück (bzw. <strong>5–12 Sek.</strong> für alle).
         </p>
+
+        <!-- Knopf: ALLE auf einmal wieder freigeben -->
+        <div id="fflw-master-alle-box" style="display: none; margin-bottom: 16px;">
+          <button type="button" id="fflw-master-alle-btn"
+                  style="width: 100%; background-color: #d84315; color: #ffffff; border: 2px solid #ffd700; padding: 12px 18px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.35);">
+            ↺ ALLE reservierten Möbel auf einmal wieder freigeben
+          </button>
+        </div>
 
         <div id="fflw-master-status" style="font-weight: bold; margin-bottom: 12px; color: #ffd700;"></div>
         <div id="fflw-master-liste" style="display: flex; flex-direction: column; gap: 14px;"></div>
@@ -278,14 +286,11 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       // =========================================================================
-      // EINSTELLUNGEN FÜR ZUGANGSCODE, MASTER-CODE & ARTIKEL-BEGRENZUNG:
-      // 1) ZUGANGS_CODE: Deine Basis-Zahl (z. B. "11"). Leer "" = Schutz aus.
+      // EINSTELLUNGEN:
+      // 1) ZUGANGS_CODE: Basis-Zahl (z. B. "11"). Leer "" = Schutz aus.
       // 2) STANDARD_MAX_ARTIKEL: Wie viele Artikel man mit "11" wählen darf (z. B. 2).
-      //    TRICK: Gibst du jemandem "11-4", darf diese Person 4 Artikel wählen!
-      //           Gibst du jemandem "11-1", darf diese Person nur 1 Artikel wählen!
-      //           (0 = keine Begrenzung)
-      // 3) MASTER_ADMIN_CODE: Geheimer Code zum Öffnen des Handy-Master-Bereichs
-      //    (muss exakt mit MASTER_ADMIN_CODE im Google Apps Script übereinstimmen!)
+      // 3) MASTER_ADMIN_CODE: Geheimer Code zum Öffnen des Handy-Master-Bereichs.
+      //    Groß- und Kleinschreibung ist egal!
       // =========================================================================
       const ZUGANGS_CODE = "11";
       const STANDARD_MAX_ARTIKEL = 2;
@@ -305,28 +310,36 @@
       const masterListeEl = document.getElementById("fflw-master-liste");
       const masterStatusEl = document.getElementById("fflw-master-status");
       const masterCloseBtn = document.getElementById("fflw-master-close");
+      const masterAlleBox = document.getElementById("fflw-master-alle-box");
+      const masterAlleBtn = document.getElementById("fflw-master-alle-btn");
+
+      let aktiverMasterCode = "";
 
       if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
         codeBoxEl.style.display = "block";
         codeInputEl.required = true;
       }
 
-      // Prüft den eingegebenen Zugangscode und liefert { gueltig, maxArtikel }
+      // Prüft den eingegebenen Zugangscode (Groß-/Kleinschreibung egal)
       function pruefeZugangsCode() {
-        const basis = (ZUGANGS_CODE || "").trim();
+        const basis = (ZUGANGS_CODE || "").trim().toLowerCase();
         if (!basis) {
           return { gueltig: true, maxArtikel: STANDARD_MAX_ARTIKEL };
         }
-        const eingabe = codeInputEl.value.trim();
+        const eingabe = codeInputEl.value.trim().toLowerCase();
         if (eingabe === basis) {
           return { gueltig: true, maxArtikel: STANDARD_MAX_ARTIKEL };
         }
-        // Trick: Format "11-3" erlaubt 3 Artikel, "11-1" erlaubt 1 Artikel
-        const match = eingabe.match(/^([a-zA-Z0-9]+)-(\d+)$/);
+        const match = eingabe.match(/^([a-z0-9]+)-(\d+)$/);
         if (match && match[1] === basis) {
           return { gueltig: true, maxArtikel: parseInt(match[2], 10) };
         }
         return { gueltig: false, maxArtikel: STANDARD_MAX_ARTIKEL };
+      }
+
+      function istMasterCode(eingabe) {
+        const ziel = (MASTER_ADMIN_CODE || "").trim().toLowerCase();
+        return ziel !== "" && String(eingabe || "").trim().toLowerCase() === ziel;
       }
 
       function retranslate(targetEl) {
@@ -381,16 +394,20 @@
       }
 
       // =========================================================================
-      // HANDY-MASTER-BEREICH: SCHLIESSEN, LADEN & 1-KLICK-FREIGABE
+      // HANDY-MASTER-BEREICH: EINZELN & ALLE FREIGEBEN
       // =========================================================================
       masterCloseBtn.addEventListener("click", function () {
         masterPanelEl.style.display = "none";
+        aktiverMasterCode = "";
         codeInputEl.value = "";
+        feedbackEl.textContent = "";
         updateAuswahlCounter();
       });
 
       function ladeReservierteFuerMaster(code) {
+        aktiverMasterCode = code;
         masterPanelEl.style.display = "block";
+        masterAlleBox.style.display = "none";
         masterStatusEl.textContent = "⏳ Lade reservierte Möbel aus Google Drive …";
         masterListeEl.innerHTML = "";
         masterPanelEl.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -416,10 +433,17 @@
             }
 
             masterStatusEl.textContent = "Gefundene Reservierungen: " + data.items.length;
+            if (data.items.length >= 2) {
+              masterAlleBox.style.display = "block";
+              masterAlleBtn.disabled = false;
+              masterAlleBtn.style.backgroundColor = "#d84315";
+              masterAlleBtn.textContent = "↺ ALLE " + data.items.length + " reservierten Möbel auf einmal freigeben";
+            }
 
             data.items.forEach(item => {
               const karte = document.createElement("div");
-              karte.style.cssText = "display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.25);";
+              karte.className = "fflw-master-item";
+              karte.style.cssText = "display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.25); transition: all 0.25s;";
 
               const imgHtml = item.bildUrl
                 ? `<img src="${item.bildUrl}" alt="" style="width: 84px; height: 84px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc; flex-shrink: 0;">`
@@ -444,7 +468,7 @@
                   return;
                 }
                 btn.disabled = true;
-                btn.textContent = "⏳ Wird freigegeben …";
+                btn.textContent = "⏳ Dauert ca. 3 Sek. …";
                 btn.style.backgroundColor = "#666";
 
                 fetch(WEB_APP_URL, {
@@ -453,7 +477,7 @@
                   headers: { "Content-Type": "text/plain;charset=utf-8" },
                   body: JSON.stringify({
                     action: "admin_release",
-                    masterCode: code,
+                    masterCode: aktiverMasterCode,
                     ordnerId: item.id
                   })
                 })
@@ -461,9 +485,11 @@
                   .then(resData => {
                     if (resData.ok) {
                       karte.style.borderColor = "#4caf50";
-                      karte.style.background = "rgba(46, 125, 50, 0.25)";
+                      karte.style.background = "rgba(46, 125, 50, 0.28)";
                       btn.textContent = "✓ Wieder online!";
                       btn.style.backgroundColor = "#1b5e20";
+                      masterStatusEl.textContent = "✓ „" + item.artikelName + "“ ist wieder frei. Du kannst direkt beim nächsten Stück weitermachen.";
+                      // Galerie im Hintergrund aktualisieren, Master-Fenster bleibt dabei offen!
                       ladeAngebote();
                     } else {
                       alert("Fehler: " + (resData.error || "Unbekannt"));
@@ -488,14 +514,71 @@
           });
       }
 
-      codeInputEl.addEventListener("input", function () {
-        updateAuswahlCounter();
-        if (MASTER_ADMIN_CODE && codeInputEl.value.trim() === MASTER_ADMIN_CODE) {
-          ladeReservierteFuerMaster(MASTER_ADMIN_CODE);
+      // Klick auf "ALLE auf einmal wieder freigeben"
+      masterAlleBtn.addEventListener("click", function () {
+        if (!confirm("Möchtest du wirklich ALLE reservierten Möbelstücke auf einmal wieder freigeben?")) {
+          return;
         }
+        masterAlleBtn.disabled = true;
+        masterAlleBtn.style.backgroundColor = "#666";
+        masterAlleBtn.textContent = "⏳ Alle werden freigegeben (dauert ca. 5–12 Sek.) …";
+        masterStatusEl.textContent = "⏳ Bitte kurz warten, alle Ordner werden zurückgeschoben …";
+
+        // Einzel-Buttons währenddessen sperren
+        masterListeEl.querySelectorAll(".fflw-release-btn").forEach(b => b.disabled = true);
+
+        fetch(WEB_APP_URL, {
+          method: "POST",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "admin_release_all",
+            masterCode: aktiverMasterCode
+          })
+        })
+          .then(r => r.json())
+          .then(resData => {
+            if (resData.ok) {
+              masterAlleBox.style.display = "none";
+              masterStatusEl.textContent = "✅ Fertig! Alle " + resData.anzahl + " Möbelstücke sind wieder online.";
+              masterListeEl.querySelectorAll(".fflw-master-item").forEach(k => {
+                k.style.borderColor = "#4caf50";
+                k.style.background = "rgba(46, 125, 50, 0.28)";
+              });
+              masterListeEl.querySelectorAll(".fflw-release-btn").forEach(b => {
+                b.textContent = "✓ Wieder online!";
+                b.style.backgroundColor = "#1b5e20";
+              });
+              ladeAngebote();
+            } else {
+              alert("Fehler: " + (resData.error || "Unbekannt"));
+              masterAlleBtn.disabled = false;
+              masterAlleBtn.style.backgroundColor = "#d84315";
+              masterAlleBtn.textContent = "↺ ALLE reservierten Möbel auf einmal wieder freigeben";
+            }
+          })
+          .catch(err => {
+            alert("Verbindungsfehler: " + err.message);
+            masterAlleBtn.disabled = false;
+            masterAlleBtn.style.backgroundColor = "#d84315";
+            masterAlleBtn.textContent = "↺ ALLE reservierten Möbel auf einmal wieder freigeben";
+          });
       });
 
-      // Erzeugt einen kräftigen, unübersehbaren Trennbalken zwischen Artikeln
+      // Lauscht auf die Eingabe im Code-Feld (Groß-/Kleinschreibung egal)
+      codeInputEl.addEventListener("input", function () {
+        const aktuellerWert = codeInputEl.value;
+        if (istMasterCode(aktuellerWert)) {
+          // Feld leeren, damit unten nie "Falscher Code" gemeldet wird
+          codeInputEl.value = "";
+          feedbackEl.textContent = "";
+          updateAuswahlCounter();
+          ladeReservierteFuerMaster(aktuellerWert.trim());
+          return;
+        }
+        updateAuswahlCounter();
+      });
+
       function createTrennBalken() {
         const balken = document.createElement("div");
         balken.setAttribute("aria-hidden", "true");
@@ -620,6 +703,14 @@
         feedbackEl.textContent = "";
         feedbackEl.style.color = "#ffffff";
 
+        // Falls jemand doch den Master-Code + Enter gedrückt hat
+        if (istMasterCode(codeInputEl.value)) {
+          const c = codeInputEl.value.trim();
+          codeInputEl.value = "";
+          ladeReservierteFuerMaster(c);
+          return;
+        }
+
         const codeStatus = pruefeZugangsCode();
         if (!codeStatus.gueltig) {
           feedbackEl.style.color = "#ff8a80";
@@ -700,7 +791,6 @@
           });
       });
 
-      // Startet beim Öffnen der Seite
       ladeAngebote();
     });
   </script>
