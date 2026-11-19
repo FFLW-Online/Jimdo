@@ -9,7 +9,7 @@
   --bg-color: #ffffff;
   --light-bg: #f4f4f4;
   --border-color: #dddddd;
-  --header-offset: 185px;
+  --header-offset: 195px;
 }
 
 * {
@@ -54,12 +54,12 @@ html, body {
 }
 
 /* ==========================================================================
-2. HEADER, FLAGGEN-LAUFBAND & LAYOUT
+2. HEADER, FLAGGEN-LAUFBAND (STILE A, B, C) & LAYOUT
    ========================================================================== */
 .site-header {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 16px 25px 10px 25px;
+  padding: 18px 25px 12px 25px;
   text-align: center;
   background-color: #ffffff;
   border-radius: 4px 4px 0 0;
@@ -70,27 +70,85 @@ html, body {
   margin: 0 auto;
 }
 
-/* Globales Flaggen-Laufband direkt unter dem Logo */
+/* Gemeinsame Basis für das globale Flaggenband mit großzügigem Abstand zum Logo */
 .global-flag-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: 10px;
-  padding: 6px 12px;
-  background: linear-gradient(90deg, #f0f5fa 0%, #e4eef8 100%);
-  border: 1px solid #c5d7eb;
-  border-left: 4px solid var(--primary-color);
-  border-radius: 6px;
+  gap: 10px;
+  margin-top: 20px;
   text-decoration: none;
   color: var(--primary-color) !important;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
   overflow: hidden;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-.global-flag-bar:hover {
-  background: linear-gradient(90deg, #e4eef8 0%, #d6e6f7 100%);
-  box-shadow: 0 2px 6px rgba(0, 64, 128, 0.15);
+/* STIL A (Standard): Zeigehand + pulsierende Radar-Kreiswellen an der Fingerspitze */
+.global-flag-bar.style-A {
+  padding: 6px 12px;
+  background: linear-gradient(90deg, #f2f6fb 0%, #e6eff9 50%, #f2f6fb 100%);
+  border: 1px solid #c5d7eb;
+  border-radius: 8px;
+}
+
+.global-flag-bar.style-A:hover {
+  background: linear-gradient(90deg, #e6eff9 0%, #d8e7f7 50%, #e6eff9 100%);
+  box-shadow: 0 2px 8px rgba(0, 64, 128, 0.16);
+}
+
+/* STIL B: 3D-Chip mit Vereinsblau-Rahmen und Richtungsbogen */
+.global-flag-bar.style-B {
+  padding: 5px 8px;
+  background: #ffffff;
+  border: 2px solid var(--primary-color);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 64, 128, 0.12);
+}
+
+.global-flag-bar.style-B:hover {
+  background: #f4f8fc;
+  box-shadow: 0 4px 10px rgba(0, 64, 128, 0.22);
+}
+
+/* STIL C: Minimalistisch, schmal & luftig ohne schweren Rahmen */
+.global-flag-bar.style-C {
+  margin-top: 22px;
+  padding: 3px 6px;
+  background: transparent;
+  border-top: 1px solid #dce6f2;
+  border-bottom: 1px solid #dce6f2;
+  border-radius: 0;
+}
+
+.global-flag-bar.style-C:hover {
+  background: #f7fafe;
+}
+
+.global-flag-hand {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.global-flag-bar.style-B .global-flag-hand {
+  background: var(--primary-color);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* Sanftes Pulsieren der Radar-Kreiswellen an der Fingerspitze */
+@keyframes fflw-tap-wave {
+  0%   { opacity: 0.95; transform: scale(0.88); }
+  50%  { opacity: 0.45; transform: scale(1.08); }
+  100% { opacity: 0.95; transform: scale(0.88); }
+}
+
+.fflw-wave-ring {
+  transform-origin: center;
+  animation: fflw-tap-wave 2s ease-in-out infinite;
 }
 
 .global-flag-marquee {
@@ -98,8 +156,8 @@ html, body {
   overflow: hidden;
   white-space: nowrap;
   position: relative;
-  mask-image: linear-gradient(to right, transparent 0%, #000 4%, #000 96%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 4%, #000 96%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, #000 3%, #000 97%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 3%, #000 97%, transparent 100%);
 }
 
 .global-flag-track {
@@ -114,28 +172,19 @@ html, body {
 
 .global-flag-track span {
   display: inline-block;
-  font-size: 1.25rem;
-  margin-right: 10px;
+  font-size: 1.28rem;
+  margin-right: 11px;
   line-height: 1.2;
+}
+
+.global-flag-bar.style-C .global-flag-track span {
+  font-size: 1.12rem;
+  margin-right: 9px;
 }
 
 @keyframes global-flag-scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
-}
-
-.global-flag-cta {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background-color: var(--primary-color);
-  color: #ffffff;
-  font-size: 0.85rem;
-  font-weight: bold;
-  padding: 5px 11px;
-  border-radius: 4px;
-  white-space: nowrap;
 }
 
 /* Desktop: Header + Flaggenband bleiben oben immer sichtbar stehen */
@@ -175,8 +224,8 @@ html, body {
 @media (min-width: 768px) {
   .side-nav {
     position: sticky;
-    top: var(--header-offset, 185px);
-    max-height: calc(100vh - var(--header-offset, 185px) - 16px);
+    top: var(--header-offset, 195px);
+    max-height: calc(100vh - var(--header-offset, 195px) - 16px);
     overflow-y: auto;
     overscroll-behavior: contain;
     z-index: 800;
@@ -210,7 +259,6 @@ html, body {
   padding: 0 !important;
 }
 
-/* 3.1 Browser-Standards für Aufklappmenüs (<details> & <summary>) bereinigen */
 .side-nav details {
   display: block;
   margin: 0 !important;
@@ -236,7 +284,6 @@ html, body {
   content: "" !important;
 }
 
-/* 3.2 Normale Direkt-Links ausrichten */
 .nav-list > li > a,
 .nav-list > li > a:visited {
   display: block;
@@ -249,7 +296,6 @@ html, body {
   box-sizing: border-box;
 }
 
-/* 3.3 Doppel-Padding bei Links innerhalb von <summary> unterbinden */
 .side-nav details summary a,
 .side-nav details summary a:visited {
   display: inline-block;
@@ -265,7 +311,6 @@ html, body {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* Flexbox für Übersetzungstool im Menü */
 .nav-link-flex {
   display: flex !important;
   align-items: center;
@@ -297,7 +342,6 @@ html, body {
   100% { transform: translateX(-50%); }
 }
 
-/* 3.4 Sub-Menüs (Unterpunkte) gezielt einrücken & auf leuchtendes Weiß zwingen */
 .side-nav details ul li a,
 .side-nav details ul li a:visited {
   display: block;
@@ -315,7 +359,6 @@ html, body {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Plus- & Minus-Kästchen im Menü */
 .side-nav summary::after {
   content: "+";
   position: absolute;
@@ -341,7 +384,7 @@ html, body {
 }
 
 /* ==========================================================================
-4. INHALTSBEREICH (TEIL DER NAHTLOSEN WEISSEN FLÄCHE)
+4. INHALTSBEREICH, WARTUNGS-KARTE & LIVE-AUSGRAUEN RESERVIERTER ARTIKEL
    ========================================================================== */
 .content {
   flex-grow: 1;
@@ -359,6 +402,52 @@ html, body {
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
+}
+
+/* Wartungskarte mit Stopp-Händen in Vereinsfarben */
+.fflw-maintenance-card {
+  background: linear-gradient(180deg, #f4f8fc 0%, #ffffff 100%);
+  border: 2px solid var(--primary-color);
+  border-top: 8px solid var(--accent-color);
+  border-radius: 12px;
+  padding: 28px 22px;
+  margin: 15px 0 25px 0;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 64, 128, 0.12);
+}
+
+.fflw-maintenance-card h2 {
+  color: var(--primary-color);
+  font-size: 1.45rem;
+  margin: 12px 0 10px 0;
+}
+
+.fflw-maintenance-card p {
+  max-width: 540px;
+  margin: 0 auto 14px auto;
+  font-size: 1.02rem;
+  color: #333333;
+}
+
+/* Live-Ausgrauen, wenn ein Artikel während des Stöberns reserviert wurde */
+.fflw-artikel-karte.fflw-bereits-reserviert {
+  opacity: 0.48;
+  filter: grayscale(85%);
+  pointer-events: none;
+  position: relative;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+.fflw-reserviert-banner {
+  background-color: #b71c1c;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  border: 2px solid #ffd700;
+  text-align: center;
+  font-size: 0.98rem;
 }
 
 /* ==========================================================================
@@ -454,13 +543,8 @@ html, body {
   }
 
   .global-flag-bar {
-    padding: 5px 8px;
-    gap: 8px;
-  }
-
-  .global-flag-cta {
-    font-size: 0.78rem;
-    padding: 4px 8px;
+    margin-top: 14px;
+    gap: 6px;
   }
 
   .layout {
