@@ -49,8 +49,8 @@
       transition: background 0.2s, border-color 0.2s;
     }
     .fflw-checkbox-label:hover {
-      background: rgba(255, 215, 0, 0.18);
-      border-color: #ffd700;
+      background: rgba(255, 255, 255, 0.22);
+      border-color: #ffffff;
     }
     .fflw-checkbox-label input[type="checkbox"] {
       width: 22px;
@@ -58,6 +58,17 @@
       accent-color: #2e7d32;
       cursor: pointer;
       flex-shrink: 0;
+    }
+    /* Trennbalken im Stil/Farbton des Freundeskreis-Logos */
+    .fflw-logo-trennbalken {
+      display: block;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(90deg, var(--primary-color, #1b5e20), var(--accent-color, #2e7d32), var(--primary-color, #1b5e20));
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 4px;
+      margin: 42px 0 26px 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     }
   </style>
 </head>
@@ -90,14 +101,25 @@
         </a>
       </p>
 
-      <p>
-        Hier findest du unsere aktuell verfügbaren Möbelstücke. Alle angezeigten Artikel sind noch frei und können direkt hier auf dieser Seite reserviert werden.
-      </p>
+      <!-- Fairness- & Maß-Appell statt starrer Artikelbegrenzung -->
+      <div style="margin: 16px 0 22px 0; padding: 16px 18px; border-left: 6px solid #4caf50; background: rgba(255, 255, 255, 0.12); border-radius: 8px;">
+        <p style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: bold;">
+          🤝 Eine herzliche Bitte vorab (Fairness &amp; Maß):
+        </p>
+        <p style="margin: 0 0 8px 0;">
+          Wir verzichten bewusst auf eine starre Stückzahl-Begrenzung, damit Familien alles bekommen können, was sie wirklich brauchen. Bitte prüfe vor dem Reservieren kurz selbst:
+        </p>
+        <ul style="margin: 0; padding-left: 20px;">
+          <li><strong>Passt das Möbelstück wirklich</strong> in deine Wohnung und durch das Treppenhaus / die Türen?</li>
+          <li><strong>Wird es für deinen eigenen Haushalt benötigt</strong> – oder bleibt auch noch genug für andere Familien übrig?</li>
+          <li>Unsere Helferinnen und Helfer arbeiten <strong>komplett ehrenamtlich</strong> und haben nur begrenzte Transport-Kapazitäten. Vielen Dank für deine Rücksicht!</li>
+        </ul>
+      </div>
 
       <p><strong>So funktioniert die Reservierung:</strong></p>
       <ol>
         <li>Setze bei den gewünschten Möbeln direkt unter dem Foto ein Häkchen bei <strong>„▲ Diesen Artikel darüber reservieren“</strong>.</li>
-        <li>Trage ganz unten deine Kontaktdaten ein (Name und Telefonnummer oder E-Mail).</li>
+        <li>Trage ganz unten deine Kontaktdaten ein (Name, Zugangscode und Telefonnummer oder E-Mail).</li>
         <li>Klicke auf den grünen Knopf <strong>„Verbindlich reservieren“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
       </ol>
 
@@ -147,14 +169,14 @@
           Ausgewählte Artikel: 0
         </p>
 
-        <!-- Zugangscode + automatische Artikelbegrenzung -->
-        <div id="fflw-code-box" style="display: none; margin-bottom: 16px; padding: 12px 14px; border-radius: 6px; background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700;">
+        <!-- Zugangscode (ohne starre Stückzahl-Begrenzung) -->
+        <div id="fflw-code-box" style="display: none; margin-bottom: 16px; padding: 12px 14px; border-radius: 6px; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.45);">
           <label for="fflw-res-code" style="display: block; font-weight: bold; margin-bottom: 4px;">
             Zugangscode (Zahl vom Freundeskreis) *
           </label>
           <input type="text" id="fflw-res-code" autocomplete="off"
                  style="width: 160px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
-          <div id="fflw-code-limit-hinweis" style="margin-top: 6px; font-size: 0.9rem; font-weight: bold; color: #ffd700;"></div>
+          <div id="fflw-code-limit-hinweis" style="margin-top: 6px; font-size: 0.9rem; font-weight: bold; color: #a5d6a7;"></div>
         </div>
 
         <div style="margin-bottom: 14px;">
@@ -288,12 +310,11 @@
       // =========================================================================
       // EINSTELLUNGEN:
       // 1) ZUGANGS_CODE: Basis-Zahl (z. B. "11"). Leer "" = Schutz aus.
-      // 2) STANDARD_MAX_ARTIKEL: Wie viele Artikel man mit "11" wählen darf (z. B. 2).
-      // 3) MASTER_ADMIN_CODE: Geheimer Code zum Öffnen des Handy-Master-Bereichs.
+      //    Keine starre Artikelbegrenzung mehr (Fairness-Appell steht oben).
+      // 2) MASTER_ADMIN_CODE: Geheimer Code zum Öffnen des Handy-Master-Bereichs.
       //    Groß- und Kleinschreibung ist egal!
       // =========================================================================
       const ZUGANGS_CODE = "11";
-      const STANDARD_MAX_ARTIKEL = 2;
       const MASTER_ADMIN_CODE = "FFLW-99";
 
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
@@ -320,21 +341,12 @@
         codeInputEl.required = true;
       }
 
-      // Prüft den eingegebenen Zugangscode (Groß-/Kleinschreibung egal)
-      function pruefeZugangsCode() {
+      // Prüft den eingegebenen Zugangscode (Groß-/Kleinschreibung egal, keine Stückzahl-Sperre)
+      function istZugangsCodeGueltig() {
         const basis = (ZUGANGS_CODE || "").trim().toLowerCase();
-        if (!basis) {
-          return { gueltig: true, maxArtikel: STANDARD_MAX_ARTIKEL };
-        }
+        if (!basis) return true;
         const eingabe = codeInputEl.value.trim().toLowerCase();
-        if (eingabe === basis) {
-          return { gueltig: true, maxArtikel: STANDARD_MAX_ARTIKEL };
-        }
-        const match = eingabe.match(/^([a-z0-9]+)-(\d+)$/);
-        if (match && match[1] === basis) {
-          return { gueltig: true, maxArtikel: parseInt(match[2], 10) };
-        }
-        return { gueltig: false, maxArtikel: STANDARD_MAX_ARTIKEL };
+        return eingabe === basis;
       }
 
       function istMasterCode(eingabe) {
@@ -353,36 +365,10 @@
       function updateAuswahlCounter() {
         const allBoxes = Array.from(container.querySelectorAll('input[type="checkbox"]'));
         const checked = allBoxes.filter(cb => cb.checked);
-        const codeStatus = pruefeZugangsCode();
-        const limit = codeStatus.maxArtikel;
-
-        if (limit > 0) {
-          auswahlInfoEl.textContent = "Ausgewählte Artikel: " + checked.length + " (maximal " + limit + " erlaubt)";
-          const limitErreicht = checked.length >= limit;
-          allBoxes.forEach(cb => {
-            if (!cb.checked) {
-              cb.disabled = limitErreicht;
-              if (cb.parentElement) {
-                cb.parentElement.style.opacity = limitErreicht ? "0.45" : "1";
-                cb.parentElement.style.cursor = limitErreicht ? "not-allowed" : "pointer";
-              }
-            }
-          });
-        } else {
-          auswahlInfoEl.textContent = "Ausgewählte Artikel: " + checked.length;
-          allBoxes.forEach(cb => {
-            cb.disabled = false;
-            if (cb.parentElement) {
-              cb.parentElement.style.opacity = "1";
-              cb.parentElement.style.cursor = "pointer";
-            }
-          });
-        }
+        auswahlInfoEl.textContent = "Ausgewählte Artikel: " + checked.length;
 
         if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
-          if (codeStatus.gueltig && limit > 0) {
-            codeLimitHinweisEl.textContent = "✓ Code gültig: Du kannst bis zu " + limit + " Artikel reservieren.";
-          } else if (codeStatus.gueltig) {
+          if (istZugangsCodeGueltig()) {
             codeLimitHinweisEl.textContent = "✓ Code gültig.";
           } else {
             codeLimitHinweisEl.textContent = "";
@@ -412,14 +398,10 @@
         masterListeEl.innerHTML = "";
         masterPanelEl.scrollIntoView({ behavior: "smooth", block: "start" });
 
-        fetch(WEB_APP_URL, {
-          method: "POST",
-          redirect: "follow",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            action: "admin_list",
-            masterCode: code
-          })
+        const url = WEB_APP_URL + "?action=admin_list&masterCode=" + encodeURIComponent(code) + "&t=" + Date.now();
+        fetch(url, {
+          method: "GET",
+          redirect: "follow"
         })
           .then(res => res.json())
           .then(data => {
@@ -489,7 +471,6 @@
                       btn.textContent = "✓ Wieder online!";
                       btn.style.backgroundColor = "#1b5e20";
                       masterStatusEl.textContent = "✓ „" + item.artikelName + "“ ist wieder frei. Du kannst direkt beim nächsten Stück weitermachen.";
-                      // Galerie im Hintergrund aktualisieren, Master-Fenster bleibt dabei offen!
                       ladeAngebote();
                     } else {
                       alert("Fehler: " + (resData.error || "Unbekannt"));
@@ -514,7 +495,6 @@
           });
       }
 
-      // Klick auf "ALLE auf einmal wieder freigeben"
       masterAlleBtn.addEventListener("click", function () {
         if (!confirm("Möchtest du wirklich ALLE reservierten Möbelstücke auf einmal wieder freigeben?")) {
           return;
@@ -524,7 +504,6 @@
         masterAlleBtn.textContent = "⏳ Alle werden freigegeben (dauert ca. 5–12 Sek.) …";
         masterStatusEl.textContent = "⏳ Bitte kurz warten, alle Ordner werden zurückgeschoben …";
 
-        // Einzel-Buttons währenddessen sperren
         masterListeEl.querySelectorAll(".fflw-release-btn").forEach(b => b.disabled = true);
 
         fetch(WEB_APP_URL, {
@@ -565,11 +544,9 @@
           });
       });
 
-      // Lauscht auf die Eingabe im Code-Feld (Groß-/Kleinschreibung egal)
       codeInputEl.addEventListener("input", function () {
         const aktuellerWert = codeInputEl.value;
         if (istMasterCode(aktuellerWert)) {
-          // Feld leeren, damit unten nie "Falscher Code" gemeldet wird
           codeInputEl.value = "";
           feedbackEl.textContent = "";
           updateAuswahlCounter();
@@ -579,10 +556,11 @@
         updateAuswahlCounter();
       });
 
+      // Erzeugt den Trennbalken im Stil/Farbton des Freundeskreis-Logos
       function createTrennBalken() {
         const balken = document.createElement("div");
+        balken.className = "fflw-logo-trennbalken";
         balken.setAttribute("aria-hidden", "true");
-        balken.style.cssText = "display: block; width: 100%; height: 8px; background-color: #ffd700; border-radius: 4px; margin: 42px 0 26px 0; box-shadow: 0 2px 6px rgba(0,0,0,0.35);";
         return balken;
       }
 
@@ -696,14 +674,13 @@
       }
 
       // =========================================================================
-      // RESERVIERUNG ABSENDEN
+      // RESERVIERUNG ABSENDEN (blitzschnell in 2-3 Sek.)
       // =========================================================================
       formEl.addEventListener("submit", function (e) {
         e.preventDefault();
         feedbackEl.textContent = "";
         feedbackEl.style.color = "#ffffff";
 
-        // Falls jemand doch den Master-Code + Enter gedrückt hat
         if (istMasterCode(codeInputEl.value)) {
           const c = codeInputEl.value.trim();
           codeInputEl.value = "";
@@ -711,8 +688,7 @@
           return;
         }
 
-        const codeStatus = pruefeZugangsCode();
-        if (!codeStatus.gueltig) {
+        if (!istZugangsCodeGueltig()) {
           feedbackEl.style.color = "#ff8a80";
           feedbackEl.textContent = "❌ Bitte gib den gültigen Zugangscode vom Freundeskreis ein.";
           codeInputEl.focus();
@@ -726,13 +702,6 @@
         if (gewaehlteArtikel.length === 0) {
           feedbackEl.style.color = "#ff8a80";
           feedbackEl.textContent = "❌ Bitte wähle oben mindestens ein Möbelstück durch Häkchen aus.";
-          retranslate(feedbackEl);
-          return;
-        }
-
-        if (codeStatus.maxArtikel > 0 && gewaehlteArtikel.length > codeStatus.maxArtikel) {
-          feedbackEl.style.color = "#ff8a80";
-          feedbackEl.textContent = "❌ Mit deinem Code kannst du maximal " + codeStatus.maxArtikel + " Artikel auswählen.";
           retranslate(feedbackEl);
           return;
         }
