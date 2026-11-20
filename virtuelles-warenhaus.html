@@ -1,60 +1,100 @@
+<!-- ==========================================================================
+  DATEI: virtuelles-warenhaus.html_von_gemini.txt
+  ERSTELLT VON GEMINI AM: 2026-11-20 01:32 CET
+  BESCHREIBUNG: Übersichts- & Startseite für das Virtuelle Warenhaus FFLW
+    - Klare Einstiegs-Karten: Angebote ansehen, Möbel spenden, Bedarf anmelden, Dauerbedarf
+    - Live-Status-Kachel (zeigt direkt an, wie viele Angebote online & wie viele Gesuche offen sind)
+    - Bereich "Wie alles begann" mit der Zeichnung warenhaus-zeichnung.jpg
+========================================================================== -->
 <!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Virtuelles Warenhaus - Sachen clever spenden - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <title>Virtuelles Warenhaus - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .vw-hero-actions {
+    .fflw-card {
+      margin: 18px 0;
+      padding: 18px 20px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+    .fflw-card-gold {
+      border-left: 6px solid #ffd700;
+      background: rgba(255, 215, 0, 0.12);
+    }
+    .fflw-card-green {
+      border-left: 6px solid #4caf50;
+      background: rgba(46, 125, 50, 0.16);
+    }
+    .fflw-action-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-      margin: 22px 0 28px 0;
+      gap: 16px;
+      margin: 20px 0;
     }
-    .vw-action-card {
+    .fflw-action-tile {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 18px 20px;
+      padding: 18px;
       border-radius: 10px;
+      background: rgba(0, 0, 0, 0.28);
+      border: 2px solid rgba(255, 255, 255, 0.38);
       text-decoration: none;
-      border: 2px solid #004080;
-      background: #f4f8fb;
-      color: #1a2332;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .vw-action-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0, 64, 128, 0.14);
-    }
-    .vw-action-card.primary {
-      background: #004080;
       color: #ffffff;
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
     }
-    .vw-action-card strong {
-      font-size: 1.12rem;
-      display: block;
-      margin-bottom: 6px;
+    .fflw-action-tile:hover {
+      transform: translateY(-2px);
+      border-color: #ffd700;
+      background: rgba(255, 255, 255, 0.14);
     }
-    .vw-action-card span {
-      font-size: 0.92rem;
-      opacity: 0.92;
-      line-height: 1.4;
-    }
-    .vw-action-badge {
+    .fflw-tile-cta {
       display: inline-block;
       margin-top: 12px;
+      padding: 8px 14px;
+      border-radius: 6px;
       font-weight: bold;
       font-size: 0.92rem;
-      color: #ffd700;
+      text-align: center;
+      background: #2e7d32;
+      color: #ffffff;
+      border: 1px solid #a5d6a7;
     }
-    .vw-action-card:not(.primary) .vw-action-badge {
-      color: #004080;
+    .fflw-story-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .fflw-story-figure {
+      margin: 0;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.94);
+      color: #111111;
+      border: 2px solid #ffd700;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+    .fflw-story-figure img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 6px;
+    }
+    .fflw-story-figure figcaption {
+      margin-top: 8px;
+      font-size: 0.88rem;
+      font-weight: bold;
+      text-align: center;
+      color: #222222;
     }
   </style>
 </head>
-
 <body>
   <header class="site-header">
     <a href="index.html" aria-label="Zur Startseite">
@@ -68,212 +108,158 @@
     <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
 
     <main class="content">
-      <h1>Virtuelles Warenhaus – Sachen clever spenden &amp; finden</h1>
+      <h2>Das Virtuelle Warenhaus</h2>
 
-      <div class="vw-hero-actions">
-        <a href="moebel-abgeben.html" class="vw-action-card primary">
+      <!-- Sprachenknopf -->
+      <p style="margin: 14px 0 22px 0;">
+        <a href="fflw-international.html?return=virtuelles-warenhaus.html"
+           style="display: inline-flex; align-items: center; gap: 10px; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+           <span>🌐 Sprache wählen / ÜbersetzungsTool</span>
+           <span class="flag-carousel-inline" title="Viele Sprachen unterstützt">
+             <span class="flag-track-inline">
+               <span>🇩🇪</span><span>🇺🇦</span><span>🇬🇧</span><span>🇸🇾</span><span>🇦🇫</span><span>🇹🇷</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
+               <span>🇩🇪</span><span>🇺🇦</span><span>🇬🇧</span><span>🇸🇾</span><span>🇦🇫</span><span>🇹🇷</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
+             </span>
+           </span>
+        </a>
+      </p>
+
+      <div class="fflw-card fflw-card-green">
+        <p style="margin: 0 0 8px 0; font-size: 1.08rem; font-weight: bold;">
+          🏠 Gut erhaltene Möbel &amp; Haushaltsgeräte – direkt vermittelt statt teuer eingelagert
+        </p>
+        <p style="margin: 0;">
+          Im <strong>Virtuellen Warenhaus</strong> des Freundeskreises Flüchtlinge Leutenbach &amp; Winnenden bringen wir Menschen aus der Region, die gut erhaltene Möbel abgeben möchten, direkt mit geflüchteten Familien zusammen, die ihre erste eigene Wohnung einrichten.
+        </p>
+      </div>
+
+      <!-- 4 SCHNELLE EINSTIEGS-KACHELN -->
+      <div class="fflw-action-grid">
+        <a href="aktuelle-angebote.html" class="fflw-action-tile">
           <div>
-            <strong>🛋️ Möbel &amp; Sachen spenden</strong>
-            <span>Fotos hochladen, Maße bequem per Menü eingeben und direkt im Warenhaus einstellen.</span>
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">🛋️</div>
+            <strong style="font-size: 1.12rem; color: #ffd700;">Aktuelle Angebote ansehen</strong>
+            <p style="margin: 8px 0 0 0; font-size: 0.93rem; line-height: 1.45;">
+              Alle aktuell verfügbaren Möbel, Küchengeräte und Hausrat mit Fotos, Maßen und 1-Klick-Reservierung.
+            </p>
           </div>
-          <span class="vw-action-badge">Jetzt Spende eintragen →</span>
+          <span class="fflw-tile-cta" id="fflw-tile-angebote-count">👉 Katalog öffnen</span>
         </a>
 
-        <a href="aktuelle-angebote.html" class="vw-action-card">
+        <a href="moebel-abgeben.html" class="fflw-action-tile">
           <div>
-            <strong>🔍 Aktuelle Angebote ansehen</strong>
-            <span>Alle derzeit verfügbaren Möbel und Haushaltsgeräte mit Fotos und Maßen durchstöbern.</span>
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">🎁</div>
+            <strong style="font-size: 1.12rem; color: #a5d6a7;">Möbel &amp; Geräte spenden</strong>
+            <p style="margin: 8px 0 0 0; font-size: 0.93rem; line-height: 1.45;">
+              Stücke bequem mit Fotos eintragen – idealerweise „auf Abruf“, bis eine Familie gefunden ist.
+            </p>
           </div>
-          <span class="vw-action-badge">Zum Online-Katalog →</span>
+          <span class="fflw-tile-cta">👉 Spende melden</span>
+        </a>
+
+        <a href="suche-sachen.html" class="fflw-action-tile">
+          <div>
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">🔍</div>
+            <strong style="font-size: 1.12rem; color: #90caf9;">Sachen suchen / Bedarf melden</strong>
+            <p style="margin: 8px 0 0 0; font-size: 0.93rem; line-height: 1.45;">
+              Nichts Passendes im Katalog gefunden? Melde hier deinen Bedarf mit Raummaßen an.
+            </p>
+          </div>
+          <span class="fflw-tile-cta" style="background: #1565c0; border-color: #90caf9;">👉 Bedarf eintragen</span>
+        </a>
+
+        <a href="dinge-die-wir-fast-immer-brauchen-koennen.html" class="fflw-action-tile">
+          <div>
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">📊</div>
+            <strong style="font-size: 1.12rem; color: #ffcc80;">Was besonders oft fehlt</strong>
+            <p style="margin: 8px 0 0 0; font-size: 0.93rem; line-height: 1.45;">
+              Unsere Dauerbedarfsliste mit Live-Zähler der aktuell offenen Suchanfragen.
+            </p>
+          </div>
+          <span class="fflw-tile-cta" id="fflw-tile-bedarf-count" style="background: #e65100; border-color: #ffcc80;">👉 Live-Bedarf ansehen</span>
         </a>
       </div>
 
-      <h2>Du möchtest helfen und Flüchtlinge mit Sachspenden unterstützen?</h2>
+      <!-- SO FUNKTIONIERT DAS PRINZIP -->
+      <section class="fflw-card">
+        <h3 style="margin-top: 0;">🔄 So funktioniert unser „Virtuelles“ Warenhaus</h3>
+        <ol style="margin: 0; padding-left: 20px; line-height: 1.6;">
+          <li><strong>„Auf Abruf“ beim Spender:</strong> Da wir keine riesige Lagerhalle unterhalten können, bleiben die Möbel nach Möglichkeit noch kurz beim Spender stehen, bis sie vermittelt sind.</li>
+          <li><strong>Sorgfältige Prüfung &amp; Veröffentlichung:</strong> Unser Team prüft jede eingereichte Spende kurz (Maße, Zustand, Vollständigkeit) und schaltet sie im Online-Katalog frei.</li>
+          <li><strong>Direkte Reservierung &amp; Transport:</strong> Geflüchtete Familien (oder ihre Patinnen und Paten) reservieren genau das, was wirklich in ihre Wohnung passt. Kleinteile transportieren wir oft umweltfreundlich per PKW oder <strong>Fahrradanhänger</strong>, Großmöbel mit unserem Transporter-Team.</li>
+        </ol>
+      </section>
 
-      <p>
-        Das ist sehr schön! Genau deswegen haben wir dieses „virtuelle
-        Warenhaus“ eingerichtet.
-      </p>
+      <!-- WIE ALLES BEGANN + ZEICHNUNG -->
+      <section class="fflw-card fflw-card-gold">
+        <h3 style="margin-top: 0; color: #ffd700;">✏️ Wie alles begann</h3>
+        <div class="fflw-story-wrap">
+          <div>
+            <p style="margin-top: 0;">
+              Am Anfang stand ein ganz praktisches Problem: Auf der einen Seite riefen regelmäßig hilfsbereite Bürgerinnen und Bürger aus Leutenbach und Winnenden an, die bei einem Umzug oder einer Haushaltsauflösung gut erhaltene Schränke, Betten oder Waschmaschinen verschenken wollten. Auf der anderen Seite zogen geflüchtete Familien aus den Gemeinschaftsunterkünften in leere Wohnungen – oft ohne jegliche Grundausstattung.
+            </p>
+            <p>
+              Ein echtes Möbelhaus mit großer Lagerhalle hätte Unsummen an Miete gekostet und doppeltes Schleppen bedeutet: erst ins Lager rein, dann wieder raus. So entstand die Idee eines <strong>„Virtuellen Warenhauses“</strong> – festgehalten in dieser ersten Skizze: Die Möbel bleiben „virtuell“ im digitalen Schaufenster, während sie physisch noch beim Spender stehen, bis der direkte Weg in ihr neues Zuhause organisiert ist.
+            </p>
+            <p style="margin-bottom: 0;">
+              Was mit Zetteln, Telefonaten und ersten Fotos begann, ist heute eine lebendige Drehscheibe für Nachbarschaftshilfe und Nachhaltigkeit in unserer Gemeinde.
+            </p>
+          </div>
 
-      <p>
-        Ein wichtiger Unterschied zu einem „echten Warenhaus“ ist, dass deine
-        angebotene Sachspende erstmal nur als Fotografie mit Kurzbeschreibung
-        im virtuellen Warenhaus „abgelegt“ wird.
-      </p>
-      <hr>
-
-      <h2>Warum ein virtuelles Warenhaus?</h2>
-
-      <img
-        class="warenhaus-zeichnung"
-        src="assets/images/warenhaus-zeichnung.jpg"
-        alt="Zeichnung zum virtuellen Warenhaus">
-
-      <p>
-        Auf der einen Seite ist der Freundeskreis sehr dankbar über
-        <strong>Sachspenden</strong>, auf der anderen Seite gibt es aber
-        <strong>nicht immer</strong> sofort einen <strong>Abnehmer</strong>.
-        Hinzu kommt, dass der nötige <strong>Lagerraum fehlt</strong> und die
-        <strong>Koordination</strong> eine Menge <strong>Zeit verbraucht</strong>.
-      </p>
-
-      <p>
-        Zwei Freundeskreisler haben sich also Gedanken gemacht, wie Spenden die
-        Geflüchteten erst dann erreichen, wenn sie die
-        <strong>Spenden wirklich benötigen</strong>. Das Ganze ohne hohen
-        Koordinierungsaufwand und ohne Notwendigkeit eines Lagers. Die
-        ausgetüftelte Antwort lautet „<strong>Virtuelles Warenhaus</strong>“.
-      </p>
-
-      <p>
-        Die Spende wird dabei als Foto mit kurzer Beschreibung und Maßen in
-        unserer Online-Datenbank abgelegt. Alle Ehrenamtlichen und Familien können die gespendeten
-        Gegenstände einsehen und erst wenn es
-        <strong>Bedarf bei den Flüchtlingen</strong> gibt, kommt es zur
-        <strong>Abholung oder Lieferung</strong> der Sachspende.
-      </p>
-
-      <h2>Was passt ins virtuelle Warenhaus?</h2>
-
-      <ul>
-        <li>
-          <strong>Möbel</strong> – alles was man für die Ausstattung einer Wohnung braucht
-        </li>
-        <li>
-          <strong>Elektrogeräte</strong> – von Wasserkocher über Lampe, Fernseher bis hin zu Computer
-        </li>
-        <li>
-          <strong>Spielsachen</strong> – für Groß und Klein
-        </li>
-        <li>
-          <strong><em>Fahrräder</em></strong> – besser direkt über die
-          <strong><a href="fahrradwerkstatt.html">Rad-Werkstatt</a></strong>:
-          <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a>
-        </li>
-        <li>
-          <strong>Gartenmöbel</strong>
-        </li>
-        <li>
-          <strong>Musikinstrumente</strong>
-        </li>
-      </ul>
-
-      <p>
-        Eine Übersicht, welche Dinge besonders häufig gebraucht werden, findest du hier:
-        <a href="dinge-die-wir-fast-immer-brauchen-koennen.html"><strong>Was wir besonders oft brauchen</strong></a>.
-      </p>
-
-      <p>
-        <strong>Kleidung bitte NICHT über das virtuelle Warenhaus</strong>
-        <br>
-        sondern z.&nbsp;B. über Spendenbasare oder die Kleiderkammer vom Roten
-        Kreuz.
-      </p>
-
-      <p>
-        Genauere Informationen gibt es über die
-        <a href="https://www.drk-winnenden.de/das-drk/">
-          Webseite des Roten Kreuzes Winnenden
-        </a>.
-      </p>
-
-      <p>
-        <strong>Geschäftsstelle:</strong>
-        Mühltorstraße 50, 71364 Winnenden
-        <br>
-        <strong>Telefon:</strong>
-        <a href="tel:+49719565068">(07195) 65068</a>
-        — Montag 9:00–11:00 Uhr (außerhalb Schulferien)
-        <br>
-        <strong>E-Mail:</strong>
-        <a href="mailto:info@drk-winnenden.de">
-          info@drk-winnenden.de
-        </a>
-      </p>
-
-      <hr>
-
-      <h2>So einfach stellst du deine Spende ein</h2>
-
-      <p>
-        In unserem neuen Online-Formular kannst du direkt vom Handy oder Computer aus
-        Fotos hochladen und Maße sowie Standort bequem eingeben (Du musst keine Maße mehr selbst in Fotos hineinschreiben!):
-      </p>
-
-      <p>
-        <a href="moebel-abgeben.html" style="display: inline-block; background: #2e7d32; color: #fff; text-decoration: none; font-weight: bold; padding: 12px 22px; border-radius: 8px;">
-          🛋️ Zum Spenden-Formular (Möbel &amp; Sachen abgeben)
-        </a>
-      </p>
-
-      <p>
-        Du möchtest vorab sehen, worauf es bei guten Fotos ankommt? Schau dir gerne unsere
-        <a href="beispielbilder.html"><strong>Beispielbilder &amp; Foto-Tipps</strong></a> an.
-      </p>
-
-      <h2>Vielen Dank für deine Mithilfe!</h2>
-
-      <p>
-        Bitte habe Verständnis, falls nicht alles ganz schnell und reibungslos
-        klappt. Wir alle arbeiten hier im Ehrenamt und versuchen – so gut es geht – zu helfen.
-        Wer mitmachen möchte, ist herzlich willkommen.
-      </p>
-
-      <p>
-        <em>
-          *Datenschutz: Deine Adresse wird nicht im Internet öffentlich
-          sichtbar sein. Wir benötigen die Adresse aber zur Kontaktaufnahme.
-          Daher wird die Adresse auch im Computer gespeichert. Mit der Angabe
-          deiner Adresse stimmst du dieser Vorgehensweise zu.
-        </em>
-      </p>
+          <figure class="fflw-story-figure">
+            <img src="assets/images/warenhaus-zeichnung.jpg"
+                 onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src='warenhaus-zeichnung.jpg';}"
+                 alt="Erste Idee und Zeichnung zum Virtuellen Warenhaus des Freundeskreises">
+            <figcaption>Unsere ursprüngliche Idee auf Papier: Vom Spender direkt ins neue Zuhause – ohne teures Zwischenlager.</figcaption>
+          </figure>
+        </div>
+      </section>
     </main>
   </div>
 
   <section class="contact-block">
+    <p><strong>Du möchtest aktiv werden? Oder einfach mal den Kontakt zum Freundeskreis aufnehmen? Dann schreib uns doch, wir freuen uns!</strong></p>
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
     <p>
-      <strong>
-        Du möchtest aktiv werden? Oder einfach mal den Kontakt zum
-        Freundeskreis aufnehmen? Dann schreib uns doch, wir freuen uns!
-      </strong>
-    </p>
-
-    <p>
-      <strong>
-        Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden
-      </strong>
-    </p>
-
-    <p>
-      <strong>Allgemeines:</strong>
-      <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a><br>
-      <strong>Sachen-Spenden (Infos, Kontakt):</strong>
-      <a href="mailto:Warenhaus@freundeleuwi.org">Warenhaus@freundeleuwi.org</a><br>
-      <strong>Sachen-Suchen (Infos, Kontakt):</strong>
-      <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
-      <strong>Transport-Mithilfe (Infos, Kontakt):</strong>
-      <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a><br>
-      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong>
-      <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a><br>
-      <strong>Geldspenden und Spendenbescheinigungen:</strong>
-      <a href="mailto:Kasse-FFLW@freundeleuwi.org">Kasse-FFLW@freundeleuwi.org</a><br>
-      <strong>Lust auf Mitmachen / Mitgliedschaft:</strong>
-      <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a>
-    </p>
-
-    <p>
-      <a href="https://docuseal.com/d/Mcvg84UEAD5aay">Mitgliedsantrag: Hier klicken</a><br>
-      <a href="https://drive.google.com/file/d/1WnPaR-iuMEsvg-mLMCiaXJF38-p0-MUm/view?usp=sharing">Unsere Satzung</a>
+      <strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a><br>
+      <strong>Sachen-Spenden (Infos, Kontakt):</strong> <a href="mailto:Warenhaus@freundeleuwi.org">Warenhaus@freundeleuwi.org</a><br>
+      <strong>Sachen-Suchen (Infos, Kontakt):</strong> <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
+      <strong>Transport-Mithilfe (Infos, Kontakt):</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a><br>
+      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong> <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a><br>
+      <strong>Geldspenden und Spendenbescheinigungen:</strong> <a href="mailto:Kasse-FFLW@freundeleuwi.org">Kasse-FFLW@freundeleuwi.org</a>
     </p>
   </section>
 
   <footer class="legal-footer">
-    <a href="impressum.html">Impressum</a>
-    |
-    <a href="datenschutz.html">Datenschutz</a>
-    |
-    <a href="sitemap.html">Sitemap</a>
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="sitemap.html">Sitemap</a>
   </footer>
-<script src="nav-loader.js"></script>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+
+      fetch(WEB_APP_URL + "?t=" + Date.now(), { method: "GET", redirect: "follow" })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.ok && Array.isArray(data.items)) {
+            const btn = document.getElementById("fflw-tile-angebote-count");
+            if (btn) btn.textContent = `👉 ${data.items.length} Angebot(e) ansehen`;
+          }
+        })
+        .catch(() => {});
+
+      fetch(WEB_APP_URL + "?action=getDemandStats&t=" + Date.now(), { method: "GET", redirect: "follow" })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.ok && Array.isArray(data.ranking)) {
+            const gesamt = data.ranking.reduce((s, x) => s + (x.anzahl || 0), 0);
+            const btn = document.getElementById("fflw-tile-bedarf-count");
+            if (btn && gesamt > 0) btn.textContent = `👉 ${gesamt} offene Anfrage(n)`;
+          }
+        })
+        .catch(() => {});
+    });
+  </script>
 </body>
 </html>
