@@ -1,3 +1,12 @@
+<!-- ==========================================================================
+  DATEI: dinge-die-wir-fast-immer-brauchen-koennen.html_von_gemini.txt
+  ERSTELLT VON GEMINI AM: 2026-11-20 01:32 CET
+  BESCHREIBUNG: Dauerbedarfs-Übersicht mit automatischem Live-Bedarfszähler
+    - Lädt die aktuellen offenen Bedarfsanmeldungen live aus Code.gs (?action=getDemandStats)
+    - Zeigt oben die aktuell am häufigsten gesuchten Artikel als Live-Ranking
+    - Versieht alle Dauergesuche mit Live-Badges ("Aktuell X offene Anfrage(n)")
+    - Direkte 1-Klick-Links zu "Jetzt spenden" oder "Selbst Bedarf anmelden"
+========================================================================== -->
 <!doctype html>
 <html lang="de">
 <head>
@@ -5,8 +14,110 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dinge, die wir fast immer brauchen können - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .fflw-card {
+      margin: 18px 0;
+      padding: 18px 20px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+    .fflw-card-gold {
+      border-left: 6px solid #ffd700;
+      background: rgba(255, 215, 0, 0.12);
+    }
+    .fflw-card-green {
+      border-left: 6px solid #4caf50;
+      background: rgba(46, 125, 50, 0.16);
+    }
+    .fflw-need-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .fflw-need-card {
+      padding: 16px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.26);
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .fflw-need-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .fflw-live-badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 0.82rem;
+      font-weight: bold;
+      white-space: nowrap;
+      background: rgba(255, 255, 255, 0.14);
+      color: #e0e0e0;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .fflw-live-badge-hot {
+      background: #c62828;
+      color: #ffffff;
+      border-color: #ffcdd2;
+    }
+    .fflw-live-badge-active {
+      background: #2e7d32;
+      color: #ffffff;
+      border-color: #a5d6a7;
+    }
+    .fflw-ranking-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .fflw-ranking-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 13px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.32);
+      border: 1px solid #ffd700;
+      font-weight: bold;
+      font-size: 0.94rem;
+    }
+    .fflw-btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .fflw-mini-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-size: 0.86rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .fflw-mini-btn-donate {
+      background: #2e7d32;
+      color: #ffffff;
+      border: 1px solid #a5d6a7;
+    }
+    .fflw-mini-btn-search {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+    }
+  </style>
 </head>
-
 <body>
   <header class="site-header">
     <a href="index.html" aria-label="Zur Startseite">
@@ -20,165 +131,230 @@
     <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
 
     <main class="content">
-      <h1>Virtuelles Warenhaus - Sachen clever spenden</h1>
+      <h2>Dinge, die wir fast immer brauchen können</h2>
 
-      <h2>Dinge, die wir fast immer brauchen können...</h2>
-
-      <hr>
-
-      <h3>
-        <span class="text-rot">KÜCHE etc.</span>
-      </h3>
-
-      <ol>
-        <li><strong>Mikrowelle</strong></li>
-        <li><strong>Wasserkocher</strong></li>
-        <li><strong>Kühlschrank</strong></li>
-        <li><strong>Gefrierschrank / Gefriertruhe</strong></li>
-        <li><strong>Schnellkochtopf</strong></li>
-        <li><strong>Große Kochtöpfe</strong></li>
-        <li><strong>Toaster</strong></li>
-        <li><strong>Kaffee-Maschine</strong></li>
-        <li><strong>Standmixer (engl. Blender)</strong></li>
-      </ol>
-
-      <h3>
-        <span class="text-rot">HAUSHALT, allgemein</span>
-      </h3>
-
-      <ol start="10">
-        <li><strong>Waschmaschine / Waschtrockner</strong></li>
-        <li><strong>Bügelbrett / Bügeleisen</strong></li>
-        <li><strong>Kinderwägen (alle Größen)</strong></li>
-        <li><strong>Staubsauger</strong></li>
-        <li>
-          <strong>
-            große Koffer, mit 4 Räder oder auch 2 Räder....
-          </strong>
-        </li>
-        <li><strong>Haar-Fön</strong></li>
-        <li><strong>Teppiche</strong></li>
-        <li><strong>Schuhschränke</strong></li>
-        <li><strong>Spiegel</strong></li>
-        <li>
-          <strong>
-            Trolley zum Einkaufen
-            (diese Einkaufstaschen mit Rädern)
-          </strong>
-        </li>
-      </ol>
-
-      <h3>
-        <span class="text-rot">
-          ELEKTRONISCHES, WERKZEUG, ETC.
-        </span>
-      </h3>
-
-      <ol start="20">
-        <li><strong>TV-Geräte = Fernseher</strong></li>
-        <li><strong>Handy/ Smartphone</strong></li>
-        <li><strong>Computer (Laptop, Notebook)</strong></li>
-        <li><strong>Werkzeuge aller Art</strong></li>
-        <li>
-          <strong>
-            Nähmaschine<br>
-            (auch alte, mechanische, mit Tretwippe unten)
-          </strong>
-        </li>
-        <li>
-          <strong>Klappräder (auch ältere Modelle)</strong>
-        </li>
-      </ol>
-
-      <hr>
-
-      <p>
-        <em>
-          *Datenschutz: Deine Adresse wird nicht im Internet öffentlich
-          sichtbar sein. Wir benötigen die Adresse aber zur Kontaktaufnahme.
-          Daher wird die Adresse auch im Computer gespeichert. Mit der Angabe
-          deiner Adresse stimmst du dieser Vorgehensweise zu.
-        </em>
+      <!-- Sprachenknopf -->
+      <p style="margin: 14px 0 22px 0;">
+        <a href="fflw-international.html?return=dinge-die-wir-fast-immer-brauchen-koennen.html"
+           style="display: inline-flex; align-items: center; gap: 10px; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
+           <span>🌐 Sprache wählen / ÜbersetzungsTool</span>
+           <span class="flag-carousel-inline" title="Viele Sprachen unterstützt">
+             <span class="flag-track-inline">
+               <span>🇩🇪</span><span>🇺🇦</span><span>🇬🇧</span><span>🇸🇾</span><span>🇦🇫</span><span>🇹🇷</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
+               <span>🇩🇪</span><span>🇺🇦</span><span>🇬🇧</span><span>🇸🇾</span><span>🇦🇫</span><span>🇹🇷</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
+             </span>
+           </span>
+        </a>
       </p>
+
+      <!-- LIVE-BEDARFSZÄHLER AUS DEM SYSTEM -->
+      <section class="fflw-card fflw-card-gold" id="fflw-live-demand-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+          <strong style="font-size: 1.08rem; color: #ffd700;">
+            📊 Aktuelle Live-Suchanfragen aus unserem Warenhaus
+          </strong>
+          <span id="fflw-demand-total-badge" style="font-size: 0.9rem; opacity: 0.92;">⏳ Lade Live-Zähler …</span>
+        </div>
+        <p style="margin: 6px 0 0 0; font-size: 0.93rem;">
+          Diese Zahlen stammen direkt aus den eingegangenen Bedarfsanmeldungen geflüchteter Familien in Leutenbach und Winnenden:
+        </p>
+        <div id="fflw-demand-ranking-list" class="fflw-ranking-pills"></div>
+      </section>
+
+      <div class="fflw-card fflw-card-green">
+        <p style="margin: 0;">
+          <strong>❤️ Gute Erhaltung ist entscheidend:</strong> Bitte spende nur funktionsfähige, saubere und unbeschädigte Sachen, die du selbst noch guten Gewissens verwenden würdest. Vielen Dank für deine Unterstützung!
+        </p>
+      </div>
+
+      <h3>Unsere Dauerbrenner nach Bereichen</h3>
+      <div id="fflw-dauerbedarf-grid" class="fflw-need-grid"></div>
+
+      <!-- Hinweis zur Rad-Werkstatt -->
+      <div class="fflw-card">
+        <h3 style="margin-top: 0;">🚲 Fahrräder &amp; Kinderfahrräder</h3>
+        <p style="margin: 0 0 10px 0;">
+          Verkehrstüchtige oder leicht reparaturbedürftige Fahrräder für Kinder, Jugendliche und Erwachsene werden ebenfalls ständig gesucht – sie machen Menschen vor Ort mobil für Schule, Sprachkurs und Arbeit.
+        </p>
+        <a href="radwerkstatt.html" class="fflw-mini-btn fflw-mini-btn-donate">🚲 Mehr zur FFLW Rad-Werkstatt</a>
+      </div>
     </main>
   </div>
 
   <section class="contact-block">
+    <p><strong>Du möchtest aktiv werden? Oder einfach mal den Kontakt zum Freundeskreis aufnehmen? Dann schreib uns doch, wir freuen uns!</strong></p>
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
     <p>
-      <strong>
-        Du möchtest aktiv werden? Oder einfach mal den Kontakt zum
-        Freundeskreis aufnehmen? Dann schreib uns doch, wir freuen uns!
-      </strong>
-    </p>
-
-    <p>
-      <strong>
-        Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden
-      </strong>
-    </p>
-
-    <p>
-      <strong>Allgemeines:</strong>
-      <a href="mailto:Kontakt@freundeleuwi.org">
-        Kontakt@freundeleuwi.org
-      </a>
-      <br>
-
-      <strong>Sachen-Spenden (Infos, Kontakt):</strong>
-      <a href="mailto:Warenhaus@freundeleuwi.org">
-        Warenhaus@freundeleuwi.org
-      </a>
-      <br>
-
-      <strong>Sachen-Suchen (Infos, Kontakt):</strong>
-      <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">
-        Warenhaus-anfrage@freundeleuwi.org
-      </a>
-      <br>
-
-      <strong>Transport-Mithilfe (Infos, Kontakt):</strong>
-      <a href="mailto:Transport-Hilfe@freundeleuwi.org">
-        Transport-Hilfe@freundeleuwi.org
-      </a>
-      <br>
-
-      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong>
-      <a href="mailto:Rad-Werkstatt@freundeleuwi.org">
-        Rad-Werkstatt@freundeleuwi.org
-      </a>
-      <br>
-
-      <strong>Geldspenden und Spendenbescheinigungen:</strong>
-      <a href="mailto:Kasse-FFLW@freundeleuwi.org">
-        Kasse-FFLW@freundeleuwi.org
-      </a>
-      <br>
-
-      <strong>Lust auf Mitmachen / Mitgliedschaft:</strong>
-      <a href="mailto:Kontakt@freundeleuwi.org">
-        Kontakt@freundeleuwi.org
-      </a>
-    </p>
-
-    <p>
-      <a href="https://docuseal.com/d/Mcvg84UEAD5aay">
-        Mitgliedsantrag: Hier klicken
-      </a>
-      <br>
-
-      <a href="https://drive.google.com/file/d/1WnPaR-iuMEsvg-mLMCiaXJF38-p0-MUm/view?usp=sharing">
-        Unsere Satzung
-      </a>
+      <strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a><br>
+      <strong>Sachen-Spenden (Infos, Kontakt):</strong> <a href="mailto:Warenhaus@freundeleuwi.org">Warenhaus@freundeleuwi.org</a><br>
+      <strong>Sachen-Suchen (Infos, Kontakt):</strong> <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
+      <strong>Transport-Mithilfe (Infos, Kontakt):</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a><br>
+      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong> <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a><br>
+      <strong>Geldspenden und Spendenbescheinigungen:</strong> <a href="mailto:Kasse-FFLW@freundeleuwi.org">Kasse-FFLW@freundeleuwi.org</a>
     </p>
   </section>
 
   <footer class="legal-footer">
-    <a href="impressum.html">Impressum</a>
-    |
-    <a href="datenschutz.html">Datenschutz</a>
-    |
-    <a href="sitemap.html">Sitemap</a>
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="sitemap.html">Sitemap</a>
   </footer>
-<script src="nav-loader.js"></script>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+
+      const DAUER_BEDARF = [
+        {
+          icon: "🧺",
+          titel: "Waschmaschinen (funktionsfähig)",
+          suchBegriff: "Waschmaschine",
+          keywords: ["waschmaschine", "waschtrockner"],
+          text: "Besonders für Familien mit Kindern unverzichtbar – bitte nur funktionierende Geräte (Standardbreite 60 cm)."
+        },
+        {
+          icon: "❄️",
+          titel: "Kühlschränke & Kühl-Gefrier-Kombis",
+          suchBegriff: "Kühlschrank",
+          keywords: ["kühlschrank", "kühl-gefrier", "gefrier"],
+          text: "Saubere, voll funktionsfähige Geräte in Standardbreite (60 cm) werden fast wöchentlich benötigt."
+        },
+        {
+          icon: "🛏️",
+          titel: "Einzelbetten, Kinderbetten & Lattenroste",
+          suchBegriff: "Einzelbett",
+          keywords: ["bett", "matratze", "lattenrost"],
+          text: "Kompakte Betten (90×200 cm oder 140×200 cm) inkl. Lattenrost und sauberer, fleckenfreier Matratze."
+        },
+        {
+          icon: "🚪",
+          titel: "Kleiderschränke (2- oder 3-türig)",
+          suchBegriff: "Kleiderschrank",
+          keywords: ["kleiderschrank", "schrank", "kommode"],
+          text: "Besonders gefragt sind zerlegbare Schränke bis max. 200–210 cm Höhe (passen auch in niedrigere Räume)."
+        },
+        {
+          icon: "🍽️",
+          titel: "Esstische & stabile Stühle",
+          suchBegriff: "Esstisch",
+          keywords: ["esstisch", "stuhl"],
+          text: "Kompakte Esstische (ca. 120–160 cm) und stabile Stühle – gerne auch 4 bis 6 Stück zusammen."
+        },
+        {
+          icon: "🍲",
+          titel: "Große Kochtöpfe, Schnellkochtöpfe & Pfannen",
+          suchBegriff: "Kochtöpfe",
+          keywords: ["topf", "töpfe", "schnellkochtopf", "geschirr"],
+          text: "Gut erhaltene große Töpfe, Pfannen, Besteck und vollständige Geschirr-Sets (passen super in den PKW/Fahrradanhänger)."
+        },
+        {
+          icon: "👶",
+          titel: "Kinderwagen, Buggys & Hochstühle",
+          suchBegriff: "Kinderwagen",
+          keywords: ["kinderwagen", "buggy", "hochstuhl", "kindersitz"],
+          text: "Für junge Familien und Neugeborene – bitte sauber und technisch sicher."
+        },
+        {
+          icon: "📚",
+          titel: "Schreibtische & Schreibtischstühle",
+          suchBegriff: "Schreibtisch",
+          keywords: ["schreibtisch"],
+          text: "Für Schulkinder und Erwachsene im Deutsch- oder Integrationskurs."
+        },
+        {
+          icon: "🧹",
+          titel: "Staubsauger, Bügeleisen & Wäscheständer",
+          suchBegriff: "Staubsauger",
+          keywords: ["staubsauger", "bügel", "wäscheständer", "nähmaschine"],
+          text: "Praktische Haushaltshelfer, die sich leicht transportieren lassen."
+        }
+      ];
+
+      const gridEl = document.getElementById("fflw-dauerbedarf-grid");
+      const totalBadgeEl = document.getElementById("fflw-demand-total-badge");
+      const rankingListEl = document.getElementById("fflw-demand-ranking-list");
+
+      function renderCards(countsMap) {
+        gridEl.innerHTML = "";
+        const entries = Object.entries(countsMap || {});
+
+        DAUER_BEDARF.forEach(item => {
+          let trefferZahl = 0;
+          entries.forEach(([k, anz]) => {
+            const low = k.toLowerCase();
+            if (item.keywords.some(kw => low.includes(kw))) {
+              trefferZahl += anz;
+            }
+          });
+
+          let badgeClass = "fflw-live-badge";
+          let badgeText = "Dauerbedarf";
+          if (trefferZahl >= 3) {
+            badgeClass += " fflw-live-badge-hot";
+            badgeText = `🔥 Aktuell ${trefferZahl} offene Anfragen`;
+          } else if (trefferZahl > 0) {
+            badgeClass += " fflw-live-badge-active";
+            badgeText = `📌 Aktuell ${trefferZahl} Anfrage${trefferZahl > 1 ? "n" : ""}`;
+          }
+
+          const card = document.createElement("article");
+          card.className = "fflw-need-card";
+          card.innerHTML = `
+            <div>
+              <div class="fflw-need-header">
+                <strong style="font-size: 1.05rem; color: #ffffff;">${item.icon} ${item.titel}</strong>
+                <span class="${badgeClass}">${badgeText}</span>
+              </div>
+              <p style="margin: 8px 0 0 0; font-size: 0.92rem; line-height: 1.45; color: #e8e8e8;">${item.text}</p>
+            </div>
+            <div class="fflw-btn-row">
+              <a href="moebel-abgeben.html" class="fflw-mini-btn fflw-mini-btn-donate">🎁 Jetzt spenden</a>
+              <a href="suche-sachen.html?artikel=${encodeURIComponent(item.suchBegriff)}" class="fflw-mini-btn fflw-mini-btn-search">🔍 Selbst suchen</a>
+            </div>
+          `;
+          gridEl.appendChild(card);
+        });
+      }
+
+      renderCards({});
+
+      fetch(WEB_APP_URL + "?action=getDemandStats&t=" + Date.now(), {
+        method: "GET",
+        redirect: "follow"
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (!data || !data.ok) {
+            totalBadgeEl.textContent = "Dauerbedarfsliste";
+            return;
+          }
+
+          const ranking = data.ranking || [];
+          const counts = data.counts || {};
+          const gesamtOffen = ranking.reduce((sum, r) => sum + (r.anzahl || 0), 0);
+
+          if (gesamtOffen === 0) {
+            totalBadgeEl.textContent = "✓ Aktuell keine offenen Wartelisten-Einträge";
+            rankingListEl.innerHTML = `<span style="font-size:0.9rem; opacity:0.9;">Alle bisherigen Anfragen konnten bedient werden – Sachspenden aus den Kategorien unten sind aber jederzeit willkommen!</span>`;
+          } else {
+            totalBadgeEl.textContent = `Insgesamt ${gesamtOffen} offene Bedarfsanmeldung(en)`;
+            rankingListEl.innerHTML = "";
+            ranking.slice(0, 8).forEach(r => {
+              const pill = document.createElement("div");
+              pill.className = "fflw-ranking-pill";
+              pill.innerHTML = `
+                <span style="background:#ffd700; color:#111; padding:2px 8px; border-radius:10px;">${r.anzahl}×</span>
+                <span>${r.artikelName}</span>
+              `;
+              rankingListEl.appendChild(pill);
+            });
+          }
+
+          renderCards(counts);
+        })
+        .catch(() => {
+          totalBadgeEl.textContent = "";
+        });
+    });
+  </script>
 </body>
 </html>
