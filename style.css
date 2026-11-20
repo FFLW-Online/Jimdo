@@ -1,22 +1,29 @@
 /* ==========================================================================
-1. GLOBALE EINSTELLUNGEN & VARIABLEN
+   DATEI: style.css – von Gemini
+   ERSTELLT VON GEMINI AM: 2026-11-20 19:02 CET
+   BESCHREIBUNG: Globales Stylesheet mit hohen Kontrasten, animierter Lade-Sanduhr
+     und einheitlichen Farb-Standards (Hellgrün = Spenden, Hellblau = Suchen/Angebote)
    ========================================================================== */
+
 :root {
   --primary-color: #004080;
   --accent-color: #d97706;
   --nav: #004080;
-  --text-color: #333333;
+  --text-color: #111111;
   --bg-color: #ffffff;
   --light-bg: #f4f4f4;
   --border-color: #dddddd;
   --header-offset: 195px;
+  --donate-bg: #eaf6ec;
+  --donate-border: #2e7d32;
+  --need-bg: #eef6fc;
+  --need-border: #004080;
 }
 
 * {
   box-sizing: border-box;
 }
 
-/* Mobil: Schlicht weißer Hintergrund */
 html, body {
   margin: 0;
   padding: 0;
@@ -28,7 +35,6 @@ html, body {
   overflow-x: clip;
 }
 
-/* Desktop (ab 768px): Garten-Hintergrundbild auf HTML aktivieren */
 @media (min-width: 768px) {
   html {
     background-color: #dce6f2;
@@ -45,7 +51,6 @@ html, body {
   }
 }
 
-/* Alle Bilder im Inhaltsbereich flexibel an Mobilbildschirme anpassen */
 .content img,
 .content figure img,
 .site-header img {
@@ -53,9 +58,50 @@ html, body {
   height: auto !important;
 }
 
-/* ==========================================================================
-2. HEADER, FLAGGEN-LAUFBAND (STILE A, B, C) & LAYOUT
-   ========================================================================== */
+.content a {
+  color: #004080;
+  text-decoration: underline;
+}
+.content a:hover {
+  color: #002244;
+}
+
+@keyframes fflw-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.fflw-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(0, 64, 128, 0.25);
+  border-top-color: #004080;
+  border-radius: 50%;
+  animation: fflw-spin 0.85s linear infinite;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.fflw-spinner-light {
+  border-color: rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+}
+
+.fflw-theme-donate {
+  background-color: var(--donate-bg) !important;
+  border: 1px solid #a5d6a7 !important;
+  border-left: 6px solid var(--donate-border) !important;
+  color: #111111 !important;
+}
+
+.fflw-theme-need {
+  background-color: var(--need-bg) !important;
+  border: 1px solid #b8d4ec !important;
+  border-left: 6px solid var(--need-border) !important;
+  color: #111111 !important;
+}
+
 .site-header {
   max-width: 1100px;
   margin: 0 auto;
@@ -70,7 +116,6 @@ html, body {
   margin: 0 auto;
 }
 
-/* Gemeinsame Basis für das globale Flaggenband mit großzügigem Abstand zum Logo */
 .global-flag-bar {
   display: flex;
   align-items: center;
@@ -84,7 +129,6 @@ html, body {
   transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
-/* STIL A (Standard): Zeigehand + pulsierende Radar-Kreiswellen an der Fingerspitze */
 .global-flag-bar.style-A {
   padding: 6px 12px;
   background: linear-gradient(90deg, #f2f6fb 0%, #e6eff9 50%, #f2f6fb 100%);
@@ -97,7 +141,6 @@ html, body {
   box-shadow: 0 2px 8px rgba(0, 64, 128, 0.16);
 }
 
-/* STIL B: 3D-Chip mit Vereinsblau-Rahmen und Richtungsbogen */
 .global-flag-bar.style-B {
   padding: 5px 8px;
   background: #ffffff;
@@ -111,7 +154,6 @@ html, body {
   box-shadow: 0 4px 10px rgba(0, 64, 128, 0.22);
 }
 
-/* STIL C: Minimalistisch, schmal & luftig ohne schweren Rahmen */
 .global-flag-bar.style-C {
   margin-top: 22px;
   padding: 3px 6px;
@@ -139,7 +181,6 @@ html, body {
   border-radius: 6px;
 }
 
-/* Sanftes Pulsieren der Radar-Kreiswellen an der Fingerspitze */
 @keyframes fflw-tap-wave {
   0%   { opacity: 0.95; transform: scale(0.88); }
   50%  { opacity: 0.45; transform: scale(1.08); }
@@ -187,7 +228,6 @@ html, body {
   100% { transform: translateX(-50%); }
 }
 
-/* Desktop: Header + Flaggenband bleiben oben immer sichtbar stehen */
 @media (min-width: 768px) {
   .site-header {
     position: sticky;
@@ -208,9 +248,6 @@ html, body {
   align-items: flex-start;
 }
 
-/* ==========================================================================
-3. NAVIGATION (BOMBENFEST LINKSBÜNDIG + STICKY AUF DESKTOP)
-   ========================================================================== */
 .side-nav {
   width: 250px;
   flex-shrink: 0;
@@ -220,7 +257,6 @@ html, body {
   border-radius: 4px;
 }
 
-/* Desktop: Menü bleibt direkt unter dem Header immer sichtbar stehen */
 @media (min-width: 768px) {
   .side-nav {
     position: sticky;
@@ -318,28 +354,11 @@ html, body {
   width: 100%;
 }
 
-.flag-carousel-inline {
-  display: inline-flex;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 65px;
+.nav-static-flags {
+  font-size: 0.95rem;
   margin-left: 6px;
   flex-shrink: 0;
-}
-
-.flag-track-inline {
-  display: inline-block;
-  animation: flag-scroll 8s linear infinite;
-}
-
-.flag-track-inline span {
-  font-size: 1rem;
-  margin-right: 4px;
-}
-
-@keyframes flag-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  letter-spacing: 1px;
 }
 
 .side-nav details ul li a,
@@ -383,14 +402,12 @@ html, body {
   background: rgba(255, 255, 255, 0.35);
 }
 
-/* ==========================================================================
-4. INHALTSBEREICH, WARTUNGS-KARTE & LIVE-AUSGRAUEN RESERVIERTER ARTIKEL
-   ========================================================================== */
 .content {
   flex-grow: 1;
   background: #ffffff;
   padding: 0 10px 20px 10px;
   min-width: 0;
+  color: #111111;
 }
 
 .content h1,
@@ -404,7 +421,6 @@ html, body {
   hyphens: auto;
 }
 
-/* Wartungskarte mit Stopp-Händen in Vereinsfarben */
 .fflw-maintenance-card {
   background: linear-gradient(180deg, #f4f8fc 0%, #ffffff 100%);
   border: 2px solid var(--primary-color);
@@ -426,10 +442,9 @@ html, body {
   max-width: 540px;
   margin: 0 auto 14px auto;
   font-size: 1.02rem;
-  color: #333333;
+  color: #222222;
 }
 
-/* Live-Ausgrauen, wenn ein Artikel während des Stöberns reserviert wurde */
 .fflw-artikel-karte.fflw-bereits-reserviert {
   opacity: 0.48;
   filter: grayscale(85%);
@@ -445,14 +460,11 @@ html, body {
   padding: 10px 14px;
   border-radius: 6px;
   margin-bottom: 10px;
-  border: 2px solid #ffd700;
+  border: 2px solid #ffffff;
   text-align: center;
   font-size: 0.98rem;
 }
 
-/* ==========================================================================
-5. UNTERER BLAUER KONTAKT-BLOCK (FLASCHENPOST)
-   ========================================================================== */
 .contact-block {
   max-width: 1100px;
   margin: 0 auto;
@@ -502,12 +514,12 @@ html, body {
   background-color: #ffffff;
   text-align: left;
   font-size: 0.85rem;
-  color: #666666;
+  color: #555555;
   border-radius: 0 0 4px 4px;
 }
 
 .legal-footer a {
-  color: #666666;
+  color: #555555;
   text-decoration: none;
 }
 
@@ -515,7 +527,6 @@ html, body {
   text-decoration: underline;
 }
 
-/* SCHATTEN FÜR DEN WEISSEN GESAMTKASTEN (DESKTOP) */
 @media (min-width: 768px) {
   .layout,
   .contact-block {
@@ -526,9 +537,6 @@ html, body {
   }
 }
 
-/* ==========================================================================
-6. MOBILE RESPONSIVENESS (SCHMALER ALS 768PX)
-   ========================================================================== */
 @media (max-width: 767px) {
   body {
     padding-top: 52px;
@@ -639,7 +647,6 @@ html, body {
   }
 }
 
-/* Anpassung für die obere Google-Übersetzungsleiste */
 body { top: 0 !important; }
 .goog-te-gadget { color: #ffffff !important; font-size: 0.85rem !important; }
 .goog-te-gadget select { padding: 4px; border-radius: 3px; width: 100%; margin-top: 4px; }

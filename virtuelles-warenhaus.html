@@ -1,10 +1,10 @@
 <!-- ==========================================================================
-  DATEI: virtuelles-warenhaus.html_von_gemini.txt
-  ERSTELLT VON GEMINI AM: 2026-11-20 01:32 CET
-  BESCHREIBUNG: Übersichts- & Startseite für das Virtuelle Warenhaus FFLW
-    - Klare Einstiegs-Karten: Angebote ansehen, Möbel spenden, Bedarf anmelden, Dauerbedarf
-    - Live-Status-Kachel (zeigt direkt an, wie viele Angebote online & wie viele Gesuche offen sind)
-    - Bereich "Wie alles begann" mit der Zeichnung warenhaus-zeichnung.jpg
+  DATEI: virtuelles-warenhaus.html – von Gemini
+  ERSTELLT VON GEMINI AM: 2026-11-20 19:08 CET
+  BESCHREIBUNG: Übersichtsseite Virtuelles Warenhaus (FFLW)
+    - Kontrastreiches, helles Design mit vereinsblauer & schwarzer Schrift
+    - Aufgeräumtes Wording & direkte Einstiege (Spenden = Hellgrün, Suchen/Angebote = Hellblau)
+    - Statische Flaggen am Sprachenknopf (kein doppeltes Karussell)
 ========================================================================== -->
 <!doctype html>
 <html lang="de">
@@ -14,93 +14,72 @@
   <title>Virtuelles Warenhaus - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .fflw-card {
-      margin: 18px 0;
-      padding: 18px 20px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.10);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-    }
-    .fflw-card-gold {
-      border-left: 6px solid #ffd700;
-      background: rgba(255, 215, 0, 0.12);
-    }
-    .fflw-card-green {
-      border-left: 6px solid #4caf50;
-      background: rgba(46, 125, 50, 0.16);
-    }
-    .fflw-action-grid {
+    .vw-hero-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 16px;
-      margin: 20px 0;
+      margin: 18px 0 24px 0;
     }
-    .fflw-action-tile {
+    .vw-action-card {
+      border-radius: 10px;
+      padding: 18px 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 18px;
-      border-radius: 10px;
-      background: rgba(0, 0, 0, 0.28);
-      border: 2px solid rgba(255, 255, 255, 0.38);
-      text-decoration: none;
-      color: #ffffff;
-      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+      gap: 14px;
+      box-shadow: 0 3px 10px rgba(0, 64, 128, 0.08);
     }
-    .fflw-action-tile:hover {
-      transform: translateY(-2px);
-      border-color: #ffd700;
-      background: rgba(255, 255, 255, 0.14);
-    }
-    .fflw-tile-cta {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 0.92rem;
-      text-align: center;
-      background: #2e7d32;
-      color: #ffffff;
+    .vw-card-donate {
+      background: #eaf6ec;
       border: 1px solid #a5d6a7;
-    }
-    .fflw-story-wrap {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      align-items: center;
-      margin-top: 12px;
-    }
-    .fflw-story-figure {
-      margin: 0;
-      padding: 10px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.94);
+      border-left: 6px solid #2e7d32;
       color: #111111;
-      border: 2px solid #ffd700;
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
     }
-    .fflw-story-figure img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 6px;
+    .vw-card-browse {
+      background: #eef6fc;
+      border: 1px solid #b8d4ec;
+      border-left: 6px solid #004080;
+      color: #111111;
     }
-    .fflw-story-figure figcaption {
-      margin-top: 8px;
-      font-size: 0.88rem;
-      font-weight: bold;
+    .vw-card-search {
+      background: #eef6fc;
+      border: 1px solid #b8d4ec;
+      border-left: 6px solid #1565c0;
+      color: #111111;
+    }
+    .vw-cta-btn {
+      display: inline-block;
       text-align: center;
-      color: #222222;
+      padding: 12px 16px;
+      border-radius: 7px;
+      font-weight: bold;
+      text-decoration: none !important;
+      font-size: 0.98rem;
+    }
+    .vw-btn-green {
+      background: #2e7d32;
+      color: #ffffff !important;
+      border: 1px solid #1b5e20;
+    }
+    .vw-btn-blue {
+      background: #004080;
+      color: #ffffff !important;
+      border: 1px solid #002b55;
+    }
+    .vw-steps-box {
+      background: #f8fbff;
+      border: 1px solid #c5d7eb;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 20px 0;
+      color: #111111;
     }
   </style>
 </head>
 <body>
   <header class="site-header">
     <a href="index.html" aria-label="Zur Startseite">
-      <img
-        src="assets/images/logo-mit-text.png"
-        alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
     </a>
   </header>
 
@@ -110,110 +89,62 @@
     <main class="content">
       <h2>Das Virtuelle Warenhaus</h2>
 
-      <!-- Sprachenknopf -->
-      <p style="margin: 14px 0 22px 0;">
+      <p style="margin: 14px 0 20px 0;">
         <a href="fflw-international.html?return=virtuelles-warenhaus.html"
-           style="display: inline-flex; align-items: center; gap: 10px; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-           <span>🌐 Sprache wählen / ÜbersetzungsTool</span>
-           <span class="flag-carousel-inline" title="Viele Sprachen unterstützt">
-             <span class="flag-track-inline">
-               <span>🇩🇪</span><span>🇺🇦</span><span>🇬🇧</span><span>🇸🇾</span><span>🇦🇫</span><span>🇹🇷</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
-               <span>🇩🇪</span><span>🇺🇦</span><span>🇬🇧</span><span>🇸🇾</span><span>🇦🇫</span><span>🇹🇷</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
-             </span>
-           </span>
+           style="display: inline-flex; align-items: center; gap: 10px; background-color: #eef6fc; color: #003366; border: 2px solid #004080; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px;">
+           <span>Sprache wählen / ÜbersetzungsTool</span>
+           <span>🇩🇪 🇺🇦 🇹🇷</span>
         </a>
       </p>
 
-      <div class="fflw-card fflw-card-green">
-        <p style="margin: 0 0 8px 0; font-size: 1.08rem; font-weight: bold;">
-          🏠 Gut erhaltene Möbel &amp; Haushaltsgeräte – direkt vermittelt statt teuer eingelagert
-        </p>
-        <p style="margin: 0;">
-          Im <strong>Virtuellen Warenhaus</strong> des Freundeskreises Flüchtlinge Leutenbach &amp; Winnenden bringen wir Menschen aus der Region, die gut erhaltene Möbel abgeben möchten, direkt mit geflüchteten Familien zusammen, die ihre erste eigene Wohnung einrichten.
-        </p>
+      <p style="font-size: 1.03rem; color: #111111;">
+        In unserem <strong>Virtuellen Warenhaus</strong> vermitteln wir gut erhaltene Möbel, Haushaltsgeräte und Alltagssachen direkt von Menschen aus Leutenbach und Winnenden an geflüchtete Familien vor Ort – ohne teures Zwischenlager und ohne unnötige Wege.
+      </p>
+
+      <div class="vw-hero-grid">
+        <article class="vw-action-card vw-card-donate">
+          <div>
+            <h3 style="margin: 0 0 8px 0; color: #1b5e20;">1. Möbel &amp; Sachen spenden</h3>
+            <p style="margin: 0; font-size: 0.96rem; color: #111111;">
+              Sie haben ein gut erhaltenes Möbelstück oder Haushaltsgerät abzugeben? Einfach Foto machen, kurz beschreiben und online melden – die Sachen bleiben bis zur Vermittlung bequem bei Ihnen stehen.
+            </p>
+          </div>
+          <a href="moebel-abgeben.html" class="vw-cta-btn vw-btn-green">Jetzt Spende eintragen</a>
+        </article>
+
+        <article class="vw-action-card vw-card-browse">
+          <div>
+            <h3 style="margin: 0 0 8px 0; color: #003366;">2. Aktuelle Angebote ansehen</h3>
+            <p style="margin: 0; font-size: 0.96rem; color: #111111;">
+              Stöbern Sie durch die aktuell verfügbaren Möbel und Hausrats-Gegenstände und reservieren Sie benötigte Stücke direkt mit wenigen Klicks.
+            </p>
+          </div>
+          <a href="aktuelle-angebote.html" class="vw-cta-btn vw-btn-blue">Angebote durchsuchen</a>
+        </article>
+
+        <article class="vw-action-card vw-card-search">
+          <div>
+            <h3 style="margin: 0 0 8px 0; color: #003366;">3. Nichts gefunden? Bedarf melden</h3>
+            <p style="margin: 0; font-size: 0.96rem; color: #111111;">
+              Das passende Stück ist gerade nicht dabei? Tragen Sie Ihren Bedarf unverbindlich ein – wir melden uns, sobald etwas Passendes angeboten wird.
+            </p>
+          </div>
+          <a href="suche-sachen.html" class="vw-cta-btn vw-btn-blue">Bedarf anmelden</a>
+        </article>
       </div>
 
-      <!-- 4 SCHNELLE EINSTIEGS-KACHELN -->
-      <div class="fflw-action-grid">
-        <a href="aktuelle-angebote.html" class="fflw-action-tile">
-          <div>
-            <div style="font-size: 1.8rem; margin-bottom: 6px;">🛋️</div>
-            <strong style="font-size: 1.12rem; color: #ffd700;">Aktuelle Angebote ansehen</strong>
-            <p style="margin: 8px 0 0 0; font-size: 0.93rem; line-height: 1.45;">
-              Alle aktuell verfügbaren Möbel, Küchengeräte und Hausrat mit Fotos, Maßen und 1-Klick-Reservierung.
-            </p>
-          </div>
-          <span class="fflw-tile-cta" id="fflw-tile-angebote-count">👉 Katalog öffnen</span>
-        </a>
-
-        <a href="moebel-abgeben.html" class="fflw-action-tile">
-          <div>
-            <div style="font-size: 1.8rem; margin-bottom: 6px;">🎁</div>
-            <strong style="font-size: 1.12rem; color: #a5d6a7;">Möbel &amp; Geräte spenden</strong>
-            <p style="margin: 8px 0 0 0; font-size: 0.93rem; line-height: 1.45;">
-              Stücke bequem mit Fotos eintragen – idealerweise „auf Abruf“, bis eine Familie gefunden ist.
-            </p>
-          </div>
-          <span class="fflw-tile-cta">👉 Spende melden</span>
-        </a>
-
-        <a href="suche-sachen.html" class="fflw-action-tile">
-          <div>
-            <div style="font-size: 1.8rem; margin-bottom: 6px;">🔍</div>
-            <strong style="font-size: 1.12rem; color: #90caf9;">Sachen suchen / Bedarf melden</strong>
-            <p style="margin: 8px 0 0 0; font-size: 0.93rem; line-height: 1.45;">
-              Nichts Passendes im Katalog gefunden? Melde hier deinen Bedarf mit Raummaßen an.
-            </p>
-          </div>
-          <span class="fflw-tile-cta" style="background: #1565c0; border-color: #90caf9;">👉 Bedarf eintragen</span>
-        </a>
-
-        <a href="dinge-die-wir-fast-immer-brauchen-koennen.html" class="fflw-action-tile">
-          <div>
-            <div style="font-size: 1.8rem; margin-bottom: 6px;">📊</div>
-            <strong style="font-size: 1.12rem; color: #ffcc80;">Was besonders oft fehlt</strong>
-            <p style="margin: 8px 0 0 0; font-size: 0.93rem; line-height: 1.45;">
-              Unsere Dauerbedarfsliste mit Live-Zähler der aktuell offenen Suchanfragen.
-            </p>
-          </div>
-          <span class="fflw-tile-cta" id="fflw-tile-bedarf-count" style="background: #e65100; border-color: #ffcc80;">👉 Live-Bedarf ansehen</span>
-        </a>
-      </div>
-
-      <!-- SO FUNKTIONIERT DAS PRINZIP -->
-      <section class="fflw-card">
-        <h3 style="margin-top: 0;">🔄 So funktioniert unser „Virtuelles“ Warenhaus</h3>
-        <ol style="margin: 0; padding-left: 20px; line-height: 1.6;">
-          <li><strong>„Auf Abruf“ beim Spender:</strong> Da wir keine riesige Lagerhalle unterhalten können, bleiben die Möbel nach Möglichkeit noch kurz beim Spender stehen, bis sie vermittelt sind.</li>
-          <li><strong>Sorgfältige Prüfung &amp; Veröffentlichung:</strong> Unser Team prüft jede eingereichte Spende kurz (Maße, Zustand, Vollständigkeit) und schaltet sie im Online-Katalog frei.</li>
-          <li><strong>Direkte Reservierung &amp; Transport:</strong> Geflüchtete Familien (oder ihre Patinnen und Paten) reservieren genau das, was wirklich in ihre Wohnung passt. Kleinteile transportieren wir oft umweltfreundlich per PKW oder <strong>Fahrradanhänger</strong>, Großmöbel mit unserem Transporter-Team.</li>
+      <section class="vw-steps-box">
+        <h3 style="margin-top: 0; color: #003366;">So funktioniert die Vermittlung</h3>
+        <ol style="margin: 0; padding-left: 20px; line-height: 1.75; color: #111111;">
+          <li><strong>Angebot einstellen:</strong> Spender tragen ihre Sachen mit Fotos und ungefähren Maßen ein.</li>
+          <li><strong>Kurze Prüfung:</strong> Unser Ehrenamts-Team schaltet das Angebot frei und gleicht es mit offenen Bedarfen vor Ort ab.</li>
+          <li><strong>Reservierung &amp; Abholung:</strong> Nach einer Reservierung stimmen wir die Übergabe ab – bei Bedarf unterstützt unser <a href="transport.html"><strong>Transport-Pool</strong></a>.</li>
         </ol>
       </section>
 
-      <!-- WIE ALLES BEGANN + ZEICHNUNG -->
-      <section class="fflw-card fflw-card-gold">
-        <h3 style="margin-top: 0; color: #ffd700;">✏️ Wie alles begann</h3>
-        <div class="fflw-story-wrap">
-          <div>
-            <p style="margin-top: 0;">
-              Am Anfang stand ein ganz praktisches Problem: Auf der einen Seite riefen regelmäßig hilfsbereite Bürgerinnen und Bürger aus Leutenbach und Winnenden an, die bei einem Umzug oder einer Haushaltsauflösung gut erhaltene Schränke, Betten oder Waschmaschinen verschenken wollten. Auf der anderen Seite zogen geflüchtete Familien aus den Gemeinschaftsunterkünften in leere Wohnungen – oft ohne jegliche Grundausstattung.
-            </p>
-            <p>
-              Ein echtes Möbelhaus mit großer Lagerhalle hätte Unsummen an Miete gekostet und doppeltes Schleppen bedeutet: erst ins Lager rein, dann wieder raus. So entstand die Idee eines <strong>„Virtuellen Warenhauses“</strong> – festgehalten in dieser ersten Skizze: Die Möbel bleiben „virtuell“ im digitalen Schaufenster, während sie physisch noch beim Spender stehen, bis der direkte Weg in ihr neues Zuhause organisiert ist.
-            </p>
-            <p style="margin-bottom: 0;">
-              Was mit Zetteln, Telefonaten und ersten Fotos begann, ist heute eine lebendige Drehscheibe für Nachbarschaftshilfe und Nachhaltigkeit in unserer Gemeinde.
-            </p>
-          </div>
-
-          <figure class="fflw-story-figure">
-            <img src="assets/images/warenhaus-zeichnung.jpg"
-                 onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src='warenhaus-zeichnung.jpg';}"
-                 alt="Erste Idee und Zeichnung zum Virtuellen Warenhaus des Freundeskreises">
-            <figcaption>Unsere ursprüngliche Idee auf Papier: Vom Spender direkt ins neue Zuhause – ohne teures Zwischenlager.</figcaption>
-          </figure>
-        </div>
-      </section>
+      <p style="font-size: 0.96rem;">
+        Sie möchten wissen, welche Dinge besonders häufig gebraucht werden? Hier geht es zu unserer <a href="dinge-die-wir-fast-immer-brauchen-koennen.html"><strong>Dauerbedarfs-Übersicht</strong></a>.
+      </p>
     </main>
   </div>
 
@@ -233,33 +164,6 @@
   <footer class="legal-footer">
     <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="sitemap.html">Sitemap</a>
   </footer>
-
   <script src="nav-loader.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
-
-      fetch(WEB_APP_URL + "?t=" + Date.now(), { method: "GET", redirect: "follow" })
-        .then(r => r.json())
-        .then(data => {
-          if (data && data.ok && Array.isArray(data.items)) {
-            const btn = document.getElementById("fflw-tile-angebote-count");
-            if (btn) btn.textContent = `👉 ${data.items.length} Angebot(e) ansehen`;
-          }
-        })
-        .catch(() => {});
-
-      fetch(WEB_APP_URL + "?action=getDemandStats&t=" + Date.now(), { method: "GET", redirect: "follow" })
-        .then(r => r.json())
-        .then(data => {
-          if (data && data.ok && Array.isArray(data.ranking)) {
-            const gesamt = data.ranking.reduce((s, x) => s + (x.anzahl || 0), 0);
-            const btn = document.getElementById("fflw-tile-bedarf-count");
-            if (btn && gesamt > 0) btn.textContent = `👉 ${gesamt} offene Anfrage(n)`;
-          }
-        })
-        .catch(() => {});
-    });
-  </script>
 </body>
 </html>

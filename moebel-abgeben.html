@@ -1,270 +1,148 @@
+<!-- ==========================================================================
+  DATEI: moebel-abgeben.html – von Gemini
+  ERSTELLT VON GEMINI AM: 2026-11-20 19:08 CET
+  BESCHREIBUNG: Möbel & Sachen spenden (Hellgrün-Design, Foto-Editor mit Pinselgröße & Undo,
+    KI-Maß-Assistent, persönlicher Nachtrags-Link + PIN)
+========================================================================== -->
 <!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Möbel &amp; Sachen abgeben - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <title>Möbel &amp; Sachen spenden - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .fflw-card {
-      margin: 18px 0;
+    .sp-card {
+      background: #eaf6ec;
+      border: 1px solid #a5d6a7;
+      border-left: 6px solid #2e7d32;
+      border-radius: 10px;
       padding: 18px 20px;
+      margin: 16px 0;
+      color: #111111;
+    }
+    .sp-card-white {
+      background: #ffffff;
+      border: 1px solid #b8d4ec;
+      border-left: 6px solid #004080;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.10);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      clear: both;
+      padding: 18px 20px;
+      margin: 16px 0;
+      color: #111111;
     }
-    .fflw-card-green {
-      border-left: 6px solid #4caf50;
-      background: rgba(46, 125, 50, 0.18);
-    }
-    .fflw-card-gold {
-      border-left: 6px solid #ffd700;
-      background: rgba(255, 215, 0, 0.12);
-    }
-    .fflw-item-box {
-      margin: 18px 0;
-      padding: 18px;
+    .sp-item-box {
+      background: #ffffff;
+      border: 2px solid #2e7d32;
       border-radius: 10px;
-      background: rgba(0, 0, 0, 0.24);
-      border: 2px solid rgba(255, 255, 255, 0.35);
-      position: relative;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      color: #111111;
     }
-    .fflw-item-header {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      padding-bottom: 12px;
-      margin-bottom: 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-    }
-    .fflw-field {
-      margin-bottom: 15px;
-      clear: both;
-    }
-    .fflw-field label {
+    .sp-label {
       display: block;
       font-weight: bold;
-      margin-bottom: 5px;
+      margin: 10px 0 4px 0;
+      color: #003366;
+      font-size: 0.95rem;
     }
-    .fflw-input, .fflw-select, .fflw-textarea {
+    .sp-input, .sp-select, .sp-textarea {
       width: 100%;
-      max-width: 560px;
       padding: 10px 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      border-radius: 7px;
+      border: 1px solid #8faadc;
       font-size: 16px;
       color: #111111;
       background: #ffffff;
-      box-sizing: border-box;
     }
-    .fflw-grid-2 {
+    .sp-row-3 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 14px;
-      max-width: 720px;
-    }
-    .fflw-grid-3 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 12px;
-      max-width: 560px;
-    }
-    .fflw-dim-check-needed {
-      border: 3px solid #ffd700 !important;
-      background: #fffde7 !important;
-    }
-    .fflw-plausi-box {
-      margin-top: 8px;
-      padding: 10px 12px;
-      border-radius: 6px;
-      background: rgba(255, 193, 7, 0.22);
-      border: 2px solid #ffd54f;
-      color: #fff;
-      font-size: 0.92rem;
-    }
-    .fflw-copy-banner {
-      margin-bottom: 12px;
-      padding: 10px 12px;
-      border-radius: 6px;
-      background: rgba(255, 215, 0, 0.20);
-      border: 1px solid #ffd700;
-      color: #fffde7;
-      font-size: 0.92rem;
-    }
-    .fflw-btn-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 10px;
-      background-color: #2e7d32;
-      color: #ffffff;
-      border: 2px solid #ffffff;
-      padding: 14px 28px;
-      font-size: 17px;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
     }
-    .fflw-btn-secondary {
+    .sp-row-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .sp-btn {
+      padding: 11px 16px;
+      border-radius: 7px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      color: #ffffff;
+      font-size: 0.95rem;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background-color: #1565c0;
-      color: #ffffff;
-      border: 1px solid #90caf9;
-      padding: 8px 14px;
-      font-size: 14px;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
     }
-    .fflw-btn-danger {
-      background-color: #b71c1c;
-      color: #ffffff;
-      border: 1px solid #ffcdd2;
-      padding: 7px 12px;
-      font-size: 13px;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .fflw-thumbs {
+    .sp-btn-green { background: #2e7d32; }
+    .sp-btn-blue { background: #004080; }
+    .sp-btn-orange { background: #d97706; }
+    .sp-btn-red { background: #c62828; }
+    .sp-btn-gray { background: #455a64; }
+    .sp-btn:disabled { opacity: 0.6; cursor: wait; }
+
+    .sp-photo-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 12px;
+      gap: 10px;
+      margin-top: 10px;
     }
-    .fflw-thumb-wrap {
-      position: relative;
-      width: 108px;
-      height: 108px;
+    .sp-photo-thumb {
+      width: 115px;
+      border: 1px solid #b8d4ec;
+      border-radius: 8px;
+      padding: 6px;
+      background: #f8fbff;
+      text-align: center;
     }
-    .fflw-thumb-wrap img {
-      width: 108px;
-      height: 108px;
+    .sp-photo-thumb img {
+      width: 100%;
+      height: 85px !important;
       object-fit: cover;
-      border-radius: 8px;
-      border: 2px solid #fff;
+      border-radius: 5px;
+      display: block;
+      margin-bottom: 5px;
     }
-    .fflw-thumb-del {
-      position: absolute;
-      top: -7px;
-      right: -7px;
-      background: #c62828;
-      color: #fff;
-      border: 2px solid #fff;
-      border-radius: 50%;
-      width: 26px;
-      height: 26px;
-      font-weight: bold;
-      cursor: pointer;
-      line-height: 20px;
-      padding: 0;
-    }
-    .fflw-thumb-edit {
-      position: absolute;
-      bottom: -7px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #ffd700;
-      color: #111;
-      border: 2px solid #111;
-      border-radius: 12px;
-      padding: 2px 8px;
-      font-size: 11px;
-      font-weight: bold;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    #fflw-upload-overlay {
+
+    /* Foto-Editor Modal */
+    .sp-modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.82);
-      z-index: 2147483646;
+      background: rgba(0, 0, 0, 0.78);
+      z-index: 10000;
       display: none;
       align-items: center;
       justify-content: center;
+      padding: 12px;
+    }
+    .sp-modal {
+      background: #ffffff;
+      color: #111111;
+      border-radius: 12px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 94vh;
+      overflow-y: auto;
       padding: 18px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     }
-    .fflw-upload-modal {
-      background: #142218;
-      color: #ffffff;
-      border: 3px solid #66bb6a;
-      border-radius: 14px;
-      max-width: 440px;
-      width: 100%;
-      padding: 24px 20px;
+    .sp-canvas-wrap {
       text-align: center;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.6);
-    }
-    .fflw-progress-bar-bg {
-      width: 100%;
-      height: 14px;
-      background: rgba(255,255,255,0.2);
+      background: #eef6fc;
+      border: 1px solid #b8d4ec;
       border-radius: 8px;
-      overflow: hidden;
-      margin: 14px 0;
-    }
-    .fflw-progress-bar-fill {
-      height: 100%;
-      width: 15%;
-      background: #66bb6a;
-      transition: width 0.35s ease;
-    }
-    #fflw-marker-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.90);
-      z-index: 2147483647;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-    }
-    .fflw-marker-box {
-      background: #1a1a1a;
-      border: 2px solid #ffd700;
-      border-radius: 12px;
-      max-width: 560px;
-      width: 100%;
-      padding: 12px;
-      color: #fff;
-      text-align: center;
-    }
-    .fflw-marker-tools {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
+      padding: 8px;
       margin: 10px 0;
-    }
-    .fflw-tool-btn {
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: 2px solid #666;
-      background: #2b2b2b;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 13px;
-    }
-    .fflw-tool-btn.active {
-      border-color: #ffd700;
-      background: #004080;
-    }
-    #fflw-marker-canvas {
-      max-width: 100%;
-      max-height: 55vh;
-      border: 2px solid #fff;
-      border-radius: 6px;
       touch-action: none;
+    }
+    #sp-editor-canvas {
+      max-width: 100%;
+      max-height: 52vh;
+      border-radius: 4px;
       cursor: crosshair;
-      background: #000;
+      touch-action: none;
     }
   </style>
 </head>
@@ -279,183 +157,200 @@
     <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
 
     <main class="content">
-      <h2>Möbel &amp; Haushaltssachen zur Verfügung stellen</h2>
+      <h2>Möbel &amp; Sachen spenden</h2>
 
-      <!-- Sprachauswahl-Kasten bewusst deaktiviert (läuft global über Kopfzeile) -->
+      <p style="margin: 12px 0 18px 0;">
+        <a href="fflw-international.html?return=moebel-abgeben.html"
+           style="display: inline-flex; align-items: center; gap: 10px; background-color: #eef6fc; color: #003366; border: 2px solid #004080; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px;">
+           <span>Sprache wählen / ÜbersetzungsTool</span>
+           <span>🇩🇪 🇺🇦 🇹🇷</span>
+        </a>
+      </p>
 
-      <div id="fflw-success-box" class="fflw-card fflw-card-green" style="display: none; border-width: 3px;">
-        <h3 style="margin-top: 0; color: #a5d6a7;">✅ Herzlichen Dank! Deine Sachspende ist eingegangen.</h3>
-        <div id="fflw-success-details"></div>
-      </div>
-
-      <div class="fflw-card fflw-card-green">
-        <p style="margin: 0 0 8px 0; font-size: 1.06rem; font-weight: bold;">
-          💚 Gut erhaltene Möbel &amp; Haushaltsgeräte direkt an bedürftige Personen und Familien vermitteln
-        </p>
-        <p style="margin: 0 0 8px 0;">
-          Da wir kein großes Lager unterhalten, bleiben die Sachen in der Regel bis zur direkten Weitergabe bei dir stehen. Trage hier ein, was du zur Verfügung stellen möchtest – wir prüfen die Angaben und schalten das Angebot frei.
-        </p>
-        <p style="margin: 0; font-size: 0.92rem; color: #e8f5e9;">
-          ✉️ <strong>Lieber per E-Mail?</strong> Du kannst uns Fotos (gerne mit einem Referenzobjekt wie einem Zollstock oder DIN-A4-Blatt daneben) und kurze Infos auch direkt an <a href="mailto:Warenhaus@freundeleuwi.org" style="color:#ffd700;">Warenhaus@freundeleuwi.org</a> senden.
+      <!-- Beruhigender Spender-Hinweis -->
+      <div class="sp-card">
+        <h3 style="margin-top: 0; color: #1b5e20;">Ganz entspannt spenden – kein Aufwand für Sie</h3>
+        <p style="margin: 0; font-size: 0.97rem; color: #111111;">
+          Sie müssen nichts sofort abbauen oder irgendwohin bringen. Ihre Möbel bleiben einfach bei Ihnen stehen, bis wir eine Familie gefunden haben, die genau dieses Stück braucht. Falls Sie Maße oder weitere Fotos gerade nicht zur Hand haben, können Sie das jederzeit später über Ihren persönlichen Link ergänzen.
         </p>
       </div>
 
-      <form id="fflw-spende-form">
-        <section class="fflw-card">
-          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px;">
-            <h3 style="margin: 0;">1. Was möchtest du zur Verfügung stellen?</h3>
-            <button type="button" id="fflw-add-item-btn" class="fflw-btn-secondary">
-              ➕ Weiteres Möbelstück / Teil hinzufügen
-            </button>
-          </div>
-          <p style="margin-top: 0; font-size: 0.92rem; opacity: 0.92;">
-            Tipp: Falls du zwei ähnliche Stücke hast (z. B. zwei unterschiedliche Schränke oder Betten), klicke an einer Position auf <strong>„📋 Ähnliches Stück kopieren“</strong>.
-          </p>
-          <div id="fflw-items-container"></div>
-        </section>
-
-        <section class="fflw-card">
-          <h3 style="margin-top: 0;">2. Abholort &amp; zeitliche Verfügbarkeit</h3>
-
-          <div class="fflw-grid-2">
-            <div class="fflw-field">
-              <label for="fflw-spende-ort">Abholort (PLZ &amp; Ort / Teilort) *</label>
-              <input type="text" id="fflw-spende-ort" class="fflw-input" required placeholder="z. B. 71397 Leutenbach-Nellmersbach">
+      <!-- Optionaler Nachtrags-Login für bestehende Spenden -->
+      <details class="sp-card-white" id="sp-edit-existing-box">
+        <summary style="font-weight: bold; color: #003366; cursor: pointer;">
+          Sie haben bereits etwas gemeldet und möchten Fotos/Maße ergänzen oder ein Teil auf „erledigt“ setzen?
+        </summary>
+        <div style="margin-top: 12px;">
+          <div class="sp-row-2">
+            <div>
+              <label class="sp-label" for="sp-edit-batch-id">Angebots-ID</label>
+              <input type="text" id="sp-edit-batch-id" class="sp-input" placeholder="z. B. SP-1732123456">
             </div>
+            <div>
+              <label class="sp-label" for="sp-edit-pin">Ihre 4-stellige PIN</label>
+              <input type="text" id="sp-edit-pin" class="sp-input" placeholder="z. B. 4821">
+            </div>
+          </div>
+          <div style="margin-top: 10px;">
+            <button type="button" id="sp-load-edit-btn" class="sp-btn sp-btn-blue">Meine Spende öffnen</button>
+            <span id="sp-edit-status" style="margin-left: 10px; font-weight: bold; color: #004080;"></span>
+          </div>
+          <div id="sp-edit-items-container" style="margin-top: 14px;"></div>
+        </div>
+      </details>
 
-            <div class="fflw-field">
-              <label for="fflw-spende-zeitraum">Wie lange kann das Stück bei dir stehen bleiben? *</label>
-              <select id="fflw-spende-zeitraum" class="fflw-select" required>
-                <option value="Auf Abruf (zeitlich flexibel, kein Druck)" selected>🟢 Auf Abruf (zeitlich flexibel, kein Druck)</option>
-                <option value="Innerhalb der nächsten 2 bis 4 Wochen">🟡 Innerhalb der nächsten 2 bis 4 Wochen</option>
-                <option value="Muss bis zu einem festen Datum raus (bitte unten angeben)">🟠 Muss bis zu einem festen Datum raus</option>
-                <option value="Sehr dringend (innerhalb der nächsten 7 Tage)">🔴 Sehr dringend (innerhalb der nächsten 7 Tage)</option>
+      <!-- HAUPTFORMULAR NEUE SPENDE -->
+      <form id="sp-donation-form">
+        <div class="sp-card-white">
+          <h3 style="margin-top: 0; color: #003366;">Schritt 1: Ihre Gegenstände eintragen</h3>
+          <div id="sp-items-list"></div>
+          <button type="button" id="sp-add-item-btn" class="sp-btn sp-btn-blue">+ Weiteres Möbelstück / Teil hinzufügen</button>
+        </div>
+
+        <div class="sp-card">
+          <h3 style="margin-top: 0; color: #1b5e20;">Schritt 2: Abholort, Zeitfenster &amp; Kontakt</h3>
+
+          <div class="sp-row-2">
+            <div>
+              <label class="sp-label" for="sp-name">Ihr Name *</label>
+              <input type="text" id="sp-name" class="sp-input" required placeholder="Vor- und Nachname">
+            </div>
+            <div>
+              <label class="sp-label" for="sp-phone">Telefon / Mobilfunk (für WhatsApp/Rückruf) *</label>
+              <input type="tel" id="sp-phone" class="sp-input" required placeholder="z. B. 0171 1234567">
+            </div>
+          </div>
+
+          <div class="sp-row-2">
+            <div>
+              <label class="sp-label" for="sp-email">E-Mail-Adresse (für Ihren persönlichen Bearbeitungs-Link)</label>
+              <input type="email" id="sp-email" class="sp-input" placeholder="name@beispiel.de">
+            </div>
+            <div>
+              <label class="sp-label" for="sp-plz-ort">PLZ und Ort *</label>
+              <input type="text" id="sp-plz-ort" class="sp-input" required placeholder="z. B. 71364 Winnenden">
+            </div>
+          </div>
+
+          <div class="sp-row-2">
+            <div>
+              <label class="sp-label" for="sp-street">Straße &amp; Hausnummer (wird NICHT öffentlich gezeigt)</label>
+              <input type="text" id="sp-street" class="sp-input" placeholder="Musterstraße 12">
+            </div>
+            <div>
+              <label class="sp-label" for="sp-lager">Lagerung bis zur Vermittlung</label>
+              <select id="sp-lager" class="sp-select">
+                <option value="Kann auf Abruf bei mir stehen bleiben">Kann auf Abruf bei mir stehen bleiben</option>
+                <option value="Steht bereits abholbereit (Garage/Erdgeschoss)">Steht bereits abholbereit (Garage/Erdgeschoss)</option>
+                <option value="Muss bis zu einem festen Termin raus">Muss bis zu einem festen Termin raus</option>
               </select>
             </div>
           </div>
 
-          <div class="fflw-field" id="fflw-spende-frist-box" style="display: none;">
-            <label for="fflw-spende-frist-datum">Spätester Abholtermin / Stichtag *</label>
-            <input type="date" id="fflw-spende-frist-datum" class="fflw-input" style="max-width: 240px;">
-          </div>
-
-          <div id="fflw-grossmoebel-logistik" style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed rgba(255,255,255,0.3);">
-            <div style="font-weight: bold; color: #ffd700; margin-bottom: 10px;">
-              🚚 Kurze Info für unser Transport-Team (wegen Großmöbeln):
+          <div class="sp-row-2">
+            <div>
+              <label class="sp-label" for="sp-verfuegbar-ab">Verfügbar ab</label>
+              <input type="text" id="sp-verfuegbar-ab" class="sp-input" value="Ab sofort" placeholder="z. B. Ab sofort oder ab 01.12.">
             </div>
-            <div class="fflw-grid-2">
-              <div class="fflw-field">
-                <label for="fflw-spende-etage">Stockwerk &amp; Aufzug *</label>
-                <select id="fflw-spende-etage" class="fflw-select">
-                  <option value="Erdgeschoss / ebenerdig / Garage">Erdgeschoss / ebenerdig / Garage</option>
-                  <option value="Mit großem Aufzug erreichbar">Mit großem Aufzug erreichbar</option>
-                  <option value="1. oder 2. Obergeschoss (Treppenhaus)">1. oder 2. Obergeschoss (Treppenhaus)</option>
-                  <option value="3. Obergeschoss oder höher (ohne Aufzug)">3. Obergeschoss oder höher (ohne Aufzug)</option>
-                  <option value="Keller / Dachboden">Keller / Dachboden</option>
-                </select>
-              </div>
-
-              <div class="fflw-field">
-                <label for="fflw-spende-parken">Parkmöglichkeit &amp; Tragehilfe vor Ort</label>
-                <select id="fflw-spende-parken" class="fflw-select">
-                  <option value="Transporter kann direkt vor die Tür / Hof fahren">Transporter kann direkt vor die Tür fahren</option>
-                  <option value="Kurzer Fußweg (ca. 10–30 m) zum Fahrzeug">Kurzer Fußweg (ca. 10–30 m) zum Fahrzeug</option>
-                  <option value="Ich/wir können beim Raustragen mit anfassen">Ich/wir können beim Raustragen mit anfassen</option>
-                </select>
-              </div>
+            <div>
+              <label class="sp-label" for="sp-abholfrist">Zeitraum / Frist (falls vorhanden)</label>
+              <input type="text" id="sp-abholfrist" class="sp-input" placeholder="z. B. flexibel oder bis Ende des Monats">
             </div>
           </div>
 
-          <div class="fflw-field" style="margin-top: 12px; background: rgba(255,255,255,0.07); padding: 12px; border-radius: 8px;">
-            <label style="display: flex; align-items: flex-start; gap: 10px; font-weight: normal; cursor: pointer; margin: 0;">
-              <input type="checkbox" id="fflw-spende-zweite-chance" checked style="width: 20px; height: 20px; margin-top: 2px; accent-color: #2e7d32; flex-shrink: 0;">
-              <span>
-                <strong>🌍 „Alles ist besser als die Deponie“:</strong> Falls vor Ort kein Abnehmer gefunden wird, darf das Stück auch für angemeldete regionale, bundesweite oder internationale Hilfsbedarfe vermittelt werden.
-              </span>
-            </label>
-          </div>
-        </section>
-
-        <section class="fflw-card">
-          <h3 style="margin-top: 0;">3. Deine Kontaktdaten (bleiben intern, nicht öffentlich)</h3>
-
-          <div class="fflw-grid-2">
-            <div class="fflw-field">
-              <label for="fflw-spende-name">Vor- und Nachname *</label>
-              <input type="text" id="fflw-spende-name" class="fflw-input" required placeholder="z. B. Erika Muster">
+          <div class="sp-row-3">
+            <div>
+              <label class="sp-label" for="sp-stockwerk">Stockwerk</label>
+              <select id="sp-stockwerk" class="sp-select">
+                <option value="Erdgeschoss">Erdgeschoss</option>
+                <option value="1. OG">1. OG</option>
+                <option value="2. OG">2. OG</option>
+                <option value="3. OG oder höher">3. OG oder höher</option>
+                <option value="Keller">Keller</option>
+              </select>
             </div>
-
-            <div class="fflw-field">
-              <label for="fflw-spende-telefon">Telefon / WhatsApp / Signal *</label>
-              <input type="tel" id="fflw-spende-telefon" class="fflw-input" required placeholder="z. B. 0171 1234567">
+            <div>
+              <label class="sp-label" for="sp-aufzug">Aufzug vorhanden?</label>
+              <select id="sp-aufzug" class="sp-select">
+                <option value="Kein Aufzug">Kein Aufzug</option>
+                <option value="Kleiner Personenaufzug">Kleiner Personenaufzug</option>
+                <option value="Großer Aufzug">Großer Aufzug</option>
+              </select>
+            </div>
+            <div>
+              <label class="sp-label" for="sp-mithilfe">Mithilfe beim Tragen?</label>
+              <select id="sp-mithilfe" class="sp-select">
+                <option value="Ich kann mit anfassen">Ich kann mit anfassen</option>
+                <option value="Tragehilfe durch Team nötig">Tragehilfe durch Team nötig</option>
+              </select>
             </div>
           </div>
 
-          <div class="fflw-field">
-            <label for="fflw-spende-email">E-Mail-Adresse (für Bestätigung &amp; Rückfragen) *</label>
-            <input type="email" id="fflw-spende-email" class="fflw-input" required placeholder="name@example.de">
+          <label class="sp-label" for="sp-notiz">Allgemeine Hinweise (optional)</label>
+          <textarea id="sp-notiz" class="sp-textarea" rows="2" placeholder="z. B. Beste Erreichbarkeit, Parkmöglichkeit vor dem Haus …"></textarea>
+
+          <div style="margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+            <button type="submit" id="sp-submit-btn" class="sp-btn sp-btn-green" style="font-size: 1.05rem; padding: 13px 22px;">
+              Spende absenden
+            </button>
+            <div id="sp-submit-feedback" style="font-weight: bold; color: #003366;"></div>
           </div>
-
-          <div class="fflw-field" style="margin-top: 14px;">
-            <label style="display: flex; align-items: flex-start; gap: 10px; font-weight: normal; cursor: pointer;">
-              <input type="checkbox" id="fflw-spende-dsgvo" required style="width: 20px; height: 20px; margin-top: 2px; accent-color: #2e7d32; flex-shrink: 0;">
-              <span>
-                Ich bin einverstanden, dass meine Angaben und Fotos vom Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden zur Vermittlung an bedürftige Personen und Familien verarbeitet werden. *
-              </span>
-            </label>
-          </div>
-
-          <div id="fflw-spende-feedback" style="margin: 14px 0; font-weight: bold;"></div>
-
-          <button type="submit" id="fflw-spende-submit" class="fflw-btn-primary">
-            💚 Sachspende jetzt absenden
-          </button>
-        </section>
+        </div>
       </form>
+
+      <!-- Erfolgsbox nach Absenden -->
+      <div id="sp-success-box" class="sp-card" style="display: none;">
+        <h3 style="margin-top: 0; color: #1b5e20;">Vielen Dank! Ihre Möbelspende ist eingegangen.</h3>
+        <p id="sp-success-details" style="color: #111111;"></p>
+      </div>
     </main>
   </div>
 
-  <div id="fflw-upload-overlay">
-    <div class="fflw-upload-modal">
-      <div style="font-size: 2.2rem;">⏳</div>
-      <h3 id="fflw-upload-title" style="margin: 8px 0;">Spende wird übertragen …</h3>
-      <p id="fflw-upload-step" style="margin: 6px 0; color: #a5d6a7; font-weight: bold;">Fotos werden optimiert und hochgeladen …</p>
-      <div class="fflw-progress-bar-bg">
-        <div id="fflw-upload-bar" class="fflw-progress-bar-fill"></div>
+  <!-- FOTO-EDITOR MODAL (DREHEN, ZUSCHNEIDEN, UNKENNTLICH MACHEN MIT PINSELGRÖSSE & UNDO) -->
+  <div class="sp-modal-backdrop" id="sp-editor-modal">
+    <div class="sp-modal">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+        <h3 style="margin: 0; color: #003366;">Foto drehen &amp; Privates unkenntlich machen</h3>
+        <button type="button" id="sp-ed-close" class="sp-btn sp-btn-gray">Abbrechen</button>
       </div>
-      <p style="margin: 10px 0 0 0; font-size: 0.92rem; color: #ffd54f; background: rgba(255,193,7,0.16); padding: 10px; border-radius: 8px;">
-        ⚠️ <strong>Bitte dieses Fenster kurz geöffnet lassen</strong> und nicht in eine andere App oder einen anderen Tab wechseln, bis das grüne Häkchen erscheint!
+      <p style="font-size: 0.9rem; color: #222222; margin: 6px 0;">
+        Mit dem Finger oder der Maus über Gesichter, Bilderrahmen oder persönliche Unterlagen streichen, um sie zu überdecken.
       </p>
-    </div>
-  </div>
 
-  <div id="fflw-marker-overlay">
-    <div class="fflw-marker-box">
-      <div style="font-weight: bold; color: #ffd700; margin-bottom: 4px;">
-        ✏️ Foto kurz markieren (mit Finger oder Maus zeichnen)
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px;">
+        <button type="button" id="sp-ed-rot-left" class="sp-btn sp-btn-blue">↺ 90° links</button>
+        <button type="button" id="sp-ed-rot-right" class="sp-btn sp-btn-blue">↻ 90° rechts</button>
+        <button type="button" id="sp-ed-undo" class="sp-btn sp-btn-orange">↶ Letzten Strich rückgängig</button>
+        <label style="font-size: 0.9rem; font-weight: bold; color: #003366; margin-left: 6px;">
+          Pinselstärke:
+          <select id="sp-ed-brush-size" style="padding: 5px 8px; border-radius: 5px; border: 1px solid #8faadc;">
+            <option value="18">Fein</option>
+            <option value="34" selected>Mittel</option>
+            <option value="56">Breit</option>
+          </select>
+        </label>
       </div>
-      <div style="font-size: 0.85rem; color: #ddd;">
-        Kreise das gemeinte Möbelstück <strong>grün</strong> ein oder streiche andere Sachen <strong>rot</strong> durch.
+
+      <div class="sp-canvas-wrap">
+        <canvas id="sp-editor-canvas"></canvas>
       </div>
-      <div class="fflw-marker-tools">
-        <button type="button" class="fflw-tool-btn active" data-tool="green">🟢 Einkreisen (Gemeint)</button>
-        <button type="button" class="fflw-tool-btn" data-tool="red">❌ Ausixen (Nicht gemeint)</button>
-        <button type="button" class="fflw-tool-btn" data-tool="black">⬛ Schwärzen (Privat)</button>
-        <button type="button" id="fflw-marker-reset" class="fflw-tool-btn">↺ Zurücksetzen</button>
-      </div>
-      <canvas id="fflw-marker-canvas"></canvas>
-      <div style="display: flex; justify-content: center; gap: 12px; margin-top: 12px;">
-        <button type="button" id="fflw-marker-cancel" class="fflw-btn-danger">Abbrechen</button>
-        <button type="button" id="fflw-marker-save" class="fflw-btn-primary" style="padding: 9px 20px; font-size: 15px;">✅ Markierung übernehmen</button>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button type="button" id="sp-ed-save" class="sp-btn sp-btn-green">Änderungen übernehmen</button>
       </div>
     </div>
   </div>
 
   <section class="contact-block">
+    <p><strong>Du möchtest aktiv werden? Oder einfach mal den Kontakt zum Freundeskreis aufnehmen? Dann schreib uns doch, wir freuen uns!</strong></p>
     <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
     <p>
+      <strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a><br>
       <strong>Sachen-Spenden (Infos, Kontakt):</strong> <a href="mailto:Warenhaus@freundeleuwi.org">Warenhaus@freundeleuwi.org</a><br>
-      <strong>Transport-Mithilfe:</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a>
+      <strong>Sachen-Suchen (Infos, Kontakt):</strong> <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
+      <strong>Transport-Mithilfe (Infos, Kontakt):</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a><br>
+      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong> <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a><br>
+      <strong>Geldspenden und Spendenbescheinigungen:</strong> <a href="mailto:Kasse-FFLW@freundeleuwi.org">Kasse-FFLW@freundeleuwi.org</a>
     </p>
   </section>
 
@@ -468,656 +363,616 @@
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
 
-      const TRANSPORT_OPTIONEN = [
-        "🎒 Passt in Tasche / zu Fuß tragbar",
-        "🚲 Passt auf Fahrrad mit Anhänger (Lastenanhänger)",
-        "🚗 Passt in normalen PKW (ggf. Rückbank umgeklappt)",
-        "🚐 Transporter oder Anhänger nötig"
-      ];
+      const KATALOG = {
+        "Schlafzimmer": ["Einzelbett (90×200)", "Doppelbett (140–180×200)", "Kinderbett / Gitterbett", "Matratze", "Lattenrost", "Kleiderschrank (2-türig)", "Kleiderschrank (3-türig)", "Kommode / Nachttisch", "Sonstiges (eigener Eintrag)"],
+        "Wohnzimmer & Essbereich": ["Esstisch", "Stuhl / Stühle", "Sofa / Couch (2- oder 3-Sitzer)", "Sessel", "Couchtisch", "Regal / Bücherregal", "TV-Board / Sideboard", "Sonstiges (eigener Eintrag)"],
+        "Küche & Elektrogeräte": ["Waschmaschine", "Kühlschrank", "Kühl-Gefrier-Kombination", "Herd / Backofen", "Mikrowelle", "Kaffeemaschine / Wasserkocher", "Kochtöpfe & Pfannen", "Geschirr & Besteck", "Sonstiges (eigener Eintrag)"],
+        "Kinder & Baby": ["Kinderwagen / Buggy", "Hochstuhl", "Kinder-Schreibtisch", "Kindersitz / Babyschale", "Sonstiges (eigener Eintrag)"],
+        "Arbeitszimmer & Flur": ["Schreibtisch", "Schreibtischstuhl", "Schuhschrank", "Garderobe / Spiegel", "Staubsauger", "Bügeleisen / Wäscheständer", "Sonstiges (eigener Eintrag)"]
+      };
 
-      const MOEBEL_KATALOG = [
-        {
-          gruppe: "🛏️ Schlafzimmer",
-          items: [
-            { name: "Einzelbett (90 / 100 × 200 cm)", isBig: true, b: 95, h: 80, t: 205, transport: 3 },
-            { name: "Doppelbett (140 × 200 cm)", isBig: true, b: 145, h: 85, t: 205, transport: 3 },
-            { name: "Doppelbett (160 / 180 × 200 cm)", isBig: true, b: 170, h: 85, t: 205, transport: 3 },
-            { name: "Matratze (sauber & gut erhalten)", isBig: true, b: 90, h: 18, t: 200, transport: 2 },
-            { name: "Lattenrost", isBig: true, b: 90, h: 8, t: 200, transport: 2 },
-            { name: "Kleiderschrank (1- oder 2-türig)", isBig: true, b: 100, h: 200, t: 58, transport: 3 },
-            { name: "Kleiderschrank (3- oder 4-türig)", isBig: true, b: 180, h: 210, t: 60, transport: 3 },
-            { name: "Kommode / Sideboard", isBig: true, b: 110, h: 85, t: 45, transport: 2 },
-            { name: "Nachttisch", isBig: false, b: 45, h: 55, t: 40, transport: 1 }
-          ]
-        },
-        {
-          gruppe: "🛋️ Wohnzimmer",
-          items: [
-            { name: "Sofa / Couch (2- oder 3-Sitzer)", isBig: true, b: 190, h: 85, t: 90, transport: 3 },
-            { name: "Schlafsofa", isBig: true, b: 200, h: 85, t: 95, transport: 3 },
-            { name: "Sessel", isBig: true, b: 80, h: 85, t: 80, transport: 2 },
-            { name: "Couchtisch", isBig: true, b: 110, h: 45, t: 65, transport: 2 },
-            { name: "Regal / Bücherregal", isBig: true, b: 80, h: 180, t: 32, transport: 2 },
-            { name: "TV-Lowboard / Wohnwand-Element", isBig: true, b: 140, h: 50, t: 42, transport: 2 },
-            { name: "Fernseher (TV-Gerät)", isBig: false, b: 100, h: 62, t: 10, transport: 2 }
-          ]
-        },
-        {
-          gruppe: "🍽️ Küche & Esszimmer",
-          items: [
-            { name: "Esstisch", isBig: true, b: 140, h: 75, t: 85, transport: 3 },
-            { name: "Stuhl / Esszimmerstuhl", isBig: false, b: 45, h: 88, t: 48, transport: 1 },
-            { name: "Kühlschrank (Tischgerät / Unterbau)", isBig: true, b: 55, h: 85, t: 58, transport: 2 },
-            { name: "Kühl-Gefrier-Kombination (groß)", isBig: true, b: 60, h: 185, t: 62, transport: 3 },
-            { name: "Gefrierschrank / Gefriertruhe", isBig: true, b: 60, h: 140, t: 62, transport: 3 },
-            { name: "Waschmaschine / Waschtrockner", isBig: true, b: 60, h: 85, t: 60, transport: 3 },
-            { name: "Herd / Backofen / Kochplatte", isBig: true, b: 60, h: 85, t: 60, transport: 3 },
-            { name: "Mikrowelle", isBig: false, b: 48, h: 28, t: 36, transport: 1 },
-            { name: "Kochtöpfe / Schnellkochtopf / Geschirr-Set", isBig: false, b: 35, h: 25, t: 35, transport: 0 }
-          ]
-        },
-        {
-          gruppe: "🧸 Kinderzimmer & Familie",
-          items: [
-            { name: "Babybett / Gitterbett", isBig: true, b: 75, h: 85, t: 145, transport: 2 },
-            { name: "Kinderbett / Jugendbett", isBig: true, b: 95, h: 80, t: 205, transport: 3 },
-            { name: "Stockbett / Etagenbett", isBig: true, b: 100, h: 165, t: 208, transport: 3 },
-            { name: "Kinderwagen / Buggy", isBig: false, b: 60, h: 100, t: 85, transport: 2 },
-            { name: "Hochstuhl / Kindersitz (Auto)", isBig: false, b: 48, h: 80, t: 50, transport: 1 },
-            { name: "Schreibtisch", isBig: true, b: 120, h: 75, t: 65, transport: 2 },
-            { name: "Schreibtischstuhl / Drehstuhl", isBig: false, b: 60, h: 95, t: 60, transport: 2 }
-          ]
-        },
-        {
-          gruppe: "🧹 Haushalt, Flur & Sonstiges",
-          items: [
-            { name: "Schuhschrank", isBig: true, b: 80, h: 105, t: 30, transport: 2 },
-            { name: "Garderobe / Kleiderständer", isBig: true, b: 65, h: 180, t: 35, transport: 1 },
-            { name: "Spiegel (Wandspiegel / Standspiegel)", isBig: true, b: 50, h: 140, t: 5, transport: 2 },
-            { name: "Staubsauger", isBig: false, b: 30, h: 110, t: 30, transport: 1 },
-            { name: "Bügeleisen / Bügelbrett / Wäscheständer", isBig: false, b: 40, h: 120, t: 15, transport: 1 },
-            { name: "Nähmaschine", isBig: false, b: 42, h: 32, t: 20, transport: 0 },
-            { name: "Großer Koffer / Einkaufstrolley", isBig: false, b: 50, h: 75, t: 30, transport: 1 },
-            { name: "✏️ Sonstiges (neuen Gegenstand vorschlagen)", isBig: true, isCustom: true, b: 80, h: 80, t: 50, transport: 2 }
-          ]
-        }
-      ];
+      let itemsState = [];
+      let editorTarget = { itemIdx: -1, photoIdx: -1 };
+      let editorHistory = [];
+      let isDrawing = false;
 
-      const itemsContainer = document.getElementById("fflw-items-container");
-      const addItemBtn = document.getElementById("fflw-add-item-btn");
-      const zeitraumSel = document.getElementById("fflw-spende-zeitraum");
-      const fristBox = document.getElementById("fflw-spende-frist-box");
-      const fristDatumIn = document.getElementById("fflw-spende-frist-datum");
-      const logistikBox = document.getElementById("fflw-grossmoebel-logistik");
-      const formEl = document.getElementById("fflw-spende-form");
+      const itemsListEl = document.getElementById("sp-items-list");
+      const canvas = document.getElementById("sp-editor-canvas");
+      const ctx = canvas.getContext("2d");
 
-      let positionen = [];
-      let posCounter = 0;
-
-      zeitraumSel.addEventListener("change", function () {
-        const needsDate = zeitraumSel.value.includes("festen Datum");
-        fristBox.style.display = needsDate ? "block" : "none";
-        fristDatumIn.required = needsDate;
-      });
-
-      function updateGrossmoebelVisibility() {
-        const hasBigItem = positionen.some(p => {
-          if (!p.presetVal) return true;
-          const [g, i] = p.presetVal.split("_").map(Number);
-          return MOEBEL_KATALOG[g]?.items[i]?.isBig !== false;
-        });
-        logistikBox.style.display = hasBigItem ? "block" : "none";
+      function createNewItem() {
+        return {
+          raumKategorie: "Wohnzimmer & Essbereich",
+          titelAuswahl: "Esstisch",
+          eigenerTitel: "",
+          anzahl: 1,
+          kategorie: "grossmoebel",
+          breite: "",
+          hoehe: "",
+          tiefe: "",
+          massArt: "Ungefähr geschätzt",
+          zerlegbar: "Ja, leicht zerlegbar",
+          transportGroesse: "Kombi / kleiner Transporter",
+          geraeteAlter: "3–7 Jahre",
+          elektroFunktion: "Funktioniert einwandfrei",
+          beschreibung: "",
+          photos: []
+        };
       }
 
-      function komprimiereBild(file) {
+      function compressImageFile(file) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = ev => {
             const img = new Image();
             img.onload = () => {
-              const MAX = 900;
-              let w = img.width, h = img.height;
-              if (w > MAX || h > MAX) {
-                if (w > h) { h = Math.round((h * MAX) / w); w = MAX; }
-                else { w = Math.round((w * MAX) / h); h = MAX; }
+              const maxDim = 1280;
+              let w = img.width;
+              let h = img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                else { w = Math.round(w * maxDim / h); h = maxDim; }
               }
-              const canvas = document.createElement("canvas");
-              canvas.width = w;
-              canvas.height = h;
-              canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-              const dataUrl = canvas.toDataURL("image/jpeg", 0.72);
+              const c = document.createElement("canvas");
+              c.width = w;
+              c.height = h;
+              c.getContext("2d").drawImage(img, 0, 0, w, h);
+              const dataUrl = c.toDataURL("image/jpeg", 0.82);
               resolve({
+                dataUrl,
                 base64: dataUrl.split(",")[1],
-                mimeType: "image/jpeg",
-                previewUrl: dataUrl,
-                originalUrl: dataUrl
+                mimeType: "image/jpeg"
               });
             };
-            img.onerror = () => reject(new Error("Bild konnte nicht gelesen werden."));
+            img.onerror = reject;
             img.src = ev.target.result;
           };
+          reader.onerror = reject;
           reader.readAsDataURL(file);
         });
       }
 
-      const markerOverlay = document.getElementById("fflw-marker-overlay");
-      const markerCanvas = document.getElementById("fflw-marker-canvas");
-      const markerCtx = markerCanvas.getContext("2d");
-      let activeMarkerTarget = null;
-      let activeMarkerTool = "green";
-      let isDrawing = false;
+      function renderItems() {
+        itemsListEl.innerHTML = "";
+        itemsState.forEach((it, idx) => {
+          const box = document.createElement("div");
+          box.className = "sp-item-box";
+          const raumOptions = Object.keys(KATALOG).map(r => `<option value="${r}" ${it.raumKategorie === r ? "selected" : ""}>${r}</option>`).join("");
+          const teilListe = KATALOG[it.raumKategorie] || [];
+          const teilOptions = teilListe.map(t => `<option value="${t}" ${it.titelAuswahl === t ? "selected" : ""}>${t}</option>`).join("");
+          const isSonstiges = it.titelAuswahl.startsWith("Sonstiges");
+          const isElektro = it.raumKategorie === "Küche & Elektrogeräte" && !["Kochtöpfe & Pfannen", "Geschirr & Besteck"].includes(it.titelAuswahl);
 
-      document.querySelectorAll(".fflw-tool-btn[data-tool]").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".fflw-tool-btn[data-tool]").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          activeMarkerTool = btn.getAttribute("data-tool");
+          box.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+              <strong style="font-size:1.06rem; color:#1b5e20;">Position ${idx + 1}</strong>
+              ${itemsState.length > 1 ? `<button type="button" class="sp-btn sp-btn-red btn-remove-item" style="padding:6px 11px; font-size:0.85rem;">Entfernen</button>` : ""}
+            </div>
+
+            <div class="sp-row-2">
+              <div>
+                <label class="sp-label">Bereich / Raum</label>
+                <select class="sp-select sel-raum">${raumOptions}</select>
+              </div>
+              <div>
+                <label class="sp-label">Gegenstand</label>
+                <select class="sp-select sel-teil">${teilOptions}</select>
+              </div>
+            </div>
+
+            ${isSonstiges ? `
+              <div>
+                <label class="sp-label">Bezeichnung des Gegenstands *</label>
+                <input type="text" class="sp-input inp-eigener-titel" value="${it.eigenerTitel}" placeholder="z. B. Schuhregal oder Stehlampe">
+              </div>
+            ` : ""}
+
+            <div class="sp-row-2">
+              <div>
+                <label class="sp-label">Stückzahl</label>
+                <input type="number" min="1" max="50" class="sp-input inp-anzahl" value="${it.anzahl}">
+              </div>
+              <div>
+                <label class="sp-label">Größen-Einordnung</label>
+                <select class="sp-select sel-kat">
+                  <option value="grossmoebel" ${it.kategorie === "grossmoebel" ? "selected" : ""}>Möbelstück / Großgerät (mit Maßen)</option>
+                  <option value="kleinteile" ${it.kategorie === "kleinteile" ? "selected" : ""}>Kleinteil / Hausrat (ohne Maße)</option>
+                </select>
+              </div>
+            </div>
+
+            ${it.kategorie === "grossmoebel" ? `
+              <div class="sp-row-3">
+                <div>
+                  <label class="sp-label">Breite (cm)</label>
+                  <input type="number" class="sp-input inp-b" value="${it.breite}" placeholder="z. B. 120">
+                </div>
+                <div>
+                  <label class="sp-label">Höhe (cm)</label>
+                  <input type="number" class="sp-input inp-h" value="${it.hoehe}" placeholder="z. B. 75">
+                </div>
+                <div>
+                  <label class="sp-label">Tiefe (cm)</label>
+                  <input type="number" class="sp-input inp-t" value="${it.tiefe}" placeholder="z. B. 80">
+                </div>
+              </div>
+              <div class="sp-row-2">
+                <div>
+                  <label class="sp-label">Wie wurden die Maße ermittelt?</label>
+                  <select class="sp-select sel-massart">
+                    <option value="Gemessen" ${it.massArt === "Gemessen" ? "selected" : ""}>Mit Meterstab gemessen</option>
+                    <option value="Ungefähr geschätzt" ${it.massArt === "Ungefähr geschätzt" ? "selected" : ""}>Ungefähr geschätzt</option>
+                    <option value="Keine Angabe möglich / weiß ich gerade nicht" ${it.massArt === "Keine Angabe möglich / weiß ich gerade nicht" ? "selected" : ""}>Weiß ich gerade nicht (wird später geklärt)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="sp-label">Zerlegbar?</label>
+                  <select class="sp-select sel-zerlegbar">
+                    <option value="Ja, leicht zerlegbar" ${it.zerlegbar === "Ja, leicht zerlegbar" ? "selected" : ""}>Ja, leicht zerlegbar</option>
+                    <option value="Teilweise zerlegbar" ${it.zerlegbar === "Teilweise zerlegbar" ? "selected" : ""}>Teilweise zerlegbar</option>
+                    <option value="Nein, am Stück" ${it.zerlegbar === "Nein, am Stück" ? "selected" : ""}>Nein, am Stück</option>
+                  </select>
+                </div>
+              </div>
+            ` : ""}
+
+            ${isElektro ? `
+              <div class="sp-row-2">
+                <div>
+                  <label class="sp-label">Ungefähres Geräte-Alter</label>
+                  <select class="sp-select sel-alter">
+                    <option value="Unter 3 Jahre" ${it.geraeteAlter === "Unter 3 Jahre" ? "selected" : ""}>Unter 3 Jahre</option>
+                    <option value="3–7 Jahre" ${it.geraeteAlter === "3–7 Jahre" ? "selected" : ""}>3–7 Jahre</option>
+                    <option value="Über 7 Jahre" ${it.geraeteAlter === "Über 7 Jahre" ? "selected" : ""}>Über 7 Jahre</option>
+                    <option value="Weiß ich nicht" ${it.geraeteAlter === "Weiß ich nicht" ? "selected" : ""}>Weiß ich nicht</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="sp-label">Funktion</label>
+                  <select class="sp-select sel-funktion">
+                    <option value="Funktioniert einwandfrei" ${it.elektroFunktion === "Funktioniert einwandfrei" ? "selected" : ""}>Funktioniert einwandfrei</option>
+                    <option value="Noch nicht getestet" ${it.elektroFunktion === "Noch nicht getestet" ? "selected" : ""}>Noch nicht getestet</option>
+                  </select>
+                </div>
+              </div>
+            ` : ""}
+
+            <label class="sp-label">Kurze Beschreibung (Material, Zustand, Besonderheiten)</label>
+            <textarea class="sp-textarea inp-beschr" rows="2" placeholder="z. B. Buche massiv, sehr guter Zustand, inklusive 4 Stühlen …">${it.beschreibung}</textarea>
+
+            <div style="margin-top: 12px; padding: 12px; background: #f4f9f5; border: 1px dashed #2e7d32; border-radius: 8px;">
+              <label class="sp-label" style="margin-top: 0; color: #1b5e20;">Fotos hinzufügen (optional – können auch später ergänzt werden)</label>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                <input type="file" accept="image/*" multiple class="inp-photos" style="max-width: 100%;">
+                ${it.photos.length > 0 && it.kategorie === "grossmoebel" ? `<button type="button" class="sp-btn sp-btn-blue btn-ai-measure" style="padding: 7px 12px; font-size: 0.88rem;">Maße aus Foto schätzen</button>` : ""}
+              </div>
+              <div class="sp-photo-grid"></div>
+            </div>
+          `;
+
+          if (box.querySelector(".btn-remove-item")) {
+            box.querySelector(".btn-remove-item").addEventListener("click", () => {
+              itemsState.splice(idx, 1);
+              renderItems();
+            });
+          }
+
+          box.querySelector(".sel-raum").addEventListener("change", e => {
+            it.raumKategorie = e.target.value;
+            it.titelAuswahl = KATALOG[it.raumKategorie][0];
+            renderItems();
+          });
+          box.querySelector(".sel-teil").addEventListener("change", e => {
+            it.titelAuswahl = e.target.value;
+            renderItems();
+          });
+          if (box.querySelector(".inp-eigener-titel")) {
+            box.querySelector(".inp-eigener-titel").addEventListener("input", e => { it.eigenerTitel = e.target.value; });
+          }
+          box.querySelector(".inp-anzahl").addEventListener("input", e => { it.anzahl = parseInt(e.target.value, 10) || 1; });
+          box.querySelector(".sel-kat").addEventListener("change", e => { it.kategorie = e.target.value; renderItems(); });
+          if (box.querySelector(".inp-b")) box.querySelector(".inp-b").addEventListener("input", e => { it.breite = e.target.value; });
+          if (box.querySelector(".inp-h")) box.querySelector(".inp-h").addEventListener("input", e => { it.hoehe = e.target.value; });
+          if (box.querySelector(".inp-t")) box.querySelector(".inp-t").addEventListener("input", e => { it.tiefe = e.target.value; });
+          if (box.querySelector(".sel-massart")) box.querySelector(".sel-massart").addEventListener("change", e => { it.massArt = e.target.value; });
+          if (box.querySelector(".sel-zerlegbar")) box.querySelector(".sel-zerlegbar").addEventListener("change", e => { it.zerlegbar = e.target.value; });
+          if (box.querySelector(".sel-alter")) box.querySelector(".sel-alter").addEventListener("change", e => { it.geraeteAlter = e.target.value; });
+          if (box.querySelector(".sel-funktion")) box.querySelector(".sel-funktion").addEventListener("change", e => { it.elektroFunktion = e.target.value; });
+          box.querySelector(".inp-beschr").addEventListener("input", e => { it.beschreibung = e.target.value; });
+
+          box.querySelector(".inp-photos").addEventListener("change", async e => {
+            const files = Array.from(e.target.files || []);
+            for (const f of files) {
+              const comp = await compressImageFile(f);
+              it.photos.push(comp);
+            }
+            renderItems();
+          });
+
+          const aiBtn = box.querySelector(".btn-ai-measure");
+          if (aiBtn) {
+            aiBtn.addEventListener("click", async () => {
+              aiBtn.disabled = true;
+              aiBtn.innerHTML = `<span class="fflw-spinner fflw-spinner-light"></span> <span>Prüfe Bild …</span>`;
+              try {
+                const resp = await fetch(WEB_APP_URL, {
+                  method: "POST",
+                  redirect: "follow",
+                  headers: { "Content-Type": "text/plain;charset=utf-8" },
+                  body: JSON.stringify({
+                    action: "estimateDimensionsAI",
+                    base64: it.photos[0].base64,
+                    mimeType: it.photos[0].mimeType
+                  })
+                });
+                const res = await resp.json();
+                if (res && res.ok) {
+                  if (res.breite) it.breite = res.breite;
+                  if (res.hoehe) it.hoehe = res.hoehe;
+                  if (res.tiefe) it.tiefe = res.tiefe;
+                  it.massArt = "Ungefähr geschätzt";
+                  renderItems();
+                  alert(`Schätzung (${res.referenzErkannt}): ca. ${res.breite} × ${res.hoehe} × ${res.tiefe} cm. ${res.hinweis || ""}`);
+                } else {
+                  alert(res.error || "Schätzung leider nicht möglich.");
+                }
+              } catch (err) {
+                alert("Verbindungsfehler: " + err.message);
+              }
+              aiBtn.disabled = false;
+              aiBtn.textContent = "Maße aus Foto schätzen";
+            });
+          }
+
+          const pGrid = box.querySelector(".sp-photo-grid");
+          it.photos.forEach((p, pIdx) => {
+            const thumb = document.createElement("div");
+            thumb.className = "sp-photo-thumb";
+            thumb.innerHTML = `
+              <img src="${p.dataUrl}" alt="Vorschau ${pIdx + 1}">
+              <button type="button" class="sp-btn sp-btn-blue btn-ed-photo" style="padding:4px 7px; font-size:0.78rem; width:100%; justify-content:center; margin-bottom:4px;">Drehen / Schwärzen</button>
+              <button type="button" class="sp-btn sp-btn-red btn-del-photo" style="padding:4px 7px; font-size:0.78rem; width:100%; justify-content:center;">Löschen</button>
+            `;
+            thumb.querySelector(".btn-ed-photo").addEventListener("click", () => openPhotoEditor(idx, pIdx));
+            thumb.querySelector(".btn-del-photo").addEventListener("click", () => {
+              it.photos.splice(pIdx, 1);
+              renderItems();
+            });
+            pGrid.appendChild(thumb);
+          });
+
+          itemsListEl.appendChild(box);
         });
-      });
-
-      function loadImageToMarkerCanvas(srcUrl) {
-        const img = new Image();
-        img.onload = () => {
-          markerCanvas.width = img.width;
-          markerCanvas.height = img.height;
-          markerCtx.drawImage(img, 0, 0);
-        };
-        img.src = srcUrl;
       }
 
-      function openPhotoMarker(posObj, photoIndex) {
-        activeMarkerTarget = { posObj, photoIndex };
-        const foto = posObj.photos[photoIndex];
-        loadImageToMarkerCanvas(foto.previewUrl);
-        markerOverlay.style.display = "flex";
+      function openPhotoEditor(itemIdx, photoIdx) {
+        editorTarget = { itemIdx, photoIdx };
+        editorHistory = [];
+        const photo = itemsState[itemIdx].photos[photoIdx];
+        const img = new Image();
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          editorHistory.push(canvas.toDataURL("image/jpeg", 0.9));
+          document.getElementById("sp-editor-modal").style.display = "flex";
+        };
+        img.src = photo.dataUrl;
+      }
+
+      function rotateCanvas(deg) {
+        const tmp = document.createElement("canvas");
+        tmp.width = canvas.height;
+        tmp.height = canvas.width;
+        const tctx = tmp.getContext("2d");
+        tctx.translate(tmp.width / 2, tmp.height / 2);
+        tctx.rotate(deg * Math.PI / 180);
+        tctx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
+        canvas.width = tmp.width;
+        canvas.height = tmp.height;
+        ctx.drawImage(tmp, 0, 0);
+        editorHistory.push(canvas.toDataURL("image/jpeg", 0.9));
       }
 
       function getCanvasCoords(e) {
-        const rect = markerCanvas.getBoundingClientRect();
+        const rect = canvas.getBoundingClientRect();
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return {
-          x: (clientX - rect.left) * (markerCanvas.width / rect.width),
-          y: (clientY - rect.top) * (markerCanvas.height / rect.height)
+          x: (clientX - rect.left) * (canvas.width / rect.width),
+          y: (clientY - rect.top) * (canvas.height / rect.height)
         };
       }
 
       function startDraw(e) {
         e.preventDefault();
         isDrawing = true;
-        const pt = getCanvasCoords(e);
-        markerCtx.beginPath();
-        markerCtx.moveTo(pt.x, pt.y);
+        const pos = getCanvasCoords(e);
+        const size = parseInt(document.getElementById("sp-ed-brush-size").value, 10) || 34;
+        ctx.fillStyle = "#222222";
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, size / 2, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       function moveDraw(e) {
         if (!isDrawing) return;
         e.preventDefault();
-        const pt = getCanvasCoords(e);
-        markerCtx.lineCap = "round";
-        markerCtx.lineJoin = "round";
-        if (activeMarkerTool === "green") {
-          markerCtx.strokeStyle = "#00e676";
-          markerCtx.lineWidth = Math.max(8, markerCanvas.width * 0.015);
-        } else if (activeMarkerTool === "red") {
-          markerCtx.strokeStyle = "#ff1744";
-          markerCtx.lineWidth = Math.max(10, markerCanvas.width * 0.018);
-        } else {
-          markerCtx.strokeStyle = "#000000";
-          markerCtx.lineWidth = Math.max(26, markerCanvas.width * 0.045);
-        }
-        markerCtx.lineTo(pt.x, pt.y);
-        markerCtx.stroke();
+        const pos = getCanvasCoords(e);
+        const size = parseInt(document.getElementById("sp-ed-brush-size").value, 10) || 34;
+        ctx.fillStyle = "#222222";
+        ctx.beginPath();
+        ctx.arc(pos.x, pos.y, size / 2, 0, Math.PI * 2);
+        ctx.fill();
       }
 
-      function endDraw() { isDrawing = false; }
+      function endDraw() {
+        if (!isDrawing) return;
+        isDrawing = false;
+        editorHistory.push(canvas.toDataURL("image/jpeg", 0.9));
+      }
 
-      markerCanvas.addEventListener("mousedown", startDraw);
-      markerCanvas.addEventListener("mousemove", moveDraw);
+      canvas.addEventListener("mousedown", startDraw);
+      canvas.addEventListener("mousemove", moveDraw);
       window.addEventListener("mouseup", endDraw);
-      markerCanvas.addEventListener("touchstart", startDraw, { passive: false });
-      markerCanvas.addEventListener("touchmove", moveDraw, { passive: false });
-      markerCanvas.addEventListener("touchend", endDraw);
+      canvas.addEventListener("touchstart", startDraw, { passive: false });
+      canvas.addEventListener("touchmove", moveDraw, { passive: false });
+      canvas.addEventListener("touchend", endDraw);
 
-      document.getElementById("fflw-marker-reset").addEventListener("click", () => {
-        if (!activeMarkerTarget) return;
-        loadImageToMarkerCanvas(activeMarkerTarget.posObj.photos[activeMarkerTarget.photoIndex].originalUrl);
-      });
-
-      document.getElementById("fflw-marker-cancel").addEventListener("click", () => {
-        markerOverlay.style.display = "none";
-        activeMarkerTarget = null;
-      });
-
-      document.getElementById("fflw-marker-save").addEventListener("click", () => {
-        if (!activeMarkerTarget) return;
-        const dataUrl = markerCanvas.toDataURL("image/jpeg", 0.75);
-        const foto = activeMarkerTarget.posObj.photos[activeMarkerTarget.photoIndex];
-        foto.previewUrl = dataUrl;
-        foto.base64 = dataUrl.split(",")[1];
-        markerOverlay.style.display = "none";
-        renderAllPositions();
-      });
-
-      function parseDecimalCm(raw) {
-        if (!raw) return NaN;
-        return parseFloat(String(raw).replace(",", ".").trim());
-      }
-
-      function checkDimensionsPlausibility(pos, plausiDiv, boxEl) {
-        const vals = [
-          { key: "breite", label: "Breite", num: parseDecimalCm(pos.breite) },
-          { key: "hoehe", label: "Höhe", num: parseDecimalCm(pos.hoehe) },
-          { key: "tiefe", label: "Tiefe", num: parseDecimalCm(pos.tiefe) }
-        ].filter(x => !isNaN(x.num) && x.num > 0);
-
-        const meterVerdacht = vals.find(x => x.num < 15);
-        const mmVerdacht = vals.find(x => x.num > 350);
-
-        if (meterVerdacht) {
-          plausiDiv.style.display = "block";
-          plausiDiv.innerHTML = `
-            ⚠️ <strong>Meter statt Zentimeter?</strong> Bei <em>${meterVerdacht.label}</em> steht <strong>${meterVerdacht.num}</strong> (das wären nur ${meterVerdacht.num} cm).
-            <button type="button" class="fflw-btn-secondary" style="margin-left:8px; padding:4px 10px; font-size:13px;" data-conv="m2cm">
-              ✨ Alle kleinen Werte × 100 in cm umrechnen
-            </button>
-          `;
-          plausiDiv.querySelector("[data-conv='m2cm']").addEventListener("click", () => {
-            ["breite", "hoehe", "tiefe"].forEach(k => {
-              const n = parseDecimalCm(pos[k]);
-              if (!isNaN(n) && n > 0 && n < 15) {
-                pos[k] = String(Math.round(n * 100));
-                boxEl.querySelector(`[data-dim="${k}"]`).value = pos[k];
-              }
-            });
-            checkDimensionsPlausibility(pos, plausiDiv, boxEl);
-          });
-        } else if (mmVerdacht) {
-          plausiDiv.style.display = "block";
-          plausiDiv.innerHTML = `
-            ⚠️ <strong>Millimeter statt Zentimeter?</strong> Bei <em>${mmVerdacht.label}</em> steht <strong>${mmVerdacht.num}</strong> (das wären ${(mmVerdacht.num / 100).toFixed(1)} Meter).
-            <button type="button" class="fflw-btn-secondary" style="margin-left:8px; padding:4px 10px; font-size:13px;" data-conv="mm2cm">
-              ✨ Große Werte ÷ 10 in cm umrechnen
-            </button>
-          `;
-          plausiDiv.querySelector("[data-conv='mm2cm']").addEventListener("click", () => {
-            ["breite", "hoehe", "tiefe"].forEach(k => {
-              const n = parseDecimalCm(pos[k]);
-              if (!isNaN(n) && n > 350) {
-                pos[k] = String(Math.round(n / 10));
-                boxEl.querySelector(`[data-dim="${k}"]`).value = pos[k];
-              }
-            });
-            checkDimensionsPlausibility(pos, plausiDiv, boxEl);
-          });
-        } else {
-          plausiDiv.style.display = "none";
-          plausiDiv.innerHTML = "";
-        }
-      }
-
-      function createPositionData(template = null, sourceIndex = null) {
-        posCounter++;
-        if (template) {
-          return {
-            id: posCounter,
-            isCopyFrom: sourceIndex,
-            dimsVerified: false,
-            presetVal: template.presetVal,
-            customTitel: template.customTitel,
-            anzahl: 1,
-            breite: template.breite,
-            hoehe: template.hoehe,
-            tiefe: template.tiefe,
-            zerlegbar: template.zerlegbar,
-            transport: template.transport,
-            beschreibung: template.beschreibung,
-            photos: []
-          };
-        }
-        return {
-          id: posCounter,
-          isCopyFrom: null,
-          dimsVerified: true,
-          presetVal: "",
-          customTitel: "",
-          anzahl: 1,
-          breite: "",
-          hoehe: "",
-          tiefe: "",
-          zerlegbar: "Nein / am Stück",
-          transport: TRANSPORT_OPTIONEN[2],
-          beschreibung: "",
-          photos: []
+      document.getElementById("sp-ed-rot-left").addEventListener("click", () => rotateCanvas(-90));
+      document.getElementById("sp-ed-rot-right").addEventListener("click", () => rotateCanvas(90));
+      document.getElementById("sp-ed-undo").addEventListener("click", () => {
+        if (editorHistory.length <= 1) return;
+        editorHistory.pop();
+        const prev = new Image();
+        prev.onload = () => {
+          canvas.width = prev.width;
+          canvas.height = prev.height;
+          ctx.drawImage(prev, 0, 0);
         };
-      }
-
-      function renderAllPositions() {
-        itemsContainer.innerHTML = "";
-        positionen.forEach((pos, idx) => {
-          const box = document.createElement("div");
-          box.className = "fflw-item-box";
-
-          let selectHtml = '<option value="">-- Bitte Gegenstand nach Zimmer wählen --</option>';
-          MOEBEL_KATALOG.forEach((grp, gIdx) => {
-            selectHtml += `<optgroup label="${grp.gruppe}">`;
-            grp.items.forEach((it, iIdx) => {
-              const v = `${gIdx}_${iIdx}`;
-              selectHtml += `<option value="${v}" ${pos.presetVal === v ? "selected" : ""}>${it.name}</option>`;
-            });
-            selectHtml += "</optgroup>";
-          });
-
-          const isCustom = (() => {
-            if (!pos.presetVal) return false;
-            const [g, i] = pos.presetVal.split("_").map(Number);
-            return Boolean(MOEBEL_KATALOG[g]?.items[i]?.isCustom);
-          })();
-
-          const dimHighlightClass = (pos.isCopyFrom !== null && !pos.dimsVerified) ? "fflw-dim-check-needed" : "";
-
-          box.innerHTML = `
-            <div class="fflw-item-header">
-              <strong style="font-size: 1.08rem; color: #ffd700;">📦 Position #${idx + 1}</strong>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button type="button" class="fflw-btn-secondary fflw-copy-pos-btn">
-                  📋 Ähnliches Stück kopieren
-                </button>
-                ${positionen.length > 1 ? `<button type="button" class="fflw-btn-danger fflw-del-pos-btn">✕ Entfernen</button>` : ""}
-              </div>
-            </div>
-
-            ${pos.isCopyFrom !== null && !pos.dimsVerified ? `
-              <div class="fflw-copy-banner">
-                ⚠️ <strong>Kopie von Position #${pos.isCopyFrom}:</strong> Kategorie und Text wurden übernommen. Bitte <strong>Maße</strong> (gelb markiert) prüfen/anpassen und <strong>eigene Fotos</strong> dieses Stücks hochladen!
-              </div>
-            ` : ""}
-
-            <div class="fflw-grid-2">
-              <div class="fflw-field">
-                <label>Gegenstand / Möbelstück *</label>
-                <select class="fflw-select fflw-pos-preset" required>${selectHtml}</select>
-              </div>
-              <div class="fflw-field">
-                <label>Stückzahl</label>
-                <input type="number" min="1" max="30" class="fflw-input fflw-pos-anzahl" value="${pos.anzahl}" style="max-width: 110px;">
-              </div>
-            </div>
-
-            <div class="fflw-field fflw-pos-custom-wrap" style="display: ${isCustom ? "block" : "none"};">
-              <label>Neuen Gegenstand benennen (wird für unseren Katalog gemerkt) *</label>
-              <input type="text" class="fflw-input fflw-pos-custom" value="${pos.customTitel}" placeholder="z. B. Wickelkommode, Gefrierbox, Teppich" ${isCustom ? "required" : ""}>
-            </div>
-
-            <div class="fflw-field">
-              <label>Ungefähre Maße in Zentimetern (cm) – Breite × Höhe × Tiefe</label>
-              <div class="fflw-grid-3">
-                <div>
-                  <span style="font-size:0.82rem;">Breite (cm)</span>
-                  <input type="text" inputmode="decimal" data-dim="breite" class="fflw-input fflw-pos-dim ${dimHighlightClass}" value="${pos.breite}" placeholder="z. B. 120">
-                </div>
-                <div>
-                  <span style="font-size:0.82rem;">Höhe (cm)</span>
-                  <input type="text" inputmode="decimal" data-dim="hoehe" class="fflw-input fflw-pos-dim ${dimHighlightClass}" value="${pos.hoehe}" placeholder="z. B. 200">
-                </div>
-                <div>
-                  <span style="font-size:0.82rem;">Tiefe (cm)</span>
-                  <input type="text" inputmode="decimal" data-dim="tiefe" class="fflw-input fflw-pos-dim ${dimHighlightClass}" value="${pos.tiefe}" placeholder="z. B. 58">
-                </div>
-              </div>
-              <div class="fflw-plausi-box" style="display: none;"></div>
-            </div>
-
-            <div class="fflw-grid-2">
-              <div class="fflw-field">
-                <label>Transport-Einschätzung *</label>
-                <select class="fflw-select fflw-pos-transport">
-                  ${TRANSPORT_OPTIONEN.map(opt => `<option value="${opt}" ${pos.transport === opt ? "selected" : ""}>${opt}</option>`).join("")}
-                </select>
-              </div>
-              <div class="fflw-field">
-                <label>Zerlegbarkeit / Zustand</label>
-                <select class="fflw-select fflw-pos-zerlegbar">
-                  <option value="Nein / am Stück" ${pos.zerlegbar === "Nein / am Stück" ? "selected" : ""}>Am Stück (nicht zerlegbar)</option>
-                  <option value="Ja, lässt sich leicht zerlegen" ${pos.zerlegbar === "Ja, lässt sich leicht zerlegen" ? "selected" : ""}>Ja, lässt sich leicht zerlegen</option>
-                  <option value="Bereits zerlegt & abholbereit" ${pos.zerlegbar === "Bereits zerlegt & abholbereit" ? "selected" : ""}>Bereits zerlegt &amp; abholbereit</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="fflw-field">
-              <label>Kurze Beschreibung (Farbe, Material, Besonderheiten)</label>
-              <textarea rows="2" class="fflw-textarea fflw-pos-desc" placeholder="z. B. Buche hell, guter Zustand, voll funktionsfähig">${pos.beschreibung}</textarea>
-            </div>
-
-            <div class="fflw-field">
-              <label>Fotos hochladen (1 bis 5 Bilder – danach über ✏️ markierbar)</label>
-              <input type="file" accept="image/*" multiple class="fflw-pos-file" style="color: #fff;">
-              <div class="fflw-thumbs"></div>
-            </div>
-          `;
-
-          const presetEl = box.querySelector(".fflw-pos-preset");
-          const customWrap = box.querySelector(".fflw-pos-custom-wrap");
-          const customIn = box.querySelector(".fflw-pos-custom");
-          const plausiDiv = box.querySelector(".fflw-plausi-box");
-
-          presetEl.addEventListener("change", () => {
-            pos.presetVal = presetEl.value;
-            if (pos.presetVal) {
-              const [g, i] = pos.presetVal.split("_").map(Number);
-              const itemDef = MOEBEL_KATALOG[g].items[i];
-              customWrap.style.display = itemDef.isCustom ? "block" : "none";
-              customIn.required = Boolean(itemDef.isCustom);
-              pos.transport = TRANSPORT_OPTIONEN[itemDef.transport] || TRANSPORT_OPTIONEN[2];
-              box.querySelector(".fflw-pos-transport").value = pos.transport;
-              if (!pos.breite && !pos.hoehe && !pos.tiefe) {
-                pos.breite = String(itemDef.b);
-                pos.hoehe = String(itemDef.h);
-                pos.tiefe = String(itemDef.t);
-                box.querySelector('[data-dim="breite"]').value = pos.breite;
-                box.querySelector('[data-dim="hoehe"]').value = pos.hoehe;
-                box.querySelector('[data-dim="tiefe"]').value = pos.tiefe;
-              }
-            }
-            updateGrossmoebelVisibility();
-          });
-
-          customIn.addEventListener("input", () => { pos.customTitel = customIn.value; });
-          box.querySelector(".fflw-pos-anzahl").addEventListener("input", e => { pos.anzahl = parseInt(e.target.value, 10) || 1; });
-          box.querySelector(".fflw-pos-transport").addEventListener("change", e => { pos.transport = e.target.value; });
-          box.querySelector(".fflw-pos-zerlegbar").addEventListener("change", e => { pos.zerlegbar = e.target.value; });
-          box.querySelector(".fflw-pos-desc").addEventListener("input", e => { pos.beschreibung = e.target.value; });
-
-          box.querySelectorAll(".fflw-pos-dim").forEach(inp => {
-            inp.addEventListener("input", () => {
-              const k = inp.getAttribute("data-dim");
-              pos[k] = inp.value;
-              pos.dimsVerified = true;
-              inp.classList.remove("fflw-dim-check-needed");
-              checkDimensionsPlausibility(pos, plausiDiv, box);
-            });
-          });
-          checkDimensionsPlausibility(pos, plausiDiv, box);
-
-          box.querySelector(".fflw-copy-pos-btn").addEventListener("click", () => {
-            const copy = createPositionData(pos, idx + 1);
-            positionen.splice(idx + 1, 0, copy);
-            renderAllPositions();
-          });
-
-          const delBtn = box.querySelector(".fflw-del-pos-btn");
-          if (delBtn) {
-            delBtn.addEventListener("click", () => {
-              positionen.splice(idx, 1);
-              renderAllPositions();
-              updateGrossmoebelVisibility();
-            });
-          }
-
-          const thumbsDiv = box.querySelector(".fflw-thumbs");
-          pos.photos.forEach((foto, fIdx) => {
-            const tw = document.createElement("div");
-            tw.className = "fflw-thumb-wrap";
-            tw.innerHTML = `
-              <img src="${foto.previewUrl}" alt="Vorschau">
-              <button type="button" class="fflw-thumb-del" title="Foto löschen">✕</button>
-              <button type="button" class="fflw-thumb-edit" title="Möbelstück einkreisen">✏️ Markieren</button>
-            `;
-            tw.querySelector(".fflw-thumb-del").addEventListener("click", () => {
-              pos.photos.splice(fIdx, 1);
-              renderAllPositions();
-            });
-            tw.querySelector(".fflw-thumb-edit").addEventListener("click", () => {
-              openPhotoMarker(pos, fIdx);
-            });
-            thumbsDiv.appendChild(tw);
-          });
-
-          const fileIn = box.querySelector(".fflw-pos-file");
-          fileIn.addEventListener("change", async () => {
-            const files = Array.from(fileIn.files || []).slice(0, 5 - pos.photos.length);
-            for (const f of files) {
-              const comp = await komprimiereBild(f);
-              pos.photos.push(comp);
-            }
-            fileIn.value = "";
-            renderAllPositions();
-          });
-
-          itemsContainer.appendChild(box);
-        });
-        updateGrossmoebelVisibility();
-      }
-
-      addItemBtn.addEventListener("click", () => {
-        positionen.push(createPositionData());
-        renderAllPositions();
+        prev.src = editorHistory[editorHistory.length - 1];
+      });
+      document.getElementById("sp-ed-close").addEventListener("click", () => {
+        document.getElementById("sp-editor-modal").style.display = "none";
+      });
+      document.getElementById("sp-ed-save").addEventListener("click", () => {
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.84);
+        itemsState[editorTarget.itemIdx].photos[editorTarget.photoIdx] = {
+          dataUrl,
+          base64: dataUrl.split(",")[1],
+          mimeType: "image/jpeg"
+        };
+        document.getElementById("sp-editor-modal").style.display = "none";
+        renderItems();
       });
 
-      positionen.push(createPositionData());
-      renderAllPositions();
+      itemsState.push(createNewItem());
+      renderItems();
 
-      formEl.addEventListener("submit", async function (e) {
+      document.getElementById("sp-add-item-btn").addEventListener("click", () => {
+        itemsState.push(createNewItem());
+        renderItems();
+      });
+
+      document.getElementById("sp-donation-form").addEventListener("submit", async e => {
         e.preventDefault();
-        const feedbackEl = document.getElementById("fflw-spende-feedback");
-        feedbackEl.textContent = "";
+        const btn = document.getElementById("sp-submit-btn");
+        const fb = document.getElementById("sp-submit-feedback");
+        btn.disabled = true;
 
-        const itemsPayload = [];
-        const customVorschlaege = [];
+        const batchId = "SP-" + Date.now();
+        const editPin = String(Math.floor(1000 + Math.random() * 9000));
+        const editUrl = `${window.location.origin}${window.location.pathname}?edit=${encodeURIComponent(batchId + "-" + editPin)}`;
 
-        for (let i = 0; i < positionen.length; i++) {
-          const p = positionen[i];
-          if (!p.presetVal) {
-            feedbackEl.style.color = "#ff8a80";
-            feedbackEl.textContent = `❌ Bitte wähle bei Position #${i + 1} einen Gegenstand aus.`;
-            return;
-          }
-          const [g, itIdx] = p.presetVal.split("_").map(Number);
-          const grp = MOEBEL_KATALOG[g];
-          const itemDef = grp.items[itIdx];
-          const titel = itemDef.isCustom ? p.customTitel.trim() : itemDef.name;
-          if (!titel) {
-            feedbackEl.style.color = "#ff8a80";
-            feedbackEl.textContent = `❌ Bitte benenne den Gegenstand bei Position #${i + 1}.`;
-            return;
-          }
-          if (itemDef.isCustom) {
-            customVorschlaege.push(titel);
-          }
-
-          itemsPayload.push({
-            raumKategorie: grp.gruppe,
-            titel: titel,
-            anzahl: p.anzahl,
-            breiteCm: p.breite,
-            hoeheCm: p.hoehe,
-            tiefeCm: p.tiefe,
-            transportInfo: p.transport,
-            zerlegbar: p.zerlegbar,
-            beschreibung: p.beschreibung,
-            photos: p.photos.map(ph => ({ base64: ph.base64, mimeType: ph.mimeType }))
-          });
-        }
-
-        const overlay = document.getElementById("fflw-upload-overlay");
-        const bar = document.getElementById("fflw-upload-bar");
-        const stepTxt = document.getElementById("fflw-upload-step");
-        overlay.style.display = "flex";
-        bar.style.width = "25%";
-        stepTxt.textContent = `Übertrage ${itemsPayload.length} Position(en) an das Virtuelle Warenhaus …`;
-
-        let wakeLock = null;
-        try {
-          if ("wakeLock" in navigator) {
-            wakeLock = await navigator.wakeLock.request("screen");
-          }
-        } catch (err) {}
-
-        const progressTimer = setInterval(() => {
-          const cur = parseFloat(bar.style.width) || 25;
-          if (cur < 88) bar.style.width = (cur + 7) + "%";
-        }, 700);
-
-        const payload = {
-          action: "submitDonation",
-          spenderName: document.getElementById("fflw-spende-name").value.trim(),
-          telefon: document.getElementById("fflw-spende-telefon").value.trim(),
-          email: document.getElementById("fflw-spende-email").value.trim(),
-          ort: document.getElementById("fflw-spende-ort").value.trim(),
-          lagerStatus: zeitraumSel.value,
-          abholFrist: fristDatumIn.value || "",
-          etage: document.getElementById("fflw-spende-etage").value,
-          parken: document.getElementById("fflw-spende-parken").value,
-          zweiteChanceDeponie: document.getElementById("fflw-spende-zweite-chance").checked,
-          customVorschlaege: customVorschlaege,
-          items: itemsPayload
+        const meta = {
+          spendeBatchId: batchId,
+          editPin: editPin,
+          editUrl: editUrl,
+          spenderName: document.getElementById("sp-name").value.trim(),
+          spenderTelefon: document.getElementById("sp-phone").value.trim(),
+          spenderEmail: document.getElementById("sp-email").value.trim(),
+          plzOrt: document.getElementById("sp-plz-ort").value.trim(),
+          strasse: document.getElementById("sp-street").value.trim(),
+          lagerStatus: document.getElementById("sp-lager").value,
+          verfuegbarAb: document.getElementById("sp-verfuegbar-ab").value.trim(),
+          abholFrist: document.getElementById("sp-abholfrist").value.trim(),
+          stockwerk: document.getElementById("sp-stockwerk").value,
+          aufzug: document.getElementById("sp-aufzug").value,
+          mithilfe: document.getElementById("sp-mithilfe").value,
+          allgemeineNotiz: document.getElementById("sp-notiz").value.trim(),
+          hatOffeneAngaben: itemsState.some(x => x.massArt.startsWith("Keine Angabe") || x.photos.length === 0)
         };
 
+        const overview = [];
         try {
-          const resp = await fetch(WEB_APP_URL, {
+          for (let i = 0; i < itemsState.length; i++) {
+            const it = itemsState[i];
+            const isSonst = it.titelAuswahl.startsWith("Sonstiges");
+            const finalTitle = isSonst ? (it.eigenerTitel.trim() || "Sonstiges Möbelstück") : it.titelAuswahl;
+
+            fb.innerHTML = `<span class="fflw-spinner"></span> <span>Übertrage Position ${i + 1} von ${itemsState.length} …</span>`;
+
+            const itemPayload = {
+              raumKategorie: it.raumKategorie,
+              titel: finalTitle,
+              istSonstigesVorschlag: isSonst,
+              anzahl: it.anzahl,
+              kategorie: it.kategorie,
+              breite: it.breite,
+              hoehe: it.hoehe,
+              tiefe: it.tiefe,
+              massArt: it.massArt,
+              istElektro: it.raumKategorie === "Küche & Elektrogeräte",
+              geraeteAlter: it.geraeteAlter,
+              elektroFunktion: it.elektroFunktion,
+              zerlegbar: it.zerlegbar,
+              transportGroesse: it.transportGroesse,
+              beschreibung: it.beschreibung,
+              photos: it.photos
+            };
+
+            const resp = await fetch(WEB_APP_URL, {
+              method: "POST",
+              redirect: "follow",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({
+                action: "submitDonationItem",
+                itemIndex: i + 1,
+                meta: meta,
+                item: itemPayload
+              })
+            });
+            const res = await resp.json();
+            if (!res || !res.ok) throw new Error(res && res.error ? res.error : "Speicherfehler");
+
+            overview.push({
+              titel: finalTitle,
+              anzahl: it.anzahl,
+              masse: it.kategorie === "grossmoebel" ? `${it.breite || "?"}×${it.hoehe || "?"}×${it.tiefe || "?"} cm` : "Kleinteil",
+              zerlegbar: it.zerlegbar,
+              transportGroesse: it.transportGroesse,
+              anzahlFotos: it.photos.length
+            });
+          }
+
+          fb.innerHTML = `<span class="fflw-spinner"></span> <span>Sende Bestätigung …</span>`;
+          await fetch(WEB_APP_URL, {
             method: "POST",
             redirect: "follow",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+              action: "finalizeDonationBatch",
+              meta: meta,
+              itemsOverview: overview
+            })
           });
-          const res = await resp.json();
-          clearInterval(progressTimer);
 
-          if (res && res.ok) {
-            bar.style.width = "100%";
-            stepTxt.textContent = "✅ Erfolgreich gespeichert!";
-            setTimeout(() => {
-              overlay.style.display = "none";
-              const succBox = document.getElementById("fflw-success-box");
-              const succDet = document.getElementById("fflw-success-details");
-              succDet.innerHTML = `
-                <p style="margin: 0 0 8px 0;">Wir haben deine Angaben erhalten und prüfen sie kurz vor der Freischaltung.</p>
-                ${res.pin ? `<p style="margin: 0 0 6px 0;">🔑 <strong>Deine Spender-PIN für spätere Änderungen:</strong> <code style="background:#000; padding:3px 8px; border-radius:4px; color:#ffd700;">${res.pin}</code></p>` : ""}
-              `;
-              succBox.style.display = "block";
-              succBox.scrollIntoView({ behavior: "smooth", block: "start" });
-
-              formEl.reset();
-              positionen = [createPositionData()];
-              renderAllPositions();
-            }, 600);
-          } else {
-            overlay.style.display = "none";
-            feedbackEl.style.color = "#ff8a80";
-            feedbackEl.textContent = "❌ Fehler beim Speichern: " + (res && res.error ? res.error : "Unbekannter Fehler");
-          }
+          document.getElementById("sp-donation-form").style.display = "none";
+          const succBox = document.getElementById("sp-success-box");
+          succBox.style.display = "block";
+          document.getElementById("sp-success-details").innerHTML = `
+            Ihr Angebot wurde unter der ID <strong>${batchId}</strong> gespeichert.<br>
+            Ihre persönliche Bearbeitungs-PIN lautet: <strong>${editPin}</strong><br><br>
+            Über diesen Link können Sie jederzeit Fotos ergänzen, Maße nachtragen oder ein Stück auf „erledigt“ setzen:<br>
+            <a href="${editUrl}"><strong>${editUrl}</strong></a>
+          `;
         } catch (err) {
-          clearInterval(progressTimer);
-          overlay.style.display = "none";
-          feedbackEl.style.color = "#ff8a80";
-          feedbackEl.textContent = "❌ Verbindungsfehler: " + err.message;
-        } finally {
-          if (wakeLock) {
-            try { await wakeLock.release(); } catch (e) {}
-          }
+          fb.innerHTML = `<span style="color:#c62828;">Fehler beim Senden: ${err.message}</span>`;
+          btn.disabled = false;
         }
       });
+
+      // Nachtrags-Funktion (?edit=BATCH-PIN)
+      async function loadExistingBatch(batchId, pin) {
+        const statusEl = document.getElementById("sp-edit-status");
+        const cont = document.getElementById("sp-edit-items-container");
+        statusEl.innerHTML = `<span class="fflw-spinner"></span> <span>Lade Angebot …</span>`;
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=getDonorBatchForEdit&batchId=${encodeURIComponent(batchId)}&pin=${encodeURIComponent(pin)}&t=${Date.now()}`, {
+            method: "GET",
+            redirect: "follow"
+          });
+          const data = await resp.json();
+          if (!data || !data.ok) {
+            statusEl.innerHTML = `<span style="color:#c62828;">${data && data.error ? data.error : "Nicht gefunden"}</span>`;
+            return;
+          }
+          statusEl.innerHTML = `<span style="color:#1b5e20;">Angebot von ${data.meta.spenderName} geladen</span>`;
+          cont.innerHTML = "";
+          const updates = [];
+
+          (data.items || []).forEach(item => {
+            const upd = {
+              folderId: item.folderId,
+              breite: item.meta.breite || "",
+              hoehe: item.meta.hoehe || "",
+              tiefe: item.meta.tiefe || "",
+              beschreibung: item.meta.beschreibung || "",
+              alsErledigtMarkieren: false,
+              newPhotos: []
+            };
+            updates.push(upd);
+
+            const div = document.createElement("div");
+            div.className = "sp-item-box";
+            div.innerHTML = `
+              <strong style="color:#003366;">${item.meta.titel || item.folderName}</strong>
+              <div class="sp-row-3">
+                <div><label class="sp-label">Breite (cm)</label><input type="number" class="sp-input u-b" value="${upd.breite}"></div>
+                <div><label class="sp-label">Höhe (cm)</label><input type="number" class="sp-input u-h" value="${upd.hoehe}"></div>
+                <div><label class="sp-label">Tiefe (cm)</label><input type="number" class="sp-input u-t" value="${upd.tiefe}"></div>
+              </div>
+              <label class="sp-label">Beschreibung</label>
+              <textarea class="sp-textarea u-beschr" rows="2">${upd.beschreibung}</textarea>
+              <label class="sp-label">Weitere Fotos ergänzen</label>
+              <input type="file" accept="image/*" multiple class="u-photos">
+              <label style="display:block; margin-top:10px; font-weight:bold; color:#c62828;">
+                <input type="checkbox" class="u-done"> Dieses Teil ist anderweitig vergeben / erledigt (aus Angebot entfernen)
+              </label>
+            `;
+            div.querySelector(".u-b").addEventListener("input", e => { upd.breite = e.target.value; });
+            div.querySelector(".u-h").addEventListener("input", e => { upd.hoehe = e.target.value; });
+            div.querySelector(".u-t").addEventListener("input", e => { upd.tiefe = e.target.value; });
+            div.querySelector(".u-beschr").addEventListener("input", e => { upd.beschreibung = e.target.value; });
+            div.querySelector(".u-done").addEventListener("change", e => { upd.alsErledigtMarkieren = e.target.checked; });
+            div.querySelector(".u-photos").addEventListener("change", async e => {
+              for (const f of Array.from(e.target.files || [])) {
+                upd.newPhotos.push(await compressImageFile(f));
+              }
+            });
+            cont.appendChild(div);
+          });
+
+          const saveBtn = document.createElement("button");
+          saveBtn.type = "button";
+          saveBtn.className = "sp-btn sp-btn-green";
+          saveBtn.textContent = "Änderungen speichern";
+          saveBtn.addEventListener("click", async () => {
+            saveBtn.disabled = true;
+            const r = await fetch(WEB_APP_URL, {
+              method: "POST",
+              redirect: "follow",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({
+                action: "updateDonorBatch",
+                batchId: batchId,
+                pin: pin,
+                items: updates
+              })
+            });
+            const j = await r.json();
+            if (j && j.ok) {
+              alert("Ihre Änderungen wurden gespeichert!");
+              loadExistingBatch(batchId, pin);
+            } else {
+              alert("Fehler beim Speichern.");
+            }
+            saveBtn.disabled = false;
+          });
+          cont.appendChild(saveBtn);
+        } catch (err) {
+          statusEl.innerHTML = `<span style="color:#c62828;">Fehler: ${err.message}</span>`;
+        }
+      }
+
+      document.getElementById("sp-load-edit-btn").addEventListener("click", () => {
+        loadExistingBatch(
+          document.getElementById("sp-edit-batch-id").value.trim(),
+          document.getElementById("sp-edit-pin").value.trim()
+        );
+      });
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const editParam = urlParams.get("edit");
+      if (editParam && editParam.includes("-")) {
+        const lastDash = editParam.lastIndexOf("-");
+        const bId = editParam.substring(0, lastDash);
+        const pPin = editParam.substring(lastDash + 1);
+        document.getElementById("sp-edit-existing-box").open = true;
+        document.getElementById("sp-edit-batch-id").value = bId;
+        document.getElementById("sp-edit-pin").value = pPin;
+        loadExistingBatch(bId, pPin);
+      }
     });
   </script>
 </body>

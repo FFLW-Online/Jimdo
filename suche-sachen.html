@@ -1,169 +1,60 @@
+<!-- ==========================================================================
+  DATEI: suche-sachen.html – von Gemini
+  ERSTELLT VON GEMINI AM: 2026-11-20 19:08 CET
+  BESCHREIBUNG: Bedarf anmelden (wenn in den aktuellen Angeboten nichts Passendes war)
+    - Kontrastreiche hellblaue/weiße Karten mit schwarzer Schrift
+    - Vorrang für Familien in Leutenbach & Winnenden
+    - Optionales Foto des Stellplatzes & maximale Raummaße
+========================================================================== -->
 <!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sachen suchen / Bedarf anmelden - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <title>Bedarf anmelden - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .fflw-card {
-      margin: 18px 0;
-      padding: 18px 20px;
+    .su-card {
+      background: #eef6fc;
+      border: 1px solid #b8d4ec;
+      border-left: 6px solid #004080;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.10);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      clear: both;
+      padding: 18px 20px;
+      margin: 16px 0;
+      color: #111111;
     }
-    .fflw-card-blue {
-      border-left: 6px solid #42a5f5;
-      background: rgba(21, 101, 192, 0.22);
-    }
-    .fflw-weiche-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .fflw-weiche-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 4px;
-      padding: 12px 14px;
-      border-radius: 8px;
-      border: 2px solid rgba(255,255,255,0.35);
-      background: rgba(0, 0, 0, 0.25);
-      color: #ffffff;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .fflw-weiche-btn.active {
-      border-color: #ffd700;
-      background: #0d47a1;
-      box-shadow: 0 0 0 2px rgba(255,215,0,0.35);
-    }
-    .fflw-field {
-      margin-bottom: 15px;
-      clear: both;
-    }
-    .fflw-field label {
+    .su-label {
       display: block;
       font-weight: bold;
-      margin-bottom: 5px;
+      margin: 11px 0 4px 0;
+      color: #003366;
+      font-size: 0.95rem;
     }
-    .fflw-input, .fflw-select, .fflw-textarea {
+    .su-input, .su-select, .su-textarea {
       width: 100%;
-      max-width: 540px;
       padding: 10px 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+      border-radius: 7px;
+      border: 1px solid #8faadc;
       font-size: 16px;
       color: #111111;
       background: #ffffff;
-      box-sizing: border-box;
     }
-    .fflw-grid-2 {
+    .su-row-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 14px;
-      max-width: 720px;
-    }
-    .fflw-btn-primary {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      background-color: #1565c0;
-      color: #ffffff;
-      border: 2px solid #ffffff;
-      padding: 14px 28px;
-      font-size: 17px;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-    }
-    .fflw-btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background-color: #2e7d32;
-      color: #ffffff;
-      border: 2px solid #a5d6a7;
-      padding: 10px 18px;
-      font-size: 15px;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .fflw-live-match-box {
-      margin: 14px 0;
-      padding: 14px 16px;
-      border-radius: 8px;
-      background: rgba(46, 125, 50, 0.28);
-      border: 2px solid #a5d6a7;
-    }
-    .fflw-match-item {
-      display: flex;
-      align-items: center;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 12px;
-      padding: 8px 10px;
-      margin-top: 8px;
-      border-radius: 6px;
-      background: rgba(0, 0, 0, 0.28);
-      border: 1px solid rgba(255, 255, 255, 0.25);
     }
-    .fflw-match-item img {
-      width: 64px;
-      height: 64px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid #fff;
-      flex-shrink: 0;
-    }
-    .fflw-bike-box {
-      margin: 14px 0;
-      padding: 16px;
-      border-radius: 8px;
-      background: rgba(255, 152, 0, 0.20);
-      border: 2px solid #ffb74d;
-    }
-    .fflw-thumbs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 10px;
-      clear: both;
-    }
-    .fflw-thumb-wrap {
-      position: relative;
-      width: 96px;
-      height: 96px;
-    }
-    .fflw-thumb-wrap img {
-      width: 96px;
-      height: 96px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 2px solid #fff;
-    }
-    .fflw-thumb-del {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      background: #c62828;
-      color: #fff;
-      border: 1px solid #fff;
-      border-radius: 50%;
-      width: 22px;
-      height: 22px;
+    .su-btn-blue {
+      background: #004080;
+      color: #ffffff;
+      border: none;
+      padding: 13px 22px;
+      border-radius: 7px;
       font-weight: bold;
+      font-size: 1.02rem;
       cursor: pointer;
-      line-height: 18px;
-      padding: 0;
     }
+    .su-btn-blue:disabled { opacity: 0.6; cursor: wait; }
   </style>
 </head>
 <body>
@@ -177,195 +68,131 @@
     <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
 
     <main class="content">
-      <h2>Sachen suchen / Bedarf anmelden</h2>
+      <h2>Nichts gefunden? Bedarf anmelden</h2>
 
-      <div class="fflw-card fflw-card-blue">
-        <p style="margin: 0 0 8px 0; font-size: 1.06rem; font-weight: bold;">
-          🔍 Du suchst ein bestimmtes Möbelstück oder Haushaltsgerät für bedürftige Personen oder Familien?
-        </p>
-        <p style="margin: 0;">
-          Schau zuerst gerne in unsere <a href="aktuelle-angebote.html"><strong>Aktuellen Angebote</strong></a> – vielleicht ist das Wunschstück schon direkt verfügbar! Wenn nicht, trage hier den Bedarf ein. Unser Team prüft passende Spenden und meldet sich bei dir.
+      <p style="margin: 12px 0 18px 0;">
+        <a href="fflw-international.html?return=suche-sachen.html"
+           style="display: inline-flex; align-items: center; gap: 10px; background-color: #eef6fc; color: #003366; border: 2px solid #004080; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px;">
+           <span>Sprache wählen / ÜbersetzungsTool</span>
+           <span>🇩🇪 🇺🇦 🇹🇷</span>
+        </a>
+      </p>
+
+      <div class="su-card">
+        <p style="margin: 0; font-size: 0.97rem; color: #111111;">
+          Wenn in unseren <a href="aktuelle-angebote.html"><strong>aktuellen Angeboten</strong></a> gerade kein passendes Möbelstück oder Gerät dabei ist, können Sie hier Ihren Bedarf vormerken. Menschen und Familien aus <strong>Leutenbach und Winnenden</strong> werden dabei vorrangig berücksichtigt.
         </p>
       </div>
 
-      <form id="fflw-bedarf-form">
-        <!-- ABSCHNITT 0: 4-STUFIGE BEDARFS-WEICHE -->
-        <section class="fflw-card fflw-card-blue">
-          <h3 style="margin-top: 0;">1. Bedarfs-Weiche: Wo wird das Stück benötigt? *</h3>
-          <p style="margin: 0 0 10px 0; font-size: 0.93rem;">
-            Bedarfe direkt vor Ort haben oberste Priorität. Wenn jedoch ein gut erhaltenes Stück vor Ort keinen Abnehmer findet, fragen wir nach dem Prinzip <strong>„Alles ist besser als die Deponie“</strong> gezielt auch in der Region, deutschlandweit oder für internationale Hilfstransporte an.
-          </p>
+      <form id="su-demand-form" class="su-card" style="background: #ffffff;">
+        <h3 style="margin-top: 0; color: #003366;">Was wird dringend benötigt?</h3>
 
-          <div class="fflw-weiche-grid" id="fflw-weiche-buttons">
-            <button type="button" class="fflw-weiche-btn active" data-stufe="1" data-val="Stufe 1: Bedarf vor Ort (Leutenbach & Winnenden)">
-              <strong style="color:#ffd700;">🏠 1. Bedarf vor Ort</strong>
-              <span style="font-size:0.85rem;">Leutenbach, Winnenden &amp; direkte Nachbarorte (Priorität #1)</span>
-            </button>
-            <button type="button" class="fflw-weiche-btn" data-stufe="2" data-val="Stufe 2: Bedarf Region (Rems-Murr-Kreis)">
-              <strong style="color:#90caf9;">🚗 2. Bedarf Region</strong>
-              <span style="font-size:0.85rem;">Rems-Murr-Kreis &amp; Umgebung</span>
-            </button>
-            <button type="button" class="fflw-weiche-btn" data-stufe="3" data-val="Stufe 3: Bedarf Deutschland (überregional)">
-              <strong style="color:#90caf9;">🇩🇪 3. Bedarf Deutschland</strong>
-              <span style="font-size:0.85rem;">Bundesweite Familienhilfe / Selbsttransport</span>
-            </button>
-            <button type="button" class="fflw-weiche-btn" data-stufe="4" data-val="Stufe 4: Bedarf international (Hilfstransport / Familie)">
-              <strong style="color:#a5d6a7;">🌍 4. Bedarf international</strong>
-              <span style="font-size:0.85rem;">Ausland / Hilfstransporte („Zweite Chance vor Deponie“)</span>
-            </button>
-          </div>
-          <input type="hidden" id="fflw-bedarf-ort-typ" value="Stufe 1: Bedarf vor Ort (Leutenbach & Winnenden)">
-
-          <div class="fflw-field" style="margin-top: 14px; margin-bottom: 0;">
-            <label for="fflw-bedarf-ort-details" id="fflw-ort-details-label">Genauer Ort / Teilort (z. B. Winnenden-Schelmenholz, Nellmersbach) *</label>
-            <input type="text" id="fflw-bedarf-ort-details" class="fflw-input" required placeholder="z. B. 71364 Winnenden">
-          </div>
-        </section>
-
-        <!-- ABSCHNITT 2: WAS WIRD GESUCHT? -->
-        <section class="fflw-card">
-          <h3 style="margin-top: 0;">2. Was genau wird gesucht?</h3>
-
-          <div class="fflw-field">
-            <label for="fflw-bedarf-preset">Gegenstand aus dem Zimmer-Menü auswählen *</label>
-            <select id="fflw-bedarf-preset" class="fflw-select" required></select>
-          </div>
-
-          <div class="fflw-field" id="fflw-bedarf-custom-box" style="display: none;">
-            <label for="fflw-bedarf-custom-titel">Bitte gesuchten Gegenstand benennen *</label>
-            <input type="text" id="fflw-bedarf-custom-titel" class="fflw-input" placeholder="z. B. Nähmaschine, Wickelkommode, Teppich">
-          </div>
-
-          <div id="fflw-bike-redirect-box" class="fflw-bike-box" style="display: none;">
-            <p style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: bold; color: #ffd700;">
-              🚲 Für Fahrräder &amp; Kinderfahrräder ist unsere Rad-Werkstatt direkt zuständig!
-            </p>
-            <p style="margin: 0 0 12px 0;">
-              Bitte melde dich für Fahrräder direkt bei unserer ehrenamtlichen Rad-Werkstatt (gerne mit Körpergröße):
-            </p>
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-              <a href="fahrradwerkstatt.html" class="fflw-btn-secondary" style="background:#1565c0; border-color:#90caf9;">🚲 Zur Seite der Rad-Werkstatt</a>
-              <a href="mailto:Rad-Werkstatt@freundeleuwi.org?subject=Fahrrad-Anfrage%20FFLW" class="fflw-btn-secondary">
-                ✉️ E-Mail an Rad-Werkstatt@freundeleuwi.org
-              </a>
-            </div>
-          </div>
-
-          <div id="fflw-live-match-box" class="fflw-live-match-box" style="display: none;">
-            <div style="font-weight: bold; color: #a5d6a7; font-size: 1.02rem;">
-              🎉 Gute Nachricht! Folgende passende Angebote sind aktuell bereits online verfügbar:
-            </div>
-            <div id="fflw-live-match-list"></div>
-            <div style="margin-top: 12px;">
-              <a href="aktuelle-angebote.html" class="fflw-btn-secondary">
-                👉 Jetzt zu den Aktuellen Angeboten &amp; direkt anfragen
-              </a>
-            </div>
-          </div>
-
-          <div class="fflw-field">
-            <label for="fflw-bedarf-prioritaet">Wie dringend wird der Gegenstand benötigt? *</label>
-            <select id="fflw-bedarf-prioritaet" class="fflw-select" required>
-              <option value="🔴 Dringend (Notfall / Erstausstattung fehlt komplett)">🔴 Dringend (Notfall / Erstausstattung fehlt komplett)</option>
-              <option value="🟡 Wichtig, hat etwas Zeit (innerhalb der nächsten Wochen)" selected>🟡 Wichtig, hat etwas Zeit (innerhalb der nächsten Wochen)</option>
-              <option value="🟢 Wunsch / Verbesserung (wäre schön, eilt aber nicht)">🟢 Wunsch / Verbesserung (wäre schön, eilt aber nicht)</option>
+        <div class="su-row-2">
+          <div>
+            <label class="su-label" for="su-raum">Bereich</label>
+            <select id="su-raum" class="su-select">
+              <option value="Schlafzimmer">Schlafzimmer (Bett, Matratze, Schrank)</option>
+              <option value="Wohnzimmer & Essbereich">Wohnzimmer &amp; Essbereich (Tisch, Stühle, Sofa)</option>
+              <option value="Küche & Elektrogeräte">Küche &amp; Elektrogeräte (Waschmaschine, Kühlschrank)</option>
+              <option value="Kinder & Baby">Kinder &amp; Baby (Kinderwagen, Hochstuhl)</option>
+              <option value="Arbeitszimmer & Haushalt">Arbeitszimmer &amp; Haushalt (Schreibtisch, Staubsauger)</option>
             </select>
           </div>
-
-          <div class="fflw-field">
-            <label for="fflw-bedarf-begruendung">Kurze Begründung / Details (z. B. Familiengröße, Transportmöglichkeit) *</label>
-            <textarea id="fflw-bedarf-begruendung" class="fflw-textarea" rows="3" required
-                      placeholder="z. B. Familie mit 2 Schulkindern ist neu in die Wohnung eingezogen, bisher schlafen die Kinder auf Matratzen am Boden."></textarea>
+          <div>
+            <label class="su-label" for="su-artikel">Gesuchter Gegenstand *</label>
+            <input type="text" id="su-artikel" class="su-input" required placeholder="z. B. Waschmaschine, Einzelbett, Kleiderschrank">
           </div>
-        </section>
+        </div>
 
-        <!-- ABSCHNITT 3: KONTEXTSENSITIVE WOHNSITUATION & MASSE -->
-        <section class="fflw-card" id="fflw-wohnsituation-card">
-          <h3 style="margin-top: 0;">3. Wohnsituation, Stellplatz &amp; maximale Maße</h3>
-          <p style="margin-top: 0; font-size: 0.94rem;">
-            Damit kein zu großes Möbelstück eingeplant wird, das nicht durch die Tür oder unter die Decke passt:
-          </p>
-
-          <div class="fflw-field">
-            <label for="fflw-bedarf-wohnsituation">Wohnsituation &amp; Zugang (Stockwerk, schmales Treppenhaus, Aufzug?)</label>
-            <select id="fflw-bedarf-wohnsituation" class="fflw-select">
-              <option value="Eigene Wohnung (Erdgeschoss / mit Aufzug)">Eigene Wohnung (Erdgeschoss / mit Aufzug)</option>
-              <option value="Eigene Wohnung (Obergeschoss ohne Aufzug)">Eigene Wohnung (Obergeschoss ohne Aufzug)</option>
-              <option value="Gemeinschaftsunterkunft / Anschlussunterbringung">Gemeinschaftsunterkunft / Anschlussunterbringung</option>
-              <option value="Wohngemeinschaft / Einzelzimmer">Wohngemeinschaft / Einzelzimmer</option>
-              <option value="Sammeltransport / Lager für Hilfstransport">Sammeltransport / Lager für Hilfstransport</option>
+        <div class="su-row-2">
+          <div>
+            <label class="su-label" for="su-prio">Dringlichkeit</label>
+            <select id="su-prio" class="su-select">
+              <option value="Sehr dringend (fehlt komplett)">Sehr dringend (fehlt komplett)</option>
+              <option value="Wichtig, hat etwas Zeit" selected>Wichtig, hat etwas Zeit</option>
+              <option value="Wäre schön als Ergänzung">Wäre schön als Ergänzung</option>
             </select>
           </div>
-
-          <div class="fflw-grid-2">
-            <div class="fflw-field">
-              <label for="fflw-bedarf-max-hoehe">Maximale Höhe / Deckenhöhe (cm, optional)</label>
-              <input type="number" min="30" max="400" id="fflw-bedarf-max-hoehe" class="fflw-input" placeholder="z. B. 210 (wichtig bei Schränken!)">
-            </div>
-
-            <div class="fflw-field">
-              <label for="fflw-bedarf-max-breite">Maximale Stellbreite (cm, optional)</label>
-              <input type="number" min="20" max="500" id="fflw-bedarf-max-breite" class="fflw-input" placeholder="z. B. 160">
-            </div>
+          <div>
+            <label class="su-label" for="su-ort-typ">Wohnort / Region *</label>
+            <select id="su-ort-typ" class="su-select">
+              <option value="Direkt vor Ort (Leutenbach / Winnenden)">Direkt vor Ort (Leutenbach / Winnenden)</option>
+              <option value="Nachbargemeinde (Rems-Murr-Kreis)">Nachbargemeinde (Rems-Murr-Kreis)</option>
+              <option value="Weiter entfernt">Weiter entfernt</option>
+            </select>
           </div>
+        </div>
 
-          <div class="fflw-field">
-            <label for="fflw-bedarf-fotos">Optional: Foto vom Stellplatz / Zimmer hochladen (1 bis 3 Bilder)</label>
-            <input type="file" id="fflw-bedarf-fotos" accept="image/*" multiple style="color: #fff;">
-            <div id="fflw-bedarf-foto-status" style="font-size: 0.88rem; color: #a5d6a7; margin-top: 4px;"></div>
-            <div id="fflw-bedarf-thumbs" class="fflw-thumbs"></div>
+        <div class="su-row-2">
+          <div>
+            <label class="su-label" for="su-ort-details">Genauer Ort / Unterkunft</label>
+            <input type="text" id="su-ort-details" class="su-input" placeholder="z. B. Winnenden-Birkmannsweiler oder Leutenbach">
           </div>
-        </section>
-
-        <!-- ABSCHNITT 4: KONTAKTDATEN -->
-        <section class="fflw-card">
-          <h3 style="margin-top: 0;">4. Kontaktdaten für Rückfragen &amp; Vermittlung</h3>
-
-          <div class="fflw-grid-2">
-            <div class="fflw-field">
-              <label for="fflw-bedarf-name">Name (Vor- und Nachname) *</label>
-              <input type="text" id="fflw-bedarf-name" class="fflw-input" required placeholder="z. B. Ahmad Al-Mansoor oder Sabine Weber">
-            </div>
-
-            <div class="fflw-field">
-              <label for="fflw-bedarf-rolle">Für wen fragst du an? *</label>
-              <select id="fflw-bedarf-rolle" class="fflw-select" required>
-                <option value="Für mich / meine Familie">Für mich / meine Familie</option>
-                <option value="Als Pate / Helfer / Sozialarbeiter für bedürftige Personen">Als Pate / Helfer / Sozialarbeiter für bedürftige Personen</option>
-                <option value="Für Hilfsprojekt / Hilfstransport">Für Hilfsprojekt / Hilfstransport</option>
-              </select>
-            </div>
+          <div>
+            <label class="su-label" for="su-wohnsit">Wohnsituation (z. B. Familiengröße)</label>
+            <input type="text" id="su-wohnsit" class="su-input" placeholder="z. B. Familie mit 2 Kindern, neue Wohnung">
           </div>
+        </div>
 
-          <div class="fflw-field">
-            <label for="fflw-bedarf-kontakt">E-Mail-Adresse und/oder Telefon / WhatsApp / Signal *</label>
-            <input type="text" id="fflw-bedarf-kontakt" class="fflw-input" required placeholder="z. B. name@example.de oder 0172 9876543 (WhatsApp)">
+        <div class="su-row-2">
+          <div>
+            <label class="su-label" for="su-max-b">Maximale Breite in cm (falls Platz begrenzt)</label>
+            <input type="number" id="su-max-b" class="su-input" placeholder="z. B. 160">
           </div>
-
-          <div class="fflw-field" style="margin-top: 16px;">
-            <label style="display: flex; align-items: flex-start; gap: 10px; font-weight: normal; cursor: pointer;">
-              <input type="checkbox" id="fflw-bedarf-dsgvo" required style="width: 20px; height: 20px; margin-top: 2px; accent-color: #1565c0; flex-shrink: 0;">
-              <span>
-                Ich bin einverstanden, dass meine Bedarfsanmeldung vom Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden gespeichert und zur Vermittlung passender Sachspenden verwendet wird. *
-              </span>
-            </label>
+          <div>
+            <label class="su-label" for="su-max-h">Maximale Höhe in cm (z. B. bei Dachschräge)</label>
+            <input type="number" id="su-max-h" class="su-input" placeholder="z. B. 200">
           </div>
+        </div>
 
-          <div id="fflw-bedarf-feedback" style="margin: 16px 0; font-weight: bold;"></div>
+        <label class="su-label" for="su-grund">Zusätzliche Hinweise (optional)</label>
+        <textarea id="su-grund" class="su-textarea" rows="2" placeholder="z. B. Türbreite im Bad ist 65 cm …"></textarea>
 
-          <button type="submit" id="fflw-bedarf-submit" class="fflw-btn-primary">
-            🔵 Bedarf jetzt verbindlich anmelden
-          </button>
-        </section>
+        <h3 style="margin-top: 20px; color: #003366;">Kontaktdaten für Rückfragen</h3>
+        <div class="su-row-2">
+          <div>
+            <label class="su-label" for="su-name">Name *</label>
+            <input type="text" id="su-name" class="su-input" required placeholder="Vor- und Nachname">
+          </div>
+          <div>
+            <label class="su-label" for="su-kontakt">Telefon / WhatsApp oder E-Mail *</label>
+            <input type="text" id="su-kontakt" class="su-input" required placeholder="z. B. 0171 1234567 oder E-Mail">
+          </div>
+        </div>
+
+        <div class="su-row-2">
+          <div>
+            <label class="su-label" for="su-rolle">Wer meldet den Bedarf?</label>
+            <select id="su-rolle" class="su-select">
+              <option value="Für mich / meine Familie">Für mich / meine Familie</option>
+              <option value="Ehrenamtlicher Pate / Helfer">Ehrenamtlicher Pate / Helfer</option>
+              <option value="Sozialarbeit / Integrationsmanagement">Sozialarbeit / Integrationsmanagement</option>
+            </select>
+          </div>
+          <div>
+            <label class="su-label" for="su-photo">Optionales Foto vom Stellplatz</label>
+            <input type="file" id="su-photo" accept="image/*" class="su-input" style="padding: 7px;">
+          </div>
+        </div>
+
+        <div style="margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+          <button type="submit" id="su-submit-btn" class="su-btn-blue">Bedarf absenden</button>
+          <span id="su-feedback" style="font-weight: bold; color: #003366;"></span>
+        </div>
       </form>
     </main>
   </div>
 
   <section class="contact-block">
+    <p><strong>Du möchtest aktiv werden? Oder einfach mal den Kontakt zum Freundeskreis aufnehmen? Dann schreib uns doch, wir freuen uns!</strong></p>
     <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
     <p>
+      <strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a><br>
+      <strong>Sachen-Spenden (Infos, Kontakt):</strong> <a href="mailto:Warenhaus@freundeleuwi.org">Warenhaus@freundeleuwi.org</a><br>
       <strong>Sachen-Suchen (Infos, Kontakt):</strong> <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
-      <strong>Rad-Werkstatt:</strong> <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a>
+      <strong>Transport-Mithilfe (Infos, Kontakt):</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a><br>
+      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong> <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a><br>
+      <strong>Geldspenden und Spendenbescheinigungen:</strong> <a href="mailto:Kasse-FFLW@freundeleuwi.org">Kasse-FFLW@freundeleuwi.org</a>
     </p>
   </section>
 
@@ -378,369 +205,83 @@
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
 
-      const BEDARFS_KATALOG = [
-        {
-          gruppe: "🛏️ Schlafzimmer",
-          items: [
-            { name: "Einzelbett (90 / 100 × 200 cm)", isBig: true, keywords: ["einzelbett", "bett"] },
-            { name: "Doppelbett (140 × 200 cm)", isBig: true, keywords: ["doppelbett", "140", "bett"] },
-            { name: "Doppelbett (160 / 180 × 200 cm)", isBig: true, keywords: ["doppelbett", "160", "180", "bett"] },
-            { name: "Matratze (sauber & gut erhalten)", isBig: true, keywords: ["matratze"] },
-            { name: "Lattenrost", isBig: true, keywords: ["lattenrost"] },
-            { name: "Kleiderschrank (1- oder 2-türig)", isBig: true, keywords: ["kleiderschrank", "schrank"] },
-            { name: "Kleiderschrank (3- oder 4-türig)", isBig: true, keywords: ["kleiderschrank", "schrank"] },
-            { name: "Kommode / Sideboard", isBig: true, keywords: ["kommode", "sideboard"] },
-            { name: "Nachttisch", isBig: false, keywords: ["nachttisch"] }
-          ]
-        },
-        {
-          gruppe: "🛋️ Wohnzimmer",
-          items: [
-            { name: "Sofa / Couch (2- oder 3-Sitzer)", isBig: true, keywords: ["sofa", "couch"] },
-            { name: "Schlafsofa", isBig: true, keywords: ["schlafsofa", "sofa", "couch"] },
-            { name: "Sessel", isBig: true, keywords: ["sessel"] },
-            { name: "Couchtisch", isBig: true, keywords: ["couchtisch", "tisch"] },
-            { name: "Regal / Bücherregal", isBig: true, keywords: ["regal"] },
-            { name: "TV-Lowboard / Wohnwand-Element", isBig: true, keywords: ["lowboard", "tv", "wohnwand"] },
-            { name: "Fernseher (TV-Gerät)", isBig: false, keywords: ["fernseher", "tv"] }
-          ]
-        },
-        {
-          gruppe: "🍽️ Küche & Esszimmer",
-          items: [
-            { name: "Esstisch", isBig: true, keywords: ["esstisch", "tisch"] },
-            { name: "Stuhl / Esszimmerstuhl", isBig: false, keywords: ["stuhl"] },
-            { name: "Kühlschrank (Tischgerät / Unterbau)", isBig: true, keywords: ["kühlschrank", "kühl"] },
-            { name: "Kühl-Gefrier-Kombination (groß)", isBig: true, keywords: ["kühl", "gefrier"] },
-            { name: "Gefrierschrank / Gefriertruhe", isBig: true, keywords: ["gefrier"] },
-            { name: "Waschmaschine / Waschtrockner", isBig: true, keywords: ["waschmaschine", "waschtrockner"] },
-            { name: "Herd / Backofen / Kochplatte", isBig: true, keywords: ["herd", "backofen", "kochplatte"] },
-            { name: "Mikrowelle", isBig: false, keywords: ["mikrowelle"] },
-            { name: "Kochtöpfe / Schnellkochtopf / Geschirr-Set", isBig: false, keywords: ["topf", "töpfe", "geschirr", "schnellkochtopf"] }
-          ]
-        },
-        {
-          gruppe: "🧸 Kinderzimmer & Familie",
-          items: [
-            { name: "Babybett / Gitterbett", isBig: true, keywords: ["babybett", "gitterbett"] },
-            { name: "Kinderbett / Jugendbett", isBig: true, keywords: ["kinderbett", "jugendbett", "bett"] },
-            { name: "Stockbett / Etagenbett", isBig: true, keywords: ["stockbett", "etagenbett", "bett"] },
-            { name: "Kinderwagen / Buggy", isBig: false, keywords: ["kinderwagen", "buggy"] },
-            { name: "Hochstuhl / Kindersitz (Auto)", isBig: false, keywords: ["hochstuhl", "kindersitz"] },
-            { name: "Schreibtisch", isBig: true, keywords: ["schreibtisch"] },
-            { name: "Schreibtischstuhl / Drehstuhl", isBig: false, keywords: ["schreibtischstuhl", "drehstuhl", "stuhl"] }
-          ]
-        },
-        {
-          gruppe: "🚲 Mobilität & Fahrrad",
-          items: [
-            { name: "🚲 Fahrrad (Erwachsene / Jugend / Kinder)", isBike: true, keywords: [] },
-            { name: "Fahrradanhänger / Kindersitz fürs Rad", isBike: true, keywords: [] }
-          ]
-        },
-        {
-          gruppe: "🧹 Haushalt, Flur & Sonstiges",
-          items: [
-            { name: "Schuhschrank", isBig: true, keywords: ["schuhschrank"] },
-            { name: "Garderobe / Kleiderständer", isBig: true, keywords: ["garderobe", "kleiderständer"] },
-            { name: "Spiegel (Wandspiegel / Standspiegel)", isBig: true, keywords: ["spiegel"] },
-            { name: "Staubsauger", isBig: false, keywords: ["staubsauger"] },
-            { name: "Bügeleisen / Bügelbrett / Wäscheständer", isBig: false, keywords: ["bügel", "wäscheständer"] },
-            { name: "Nähmaschine", isBig: false, keywords: ["nähmaschine"] },
-            { name: "Großer Koffer / Einkaufstrolley", isBig: false, keywords: ["koffer", "trolley"] },
-            { name: "✏️ Sonstiges (eigenen Wunsch eingeben)", isCustom: true, isBig: true, keywords: [] }
-          ]
-        }
-      ];
-
-      // 4-stufige Bedarfs-Weiche
-      const ortTypHidden = document.getElementById("fflw-bedarf-ort-typ");
-      const ortDetailsLabel = document.getElementById("fflw-ort-details-label");
-      const ortDetailsInput = document.getElementById("fflw-bedarf-ort-details");
-      let aktuelleStufe = "1";
-
-      document.querySelectorAll(".fflw-weiche-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".fflw-weiche-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          aktuelleStufe = btn.getAttribute("data-stufe");
-          ortTypHidden.value = btn.getAttribute("data-val");
-
-          if (aktuelleStufe === "1") {
-            ortDetailsLabel.textContent = "Genauer Ort / Teilort (z. B. Winnenden-Schelmenholz, Nellmersbach) *";
-            ortDetailsInput.placeholder = "z. B. 71364 Winnenden";
-          } else if (aktuelleStufe === "2") {
-            ortDetailsLabel.textContent = "Gemeinde im Rems-Murr-Kreis & Transportmöglichkeit *";
-            ortDetailsInput.placeholder = "z. B. Backnang / Waiblingen (Abholung per PKW möglich)";
-          } else if (aktuelleStufe === "3") {
-            ortDetailsLabel.textContent = "PLZ / Stadt in Deutschland & wie wird abgeholt? *";
-            ortDetailsInput.placeholder = "z. B. 70173 Stuttgart oder 80331 München (Transporter vorhanden)";
-          } else {
-            ortDetailsLabel.textContent = "Zielland / Region & wie läuft der Hilfstransport / die Abholung? *";
-            ortDetailsInput.placeholder = "z. B. Ukraine / Syrien / Rumänien – Abholung über Hilfstransport in Winnenden";
-          }
-        });
-      });
-
-      const presetSel = document.getElementById("fflw-bedarf-preset");
-      const customBox = document.getElementById("fflw-bedarf-custom-box");
-      const customTitelIn = document.getElementById("fflw-bedarf-custom-titel");
-      const bikeBox = document.getElementById("fflw-bike-redirect-box");
-      const matchBox = document.getElementById("fflw-live-match-box");
-      const matchList = document.getElementById("fflw-live-match-list");
-      const wohnCard = document.getElementById("fflw-wohnsituation-card");
-      const formEl = document.getElementById("fflw-bedarf-form");
-      const feedbackEl = document.getElementById("fflw-bedarf-feedback");
-      const submitBtn = document.getElementById("fflw-bedarf-submit");
-
-      let verfuegbareAngeboteCache = [];
-
-      let optHtml = '<option value="">-- Bitte gesuchten Gegenstand nach Zimmer wählen --</option>';
-      BEDARFS_KATALOG.forEach((grp, gIdx) => {
-        optHtml += `<optgroup label="${grp.gruppe}">`;
-        grp.items.forEach((it, iIdx) => {
-          optHtml += `<option value="${gIdx}_${iIdx}">${it.name}</option>`;
-        });
-        optHtml += '</optgroup>';
-      });
-      presetSel.innerHTML = optHtml;
-
-      fetch(WEB_APP_URL + "?t=" + Date.now(), { method: "GET", redirect: "follow" })
-        .then(r => r.json())
-        .then(data => {
-          if (data && data.ok && Array.isArray(data.items)) {
-            verfuegbareAngeboteCache = data.items;
-            pruefeLiveTreffer();
-          }
-        })
-        .catch(() => {});
-
-      function pruefeLiveTreffer() {
-        const val = presetSel.value;
-        matchBox.style.display = "none";
-        matchList.innerHTML = "";
-        if (!val || verfuegbareAngeboteCache.length === 0) return;
-
-        const [gIdx, iIdx] = val.split("_").map(Number);
-        const itemObj = BEDARFS_KATALOG[gIdx].items[iIdx];
-        if (!itemObj || itemObj.isBike) return;
-
-        let suchWoerter = itemObj.keywords || [];
-        if (itemObj.isCustom) {
-          const txt = customTitelIn.value.trim().toLowerCase();
-          if (txt.length >= 3) suchWoerter = [txt];
-        }
-        if (!suchWoerter.length) return;
-
-        const treffer = verfuegbareAngeboteCache.filter(ang => {
-          const vollText = `${ang.titel || ""} ${ang.pfad || ""} ${ang.beschreibung || ""}`.toLowerCase();
-          return suchWoerter.some(kw => vollText.includes(kw));
-        });
-
-        if (treffer.length > 0) {
-          treffer.slice(0, 4).forEach(t => {
-            const row = document.createElement("div");
-            row.className = "fflw-match-item";
-            const imgSrc = (t.bilder && t.bilder.length > 0) ? t.bilder[0].url : "";
-            row.innerHTML = `
-              ${imgSrc ? `<img src="${imgSrc}" alt="">` : ""}
-              <div>
-                <div style="font-weight:bold; color:#fff;">${t.titel || t.pfad}</div>
-                <div style="font-size:0.86rem; color:#dcdcdc;">${(t.beschreibung || "").split("\n").slice(0, 2).join(" · ")}</div>
-              </div>
-            `;
-            matchList.appendChild(row);
-          });
-          matchBox.style.display = "block";
-        }
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("artikel")) {
+        document.getElementById("su-artikel").value = params.get("artikel");
       }
 
-      presetSel.addEventListener("change", function () {
-        const val = presetSel.value;
-        bikeBox.style.display = "none";
-        customBox.style.display = "none";
-        customTitelIn.required = false;
-
-        if (!val) {
-          matchBox.style.display = "none";
-          wohnCard.style.display = "block";
-          return;
-        }
-
-        const [gIdx, iIdx] = val.split("_").map(Number);
-        const itemObj = BEDARFS_KATALOG[gIdx].items[iIdx];
-
-        wohnCard.style.display = (itemObj.isBig === false) ? "none" : "block";
-
-        if (itemObj.isBike) bikeBox.style.display = "block";
-        if (itemObj.isCustom) {
-          customBox.style.display = "block";
-          customTitelIn.required = true;
-        }
-        pruefeLiveTreffer();
-      });
-
-      customTitelIn.addEventListener("input", pruefeLiveTreffer);
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const vorwahlArtikel = urlParams.get("artikel");
-      if (vorwahlArtikel) {
-        const such = vorwahlArtikel.toLowerCase();
-        let gefunden = false;
-        BEDARFS_KATALOG.forEach((grp, gIdx) => {
-          grp.items.forEach((it, iIdx) => {
-            if (!gefunden && it.name.toLowerCase().includes(such)) {
-              presetSel.value = `${gIdx}_${iIdx}`;
-              presetSel.dispatchEvent(new Event("change"));
-              gefunden = true;
-            }
-          });
-        });
-        if (!gefunden) {
-          const lastG = BEDARFS_KATALOG.length - 1;
-          const lastI = BEDARFS_KATALOG[lastG].items.length - 1;
-          presetSel.value = `${lastG}_${lastI}`;
-          presetSel.dispatchEvent(new Event("change"));
-          customTitelIn.value = vorwahlArtikel;
-        }
-      }
-
-      const fotoInput = document.getElementById("fflw-bedarf-fotos");
-      const fotoStatus = document.getElementById("fflw-bedarf-foto-status");
-      const thumbsEl = document.getElementById("fflw-bedarf-thumbs");
-      let stellplatzFotos = [];
-
-      function komprimiereBild(file) {
+      function fileToCompressed(file) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = ev => {
             const img = new Image();
             img.onload = () => {
-              const MAX = 900;
+              const maxDim = 1024;
               let w = img.width, h = img.height;
-              if (w > MAX || h > MAX) {
-                if (w > h) { h = Math.round((h * MAX) / w); w = MAX; }
-                else { w = Math.round((w * MAX) / h); h = MAX; }
+              if (w > maxDim || h > maxDim) {
+                if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                else { w = Math.round(w * maxDim / h); h = maxDim; }
               }
-              const canvas = document.createElement("canvas");
-              canvas.width = w; canvas.height = h;
-              canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-              const dataUrl = canvas.toDataURL("image/jpeg", 0.72);
-              resolve({ base64: dataUrl.split(",")[1], mimeType: "image/jpeg", previewUrl: dataUrl });
+              const c = document.createElement("canvas");
+              c.width = w; c.height = h;
+              c.getContext("2d").drawImage(img, 0, 0, w, h);
+              const d = c.toDataURL("image/jpeg", 0.8);
+              resolve({ base64: d.split(",")[1], mimeType: "image/jpeg" });
             };
-            img.onerror = () => reject(new Error("Bild konnte nicht gelesen werden."));
+            img.onerror = reject;
             img.src = ev.target.result;
           };
+          reader.onerror = reject;
           reader.readAsDataURL(file);
         });
       }
 
-      function renderThumbs() {
-        thumbsEl.innerHTML = "";
-        stellplatzFotos.forEach((p, idx) => {
-          const wrap = document.createElement("div");
-          wrap.className = "fflw-thumb-wrap";
-          wrap.innerHTML = `<img src="${p.previewUrl}" alt=""><button type="button" class="fflw-thumb-del">✕</button>`;
-          wrap.querySelector(".fflw-thumb-del").addEventListener("click", () => {
-            stellplatzFotos.splice(idx, 1);
-            renderThumbs();
-          });
-          thumbsEl.appendChild(wrap);
-        });
-        fotoStatus.textContent = stellplatzFotos.length > 0 ? `✓ ${stellplatzFotos.length} Stellplatz-Foto(s) bereit` : "";
-      }
-
-      fotoInput.addEventListener("change", async function () {
-        const files = Array.from(fotoInput.files || []).slice(0, 3 - stellplatzFotos.length);
-        if (!files.length) return;
-        fotoStatus.textContent = "⏳ Fotos werden optimiert …";
-        for (const f of files) {
-          const k = await komprimiereBild(f);
-          stellplatzFotos.push(k);
-        }
-        fotoInput.value = "";
-        renderThumbs();
-      });
-
-      formEl.addEventListener("submit", async function (e) {
+      document.getElementById("su-demand-form").addEventListener("submit", async e => {
         e.preventDefault();
-        feedbackEl.textContent = "";
-
-        const val = presetSel.value;
-        if (!val) {
-          feedbackEl.style.color = "#ff8a80";
-          feedbackEl.textContent = "❌ Bitte wähle einen gesuchten Gegenstand aus dem Menü aus.";
-          return;
-        }
-
-        const [gIdx, iIdx] = val.split("_").map(Number);
-        const grp = BEDARFS_KATALOG[gIdx];
-        const itemObj = grp.items[iIdx];
-
-        if (itemObj.isBike) {
-          feedbackEl.style.color = "#ffd700";
-          feedbackEl.textContent = "🚲 Bitte wende dich für Fahrräder direkt an unsere Rad-Werkstatt (Rad-Werkstatt@freundeleuwi.org).";
-          bikeBox.scrollIntoView({ behavior: "smooth", block: "center" });
-          return;
-        }
-
-        const artikelName = itemObj.isCustom ? customTitelIn.value.trim() : itemObj.name;
-        if (!artikelName) {
-          feedbackEl.style.color = "#ff8a80";
-          feedbackEl.textContent = "❌ Bitte trage den gesuchten Gegenstand ein.";
-          return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.style.backgroundColor = "#666666";
-        submitBtn.textContent = "⏳ Bedarfsanmeldung wird gesendet …";
-
-        const payload = {
-          action: "submitDemand",
-          raumKategorie: grp.gruppe,
-          artikelName: artikelName,
-          prioritaet: document.getElementById("fflw-bedarf-prioritaet").value,
-          begruendung: document.getElementById("fflw-bedarf-begruendung").value.trim(),
-          bedarfsStufe: aktuelleStufe,
-          ortTyp: ortTypHidden.value,
-          ortDetails: ortDetailsInput.value.trim(),
-          wohnsituation: document.getElementById("fflw-bedarf-wohnsituation").value,
-          maxHoeheCm: document.getElementById("fflw-bedarf-max-hoehe").value.trim(),
-          maxBreiteCm: document.getElementById("fflw-bedarf-max-breite").value.trim(),
-          name: document.getElementById("fflw-bedarf-name").value.trim(),
-          rolle: document.getElementById("fflw-bedarf-rolle").value,
-          kontakt: document.getElementById("fflw-bedarf-kontakt").value.trim(),
-          photos: stellplatzFotos.map(p => ({ base64: p.base64, mimeType: p.mimeType }))
-        };
+        const btn = document.getElementById("su-submit-btn");
+        const fb = document.getElementById("su-feedback");
+        btn.disabled = true;
+        fb.innerHTML = `<span class="fflw-spinner"></span> <span>Bedarf wird übermittelt …</span>`;
 
         try {
+          const photos = [];
+          const fileInput = document.getElementById("su-photo");
+          if (fileInput.files && fileInput.files[0]) {
+            photos.push(await fileToCompressed(fileInput.files[0]));
+          }
+
           const resp = await fetch(WEB_APP_URL, {
             method: "POST",
             redirect: "follow",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+              action: "submitDemand",
+              raumKategorie: document.getElementById("su-raum").value,
+              artikelName: document.getElementById("su-artikel").value.trim(),
+              prioritaet: document.getElementById("su-prio").value,
+              ortTyp: document.getElementById("su-ort-typ").value,
+              ortDetails: document.getElementById("su-ort-details").value.trim(),
+              wohnsituation: document.getElementById("su-wohnsit").value.trim(),
+              maxBreiteCm: document.getElementById("su-max-b").value.trim(),
+              maxHoeheCm: document.getElementById("su-max-h").value.trim(),
+              begruendung: document.getElementById("su-grund").value.trim(),
+              name: document.getElementById("su-name").value.trim(),
+              kontakt: document.getElementById("su-kontakt").value.trim(),
+              rolle: document.getElementById("su-rolle").value,
+              photos: photos
+            })
           });
           const res = await resp.json();
           if (res && res.ok) {
-            feedbackEl.style.color = "#a5d6a7";
-            feedbackEl.textContent = "✅ Vielen Dank! Deine Bedarfsanmeldung für „" + artikelName + "“ (" + ortTypHidden.value + ") wurde gespeichert.";
-            formEl.reset();
-            stellplatzFotos = [];
-            renderThumbs();
-            matchBox.style.display = "none";
-            customBox.style.display = "none";
+            fb.innerHTML = `<span style="color:#1b5e20;">Vielen Dank! Ihr Bedarf wurde gespeichert und erscheint jetzt auch im Live-Zähler.</span>`;
+            document.getElementById("su-demand-form").reset();
           } else {
-            feedbackEl.style.color = "#ff8a80";
-            feedbackEl.textContent = "❌ Fehler: " + (res && res.error ? res.error : "Speichern fehlgeschlagen.");
+            fb.innerHTML = `<span style="color:#c62828;">Fehler beim Speichern.</span>`;
           }
         } catch (err) {
-          feedbackEl.style.color = "#ff8a80";
-          feedbackEl.textContent = "❌ Verbindungsfehler: " + err.message;
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.style.backgroundColor = "#1565c0";
-          submitBtn.textContent = "🔵 Bedarf jetzt verbindlich anmelden";
+          fb.innerHTML = `<span style="color:#c62828;">Verbindungsfehler: ${err.message}</span>`;
         }
+        btn.disabled = false;
       });
     });
   </script>
