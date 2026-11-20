@@ -1,3 +1,17 @@
+<!-- ==========================================================================
+  DATEI: moebel-abgeben.html_von_gemini.txt
+  ERSTELLT VON GEMINI AM: 2026-11-19 23:09 CET
+  BESCHREIBUNG: Spenden-Formular für das Virtuelle Warenhaus FFLW
+    - Zimmerkategorien-Pulldown mit Symbolen + feiner Schrank/Betten-Einteilung
+    - Typische Standardmaße als Vorgabe & 1-Klick-Übernahme
+    - Maß-Status (Gemessen / Geschätzt / Mit KI bestimmt / Weiß ich gerade nicht)
+    - KI-Maßerkennung + Foto-Hilfe mit Alltagsgegenständen (DIN A4, 1,5L-Flasche, Tür)
+    - Stückzahl für identische Artikel (z. B. 4 Stühle)
+    - Elektrogeräte-Abfrage (Alter & elektrische Funktion inkl. Weiß ich nicht)
+    - Lagerung "Auf Abruf" vs. "Muss bis Datum raus" + Transportgröße (PKW/Anhänger vs. Transporter)
+    - Desktop-Foto-Layout-Fix (keine Überlappung mit Absende-Button)
+    - Persönlicher Spender-Nachtragszugang (Link + 4-stellige PIN)
+========================================================================== -->
 <!doctype html>
 <html lang="de">
 <head>
@@ -12,6 +26,7 @@
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.10);
       border: 1px solid rgba(255, 255, 255, 0.35);
+      clear: both;
     }
     .fflw-card-gold {
       border-left: 6px solid #ffd700;
@@ -21,8 +36,13 @@
       border-left: 6px solid #4caf50;
       background: rgba(46, 125, 50, 0.16);
     }
+    .fflw-card-blue {
+      border-left: 6px solid #42a5f5;
+      background: rgba(21, 101, 192, 0.18);
+    }
     .fflw-field {
-      margin-bottom: 14px;
+      margin-bottom: 15px;
+      clear: both;
     }
     .fflw-field label {
       display: block;
@@ -31,7 +51,7 @@
     }
     .fflw-input, .fflw-select, .fflw-textarea {
       width: 100%;
-      max-width: 520px;
+      max-width: 540px;
       padding: 10px 12px;
       border-radius: 6px;
       border: 1px solid #ccc;
@@ -42,21 +62,22 @@
     }
     .fflw-grid-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
       gap: 14px;
-      max-width: 680px;
+      max-width: 720px;
     }
     .fflw-grid-3 {
       display: grid;
-      grid-template-columns: repeat(3, minmax(85px, 140px));
+      grid-template-columns: repeat(3, minmax(85px, 145px));
       gap: 10px;
     }
     .fflw-item-box {
-      margin: 16px 0;
+      margin: 18px 0;
       padding: 16px;
       border-radius: 10px;
       background: rgba(0, 0, 0, 0.28);
       border: 2px solid rgba(255, 255, 255, 0.35);
+      overflow: hidden;
     }
     .fflw-item-header {
       display: flex;
@@ -68,23 +89,30 @@
       padding-bottom: 10px;
       margin-bottom: 14px;
     }
+    /* Desktop-Foto-Fix: sauberer Blockfluss ohne Überlappung mit Buttons darunter */
     .fflw-thumbs {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
+      gap: 12px;
+      margin-top: 12px;
+      margin-bottom: 12px;
+      width: 100%;
+      position: relative;
+      clear: both;
     }
     .fflw-thumb-wrap {
       position: relative;
-      width: 92px;
-      height: 92px;
+      width: 104px;
+      height: 104px;
+      flex: 0 0 auto;
     }
     .fflw-thumb-wrap img {
-      width: 92px;
-      height: 92px;
+      width: 104px;
+      height: 104px;
       object-fit: cover;
       border-radius: 6px;
-      border: 1px solid #fff;
+      border: 2px solid #fff;
+      display: block;
     }
     .fflw-thumb-del {
       position: absolute;
@@ -100,6 +128,15 @@
       cursor: pointer;
       line-height: 20px;
       padding: 0;
+      z-index: 2;
+    }
+    .fflw-submit-row {
+      display: block;
+      width: 100%;
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      clear: both;
     }
     .fflw-btn-primary {
       display: inline-flex;
@@ -109,7 +146,7 @@
       background-color: #2e7d32;
       color: #ffffff;
       border: 2px solid #ffffff;
-      padding: 14px 26px;
+      padding: 14px 28px;
       font-size: 17px;
       font-weight: bold;
       border-radius: 8px;
@@ -129,6 +166,22 @@
       border-radius: 8px;
       cursor: pointer;
     }
+    .fflw-btn-small {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .fflw-btn-small:hover {
+      background-color: rgba(255, 255, 255, 0.28);
+    }
     .fflw-btn-danger {
       background-color: #b71c1c;
       color: #ffffff;
@@ -142,24 +195,49 @@
     .fflw-radio-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 14px;
+      gap: 10px;
       margin-top: 6px;
     }
     .fflw-radio-pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
+      gap: 7px;
+      padding: 8px 13px;
       border-radius: 8px;
       background: rgba(255, 255, 255, 0.14);
       border: 1px solid rgba(255, 255, 255, 0.45);
       cursor: pointer;
       font-weight: bold;
+      font-size: 0.94rem;
     }
     .fflw-radio-pill input {
-      width: 18px;
-      height: 18px;
+      width: 17px;
+      height: 17px;
       accent-color: #2e7d32;
+    }
+    .fflw-standard-hint {
+      margin-top: 8px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      background: rgba(255, 215, 0, 0.14);
+      border: 1px solid rgba(255, 215, 0, 0.45);
+      font-size: 0.9rem;
+    }
+    .fflw-foto-tipps {
+      margin: 8px 0 10px 0;
+      padding: 10px 12px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-left: 4px solid #90caf9;
+      font-size: 0.88rem;
+      line-height: 1.45;
+    }
+    .fflw-elektro-box {
+      margin: 12px 0;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: rgba(21, 101, 192, 0.22);
+      border: 1px solid #90caf9;
     }
   </style>
 </head>
@@ -176,7 +254,7 @@
     <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
 
     <main class="content">
-      <h2>Möbel spenden / abgeben</h2>
+      <h2>Möbel &amp; Haushaltsgeräte spenden</h2>
 
       <!-- Sprachenknopf -->
       <p style="margin: 14px 0 22px 0;">
@@ -195,16 +273,62 @@
       <!-- Wichtige Hinweise vorab -->
       <div class="fflw-card fflw-card-green">
         <p style="margin: 0 0 8px 0; font-size: 1.06rem; font-weight: bold;">
-          ❤️ Herzlichen Dank für deine Möbelspende!
+          ❤️ Herzlichen Dank für deine Sachspende!
         </p>
         <p style="margin: 0 0 8px 0;">
-          Damit wir gut erhaltene Möbel schnell und passgenau an geflüchtete Familien in Leutenbach und Winnenden vermitteln können, bitten wir dich um ein paar Angaben und Fotos:
+          Damit wir gut erhaltene Möbel und Geräte schnell an geflüchtete Familien in Leutenbach und Winnenden vermitteln können, bitten wir dich um ein paar Angaben und Fotos:
         </p>
         <ul style="margin: 0; padding-left: 20px;">
-          <li><strong>Direktvermittlung spart Lagerplatz:</strong> Wir haben kaum eigene Lagerräume. Ideal ist es, wenn das Möbelstück noch kurz bei dir stehen bleiben kann, bis eine Familie gefunden ist.</li>
-          <li><strong>Zustand:</strong> Bitte nur saubere, funktionsfähige und vollständige Möbel anbieten (keine defekten oder stark beschädigten Stücke).</li>
-          <li><strong>Datenschutz:</strong> Deine genaue Straße, Hausnummer und Telefonnummer erscheinen <strong>nicht</strong> öffentlich auf der Webseite, sondern sind nur für unser ehrenamtliches Team sichtbar.</li>
+          <li><strong>„Auf Abruf“ spart Lagerraum:</strong> Ideal ist es, wenn das Möbelstück noch kurz bei dir stehen bleiben kann, bis eine Familie gefunden ist.</li>
+          <li><strong>Kein Stress bei unklaren Angaben:</strong> Wenn du gerade kein Maßband zur Hand hast oder es zu dunkel für Fotos ist, wähle einfach <em>„Weiß ich gerade nicht / wird später geklärt“</em> – du kannst später alles bequem über deinen persönlichen Bearbeitungs-Link nachtragen!</li>
+          <li><strong>Datenschutz:</strong> Deine genaue Straße, Hausnummer und Telefonnummer erscheinen <strong>nicht</strong> öffentlich auf der Webseite.</li>
         </ul>
+      </div>
+
+      <!-- SPENDER-NACHTRAGSZUGANG (Link oder ID + PIN) -->
+      <div class="fflw-card fflw-card-blue" id="fflw-edit-access-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div>
+            <strong>🔑 Bereits etwas eingetragen und möchtest Fotos oder Maße nachtragen?</strong>
+            <div style="font-size: 0.9rem; opacity: 0.92;">Mit deiner Angebots-ID und deiner 4-stelligen PIN kannst du deine Spende jederzeit bearbeiten oder auf „erledigt“ setzen.</div>
+          </div>
+          <button type="button" id="fflw-toggle-edit-login" class="fflw-btn-small">
+            ✏️ Bestehende Spende bearbeiten
+          </button>
+        </div>
+
+        <div id="fflw-edit-login-box" style="display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.25);">
+          <div class="fflw-grid-2">
+            <div>
+              <label style="display: block; font-weight: bold; margin-bottom: 4px;">Angebots-ID</label>
+              <input type="text" id="fflw-login-batch-id" class="fflw-input" placeholder="z. B. SP_173205...">
+            </div>
+            <div>
+              <label style="display: block; font-weight: bold; margin-bottom: 4px;">Deine 4-stellige PIN</label>
+              <input type="text" id="fflw-login-pin" class="fflw-input" placeholder="z. B. 4829" style="max-width: 180px;">
+            </div>
+          </div>
+          <button type="button" id="fflw-load-edit-btn" class="fflw-btn-secondary" style="margin-top: 10px;">
+            📂 Meine Spende laden
+          </button>
+          <div id="fflw-edit-login-status" style="margin-top: 8px; font-weight: bold;"></div>
+        </div>
+
+        <!-- Geladener Nachtrags-Editor -->
+        <div id="fflw-edit-editor-box" style="display: none; margin-top: 16px; padding-top: 16px; border-top: 2px solid #90caf9;">
+          <h3 style="margin-top: 0; color: #ffd700;">✏️ Deine gespeicherte Spende nachtragen &amp; aktualisieren</h3>
+          <p id="fflw-edit-header-info" style="font-size: 0.94rem;"></p>
+          <div id="fflw-edit-items-list"></div>
+          <div style="margin-top: 14px; display: flex; flex-wrap: wrap; gap: 10px;">
+            <button type="button" id="fflw-save-edit-btn" class="fflw-btn-primary">
+              💾 Änderungen speichern
+            </button>
+            <button type="button" id="fflw-close-edit-btn" class="fflw-btn-small">
+              Schließen
+            </button>
+          </div>
+          <div id="fflw-edit-save-status" style="margin-top: 10px; font-weight: bold;"></div>
+        </div>
       </div>
 
       <!-- Optionaler Telefon-Erfassungs-Modus für Ehrenamtliche -->
@@ -219,49 +343,84 @@
           </label>
           <input type="text" id="fflw-helfer-name" class="fflw-input" placeholder="z. B. Stefan Layer">
           <p style="margin: 8px 0 0 0; font-size: 0.9rem;">
-            Hinweis: Im Telefon-Modus sind Fotos optional (können vom Spender auch nachträglich per WhatsApp/Signal geschickt werden).
+            Hinweis: Im Telefon-Modus sind Fotos optional und können später jederzeit nachgereicht werden.
           </p>
+        </div>
+      </div>
+
+      <!-- ERFOLGS-BOX MIT PERSÖNLICHEM NACHTRAGS-LINK & PIN -->
+      <div id="fflw-success-pin-box" class="fflw-card fflw-card-green" style="display: none; border: 3px solid #ffd700;">
+        <h3 style="margin-top: 0; color: #ffd700;">✅ Vielen Dank! Deine Spende ist eingegangen</h3>
+        <p id="fflw-success-summary" style="font-weight: bold;"></p>
+        <div style="padding: 14px; border-radius: 8px; background: rgba(0,0,0,0.32); border: 1px solid #ffd700; margin: 12px 0;">
+          <p style="margin: 0 0 8px 0; font-weight: bold; color: #ffd700;">
+            🔑 Dein persönlicher Nachtrags-Zugang (bitte kurz merken oder Link kopieren!):
+          </p>
+          <p style="margin: 0 0 8px 0; font-size: 0.92rem;">
+            Über diesen Link kannst du später jederzeit weitere Fotos bei Tageslicht hochladen, offene Maße nachtragen oder ein Stück auf „erledigt“ setzen:
+          </p>
+          <div style="font-family: monospace; font-size: 0.95rem; background: #111; color: #a5d6a7; padding: 8px 10px; border-radius: 6px; word-break: break-all; margin-bottom: 8px;" id="fflw-personal-link-display"></div>
+          <div style="font-size: 1rem; margin-bottom: 10px;">
+            Angebots-ID: <strong id="fflw-personal-id-display"></strong> &nbsp;|&nbsp; PIN: <strong id="fflw-personal-pin-display" style="color: #ffd700; font-size: 1.15rem;"></strong>
+          </div>
+          <button type="button" id="fflw-copy-pin-link-btn" class="fflw-btn-secondary">
+            📋 Link &amp; PIN kopieren
+          </button>
         </div>
       </div>
 
       <form id="fflw-spende-form">
         <!-- ABSCHNITT 1: MÖBELSTÜCKE -->
         <section class="fflw-card">
-          <h3 style="margin-top: 0;">1. Welche Möbel möchtest du abgeben?</h3>
+          <h3 style="margin-top: 0;">1. Welche Möbel oder Geräte möchtest du abgeben?</h3>
           <p style="margin-top: 0; font-size: 0.95rem;">
-            Lege für jedes Möbelstück einen eigenen Eintrag an (bei mehreren Teilen einfach unten auf <strong>„+ Weiteres Möbelstück hinzufügen“</strong> klicken).
+            Wähle die passende Bezeichnung bequem aus dem Zimmer-Menü. Bei mehreren identischen Stücken (z. B. 4 Stühle) kannst du einfach die <strong>Anzahl</strong> erhöhen.
           </p>
 
           <div id="fflw-items-container"></div>
 
-          <button type="button" id="fflw-add-item-btn" class="fflw-btn-secondary">
-            + Weiteres Möbelstück hinzufügen
+          <button type="button" id="fflw-add-item-btn" class="fflw-btn-secondary" style="margin-top: 8px;">
+            + Weiteres Möbelstück / Gerät hinzufügen
           </button>
         </section>
 
         <!-- ABSCHNITT 2: ZEITFENSTER & LOGISTIK -->
         <section class="fflw-card">
-          <h3 style="margin-top: 0;">2. Abholzeitraum &amp; Transporthinweise</h3>
+          <h3 style="margin-top: 0;">2. Lagerung „Auf Abruf“, Zeitraum &amp; Transporthinweise</h3>
+
+          <div class="fflw-field">
+            <label for="fflw-lager-status">Kann das Möbelstück „auf Abruf“ bei dir stehen bleiben, bis eine Familie gefunden ist? *</label>
+            <select id="fflw-lager-status" class="fflw-select" required>
+              <option value="Auf Abruf beim Spender (kein Zeitdruck)">🟢 Ja, kann auf Abruf bei mir stehen bleiben (ideal!)</option>
+              <option value="Auf Abruf beim Spender (ca. 2–4 Wochen)">🟡 Ja, kann ca. 2–4 Wochen auf Abruf stehen bleiben</option>
+              <option value="Muss bis zu einem festen Datum raus">🟠 Nein, muss bis zu einem bestimmten Datum raus</option>
+              <option value="Weiß ich noch nicht / wird später geklärt">🤷 Weiß ich noch nicht / wird später geklärt</option>
+            </select>
+          </div>
 
           <div class="fflw-grid-2">
             <div class="fflw-field">
-              <label for="fflw-verfuegbar-ab">Ab wann ist das Möbelstück verfügbar? *</label>
+              <label for="fflw-verfuegbar-ab-typ">Ab wann ist das Stück verfügbar? *</label>
               <select id="fflw-verfuegbar-ab-typ" class="fflw-select" style="margin-bottom: 8px;">
                 <option value="Ab sofort">Ab sofort</option>
                 <option value="datum">Ab einem bestimmten Datum</option>
+                <option value="Weiß ich noch nicht / wird später geklärt">Weiß ich noch nicht / wird später geklärt</option>
               </select>
               <input type="date" id="fflw-verfuegbar-ab-datum" class="fflw-input" style="display: none;">
             </div>
 
             <div class="fflw-field">
               <label for="fflw-abhol-frist">Späteste Abholung bis wann? *</label>
-              <select id="fflw-abhol-frist" class="fflw-select" required>
-                <option value="Flexibel (kein Zeitdruck)">Flexibel (kein Zeitdruck)</option>
+              <select id="fflw-abhol-frist" class="fflw-select" style="margin-bottom: 8px;" required>
+                <option value="Flexibel / auf Abruf (kein Zeitdruck)">Flexibel / auf Abruf (kein Zeitdruck)</option>
                 <option value="Innerhalb der nächsten 7 Tage">Innerhalb der nächsten 7 Tage</option>
                 <option value="Innerhalb von 2 Wochen">Innerhalb von 2 Wochen</option>
                 <option value="Innerhalb von 4 Wochen">Innerhalb von 4 Wochen</option>
                 <option value="Dringend (innerhalb von 2–3 Tagen)">Dringend (innerhalb von 2–3 Tagen)</option>
+                <option value="festes_datum">Bis zu einem festen Stichtag (Datum wählen)</option>
+                <option value="Weiß ich noch nicht / wird später geklärt">Weiß ich noch nicht / wird später geklärt</option>
               </select>
+              <input type="date" id="fflw-abhol-frist-datum" class="fflw-input" style="display: none;">
             </div>
           </div>
 
@@ -274,6 +433,7 @@
                 <option value="2. Obergeschoss">2. Obergeschoss</option>
                 <option value="3. Obergeschoss oder höher">3. Obergeschoss oder höher</option>
                 <option value="Keller / Untergeschoss">Keller / Untergeschoss</option>
+                <option value="Weiß ich gerade nicht / wird später geklärt">Weiß ich gerade nicht / wird später geklärt</option>
               </select>
             </div>
 
@@ -283,17 +443,9 @@
                 <option value="Kein Aufzug">Kein Aufzug</option>
                 <option value="Ja, großer Aufzug (Möbel passen rein)">Ja, großer Aufzug (Möbel passen rein)</option>
                 <option value="Ja, aber nur kleiner Personenaufzug">Ja, aber nur kleiner Personenaufzug</option>
+                <option value="Weiß ich gerade nicht / wird später geklärt">Weiß ich gerade nicht / wird später geklärt</option>
               </select>
             </div>
-          </div>
-
-          <div class="fflw-field">
-            <label for="fflw-zwischenlager">Kann das Möbelstück noch etwas stehen bleiben, falls nicht sofort ein Empfänger gefunden wird? *</label>
-            <select id="fflw-zwischenlager" class="fflw-select" required>
-              <option value="Ja, 2–4 Wochen kein Problem">Ja, 2–4 Wochen kein Problem</option>
-              <option value="Ja, auch länger nach Absprache">Ja, auch länger nach Absprache</option>
-              <option value="Nein, muss bis zur Frist raus">Nein, muss bis zur genannten Frist raus</option>
-            </select>
           </div>
 
           <div class="fflw-field">
@@ -302,6 +454,7 @@
               <option value="Ja, ich/wir helfen beim Tragen">Ja, ich/wir helfen beim Tragen</option>
               <option value="Ja, Möbel sind bei Abholung bereits abgebaut">Ja, Möbel sind bei Abholung bereits abgebaut</option>
               <option value="Nein, Helferteam muss komplett tragen/abbauen">Nein, Helferteam muss komplett tragen/abbauen</option>
+              <option value="Weiß ich noch nicht / wird später geklärt">Weiß ich noch nicht / wird später geklärt</option>
             </select>
           </div>
         </section>
@@ -318,7 +471,7 @@
           <div class="fflw-grid-2">
             <div class="fflw-field">
               <label for="fflw-spender-strasse">Straße &amp; Hausnummer (nur für unser Team) *</label>
-              <input type="text" id="fflw-spender-strasse" class="fflw-input" required placeholder="z. B. Hauptstraße 12">
+              <input type="text" id="fflw-spender-strasse" class="fflw-input" required placeholder="z. B. Hauptstraße 12 (oder 'wird später geklärt')">
             </div>
 
             <div class="fflw-field">
@@ -334,7 +487,7 @@
             </div>
 
             <div class="fflw-field">
-              <label for="fflw-spender-email">E-Mail-Adresse (optional)</label>
+              <label for="fflw-spender-email">E-Mail-Adresse (empfohlen – für deinen persönlichen Bearbeitungs-Link)</label>
               <input type="email" id="fflw-spender-email" class="fflw-input" placeholder="name@beispiel.de">
             </div>
           </div>
@@ -353,11 +506,13 @@
             </label>
           </div>
 
-          <div id="fflw-spende-feedback" style="margin: 16px 0; font-weight: bold;"></div>
+          <div id="fflw-spende-feedback" style="margin: 16px 0; font-weight: bold; clear: both;"></div>
 
-          <button type="submit" id="fflw-spende-submit" class="fflw-btn-primary">
-            Möbelspende jetzt absenden
-          </button>
+          <div class="fflw-submit-row">
+            <button type="submit" id="fflw-spende-submit" class="fflw-btn-primary">
+              Möbelspende jetzt absenden
+            </button>
+          </div>
         </section>
       </form>
     </main>
@@ -371,52 +526,102 @@
       </strong>
     </p>
     <p>
-      <strong>
-        Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden
-      </strong>
+      <strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong>
     </p>
     <p>
-      <strong>Allgemeines:</strong>
-      <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a>
-      <br>
-      <strong>Sachen-Spenden (Infos, Kontakt):</strong>
-      <a href="mailto:Warenhaus@freundeleuwi.org">Warenhaus@freundeleuwi.org</a>
-      <br>
-      <strong>Sachen-Suchen (Infos, Kontakt):</strong>
-      <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a>
-      <br>
-      <strong>Transport-Mithilfe (Infos, Kontakt):</strong>
-      <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a>
-      <br>
-      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong>
-      <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a>
-      <br>
-      <strong>Geldspenden und Spendenbescheinigungen:</strong>
-      <a href="mailto:Kasse-FFLW@freundeleuwi.org">Kasse-FFLW@freundeleuwi.org</a>
-      <br>
-      <strong>Lust auf Mitmachen / Mitgliedschaft:</strong>
-      <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a>
-    </p>
-    <p>
-      <a href="https://docuseal.com/d/Mcvg84UEAD5aay">Mitgliedsantrag: Hier klicken</a>
-      <br>
-      <a href="https://drive.google.com/file/d/1WnPaR-iuMEsvg-mLMCiaXJF38-p0-MUm/view?usp=sharing">Unsere Satzung</a>
+      <strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a><br>
+      <strong>Sachen-Spenden (Infos, Kontakt):</strong> <a href="mailto:Warenhaus@freundeleuwi.org">Warenhaus@freundeleuwi.org</a><br>
+      <strong>Sachen-Suchen (Infos, Kontakt):</strong> <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
+      <strong>Transport-Mithilfe (Infos, Kontakt):</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a><br>
+      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong> <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a><br>
+      <strong>Geldspenden und Spendenbescheinigungen:</strong> <a href="mailto:Kasse-FFLW@freundeleuwi.org">Kasse-FFLW@freundeleuwi.org</a>
     </p>
   </section>
 
   <footer class="legal-footer">
-    <a href="impressum.html">Impressum</a>
-    |
-    <a href="datenschutz.html">Datenschutz</a>
-    |
-    <a href="sitemap.html">Sitemap</a>
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="sitemap.html">Sitemap</a>
   </footer>
 
   <script src="nav-loader.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // Eure fest hinterlegte Google Apps Script Web-App-URL (nichts mehr einzufügen!)
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+
+      // =========================================================================
+      // ZIMMERKATEGORIEN, TYPISCHE STANDARDMASSE, ELEKTRO-FLAG & TRANSPORTGRÖSSE
+      // =========================================================================
+      const MOEBEL_KATALOG = [
+        {
+          gruppe: "🛏️ Schlafzimmer",
+          items: [
+            { name: "Einzelbett (90 / 100 × 200 cm)", kat: "grossmoebel", b: 90, h: 80, t: 200, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typisches Einzelbett: Breite 90–100 cm × Länge 200 cm." },
+            { name: "Doppelbett (140 × 200 cm)", kat: "grossmoebel", b: 140, h: 85, t: 200, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typisches französisches Bett: Breite 140 cm × Länge 200 cm." },
+            { name: "Doppelbett (160 / 180 × 200 cm)", kat: "grossmoebel", b: 180, h: 85, t: 200, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typisches Doppelbett: Breite 160–180 cm × Länge 200 cm." },
+            { name: "Matratze (sauber & gut erhalten)", kat: "grossmoebel", b: 90, h: 18, t: 200, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Standardmaße: 90×200 cm, 140×200 cm oder 180×200 cm." },
+            { name: "Lattenrost", kat: "grossmoebel", b: 90, h: 8, t: 200, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Standardmaße: 90×200 cm oder 140×200 cm." },
+            { name: "Kleiderschrank (1-türig / schmal)", kat: "grossmoebel", b: 55, h: 200, t: 58, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typisch 1-türig: Breite ca. 50–60 cm, Tiefe ca. 58 cm, Höhe ca. 200 cm." },
+            { name: "Kleiderschrank (2-türig)", kat: "grossmoebel", b: 100, h: 200, t: 58, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typisch 2-türig: Breite ca. 90–110 cm, Tiefe ca. 58–60 cm, Höhe ca. 200–220 cm." },
+            { name: "Kleiderschrank (3-türig)", kat: "grossmoebel", b: 150, h: 210, t: 60, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typisch 3-türig: Breite ca. 135–160 cm, Tiefe ca. 60 cm, Höhe ca. 200–220 cm." },
+            { name: "Kleiderschrank (4-türig / Schwebetüren)", kat: "grossmoebel", b: 200, h: 215, t: 62, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Großer Schrank: Breite ca. 180–240 cm, Höhe bitte genau messen (Deckenhöhe!)." },
+            { name: "Kommode / Sideboard", kat: "grossmoebel", b: 100, h: 85, t: 45, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Typische Kommode: Breite 80–120 cm, Höhe ca. 80–95 cm, Tiefe ca. 40–45 cm." },
+            { name: "Nachttisch", kat: "grossmoebel", b: 45, h: 55, t: 40, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Typischer Nachttisch: Breite ca. 40–50 cm, Höhe ca. 50–60 cm." }
+          ]
+        },
+        {
+          gruppe: "🛋️ Wohnzimmer",
+          items: [
+            { name: "Sofa / Couch (2- oder 3-Sitzer)", kat: "grossmoebel", b: 190, h: 85, t: 90, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typisches 3-Sitzer-Sofa: Breite ca. 180–210 cm, Tiefe ca. 85–95 cm." },
+            { name: "Schlafsofa", kat: "grossmoebel", b: 200, h: 85, t: 95, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typisches Schlafsofa: Breite ca. 190–210 cm, Tiefe ca. 90–100 cm." },
+            { name: "Sessel", kat: "grossmoebel", b: 85, h: 85, t: 85, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typischer Sessel: ca. 80–95 cm breit und tief." },
+            { name: "Couchtisch", kat: "grossmoebel", b: 100, h: 45, t: 60, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Typischer Couchtisch: Höhe ca. 40–50 cm, Fläche ca. 100×60 cm." },
+            { name: "Regal / Bücherregal", kat: "grossmoebel", b: 80, h: 180, t: 30, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Typisches Regal: Breite 60–80 cm, Tiefe ca. 28–35 cm, Höhe 160–200 cm." },
+            { name: "TV-Lowboard / Wohnwand-Element", kat: "grossmoebel", b: 140, h: 50, t: 45, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typisches TV-Board: Breite 120–160 cm, Höhe ca. 45–55 cm." },
+            { name: "Fernseher (TV-Gerät)", kat: "kleinteil", b: "", h: "", t: "", elektro: true, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Bitte Bildschirmdiagonale (Zoll) und ob Fernbedienung dabei ist in die Beschreibung schreiben." },
+            { name: "Stehlampe / Deckenlampe", kat: "kleinteil", b: "", h: "", t: "", elektro: true, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" }
+          ]
+        },
+        {
+          gruppe: "🍽️ Küche & Esszimmer",
+          items: [
+            { name: "Esstisch", kat: "grossmoebel", b: 140, h: 75, t: 85, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typischer Esstisch: Höhe ca. 75 cm, Breite 80–90 cm, Länge 120–160 cm." },
+            { name: "Stuhl / Esszimmerstuhl", kat: "grossmoebel", b: 45, h: 85, t: 45, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Tipp: Bei mehreren identischen Stühlen oben einfach die Stückzahl eintragen!" },
+            { name: "Kühlschrank (Tischgerät / Unterbau)", kat: "grossmoebel", b: 60, h: 85, t: 60, elektro: true, transport: "🚐 Transporter / Bulli nötig", hint: "Küchen-Standardbreite ist fast immer 60 cm (Tiefe 60 cm, Höhe ca. 85 cm)." },
+            { name: "Kühl-Gefrier-Kombination (groß)", kat: "grossmoebel", b: 60, h: 185, t: 60, elektro: true, transport: "🚐 Transporter / Bulli nötig", hint: "Küchen-Standardbreite 60 cm × Tiefe 60 cm × Höhe ca. 170–200 cm." },
+            { name: "Gefrierschrank / Gefriertruhe", kat: "grossmoebel", b: 60, h: 85, t: 60, elektro: true, transport: "🚐 Transporter / Bulli nötig", hint: "Standard-Gefrierschrank meist 55–60 cm breit." },
+            { name: "Waschmaschine / Waschtrockner", kat: "grossmoebel", b: 60, h: 85, t: 60, elektro: true, transport: "🚐 Transporter / Bulli nötig", hint: "Küchen-/Bad-Standardmaß: 60 cm breit × 85 cm hoch × 60 cm tief." },
+            { name: "Herd / Backofen / Kochplatte", kat: "grossmoebel", b: 60, h: 85, t: 60, elektro: true, transport: "🚐 Transporter / Bulli nötig", hint: "Küchen-Standardmaß: 60 cm breit × 85 cm hoch × 60 cm tief." },
+            { name: "Hängeschrank / Küchen-Oberschrank", kat: "grossmoebel", b: 60, h: 70, t: 35, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Küchen-Hängeschränke sind meist 50, 60 oder 100 cm breit und ca. 35 cm tief." },
+            { name: "Mikrowelle", kat: "kleinteil", b: "", h: "", t: "", elektro: true, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Passt problemlos in PKW oder Fahrradanhänger." },
+            { name: "Wasserkocher / Kaffeemaschine / Toaster", kat: "kleinteil", b: "", h: "", t: "", elektro: true, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" },
+            { name: "Kochtöpfe / Schnellkochtopf / Geschirr-Set", kat: "kleinteil", b: "", h: "", t: "", elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" }
+          ]
+        },
+        {
+          gruppe: "🧸 Kinderzimmer & Familie",
+          items: [
+            { name: "Babybett / Gitterbett", kat: "grossmoebel", b: 75, h: 85, t: 145, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Typisches Babybett: ca. 70 × 140 cm Liegefläche." },
+            { name: "Kinderbett / Jugendbett", kat: "grossmoebel", b: 95, h: 80, t: 205, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typisches Jugendbett: 90 × 200 cm." },
+            { name: "Kinderwagen / Buggy", kat: "kleinteil", b: "", h: "", t: "", elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Bitte angeben, ob Babywanne / Sportsitz dabei ist." },
+            { name: "Hochstuhl / Kindersitz (Auto)", kat: "kleinteil", b: "", h: "", t: "", elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" },
+            { name: "Schreibtisch", kat: "grossmoebel", b: 120, h: 75, t: 60, elektro: false, transport: "🚐 Transporter / Bulli nötig", hint: "Typischer Schreibtisch: Höhe ca. 75 cm, Breite 100–140 cm, Tiefe 60–70 cm." },
+            { name: "Schreibtischstuhl / Drehstuhl", kat: "grossmoebel", b: 60, h: 95, t: 60, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" },
+            { name: "Spielsachen / Kinderbücher", kat: "kleinteil", b: "", h: "", t: "", elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" }
+          ]
+        },
+        {
+          gruppe: "🧹 Haushalt, Flur & Sonstiges",
+          items: [
+            { name: "Schuhschrank", kat: "grossmoebel", b: 80, h: 100, t: 30, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Typischer Schuhschrank: schmale Tiefe (ca. 25–35 cm), Breite 70–100 cm." },
+            { name: "Garderobe / Spiegel", kat: "grossmoebel", b: 60, h: 180, t: 30, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" },
+            { name: "Staubsauger", kat: "kleinteil", b: "", h: "", t: "", elektro: true, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" },
+            { name: "Bügeleisen / Bügelbrett / Wäscheständer", kat: "kleinteil", b: "", h: "", t: "", elektro: true, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" },
+            { name: "Nähmaschine", kat: "kleinteil", b: "", h: "", t: "", elektro: true, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Auch ältere mechanische Modelle mit Tretwippe sind sehr willkommen!" },
+            { name: "Großer Koffer / Einkaufstrolley", kat: "kleinteil", b: "", h: "", t: "", elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" },
+            { name: "Gartenmöbel (Tisch / Stühle)", kat: "grossmoebel", b: 120, h: 75, t: 80, elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "" },
+            { name: "✏️ Sonstiges (eigenen Namen eingeben)", kat: "grossmoebel", b: "", h: "", t: "", elektro: false, transport: "🚲 Passt in PKW / Fahrradanhänger", hint: "Bitte Bezeichnung unten frei eintragen." }
+          ]
+        }
+      ];
 
       const itemsContainer = document.getElementById("fflw-items-container");
       const addItemBtn = document.getElementById("fflw-add-item-btn");
@@ -430,10 +635,12 @@
 
       const verfuegbarTypEl = document.getElementById("fflw-verfuegbar-ab-typ");
       const verfuegbarDatumEl = document.getElementById("fflw-verfuegbar-ab-datum");
+      const abholFristEl = document.getElementById("fflw-abhol-frist");
+      const abholFristDatumEl = document.getElementById("fflw-abhol-frist-datum");
 
       let itemCounter = 0;
 
-      // URL-Parameter ?modus=telefon automatisch erkennen
+      // URL-Parameter prüfen (?modus=telefon oder ?edit=BATCHID-PIN)
       const params = new URLSearchParams(window.location.search);
       if (params.get("modus") === "telefon") {
         phoneToggle.checked = true;
@@ -455,7 +662,17 @@
         }
       });
 
-      // Bild clientseitig verkleinern & als JPEG komprimieren (schneller Upload vom Handy)
+      abholFristEl.addEventListener("change", function () {
+        if (abholFristEl.value === "festes_datum") {
+          abholFristDatumEl.style.display = "block";
+          abholFristDatumEl.required = true;
+        } else {
+          abholFristDatumEl.style.display = "none";
+          abholFristDatumEl.required = false;
+          abholFristDatumEl.value = "";
+        }
+      });
+
       function komprimiereBild(file) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
@@ -480,9 +697,8 @@
               const ctx = canvas.getContext("2d");
               ctx.drawImage(img, 0, 0, w, h);
               const dataUrl = canvas.toDataURL("image/jpeg", 0.80);
-              const base64 = dataUrl.split(",")[1];
               resolve({
-                base64: base64,
+                base64: dataUrl.split(",")[1],
                 mimeType: "image/jpeg",
                 previewUrl: dataUrl
               });
@@ -495,11 +711,23 @@
         });
       }
 
+      function baueSelectOptionsHtml() {
+        let html = '<option value="">-- Bitte Möbelstück / Gerät nach Zimmer wählen --</option>';
+        MOEBEL_KATALOG.forEach((grp, gIdx) => {
+          html += `<optgroup label="${grp.gruppe}">`;
+          grp.items.forEach((it, iIdx) => {
+            html += `<option value="${gIdx}_${iIdx}">${it.name}</option>`;
+          });
+          html += '</optgroup>';
+        });
+        return html;
+      }
+
       function aktualisiereNummerierung() {
         const karten = Array.from(itemsContainer.querySelectorAll(".fflw-item-box"));
         karten.forEach((karte, idx) => {
           const nrEl = karte.querySelector(".fflw-item-nr");
-          if (nrEl) nrEl.textContent = "Möbelstück #" + (idx + 1);
+          if (nrEl) nrEl.textContent = "Position #" + (idx + 1);
           const delBtn = karte.querySelector(".fflw-remove-item-btn");
           if (delBtn) delBtn.style.display = karten.length > 1 ? "inline-block" : "none";
         });
@@ -509,25 +737,67 @@
         itemCounter += 1;
         const box = document.createElement("div");
         box.className = "fflw-item-box";
-        box.dataset.photos = "[]";
 
         box.innerHTML = `
           <div class="fflw-item-header">
-            <strong class="fflw-item-nr" style="font-size: 1.08rem; color: #ffd700;">Möbelstück #${itemCounter}</strong>
+            <strong class="fflw-item-nr" style="font-size: 1.08rem; color: #ffd700;">Position #${itemCounter}</strong>
             <button type="button" class="fflw-btn-danger fflw-remove-item-btn">✕ Entfernen</button>
           </div>
 
-          <div class="fflw-field">
-            <label>Bezeichnung des Möbelstücks *</label>
-            <input type="text" class="fflw-input fflw-it-titel" required placeholder="z. B. Kleiderschrank 3-türig, Schlafsofa, Esstisch mit 4 Stühlen">
+          <div class="fflw-grid-2">
+            <div class="fflw-field">
+              <label>Gegenstand auswählen (nach Zimmer geordnet) *</label>
+              <select class="fflw-select fflw-it-preset" required>
+                ${baueSelectOptionsHtml()}
+              </select>
+            </div>
+
+            <div class="fflw-field">
+              <label>Anzahl (identische Stücke) *</label>
+              <input type="number" min="1" max="50" value="1" class="fflw-input fflw-it-anzahl" style="max-width: 130px;" required>
+              <div style="font-size: 0.82rem; color: #dcdcdc; margin-top: 3px;">z. B. 4 bei 4 gleichen Stühlen</div>
+            </div>
+          </div>
+
+          <div class="fflw-field fflw-custom-title-box" style="display: none;">
+            <label>Eigene Bezeichnung eingeben *</label>
+            <input type="text" class="fflw-input fflw-it-custom-titel" placeholder="z. B. Eckbank, Musikinstrument, Werkzeugkoffer">
+          </div>
+
+          <!-- Elektrogeräte-Block (klappt automatisch bei Elektrogeräten auf) -->
+          <div class="fflw-elektro-box" style="display: none;">
+            <div style="font-weight: bold; color: #90caf9; margin-bottom: 10px;">
+              🔌 Kurze Info zum Elektrogerät (spart Rückfragen &amp; unnötige Fahrten):
+            </div>
+            <div class="fflw-grid-2">
+              <div class="fflw-field" style="margin-bottom: 6px;">
+                <label>Ungefähres Alter des Geräts *</label>
+                <select class="fflw-select fflw-it-alter">
+                  <option value="Unter 2 Jahre (fast neu)">🆕 Unter 2 Jahre (fast neu)</option>
+                  <option value="Ca. 2 bis 5 Jahre">👍 Ca. 2 bis 5 Jahre</option>
+                  <option value="Ca. 6 bis 10 Jahre">⏳ Ca. 6 bis 10 Jahre</option>
+                  <option value="Über 10 Jahre (älteres Modell)">🕰️ Über 10 Jahre (älteres Modell)</option>
+                  <option value="Weiß ich nicht / schwer zu sagen" selected>🤷 Weiß ich nicht / schwer zu sagen</option>
+                </select>
+              </div>
+              <div class="fflw-field" style="margin-bottom: 6px;">
+                <label>Funktioniert der elektrische Betrieb? *</label>
+                <select class="fflw-select fflw-it-funktion">
+                  <option value="Funktioniert einwandfrei">✅ Funktioniert einwandfrei</option>
+                  <option value="Funktioniert eingeschränkt (siehe Beschreibung)">⚠️ Funktioniert eingeschränkt (bitte unten notieren)</option>
+                  <option value="Konnte noch nicht getestet werden / weiß ich nicht">🔌 Konnte noch nicht getestet werden / weiß ich nicht</option>
+                  <option value="Defekt (nur Bastler / Ersatzteile)">❌ Defekt (hinweis: wir vermitteln i. d. R. nur funktionierende Geräte)</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           <div class="fflw-field">
-            <label>Kategorie &amp; Maße *</label>
+            <label>Art &amp; Maße *</label>
             <div class="fflw-radio-row">
               <label class="fflw-radio-pill">
                 <input type="radio" name="kat_${itemCounter}" value="grossmoebel" class="fflw-it-kat" checked>
-                <span>Großmöbel (mit Maßen in cm)</span>
+                <span>Großmöbel / Gerät mit Maßen (cm)</span>
               </label>
               <label class="fflw-radio-pill">
                 <input type="radio" name="kat_${itemCounter}" value="kleinteil" class="fflw-it-kat">
@@ -537,30 +807,59 @@
           </div>
 
           <div class="fflw-field fflw-masse-box">
-            <label>Maße in Zentimetern (cm) *</label>
+            <label>Maße in Zentimetern (cm)</label>
             <div class="fflw-grid-3">
               <div>
                 <span style="font-size: 0.85rem;">Breite (cm)</span>
-                <input type="number" min="1" max="999" class="fflw-input fflw-it-breite" required placeholder="z. B. 150">
+                <input type="number" min="1" max="999" class="fflw-input fflw-it-breite" placeholder="z. B. 60">
               </div>
               <div>
                 <span style="font-size: 0.85rem;">Höhe (cm)</span>
-                <input type="number" min="1" max="999" class="fflw-input fflw-it-hoehe" required placeholder="z. B. 200">
+                <input type="number" min="1" max="999" class="fflw-input fflw-it-hoehe" placeholder="z. B. 85">
               </div>
               <div>
-                <span style="font-size: 0.85rem;">Tiefe (cm)</span>
-                <input type="number" min="1" max="999" class="fflw-input fflw-it-tiefe" required placeholder="z. B. 60">
+                <span style="font-size: 0.85rem;">Tiefe / Länge (cm)</span>
+                <input type="number" min="1" max="999" class="fflw-input fflw-it-tiefe" placeholder="z. B. 60">
               </div>
+            </div>
+
+            <div class="fflw-standard-hint" style="display: none;">
+              <span class="fflw-hint-text"></span>
+              <button type="button" class="fflw-btn-small fflw-apply-std-btn" style="margin-left: 8px; margin-top: 4px;">
+                ✨ Standardmaß übernehmen
+              </button>
+            </div>
+
+            <div style="margin-top: 10px;">
+              <span style="font-size: 0.88rem; font-weight: bold; display: block; margin-bottom: 4px;">Wie wurden die Maße ermittelt?</span>
+              <select class="fflw-select fflw-it-mass-art" style="max-width: 380px;">
+                <option value="Gemessen">📏 Gemessen (mit Meterstab / Maßband)</option>
+                <option value="Geschätzt / Standardmaß">🤔 Geschätzt / typisches Standardmaß</option>
+                <option value="Mit KI bestimmt">✨ Mit KI aus Foto geschätzt</option>
+                <option value="Keine Angabe möglich / weiß ich gerade nicht">➖ Keine Angabe möglich / weiß ich gerade nicht</option>
+              </select>
             </div>
           </div>
 
-          <div class="fflw-field">
-            <label>Ist das Möbelstück zerlegbar? *</label>
-            <select class="fflw-select fflw-it-zerlegbar">
-              <option value="Ja, leicht zerlegbar">Ja, leicht zerlegbar</option>
-              <option value="Teilweise zerlegbar">Teilweise zerlegbar</option>
-              <option value="Nein, am Stück">Nein, am Stück</option>
-            </select>
+          <div class="fflw-grid-2">
+            <div class="fflw-field">
+              <label>Ist das Stück zerlegbar? *</label>
+              <select class="fflw-select fflw-it-zerlegbar">
+                <option value="Ja, leicht zerlegbar">Ja, leicht zerlegbar</option>
+                <option value="Teilweise zerlegbar">Teilweise zerlegbar</option>
+                <option value="Nein, am Stück">Nein, am Stück</option>
+                <option value="Weiß ich gerade nicht / wird später geklärt">Weiß ich gerade nicht / wird später geklärt</option>
+              </select>
+            </div>
+
+            <div class="fflw-field">
+              <label>Transport-Einschätzung *</label>
+              <select class="fflw-select fflw-it-transport">
+                <option value="🚐 Transporter / Bulli nötig">🚐 Transporter / Bulli nötig</option>
+                <option value="🚲 Passt in PKW / Fahrradanhänger">🚲 Passt in PKW / Fahrradanhänger</option>
+                <option value="Weiß ich nicht">🤷 Weiß ich nicht</option>
+              </select>
+            </div>
           </div>
 
           <div class="fflw-field">
@@ -569,32 +868,106 @@
           </div>
 
           <div class="fflw-field">
-            <label>Fotos hochladen (1 bis 5 Bilder – bitte bei Tageslicht fotografieren) *</label>
-            <input type="file" accept="image/*" multiple class="fflw-it-files" style="color: #fff;">
+            <label>Fotos hochladen (1 bis 5 Bilder)</label>
+            <div class="fflw-foto-tipps">
+              <strong>📸 So gelingt das Foto fast immer (auch ohne Zollstock!):</strong><br>
+              1. Leicht schräg von vorne fotografieren, Licht anmachen.<br>
+              2. <strong>Kein Meterstab zur Hand?</strong> Lege einfach ein <strong>DIN-A4-Blatt</strong> (29,7×21 cm), eine <strong>1,5-Liter-Wasserflasche</strong> (33,5 cm) daneben oder fotografiere die <strong>Zimmertür</strong> (ca. 2 m hoch) mit!
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+              <input type="file" accept="image/*" multiple class="fflw-it-files" style="color: #fff;">
+              <button type="button" class="fflw-btn-small fflw-ai-measure-btn" style="display: none; border-color: #ffd700; color: #ffd700;">
+                ✨ Maße aus 1. Foto mit KI schätzen
+              </button>
+            </div>
+
+            <div class="fflw-ai-status" style="font-size: 0.88rem; color: #ffd700; margin-top: 6px;"></div>
             <div class="fflw-photo-status" style="font-size: 0.88rem; color: #a5d6a7; margin-top: 4px;"></div>
             <div class="fflw-thumbs"></div>
           </div>
         `;
 
+        const presetSel = box.querySelector(".fflw-it-preset");
+        const customTitleBox = box.querySelector(".fflw-custom-title-box");
+        const customTitleIn = box.querySelector(".fflw-it-custom-titel");
+        const elektroBox = box.querySelector(".fflw-elektro-box");
         const katRadios = box.querySelectorAll(".fflw-it-kat");
         const masseBox = box.querySelector(".fflw-masse-box");
         const breiteIn = box.querySelector(".fflw-it-breite");
         const hoeheIn = box.querySelector(".fflw-it-hoehe");
         const tiefeIn = box.querySelector(".fflw-it-tiefe");
+        const massArtSel = box.querySelector(".fflw-it-mass-art");
+        const transportSel = box.querySelector(".fflw-it-transport");
 
-        katRadios.forEach(r => {
-          r.addEventListener("change", function () {
-            const isGross = box.querySelector(".fflw-it-kat:checked").value === "grossmoebel";
-            masseBox.style.display = isGross ? "block" : "none";
-            breiteIn.required = isGross;
-            hoeheIn.required = isGross;
-            tiefeIn.required = isGross;
-          });
+        const stdHintBox = box.querySelector(".fflw-standard-hint");
+        const stdHintText = box.querySelector(".fflw-hint-text");
+        const applyStdBtn = box.querySelector(".fflw-apply-std-btn");
+
+        let currentPresetObj = null;
+
+        function updateMasseVisibility() {
+          const isGross = box.querySelector(".fflw-it-kat:checked").value === "grossmoebel";
+          masseBox.style.display = isGross ? "block" : "none";
+        }
+
+        presetSel.addEventListener("change", function () {
+          const val = presetSel.value;
+          if (!val) {
+            currentPresetObj = null;
+            customTitleBox.style.display = "none";
+            elektroBox.style.display = "none";
+            stdHintBox.style.display = "none";
+            return;
+          }
+          const parts = val.split("_");
+          const grp = MOEBEL_KATALOG[parseInt(parts[0], 10)];
+          const itemObj = grp.items[parseInt(parts[1], 10)];
+          currentPresetObj = Object.assign({ gruppe: grp.gruppe }, itemObj);
+
+          // Eigenes Textfeld nur bei "Sonstiges"
+          const isCustom = itemObj.name.includes("Sonstiges");
+          customTitleBox.style.display = isCustom ? "block" : "none";
+          customTitleIn.required = isCustom;
+
+          // Elektro-Abfrage automatisch einblenden
+          elektroBox.style.display = itemObj.elektro ? "block" : "none";
+
+          // Kategorie & Transport setzen
+          const targetRadio = box.querySelector(`.fflw-it-kat[value="${itemObj.kat}"]`);
+          if (targetRadio) targetRadio.checked = true;
+          updateMasseVisibility();
+
+          if (itemObj.transport) {
+            transportSel.value = itemObj.transport;
+          }
+
+          // Standardmaß-Tipp anzeigen
+          if (itemObj.hint) {
+            stdHintText.textContent = "💡 " + itemObj.hint;
+            applyStdBtn.style.display = (itemObj.b && itemObj.h && itemObj.t) ? "inline-flex" : "none";
+            stdHintBox.style.display = "block";
+          } else {
+            stdHintBox.style.display = "none";
+          }
         });
 
+        applyStdBtn.addEventListener("click", function () {
+          if (!currentPresetObj) return;
+          if (currentPresetObj.b) breiteIn.value = currentPresetObj.b;
+          if (currentPresetObj.h) hoeheIn.value = currentPresetObj.h;
+          if (currentPresetObj.t) tiefeIn.value = currentPresetObj.t;
+          massArtSel.value = "Geschätzt / Standardmaß";
+        });
+
+        katRadios.forEach(r => r.addEventListener("change", updateMasseVisibility));
+
+        // Foto-Upload & KI-Maßerkennung
         const fileInput = box.querySelector(".fflw-it-files");
         const thumbsEl = box.querySelector(".fflw-thumbs");
         const photoStatusEl = box.querySelector(".fflw-photo-status");
+        const aiBtn = box.querySelector(".fflw-ai-measure-btn");
+        const aiStatusEl = box.querySelector(".fflw-ai-status");
         let photosList = [];
 
         function renderThumbs() {
@@ -613,9 +986,8 @@
             });
             thumbsEl.appendChild(wrap);
           });
-          photoStatusEl.textContent = photosList.length > 0
-            ? "✓ " + photosList.length + " Foto(s) bereit"
-            : "";
+          photoStatusEl.textContent = photosList.length > 0 ? "✓ " + photosList.length + " Foto(s) bereit" : "";
+          aiBtn.style.display = photosList.length > 0 ? "inline-flex" : "none";
         }
 
         box._photosList = photosList;
@@ -625,13 +997,12 @@
           if (!files.length) return;
           const restPlatz = 5 - photosList.length;
           if (restPlatz <= 0) {
-            alert("Maximal 5 Fotos pro Möbelstück möglich.");
+            alert("Maximal 5 Fotos pro Position möglich.");
             fileInput.value = "";
             return;
           }
-          const auswahl = files.slice(0, restPlatz);
           photoStatusEl.textContent = "⏳ Fotos werden optimiert …";
-          for (const f of auswahl) {
+          for (const f of files.slice(0, restPlatz)) {
             try {
               const komp = await komprimiereBild(f);
               photosList.push(komp);
@@ -644,6 +1015,38 @@
           renderThumbs();
         });
 
+        aiBtn.addEventListener("click", async function () {
+          if (!photosList.length) return;
+          aiBtn.disabled = true;
+          aiStatusEl.textContent = "⏳ KI analysiert Bild & Referenzobjekte (Meterstab / DIN A4 / Flasche / Tür) …";
+          try {
+            const resp = await fetch(WEB_APP_URL, {
+              method: "POST",
+              redirect: "follow",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({
+                action: "estimateDimensionsAI",
+                base64: photosList[0].base64,
+                mimeType: photosList[0].mimeType
+              })
+            });
+            const res = await resp.json();
+            if (res.ok) {
+              if (res.breite) breiteIn.value = res.breite;
+              if (res.hoehe) hoeheIn.value = res.hoehe;
+              if (res.tiefe) tiefeIn.value = res.tiefe;
+              massArtSel.value = "Mit KI bestimmt";
+              aiStatusEl.textContent = `✨ KI-Schätzung übernommen (Referenz: ${res.referenzErkannt}). ${res.hinweis}`;
+            } else {
+              aiStatusEl.textContent = "ℹ️ " + (res.error || "KI-Schätzung nicht verfügbar.");
+            }
+          } catch (err) {
+            aiStatusEl.textContent = "❌ Verbindungsfehler bei KI-Schätzung: " + err.message;
+          } finally {
+            aiBtn.disabled = false;
+          }
+        });
+
         box.querySelector(".fflw-remove-item-btn").addEventListener("click", function () {
           box.remove();
           aktualisiereNummerierung();
@@ -653,14 +1056,203 @@
         aktualisiereNummerierung();
       }
 
-      // Erste Karte direkt beim Laden anzeigen
       fuegeMoebelKarteHinzu();
+      addItemBtn.addEventListener("click", fuegeMoebelKarteHinzu);
 
-      addItemBtn.addEventListener("click", function () {
-        fuegeMoebelKarteHinzu();
+      // =========================================================================
+      // SPENDER-NACHTRAGSZUGANG (LADEN & SPEICHERN)
+      // =========================================================================
+      const toggleEditLoginBtn = document.getElementById("fflw-toggle-edit-login");
+      const editLoginBox = document.getElementById("fflw-edit-login-box");
+      const loginBatchInput = document.getElementById("fflw-login-batch-id");
+      const loginPinInput = document.getElementById("fflw-login-pin");
+      const loadEditBtn = document.getElementById("fflw-load-edit-btn");
+      const editLoginStatus = document.getElementById("fflw-edit-login-status");
+      const editEditorBox = document.getElementById("fflw-edit-editor-box");
+      const editHeaderInfo = document.getElementById("fflw-edit-header-info");
+      const editItemsList = document.getElementById("fflw-edit-items-list");
+      const saveEditBtn = document.getElementById("fflw-save-edit-btn");
+      const closeEditBtn = document.getElementById("fflw-close-edit-btn");
+      const editSaveStatus = document.getElementById("fflw-edit-save-status");
+
+      let geladenesEditBatchId = "";
+      let geladeneEditPin = "";
+
+      toggleEditLoginBtn.addEventListener("click", function () {
+        editLoginBox.style.display = editLoginBox.style.display === "none" ? "block" : "none";
       });
 
-      // Formular absenden (stückweise Übertragung pro Möbelstück für 100% Stabilität auf dem Handy)
+      closeEditBtn.addEventListener("click", function () {
+        editEditorBox.style.display = "none";
+        editItemsList.innerHTML = "";
+      });
+
+      async function ladeSpendeZumNachtragen(batchId, pin) {
+        editLoginBox.style.display = "block";
+        loginBatchInput.value = batchId;
+        loginPinInput.value = pin;
+        editLoginStatus.style.color = "#ffd700";
+        editLoginStatus.textContent = "⏳ Lade deine Spende …";
+
+        try {
+          const url = `${WEB_APP_URL}?action=getDonorBatchForEdit&batchId=${encodeURIComponent(batchId)}&pin=${encodeURIComponent(pin)}&t=${Date.now()}`;
+          const resp = await fetch(url, { method: "GET", redirect: "follow" });
+          const data = await resp.json();
+          if (!data.ok) {
+            editLoginStatus.style.color = "#ff8a80";
+            editLoginStatus.textContent = "❌ " + (data.error || "Nicht gefunden.");
+            return;
+          }
+
+          geladenesEditBatchId = batchId;
+          geladeneEditPin = pin;
+          editLoginStatus.textContent = "";
+          editEditorBox.style.display = "block";
+          editHeaderInfo.textContent = `Spender: ${data.meta.spenderName} (${data.meta.plzOrt}) · Status: ${data.statusOrt === "online" ? "Bereits öffentlich im Katalog" : "In Prüfung"}`;
+
+          editItemsList.innerHTML = "";
+          (data.items || []).forEach(item => {
+            const m = item.meta || {};
+            const card = document.createElement("div");
+            card.className = "fflw-item-box";
+            card.dataset.folderId = item.folderId;
+            card._newPhotos = [];
+
+            const imgsHtml = (item.images || []).map(im => `<img src="${im.url}" style="width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid #fff;">`).join("");
+
+            card.innerHTML = `
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+                <strong style="color:#ffd700; font-size:1.05rem;">${m.titel || item.folderName}</strong>
+                <label style="display:inline-flex; align-items:center; gap:6px; background:#b71c1c; padding:5px 10px; border-radius:6px; cursor:pointer; font-size:0.88rem;">
+                  <input type="checkbox" class="fflw-upd-erledigt">
+                  <span>Bereits vergeben / erledigt (aus Katalog entfernen)</span>
+                </label>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">${imgsHtml}</div>
+              <div class="fflw-grid-2">
+                <div>
+                  <label style="font-size:0.85rem;">Verfügbare Stückzahl</label>
+                  <input type="number" min="0" max="50" value="${m.anzahlVerfuegbar || 1}" class="fflw-input fflw-upd-anzahl" style="max-width:110px;">
+                </div>
+                <div>
+                  <label style="font-size:0.85rem;">Maß-Art</label>
+                  <select class="fflw-select fflw-upd-massart">
+                    <option value="Gemessen" ${m.massArt === "Gemessen" ? "selected" : ""}>📏 Gemessen</option>
+                    <option value="Geschätzt / Standardmaß" ${m.massArt === "Geschätzt / Standardmaß" ? "selected" : ""}>🤔 Geschätzt</option>
+                    <option value="Mit KI bestimmt" ${m.massArt === "Mit KI bestimmt" ? "selected" : ""}>✨ Mit KI bestimmt</option>
+                    <option value="Keine Angabe möglich / weiß ich gerade nicht" ${String(m.massArt).includes("Keine") ? "selected" : ""}>➖ Noch offen</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fflw-grid-3" style="margin-top:8px;">
+                <div>
+                  <span style="font-size:0.82rem;">Breite (cm)</span>
+                  <input type="number" value="${m.breite || ""}" class="fflw-input fflw-upd-b">
+                </div>
+                <div>
+                  <span style="font-size:0.82rem;">Höhe (cm)</span>
+                  <input type="number" value="${m.hoehe || ""}" class="fflw-input fflw-upd-h">
+                </div>
+                <div>
+                  <span style="font-size:0.82rem;">Tiefe (cm)</span>
+                  <input type="number" value="${m.tiefe || ""}" class="fflw-input fflw-upd-t">
+                </div>
+              </div>
+              <div style="margin-top:8px;">
+                <label style="font-size:0.85rem;">Beschreibung / Ergänzung</label>
+                <textarea class="fflw-textarea fflw-upd-beschr" rows="2">${m.beschreibung || ""}</textarea>
+              </div>
+              <div style="margin-top:8px;">
+                <label style="font-size:0.85rem;">Weitere Fotos bei Tageslicht nachreichen (optional)</label>
+                <input type="file" accept="image/*" multiple class="fflw-upd-files" style="color:#fff;">
+                <div class="fflw-upd-foto-status" style="font-size:0.85rem; color:#a5d6a7;"></div>
+              </div>
+            `;
+
+            const fIn = card.querySelector(".fflw-upd-files");
+            const fStat = card.querySelector(".fflw-upd-foto-status");
+            fIn.addEventListener("change", async function () {
+              const fls = Array.from(fIn.files || []).slice(0, 4);
+              fStat.textContent = "⏳ Optimiere Fotos …";
+              for (const f of fls) {
+                const k = await komprimiereBild(f);
+                card._newPhotos.push({ base64: k.base64, mimeType: k.mimeType });
+              }
+              fStat.textContent = `✓ ${card._newPhotos.length} neue(s) Foto(s) zum Hochladen bereit`;
+            });
+
+            editItemsList.appendChild(card);
+          });
+        } catch (err) {
+          editLoginStatus.style.color = "#ff8a80";
+          editLoginStatus.textContent = "❌ Verbindungsfehler: " + err.message;
+        }
+      }
+
+      loadEditBtn.addEventListener("click", function () {
+        ladeSpendeZumNachtragen(loginBatchInput.value.trim(), loginPinInput.value.trim());
+      });
+
+      // Direktlink ?edit=BATCHID-PIN automatisch öffnen
+      const editParam = params.get("edit");
+      if (editParam && editParam.includes("-")) {
+        const lastDash = editParam.lastIndexOf("-");
+        const bId = editParam.substring(0, lastDash);
+        const pCode = editParam.substring(lastDash + 1);
+        if (bId && pCode) {
+          ladeSpendeZumNachtragen(bId, pCode);
+        }
+      }
+
+      saveEditBtn.addEventListener("click", async function () {
+        saveEditBtn.disabled = true;
+        editSaveStatus.style.color = "#ffd700";
+        editSaveStatus.textContent = "⏳ Speichere Änderungen …";
+
+        const cards = Array.from(editItemsList.querySelectorAll(".fflw-item-box"));
+        const updates = cards.map(c => ({
+          folderId: c.dataset.folderId,
+          alsErledigtMarkieren: c.querySelector(".fflw-upd-erledigt").checked,
+          anzahl: c.querySelector(".fflw-upd-anzahl").value,
+          massArt: c.querySelector(".fflw-upd-massart").value,
+          breite: c.querySelector(".fflw-upd-b").value.trim(),
+          hoehe: c.querySelector(".fflw-upd-h").value.trim(),
+          tiefe: c.querySelector(".fflw-upd-t").value.trim(),
+          beschreibung: c.querySelector(".fflw-upd-beschr").value.trim(),
+          newPhotos: c._newPhotos || []
+        }));
+
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "updateDonorBatch",
+              batchId: geladenesEditBatchId,
+              pin: geladeneEditPin,
+              items: updates
+            })
+          });
+          const res = await resp.json();
+          if (res.ok) {
+            editSaveStatus.style.color = "#a5d6a7";
+            editSaveStatus.textContent = "✅ Deine Änderungen wurden erfolgreich gespeichert!";
+          } else {
+            editSaveStatus.style.color = "#ff8a80";
+            editSaveStatus.textContent = "❌ Fehler: " + (res.error || "Speichern fehlgeschlagen.");
+          }
+        } catch (err) {
+          editSaveStatus.style.color = "#ff8a80";
+          editSaveStatus.textContent = "❌ Verbindungsfehler: " + err.message;
+        } finally {
+          saveEditBtn.disabled = false;
+        }
+      });
+
+      // =========================================================================
+      // NEUE SPENDE ABSENDEN
+      // =========================================================================
       formEl.addEventListener("submit", async function (e) {
         e.preventDefault();
         feedbackEl.textContent = "";
@@ -675,63 +1267,106 @@
           return;
         }
 
+        let hatOffeneAngaben = false;
         const itemsData = [];
+
         for (let i = 0; i < karten.length; i++) {
           const k = karten[i];
-          const titel = k.querySelector(".fflw-it-titel").value.trim();
+          const presetVal = k.querySelector(".fflw-it-preset").value;
+          if (!presetVal) {
+            feedbackEl.style.color = "#ff8a80";
+            feedbackEl.textContent = "❌ Bitte bei Position #" + (i + 1) + " einen Gegenstand aus dem Menü auswählen.";
+            return;
+          }
+
+          const parts = presetVal.split("_");
+          const grp = MOEBEL_KATALOG[parseInt(parts[0], 10)];
+          const itemObj = grp.items[parseInt(parts[1], 10)];
+          const isCustom = itemObj.name.includes("Sonstiges");
+          const titel = isCustom ? k.querySelector(".fflw-it-custom-titel").value.trim() : itemObj.name;
+
+          if (!titel) {
+            feedbackEl.style.color = "#ff8a80";
+            feedbackEl.textContent = "❌ Bitte bei Position #" + (i + 1) + " eine Bezeichnung eingeben.";
+            return;
+          }
+
+          const anzahl = Math.max(1, parseInt(k.querySelector(".fflw-it-anzahl").value || 1, 10) || 1);
           const kategorie = k.querySelector(".fflw-it-kat:checked").value;
           const breite = k.querySelector(".fflw-it-breite").value.trim();
           const hoehe = k.querySelector(".fflw-it-hoehe").value.trim();
           const tiefe = k.querySelector(".fflw-it-tiefe").value.trim();
+          const massArt = k.querySelector(".fflw-it-mass-art").value;
           const zerlegbar = k.querySelector(".fflw-it-zerlegbar").value;
+          const transportGroesse = k.querySelector(".fflw-it-transport").value;
           const beschreibung = k.querySelector(".fflw-it-beschr").value.trim();
           const photos = k._photosList || [];
 
-          if (!titel) {
+          const massUnbekannt = massArt.includes("Keine Angabe") || massArt.includes("weiß ich");
+          if (kategorie === "grossmoebel" && !massUnbekannt && (!breite || !hoehe || !tiefe)) {
             feedbackEl.style.color = "#ff8a80";
-            feedbackEl.textContent = "❌ Bitte bei Möbelstück #" + (i + 1) + " eine Bezeichnung eingeben.";
-            return;
-          }
-          if (kategorie === "grossmoebel" && (!breite || !hoehe || !tiefe)) {
-            feedbackEl.style.color = "#ff8a80";
-            feedbackEl.textContent = "❌ Bitte bei Möbelstück #" + (i + 1) + " Breite, Höhe und Tiefe in cm eingeben.";
-            return;
-          }
-          if (!isPhoneMode && photos.length === 0) {
-            feedbackEl.style.color = "#ff8a80";
-            feedbackEl.textContent = "❌ Bitte lade bei Möbelstück #" + (i + 1) + " mindestens 1 Foto hoch.";
+            feedbackEl.textContent = "❌ Bitte bei Position #" + (i + 1) + " Maße eingeben – oder bei 'Wie wurden die Maße ermittelt?' auf 'Keine Angabe möglich / weiß ich gerade nicht' stellen.";
             return;
           }
 
+          if (massUnbekannt || zerlegbar.includes("Weiß ich") || transportGroesse.includes("Weiß ich") || photos.length === 0) {
+            hatOffeneAngaben = true;
+          }
+
+          // Fotos sind bei 'Weiß ich gerade nicht / später nachreichen' oder Telefon-Modus nicht mehr blockierend!
           itemsData.push({
+            raumKategorie: grp.gruppe,
             titel: titel,
+            anzahl: anzahl,
             kategorie: kategorie,
             breite: breite,
             hoehe: hoehe,
             tiefe: tiefe,
+            massArt: massArt,
+            istElektro: Boolean(itemObj.elektro),
+            geraeteAlter: itemObj.elektro ? k.querySelector(".fflw-it-alter").value : "",
+            elektroFunktion: itemObj.elektro ? k.querySelector(".fflw-it-funktion").value : "",
             zerlegbar: zerlegbar,
+            transportGroesse: transportGroesse,
             beschreibung: beschreibung,
             photos: photos.map(p => ({ base64: p.base64, mimeType: p.mimeType }))
           });
         }
 
-        let verfuegbarAb = "Ab sofort";
+        const lagerStatus = document.getElementById("fflw-lager-status").value;
+        let verfuegbarAb = verfuegbarTypEl.value;
         if (verfuegbarTypEl.value === "datum" && verfuegbarDatumEl.value) {
           const teile = verfuegbarDatumEl.value.split("-");
           verfuegbarAb = teile.length === 3 ? `${teile[2]}.${teile[1]}.${teile[0]}` : verfuegbarDatumEl.value;
         }
 
+        let abholFrist = abholFristEl.value;
+        if (abholFristEl.value === "festes_datum" && abholFristDatumEl.value) {
+          const teile = abholFristDatumEl.value.split("-");
+          abholFrist = "Spätestens bis " + (teile.length === 3 ? `${teile[2]}.${teile[1]}.${teile[0]}` : abholFristDatumEl.value);
+        }
+
+        if (lagerStatus.includes("Weiß ich") || verfuegbarAb.includes("Weiß ich") || abholFrist.includes("Weiß ich")) {
+          hatOffeneAngaben = true;
+        }
+
         const spendeBatchId = "SP_" + Date.now() + "_" + Math.floor(1000 + Math.random() * 9000);
+        const editPin = String(Math.floor(1000 + Math.random() * 9000));
+        const basePageUrl = window.location.origin + window.location.pathname;
+        const editUrl = `${basePageUrl}?edit=${encodeURIComponent(spendeBatchId + "-" + editPin)}`;
 
         const meta = {
           spendeBatchId: spendeBatchId,
+          editPin: editPin,
+          editUrl: editUrl,
+          hatOffeneAngaben: hatOffeneAngaben,
           entryMode: isPhoneMode ? "phone" : "donor",
           helferName: helferInput.value.trim(),
+          lagerStatus: lagerStatus,
           verfuegbarAb: verfuegbarAb,
-          abholFrist: document.getElementById("fflw-abhol-frist").value,
+          abholFrist: abholFrist,
           stockwerk: document.getElementById("fflw-stockwerk").value,
           aufzug: document.getElementById("fflw-aufzug").value,
-          zwischenlager: document.getElementById("fflw-zwischenlager").value,
           mithilfe: document.getElementById("fflw-mithilfe").value,
           spenderName: document.getElementById("fflw-spender-name").value.trim(),
           strasse: document.getElementById("fflw-spender-strasse").value.trim(),
@@ -746,9 +1381,9 @@
 
         try {
           for (let i = 0; i < itemsData.length; i++) {
-            submitBtn.textContent = "⏳ Übertrage Möbelstück " + (i + 1) + " von " + itemsData.length + " …";
+            submitBtn.textContent = "⏳ Übertrage Position " + (i + 1) + " von " + itemsData.length + " …";
             feedbackEl.style.color = "#ffd700";
-            feedbackEl.textContent = "⏳ Bitte Seite nicht schließen – Möbelstück " + (i + 1) + " von " + itemsData.length + " wird gespeichert …";
+            feedbackEl.textContent = "⏳ Bitte Seite nicht schließen – Position " + (i + 1) + " von " + itemsData.length + " wird gespeichert …";
 
             const resp = await fetch(WEB_APP_URL, {
               method: "POST",
@@ -764,16 +1399,17 @@
             });
             const resJson = await resp.json();
             if (!resJson || (!resJson.ok && !resJson.success)) {
-              throw new Error((resJson && resJson.error) ? resJson.error : "Fehler beim Speichern von Stück #" + (i + 1));
+              throw new Error((resJson && resJson.error) ? resJson.error : "Fehler beim Speichern von Position #" + (i + 1));
             }
           }
 
-          // Abschließende Sammel-E-Mail ans Warenhaus-Team auslösen
-          submitBtn.textContent = "⏳ Sende Bestätigung ans Team …";
+          submitBtn.textContent = "⏳ Sende Bestätigung …";
           const overview = itemsData.map(it => ({
             titel: it.titel,
-            masse: it.kategorie === "grossmoebel" ? `${it.breite}×${it.hoehe}×${it.tiefe} cm` : "Kleinteil",
+            anzahl: it.anzahl,
+            masse: it.kategorie === "grossmoebel" ? `${it.breite || "?"}×${it.hoehe || "?"}×${it.tiefe || "?"} cm` : "Kleinteil",
             zerlegbar: it.zerlegbar,
+            transportGroesse: it.transportGroesse,
             anzahlFotos: it.photos.length
           }));
 
@@ -788,12 +1424,32 @@
             })
           });
 
-          feedbackEl.style.color = "#a5d6a7";
-          feedbackEl.textContent = "✅ Vielen herzlichen Dank! Deine Möbelspende (" + itemsData.length + " Position/en) ist erfolgreich bei uns eingegangen. Unser Team prüft die Angaben und meldet sich zeitnah bei dir!";
+          // Persönlichen PIN- & Link-Kasten oben prominent anzeigen
+          const successBox = document.getElementById("fflw-success-pin-box");
+          document.getElementById("fflw-success-summary").textContent =
+            "Deine Spende (" + itemsData.length + " Position/en) wurde gespeichert." +
+            (meta.spenderEmail ? " Wir haben dir den Bearbeitungs-Link zusätzlich an " + meta.spenderEmail + " geschickt." : "");
+          document.getElementById("fflw-personal-link-display").textContent = editUrl;
+          document.getElementById("fflw-personal-id-display").textContent = spendeBatchId;
+          document.getElementById("fflw-personal-pin-display").textContent = editPin;
+          successBox.style.display = "block";
+          successBox.scrollIntoView({ behavior: "smooth", block: "start" });
+
+          document.getElementById("fflw-copy-pin-link-btn").onclick = function () {
+            const copyText = `FFLW Virtuelles Warenhaus – Mein Bearbeitungs-Link:\n${editUrl}\nAngebots-ID: ${spendeBatchId} | PIN: ${editPin}`;
+            if (navigator.clipboard) {
+              navigator.clipboard.writeText(copyText).then(() => alert("Link & PIN wurden in die Zwischenablage kopiert!"));
+            } else {
+              prompt("Bitte kopieren:", copyText);
+            }
+          };
+
+          feedbackEl.textContent = "";
           formEl.reset();
           itemsContainer.innerHTML = "";
           itemCounter = 0;
           verfuegbarDatumEl.style.display = "none";
+          abholFristDatumEl.style.display = "none";
           fuegeMoebelKarteHinzu();
         } catch (err) {
           feedbackEl.style.color = "#ff8a80";
