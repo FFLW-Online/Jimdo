@@ -1017,10 +1017,8 @@ document.addEventListener("DOMContentLoaded", function () {
       trigger.title = "Webseiten-Steuerung (Master)";
       trigger.style.cssText = "opacity: 0.55; margin-left: 6px; text-decoration: none;";
       trigger.textContent = "⚙";
-      trigger.addEventListener("click", function (e) {
-        e.preventDefault();
-        openGlobalMasterModal(currentPage);
-      });
+      trigger.href = "master.html";
+      trigger.title = "Zentrale Steuerung, Koordination & Copilot (Master)";
       legalFooter.appendChild(document.createTextNode(" | "));
       legalFooter.appendChild(trigger);
     }
