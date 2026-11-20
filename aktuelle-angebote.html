@@ -1,12 +1,3 @@
-<!-- ==========================================================================
-  DATEI: aktuelle-angebote.html_von_gemini.txt
-  ERSTELLT VON GEMINI AM: 2026-11-19 23:09 CET
-  BESCHREIBUNG: Live-Katalog & Reservierung für das Virtuelle Warenhaus FFLW
-    - Automatischer Stückzahl-Zähler ("Noch X von Y Stück verfügbar") + Mengenauswahl
-    - Sichtbare Badges für Transportgröße (PKW/Fahrradanhänger vs. Transporter) & Auf-Abruf
-    - Übersetzungsfreundliche Anzeige aller Details (Maß-Art, Geräte-Alter, Funktion)
-    - Handy-Master-Bereich (Reservierungen & eingereichte Spenden freigeben)
-========================================================================== -->
 <!doctype html>
 <html lang="de">
 <head>
@@ -15,292 +6,215 @@
   <title>Aktuelle Angebote - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    @keyframes fflw-sanduhr-drehen {
-      0%   { transform: rotate(0deg); }
-      45%  { transform: rotate(180deg); }
-      50%  { transform: rotate(180deg); }
-      95%  { transform: rotate(360deg); }
-      100% { transform: rotate(360deg); }
+    .fflw-filter-bar {
+      margin: 18px 0;
+      padding: 16px 18px;
+      border-radius: 10px;
+      background: rgba(21, 101, 192, 0.24);
+      border: 2px solid #90caf9;
     }
-    .fflw-sanduhr {
-      display: inline-block;
-      font-style: normal;
-      animation: fflw-sanduhr-drehen 2.2s ease-in-out infinite;
-    }
-    .fflw-artikel-karte {
-      margin-bottom: 18px;
-    }
-    .fflw-badges-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 6px 0 10px 0;
-    }
-    .fflw-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 0.86rem;
-      font-weight: bold;
-    }
-    .fflw-badge-qty {
-      background: #2e7d32;
-      color: #ffffff;
-      border: 1px solid #a5d6a7;
-    }
-    .fflw-badge-trans {
-      background: rgba(21, 101, 192, 0.35);
-      color: #ffffff;
-      border: 1px solid #90caf9;
-    }
-    .fflw-badge-lager {
-      background: rgba(255, 215, 0, 0.18);
-      color: #ffd700;
-      border: 1px solid rgba(255, 215, 0, 0.55);
-    }
-    .fflw-bilder-grid {
+    .fflw-filter-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 14px;
-      margin: 14px 0;
-    }
-    .fflw-bilder-grid img {
-      width: 100%;
-      max-height: 360px;
-      object-fit: contain;
-      background: rgba(0, 0, 0, 0.25);
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.35);
-    }
-    .fflw-checkbox-label {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      padding: 12px 14px;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 10px;
       margin-top: 10px;
-      border-radius: 8px;
-      background: rgba(255, 255, 255, 0.12);
-      border: 2px solid rgba(255, 255, 255, 0.45);
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
     }
-    .fflw-checkbox-label:hover {
-      background: rgba(255, 255, 255, 0.22);
-      border-color: #ffffff;
-    }
-    .fflw-checkbox-label input[type="checkbox"] {
-      width: 22px;
-      height: 22px;
-      accent-color: #2e7d32;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .fflw-qty-select {
-      padding: 6px 10px;
+    .fflw-filter-input, .fflw-filter-select {
+      width: 100%;
+      padding: 9px 11px;
       border-radius: 6px;
-      border: 1px solid #fff;
+      border: 1px solid #bbb;
       font-size: 15px;
-      font-weight: bold;
       color: #111;
       background: #fff;
+      box-sizing: border-box;
     }
-    .fflw-logo-trennbalken {
+    .fflw-offers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+    .fflw-offer-card {
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .fflw-offer-card.urgent {
+      border: 2px solid #ff7043;
+      box-shadow: 0 4px 14px rgba(255, 87, 34, 0.28);
+    }
+    .fflw-urgent-badge {
+      background: #d84315;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 0.84rem;
+      padding: 6px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .fflw-offer-img {
+      width: 100%;
+      height: 210px;
+      object-fit: cover;
+      background: #111;
+      display: block;
+    }
+    .fflw-offer-body {
+      padding: 14px 16px;
+      flex: 1;
+    }
+    .fflw-tag {
+      display: inline-block;
+      font-size: 0.78rem;
+      padding: 3px 8px;
+      border-radius: 5px;
+      background: rgba(255,255,255,0.14);
+      margin: 2px 4px 4px 0;
+    }
+    .fflw-offer-footer {
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.06);
+      border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .fflw-btn-req {
       display: block;
       width: 100%;
-      height: 8px;
-      background: linear-gradient(90deg, var(--primary-color, #1b5e20), var(--accent-color, #2e7d32), var(--primary-color, #1b5e20));
-      border: 1px solid rgba(255, 255, 255, 0.45);
-      border-radius: 4px;
-      margin: 42px 0 26px 0;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      background: #1565c0;
+      color: #fff;
+      border: 2px solid #90caf9;
+      padding: 10px 12px;
+      border-radius: 7px;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      text-decoration: none;
+      box-sizing: border-box;
+    }
+    #fflw-req-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.80);
+      z-index: 2147483645;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .fflw-req-box {
+      background: #141c24;
+      color: #fff;
+      border: 2px solid #90caf9;
+      border-radius: 12px;
+      max-width: 480px;
+      width: 100%;
+      padding: 20px;
     }
   </style>
 </head>
 <body>
   <header class="site-header">
     <a href="index.html" aria-label="Zur Startseite">
-      <img
-        src="assets/images/logo-mit-text.png"
-        alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
     </a>
   </header>
 
   <div class="layout">
     <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
-    
-    <main class="content">
-      <h2>Aktuelle Angebote</h2>
 
-      <!-- Sprachenknopf -->
-      <p style="margin: 14px 0 22px 0;">
-        <a href="fflw-international.html?return=aktuelle-angebote.html"
-           style="display: inline-flex; align-items: center; gap: 10px; background-color: #ffffff; color: #111111; border: 2px solid #ffffff; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">
-           <span>🌐 Sprache wählen / ÜbersetzungsTool</span>
-           <span class="flag-carousel-inline" title="Viele Sprachen unterstützt">
-             <span class="flag-track-inline">
-               <span>🇩🇪</span><span>🇺🇦</span><span>🇬🇧</span><span>🇸🇾</span><span>🇦🇫</span><span>🇹🇷</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
-               <span>🇩🇪</span><span>🇺🇦</span><span>🇬🇧</span><span>🇸🇾</span><span>🇦🇫</span><span>🇹🇷</span><span>🇪🇸</span><span>🇫🇷</span><span>🇮🇹</span>
-             </span>
-           </span>
-        </a>
+    <main class="content">
+      <h2>Aktuelle Angebote im Virtuellen Warenhaus</h2>
+
+      <p>
+        Hier findest du gut erhaltene Möbel und Haushaltssachen, die uns aktuell zur Vermittlung an bedürftige Personen und Familien zur Verfügung gestellt wurden. <strong>Angebote, die schnell abgeholt werden müssen, stehen ganz oben.</strong>
       </p>
 
-      <!-- Fairness- & Maß-Appell -->
-      <div style="margin: 16px 0 22px 0; padding: 16px 18px; border-left: 6px solid #4caf50; background: rgba(255, 255, 255, 0.12); border-radius: 8px;">
-        <p style="margin: 0 0 8px 0; font-size: 1.05rem; font-weight: bold;">
-          🤝 Eine herzliche Bitte vorab (Fairness &amp; Maß):
-        </p>
-        <p style="margin: 0 0 8px 0;">
-          Wir verzichten bewusst auf eine starre Stückzahl-Begrenzung, damit Familien alles bekommen können, was sie wirklich brauchen. Bitte prüfe vor dem Reservieren kurz selbst:
-        </p>
-        <ul style="margin: 0; padding-left: 20px;">
-          <li><strong>Passt das Möbelstück wirklich</strong> in deine Wohnung (Deckenhöhe &amp; Stellfläche) und durch das Treppenhaus?</li>
-          <li><strong>Wird es für deinen eigenen Haushalt benötigt</strong> – oder bleibt auch noch genug für andere Familien übrig?</li>
-          <li><strong>Transport-Tipp:</strong> Kleinteile und zerlegbare Stücke passen oft in einen PKW oder unseren <strong>Fahrradanhänger</strong> – das entlastet unseren Transporter enorm!</li>
-        </ul>
-      </div>
-
-      <p><strong>So funktioniert die Reservierung:</strong></p>
-      <ol>
-        <li>Setze bei den gewünschten Möbeln direkt unter dem Foto ein Häkchen bei <strong>„▲ Diesen Artikel darüber reservieren“</strong> (bei Mehrfach-Stücken wie Stühlen kannst du die gewünschte Anzahl wählen).</li>
-        <li>Trage ganz unten deine Kontaktdaten ein (Name, Zugangscode und Telefonnummer oder E-Mail).</li>
-        <li>Klicke auf den grünen Knopf <strong>„Verbindlich reservieren“</strong> – die ausgewählten Artikel sind danach sofort für dich reserviert.</li>
-      </ol>
-
-      <div style="margin: 18px 0 22px 0; padding: 12px 16px; border-left: 5px solid #ffd700; background: rgba(255, 215, 0, 0.14); border-radius: 6px; font-weight: bold;">
-        ⏳ Geduld, Geduld – das Laden der Bilder kann eventuell sogar 1–2 Minuten dauern.
-      </div>
-
-      <!-- Persönliche Exklusiv-Vorschau für Notsituationen (?vorschau=ORDNER_ID) -->
-      <div id="fflw-exklusiv-vorschau" style="display: none; margin: 20px 0 26px 0; padding: 18px; border: 3px solid #ffd700; border-radius: 10px; background: rgba(255, 215, 0, 0.14);"></div>
-
-      <!-- Live-Galerie der verfügbaren Möbel -->
-      <div id="fflw-angebote-galerie" style="margin-top: 24px;">
-        <div id="fflw-angebote-status" style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); font-weight: bold;">
-          <span class="fflw-sanduhr" aria-hidden="true" style="font-size: 1.5rem;">⏳</span>
-          <span>Bilder werden geladen …</span>
-        </div>
-      </div>
-
-      <!-- Geheimer Handy-Master-Bereich -->
-      <section id="fflw-master-panel" style="display: none; margin-top: 28px; padding: 20px; border: 3px solid #ffd700; border-radius: 10px; background: rgba(20, 28, 36, 0.96); color: #ffffff; box-shadow: 0 6px 20px rgba(0,0,0,0.45);">
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid rgba(255,215,0,0.4); padding-bottom: 12px; margin-bottom: 14px;">
-          <h3 style="margin: 0; color: #ffd700;">🔑 Handy-Master: Reservierte Möbel &amp; Spenden-Eingang</h3>
-          <button type="button" id="fflw-master-close" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">
-            Schließen ✕
-          </button>
+      <!-- FILTER- & SUCHLEISTE -->
+      <section class="fflw-filter-bar" aria-label="Angebote filtern">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+          <strong style="font-size: 1.02rem; color: #bbdefb;">🔍 Angebote durchsuchen &amp; filtern</strong>
+          <span id="fflw-offer-count" style="font-size: 0.9rem; color: #fff;">⏳ Lade Angebote …</span>
         </div>
 
-        <div id="fflw-master-alle-box" style="display: none; margin-bottom: 16px;">
-          <button type="button" id="fflw-master-alle-btn"
-                  style="width: 100%; background-color: #d84315; color: #ffffff; border: 2px solid #ffd700; padding: 12px 18px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.35);">
-            ↺ ALLE reservierten Möbel auf einmal wieder freigeben
-          </button>
-        </div>
+        <div class="fflw-filter-grid">
+          <input type="text" id="fflw-f-text" class="fflw-filter-input" placeholder="Stichwort (z. B. Schrank, Bett, 90x200) …">
 
-        <div id="fflw-master-status" style="font-weight: bold; margin-bottom: 12px; color: #ffd700;"></div>
-        <div id="fflw-master-liste" style="display: flex; flex-direction: column; gap: 14px;"></div>
+          <select id="fflw-f-room" class="fflw-filter-select">
+            <option value="">🏠 Alle Bereiche / Zimmer</option>
+            <option value="Schlafzimmer">🛏️ Schlafzimmer</option>
+            <option value="Wohnzimmer">🛋️ Wohnzimmer</option>
+            <option value="Küche">🍽️ Küche &amp; Esszimmer</option>
+            <option value="Kinderzimmer">🧸 Kinderzimmer &amp; Familie</option>
+            <option value="Haushalt">🧹 Haushalt, Flur &amp; Sonstiges</option>
+          </select>
 
-        <!-- Eingereichte Spenden (gruppiert nach Anbieter / Wohnung) -->
-        <div style="margin-top: 24px; padding-top: 18px; border-top: 2px solid rgba(255, 215, 0, 0.45);">
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-            <h3 style="margin: 0; color: #a5d6a7;">📥 Eingereichte Spenden (nach Anbieter / Wohnung)</h3>
-            <button type="button" id="fflw-master-spenden-reload"
-                    style="background: rgba(255,255,255,0.16); color: #fff; border: 1px solid #a5d6a7; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold;">
-              ↻ Liste aktualisieren
-            </button>
-          </div>
-          <div id="fflw-master-spenden-status" style="font-weight: bold; margin-bottom: 10px; color: #a5d6a7;"></div>
-          <div id="fflw-master-spenden-liste" style="display: flex; flex-direction: column; gap: 16px;"></div>
+          <select id="fflw-f-transport" class="fflw-filter-select">
+            <option value="">🚗 Alle Transport-Größen</option>
+            <option value="Tasche">🎒 Passt in Tasche / zu Fuß</option>
+            <option value="Fahrrad">🚲 Passt auf Fahrrad-Anhänger</option>
+            <option value="PKW">🚗 Passt in normalen PKW</option>
+            <option value="Transporter">🚐 Transporter / Hänger nötig</option>
+          </select>
+
+          <select id="fflw-f-urgent" class="fflw-filter-select">
+            <option value="urgent_first">🔥 Sortierung: Dringend zuerst</option>
+            <option value="only_urgent">🟠 Nur „Muss schnell raus“</option>
+            <option value="flexible">🟢 Nur „Auf Abruf“ (flexibel)</option>
+          </select>
         </div>
       </section>
 
-      <!-- Direktes Reservierungsformular -->
-      <form id="fflw-reservierungs-form" style="display: none; margin-top: 34px; padding: 22px; border: 2px solid #ffffff; border-radius: 8px; background: rgba(255,255,255,0.08);">
-        <h3 style="margin-top: 0;">Kontaktdaten &amp; Reservierung absenden</h3>
+      <div id="fflw-offers-container" class="fflw-offers-grid"></div>
 
-        <p id="fflw-auswahl-info" style="font-weight: bold; background: rgba(0,0,0,0.28); padding: 10px 12px; border-radius: 6px;">
-          Ausgewählte Artikel: 0
+      <div style="margin-top: 26px; padding: 16px; border-radius: 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.25);">
+        <strong>Nichts Passendes dabei?</strong>
+        <p style="margin: 6px 0 0 0;">
+          Melde deinen konkreten Bedarf einfach über <a href="suche-sachen.html"><strong>Sachen suchen / Bedarf anmelden</strong></a> – wir informieren dich, sobald etwas Passendes eingeht.
         </p>
-
-        <div id="fflw-code-box" style="display: none; margin-bottom: 16px; padding: 12px 14px; border-radius: 6px; background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.45);">
-          <label for="fflw-res-code" style="display: block; font-weight: bold; margin-bottom: 4px;">
-            Zugangscode (Zahl vom Freundeskreis) *
-          </label>
-          <input type="text" id="fflw-res-code" autocomplete="off"
-                 style="width: 160px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
-          <div id="fflw-code-limit-hinweis" style="margin-top: 6px; font-size: 0.9rem; font-weight: bold; color: #a5d6a7;"></div>
-        </div>
-
-        <div style="margin-bottom: 14px;">
-          <label for="fflw-res-name" style="display: block; font-weight: bold; margin-bottom: 4px;">
-            Dein Name (Vor- und Nachname) *
-          </label>
-          <input type="text" id="fflw-res-name" required
-                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
-        </div>
-
-        <p style="margin: 14px 0 8px 0; font-size: 0.92rem; font-weight: bold;">
-          Bitte mindestens eines der beiden Kontaktfelder ausfüllen *:
-        </p>
-
-        <div style="margin-bottom: 14px;">
-          <label for="fflw-res-telefon" style="display: block; font-weight: bold; margin-bottom: 4px;">
-            Telefonnummer / WhatsApp
-          </label>
-          <input type="tel" id="fflw-res-telefon"
-                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
-        </div>
-
-        <div style="margin-bottom: 14px;">
-          <label for="fflw-res-email" style="display: block; font-weight: bold; margin-bottom: 4px;">
-            E-Mail-Adresse
-          </label>
-          <input type="email" id="fflw-res-email"
-                 style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
-        </div>
-
-        <div style="margin-bottom: 14px;">
-          <label for="fflw-res-lieferung" style="display: block; font-weight: bold; margin-bottom: 4px;">
-            Abholung oder Lieferung?
-          </label>
-          <select id="fflw-res-lieferung"
-                  style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;">
-            <option value="Ich kann selbst abholen (PKW / Fahrradanhänger)">Ich kann selbst abholen (PKW / Fahrradanhänger)</option>
-            <option value="Ich brauche Hilfe beim Transport (Lieferung)">Ich brauche Hilfe beim Transport (Lieferung)</option>
-          </select>
-        </div>
-
-        <div style="margin-bottom: 18px;">
-          <label for="fflw-res-bemerkung" style="display: block; font-weight: bold; margin-bottom: 4px;">
-            Adresse / Ort oder kurze Nachricht (optional)
-          </label>
-          <textarea id="fflw-res-bemerkung" rows="3"
-                    style="width: 100%; max-width: 460px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; color: #111; background: #fff; box-sizing: border-box;"></textarea>
-        </div>
-
-        <div id="fflw-res-feedback" style="margin-bottom: 14px; font-weight: bold;"></div>
-
-        <button type="submit" id="fflw-res-submit"
-                style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; background-color: #2e7d32; color: #ffffff; border: 2px solid #ffffff; padding: 14px 28px; font-size: 17px; font-weight: bold; border-radius: 8px; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.3);">
-          Verbindlich reservieren
-        </button>
-      </form>
+      </div>
     </main>
   </div>
 
+  <!-- Anfrage / Reservierungs-Modal -->
+  <div id="fflw-req-modal">
+    <div class="fflw-req-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <strong style="color:#90caf9; font-size:1.08rem;">🔵 Interesse / Bedarf anmelden</strong>
+        <button type="button" id="fflw-req-close" style="background:#333; color:#fff; border:1px solid #888; border-radius:5px; padding:4px 10px; cursor:pointer;">✕</button>
+      </div>
+      <p id="fflw-req-item-title" style="font-weight:bold; color:#ffd700; margin:0 0 12px 0;"></p>
+      <form id="fflw-req-form">
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-weight:bold; margin-bottom:4px;">Dein Name (oder Name des Paten/Helfers) *</label>
+          <input type="text" id="fflw-req-name" required class="fflw-filter-input">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-weight:bold; margin-bottom:4px;">Telefon / WhatsApp oder E-Mail *</label>
+          <input type="text" id="fflw-req-kontakt" required class="fflw-filter-input">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-weight:bold; margin-bottom:4px;">Wohnort &amp; kurzer Hinweis (z. B. Transportmöglichkeit) *</label>
+          <textarea id="fflw-req-note" rows="3" required class="fflw-filter-input" placeholder="z. B. Für Familie in Winnenden, eigener PKW vorhanden"></textarea>
+        </div>
+        <div id="fflw-req-feedback" style="margin:8px 0; font-weight:bold;"></div>
+        <button type="submit" id="fflw-req-submit" class="fflw-btn-req" style="background:#2e7d32; border-color:#a5d6a7;">
+          ✅ Unverbindliche Anfrage absenden
+        </button>
+      </form>
+    </div>
+  </div>
+
   <section class="contact-block">
-    <p><strong>Du möchtest aktiv werden? Oder einfach mal den Kontakt zum Freundeskreis aufnehmen? Dann schreib uns doch, wir freuen uns!</strong></p>
     <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
     <p>
-      <strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a><br>
-      <strong>Sachen-Spenden (Infos, Kontakt):</strong> <a href="mailto:Warenhaus@freundeleuwi.org">Warenhaus@freundeleuwi.org</a><br>
-      <strong>Sachen-Suchen (Infos, Kontakt):</strong> <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
-      <strong>Transport-Mithilfe (Infos, Kontakt):</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a><br>
-      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong> <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a><br>
-      <strong>Geldspenden und Spendenbescheinigungen:</strong> <a href="mailto:Kasse-FFLW@freundeleuwi.org">Kasse-FFLW@freundeleuwi.org</a>
+      <strong>Sachen-Suchen:</strong> <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
+      <strong>Transport-Mithilfe:</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a>
     </p>
   </section>
 
@@ -311,684 +225,156 @@
   <script src="nav-loader.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const ZUGANGS_CODE = "11";
-      const MASTER_ADMIN_CODE = "FFLW-99";
-
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
-      const container = document.getElementById("fflw-angebote-galerie");
-      const formEl = document.getElementById("fflw-reservierungs-form");
-      const codeBoxEl = document.getElementById("fflw-code-box");
-      const codeInputEl = document.getElementById("fflw-res-code");
-      const codeLimitHinweisEl = document.getElementById("fflw-code-limit-hinweis");
-      const auswahlInfoEl = document.getElementById("fflw-auswahl-info");
-      const feedbackEl = document.getElementById("fflw-res-feedback");
-      const submitBtn = document.getElementById("fflw-res-submit");
+      const container = document.getElementById("fflw-offers-container");
+      const countEl = document.getElementById("fflw-offer-count");
+      const fText = document.getElementById("fflw-f-text");
+      const fRoom = document.getElementById("fflw-f-room");
+      const fTransport = document.getElementById("fflw-f-transport");
+      const fUrgent = document.getElementById("fflw-f-urgent");
 
-      const masterPanelEl = document.getElementById("fflw-master-panel");
-      const masterListeEl = document.getElementById("fflw-master-liste");
-      const masterStatusEl = document.getElementById("fflw-master-status");
-      const masterCloseBtn = document.getElementById("fflw-master-close");
-      const masterAlleBox = document.getElementById("fflw-master-alle-box");
-      const masterAlleBtn = document.getElementById("fflw-master-alle-btn");
+      let allOffers = [];
+      let selectedOffer = null;
 
-      let aktiverMasterCode = "";
-      const exklusivVorschauEl = document.getElementById("fflw-exklusiv-vorschau");
-      const masterSpendenStatusEl = document.getElementById("fflw-master-spenden-status");
-      const masterSpendenListeEl = document.getElementById("fflw-master-spenden-liste");
-      const masterSpendenReloadBtn = document.getElementById("fflw-master-spenden-reload");
-
-      if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
-        codeBoxEl.style.display = "block";
-        codeInputEl.required = true;
+      function isItemUrgent(item) {
+        const s = `${item.lagerStatus || ""} ${item.beschreibung || ""} ${item.abholFrist || ""}`.toLowerCase();
+        return s.includes("festen datum") || s.includes("dringend") || s.includes("7 tage") || Boolean(item.abholFrist);
       }
 
-      function istZugangsCodeGueltig() {
-        const basis = (ZUGANGS_CODE || "").trim().toLowerCase();
-        if (!basis) return true;
-        return codeInputEl.value.trim().toLowerCase() === basis;
-      }
+      function renderOffers() {
+        const q = fText.value.trim().toLowerCase();
+        const room = fRoom.value.toLowerCase();
+        const trans = fTransport.value.toLowerCase();
+        const urgMode = fUrgent.value;
 
-      function istMasterCode(eingabe) {
-        const ziel = (MASTER_ADMIN_CODE || "").trim().toLowerCase();
-        return ziel !== "" && String(eingabe || "").trim().toLowerCase() === ziel;
-      }
-
-      function retranslate(targetEl) {
-        const activeLang = typeof getActiveLanguage === "function" ? getActiveLanguage() : null;
-        if (activeLang && activeLang !== "de" && typeof forceGoogleTranslatePopup === "function") {
-          setTimeout(() => forceGoogleTranslatePopup(activeLang, targetEl), 300);
-          setTimeout(() => forceGoogleTranslatePopup(activeLang, targetEl), 1100);
-        }
-      }
-
-      function updateAuswahlCounter() {
-        const allBoxes = Array.from(document.querySelectorAll('#fflw-angebote-galerie input[type="checkbox"], #fflw-exklusiv-vorschau input[type="checkbox"]'));
-        const checked = allBoxes.filter(cb => cb.checked);
-        let gesamtStueck = 0;
-        checked.forEach(cb => {
-          const karte = cb.closest(".fflw-artikel-karte") || cb.parentElement;
-          const qtySel = karte ? karte.querySelector(".fflw-qty-select") : null;
-          gesamtStueck += qtySel ? (parseInt(qtySel.value, 10) || 1) : 1;
+        let filtered = allOffers.filter(it => {
+          const full = `${it.titel || ""} ${it.raumKategorie || ""} ${it.beschreibung || ""} ${it.ort || ""} ${it.transportInfo || ""}`.toLowerCase();
+          if (q && !full.includes(q)) return false;
+          if (room && !full.includes(room)) return false;
+          if (trans && !full.includes(trans)) return false;
+          const urg = isItemUrgent(it);
+          if (urgMode === "only_urgent" && !urg) return false;
+          if (urgMode === "flexible" && urg) return false;
+          return true;
         });
 
-        auswahlInfoEl.textContent = `Ausgewählte Positionen: ${checked.length} (Gesamt: ${gesamtStueck} Stück)`;
-
-        if (ZUGANGS_CODE && ZUGANGS_CODE.trim() !== "") {
-          codeLimitHinweisEl.textContent = istZugangsCodeGueltig() ? "✓ Code gültig." : "";
-          retranslate(codeLimitHinweisEl);
-        }
-        retranslate(auswahlInfoEl);
-      }
-
-      // =========================================================================
-      // HANDY-MASTER-BEREICH
-      // =========================================================================
-      masterCloseBtn.addEventListener("click", function () {
-        masterPanelEl.style.display = "none";
-        aktiverMasterCode = "";
-        codeInputEl.value = "";
-        feedbackEl.textContent = "";
-        updateAuswahlCounter();
-      });
-
-      function ladeReservierteFuerMaster(code) {
-        aktiverMasterCode = code;
-        masterPanelEl.style.display = "block";
-        masterAlleBox.style.display = "none";
-        masterStatusEl.textContent = "⏳ Lade reservierte Möbel aus Google Drive …";
-        masterListeEl.innerHTML = "";
-        masterPanelEl.scrollIntoView({ behavior: "smooth", block: "start" });
-
-        const url = WEB_APP_URL + "?action=admin_list&masterCode=" + encodeURIComponent(code) + "&t=" + Date.now();
-        fetch(url, { method: "GET", redirect: "follow" })
-          .then(res => res.json())
-          .then(data => {
-            if (!data.ok) {
-              masterStatusEl.textContent = "❌ " + (data.error || "Zugriff verweigert.");
-              return;
-            }
-            if (!data.items || data.items.length === 0) {
-              masterStatusEl.textContent = "✓ Aktuell liegen keine reservierten Möbel im Privat-Ordner.";
-              return;
-            }
-
-            masterStatusEl.textContent = "Gefundene Reservierungen: " + data.items.length;
-            if (data.items.length >= 2) {
-              masterAlleBox.style.display = "block";
-              masterAlleBtn.disabled = false;
-              masterAlleBtn.style.backgroundColor = "#d84315";
-              masterAlleBtn.textContent = "↺ ALLE " + data.items.length + " reservierten Möbel auf einmal freigeben";
-            }
-
-            data.items.forEach(item => {
-              const karte = document.createElement("div");
-              karte.className = "fflw-master-item";
-              karte.style.cssText = "display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.09); border: 1px solid rgba(255,255,255,0.25);";
-
-              const imgHtml = item.bildUrl
-                ? `<img src="${item.bildUrl}" alt="" style="width: 84px; height: 84px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc; flex-shrink: 0;">`
-                : `<div style="width: 84px; height: 84px; display: flex; align-items: center; justify-content: center; background: #333; border-radius: 6px; font-size: 28px; flex-shrink: 0;">🪑</div>`;
-
-              karte.innerHTML = `
-                ${imgHtml}
-                <div style="flex: 1; min-width: 190px;">
-                  <div style="font-size: 1.05rem; font-weight: bold; color: #ffffff;">${item.artikelName}</div>
-                  <div style="font-size: 0.9rem; color: #ffd700; margin-top: 3px;">Reserviert für: <strong>${item.empfaenger}</strong></div>
-                  <div style="font-size: 0.82rem; color: #cccccc; margin-top: 2px;">Datum: ${item.datum}</div>
-                </div>
-                <button type="button" class="fflw-release-btn"
-                        style="background-color: #2e7d32; color: #ffffff; border: 2px solid #ffffff; padding: 10px 16px; font-size: 15px; font-weight: bold; border-radius: 6px; cursor: pointer; white-space: nowrap;">
-                  ↺ Wieder freigeben
-                </button>
-              `;
-
-              const btn = karte.querySelector(".fflw-release-btn");
-              btn.addEventListener("click", function () {
-                if (!confirm("Möchtest du „" + item.artikelName + "“ wirklich wieder freigeben?")) return;
-                btn.disabled = true;
-                btn.textContent = "⏳ …";
-                fetch(WEB_APP_URL, {
-                  method: "POST",
-                  redirect: "follow",
-                  headers: { "Content-Type": "text/plain;charset=utf-8" },
-                  body: JSON.stringify({ action: "admin_release", masterCode: aktiverMasterCode, ordnerId: item.id })
-                })
-                  .then(r => r.json())
-                  .then(resData => {
-                    if (resData.ok) {
-                      btn.textContent = "✓ Wieder online!";
-                      btn.style.backgroundColor = "#1b5e20";
-                      ladeAngebote();
-                    } else {
-                      alert("Fehler: " + (resData.error || "Unbekannt"));
-                      btn.disabled = false;
-                      btn.textContent = "↺ Wieder freigeben";
-                    }
-                  });
-              });
-
-              masterListeEl.appendChild(karte);
-            });
-          });
-      }
-
-      masterAlleBtn.addEventListener("click", function () {
-        if (!confirm("Wirklich ALLE reservierten Möbelstücke auf einmal wieder freigeben?")) return;
-        masterAlleBtn.disabled = true;
-        masterAlleBtn.textContent = "⏳ Alle werden freigegeben …";
-        fetch(WEB_APP_URL, {
-          method: "POST",
-          redirect: "follow",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "admin_release_all", masterCode: aktiverMasterCode })
-        })
-          .then(r => r.json())
-          .then(resData => {
-            if (resData.ok) {
-              masterAlleBox.style.display = "none";
-              masterStatusEl.textContent = "✅ Alle " + resData.anzahl + " Möbelstücke sind wieder online.";
-              ladeAngebote();
-            }
-          });
-      });
-
-      if (masterSpendenReloadBtn) {
-        masterSpendenReloadBtn.addEventListener("click", function () {
-          if (aktiverMasterCode) ladeEingereichteSpendenFuerMaster(aktiverMasterCode);
+        // Dringende Angebote ("Muss schnell raus") immer nach oben sortieren
+        filtered.sort((a, b) => {
+          const ua = isItemUrgent(a) ? 0 : 1;
+          const ub = isItemUrgent(b) ? 0 : 1;
+          if (ua !== ub) return ua - ub;
+          if (a.abholFrist && b.abholFrist) return a.abholFrist.localeCompare(b.abholFrist);
+          return 0;
         });
-      }
 
-      function kopiereLinkInZwischenablage(link, hinweisText) {
-        if (navigator.clipboard) {
-          navigator.clipboard.writeText(link).then(() => alert(hinweisText + "\n\n" + link)).catch(() => prompt(hinweisText, link));
-        } else {
-          prompt(hinweisText, link);
-        }
-      }
+        countEl.textContent = `${filtered.length} Angebot(e) angezeigt`;
+        container.innerHTML = "";
 
-      function ladeEingereichteSpendenFuerMaster(code) {
-        masterSpendenStatusEl.textContent = "⏳ Lade eingereichte Spenden aus _Eingang_Pruefung …";
-        masterSpendenListeEl.innerHTML = "";
-
-        const url = WEB_APP_URL + "?action=getPendingDonations&masterCode=" + encodeURIComponent(code) + "&t=" + Date.now();
-        fetch(url, { method: "GET", redirect: "follow" })
-          .then(r => r.json())
-          .then(data => {
-            if (!data.success) {
-              masterSpendenStatusEl.textContent = "❌ " + (data.error || "Fehler beim Laden.");
-              return;
-            }
-            const groups = data.groups || [];
-            if (groups.length === 0) {
-              masterSpendenStatusEl.textContent = "✓ Aktuell liegen keine ungeprüften Spenden im Eingangs-Ordner.";
-              return;
-            }
-            masterSpendenStatusEl.textContent = "Anbieter / Wohnungen im Eingang: " + groups.length;
-            const baseUrl = window.location.origin + window.location.pathname;
-
-            groups.forEach(group => {
-              const am = group.meta || {};
-              const anbieterBox = document.createElement("div");
-              anbieterBox.style.cssText = "padding: 14px; border-radius: 10px; background: rgba(255,255,255,0.08); border: 2px solid rgba(165,214,167,0.55);";
-
-              const offenBadge = am.hatOffeneAngaben
-                ? ` <span style="background:#e65100; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">⚠️ Angabe offen</span>`
-                : "";
-              const anbieterExklusivLink = `${baseUrl}?vorschau=${encodeURIComponent(group.anbieterFolderId)}`;
-
-              anbieterBox.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:10px; margin-bottom:12px;">
-                  <div>
-                    <div style="margin-bottom:4px;"><span style="background:#2e7d32; color:#fff; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">${am.lagerStatus || "Ab sofort"}</span>${offenBadge}</div>
-                    <div style="font-size:1.1rem; font-weight:bold; color:#ffffff;">🏠 Anbieter: ${am.spenderName || group.anbieterFolderName} (${am.plzOrt || ""})</div>
-                    <div style="font-size:0.86rem; color:#dcdcdc; margin-top:3px; line-height:1.4;">
-                      Tel: <strong>${am.spenderTelefon || "-"}</strong> | Adresse: ${am.strasse || ""}, ${am.plzOrt || ""}<br>
-                      Stockwerk: ${am.stockwerk || ""} (${am.aufzug || ""}) | Frist: ${am.abholFrist || "offen"} | PIN: ${am.editPin || "-"}
-                    </div>
-                  </div>
-                  <div style="display:flex; flex-direction:column; gap:6px;">
-                    <button type="button" class="fflw-pub-all-btn"
-                            style="background-color:#2e7d32; color:#fff; border:2px solid #fff; padding:8px 12px; font-size:13px; font-weight:bold; border-radius:6px; cursor:pointer;">
-                      ✓ Alle ${group.items.length} Teile freischalten
-                    </button>
-                    <button type="button" class="fflw-link-all-btn"
-                            style="background-color:#1565c0; color:#fff; border:1px solid #90caf9; padding:7px 12px; font-size:13px; font-weight:bold; border-radius:6px; cursor:pointer;">
-                      🔗 Exklusiv-Link für ganze Wohnung
-                    </button>
-                  </div>
-                </div>
-                <div class="fflw-anbieter-items" style="display:flex; flex-direction:column; gap:10px;"></div>
-              `;
-
-              anbieterBox.querySelector(".fflw-pub-all-btn").addEventListener("click", function () {
-                if (!confirm("Alle " + group.items.length + " Positionen jetzt öffentlich freischalten?")) return;
-                this.disabled = true;
-                this.textContent = "⏳ …";
-                fetch(WEB_APP_URL, {
-                  method: "POST",
-                  redirect: "follow",
-                  headers: { "Content-Type": "text/plain;charset=utf-8" },
-                  body: JSON.stringify({ action: "publishDonationItem", masterCode: aktiverMasterCode, folderId: group.anbieterFolderId, isWholeProvider: true })
-                }).then(r => r.json()).then(res => {
-                  if (res.ok || res.success) { anbieterBox.remove(); ladeAngebote(); }
-                });
-              });
-
-              anbieterBox.querySelector(".fflw-link-all-btn").addEventListener("click", function () {
-                kopiereLinkInZwischenablage(anbieterExklusivLink, "Exklusiv-Link kopiert:");
-              });
-
-              const itemsHost = anbieterBox.querySelector(".fflw-anbieter-items");
-              group.items.forEach(item => {
-                const m = item.meta || {};
-                const row = document.createElement("div");
-                row.style.cssText = "display:flex; flex-wrap:wrap; align-items:center; gap:12px; padding:10px; border-radius:8px; background:rgba(0,0,0,0.28); border:1px solid rgba(255,255,255,0.18);";
-                const imgUrl = (item.images && item.images.length) ? item.images[0] : "";
-                const imgHtml = imgUrl
-                  ? `<img src="${imgUrl}" alt="" style="width:74px; height:74px; object-fit:cover; border-radius:6px; border:1px solid #ccc; flex-shrink:0;">`
-                  : `<div style="width:74px; height:74px; display:flex; align-items:center; justify-content:center; background:#333; border-radius:6px; font-size:24px; flex-shrink:0;">📦</div>`;
-
-                const anzahlTag = (m.anzahlGesamt && m.anzahlGesamt > 1) ? `${m.anzahlGesamt}x ` : "";
-                const einzelLink = `${baseUrl}?vorschau=${encodeURIComponent(item.folderId)}`;
-
-                row.innerHTML = `
-                  ${imgHtml}
-                  <div style="flex:1; min-width:180px;">
-                    <div style="font-weight:bold; color:#fff;">${anzahlTag}${m.titel || item.folderName}</div>
-                    <div style="font-size:0.84rem; color:#ccc;">${m.transportGroesse || ""} · Zerlegbar: ${m.zerlegbar || "-"}</div>
-                  </div>
-                  <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                    <button type="button" class="fflw-one-pub" style="background:#2e7d32; color:#fff; border:1px solid #fff; padding:6px 10px; font-size:13px; font-weight:bold; border-radius:5px; cursor:pointer;">✓ Freischalten</button>
-                    <button type="button" class="fflw-one-link" style="background:#1565c0; color:#fff; border:1px solid #90caf9; padding:6px 10px; font-size:13px; border-radius:5px; cursor:pointer;">🔗 Link</button>
-                    <button type="button" class="fflw-one-arch" style="background:#616161; color:#fff; border:1px solid #bdbdbd; padding:6px 9px; font-size:12px; border-radius:5px; cursor:pointer;">Archiv</button>
-                  </div>
-                `;
-
-                row.querySelector(".fflw-one-pub").addEventListener("click", function () {
-                  this.disabled = true;
-                  fetch(WEB_APP_URL, {
-                    method: "POST",
-                    redirect: "follow",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ action: "publishDonationItem", masterCode: aktiverMasterCode, folderId: item.folderId, isWholeProvider: false })
-                  }).then(r => r.json()).then(res => {
-                    if (res.ok || res.success) { row.remove(); if (!itemsHost.children.length) anbieterBox.remove(); ladeAngebote(); }
-                  });
-                });
-
-                row.querySelector(".fflw-one-link").addEventListener("click", function () {
-                  kopiereLinkInZwischenablage(einzelLink, "Exklusiv-Link für Einzelstück kopiert:");
-                });
-
-                row.querySelector(".fflw-one-arch").addEventListener("click", function () {
-                  if (!confirm("Wirklich ins Archiv verschieben?")) return;
-                  fetch(WEB_APP_URL, {
-                    method: "POST",
-                    redirect: "follow",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ action: "archiveDonationItem", masterCode: aktiverMasterCode, folderId: item.folderId })
-                  }).then(r => r.json()).then(() => {
-                    row.remove(); if (!itemsHost.children.length) anbieterBox.remove();
-                  });
-                });
-
-                itemsHost.appendChild(row);
-              });
-
-              masterSpendenListeEl.appendChild(anbieterBox);
-            });
-          });
-      }
-
-      codeInputEl.addEventListener("input", function () {
-        const aktuellerWert = codeInputEl.value;
-        if (istMasterCode(aktuellerWert)) {
-          codeInputEl.value = "";
-          feedbackEl.textContent = "";
-          updateAuswahlCounter();
-          ladeReservierteFuerMaster(aktuellerWert.trim());
-          ladeEingereichteSpendenFuerMaster(aktuellerWert.trim());
+        if (filtered.length === 0) {
+          container.innerHTML = `<div style="grid-column: 1/-1; padding: 20px; background: rgba(255,255,255,0.08); border-radius: 8px;">Keine passenden Angebote für diese Filterauswahl gefunden.</div>`;
           return;
         }
-        updateAuswahlCounter();
+
+        filtered.forEach(item => {
+          const urgent = isItemUrgent(item);
+          const card = document.createElement("article");
+          card.className = "fflw-offer-card" + (urgent ? " urgent" : "");
+
+          const imgUrl = (item.bilder && item.bilder.length > 0) ? item.bilder[0].url : "";
+          const fristText = item.abholFrist ? ` bis ${item.abholFrist}` : "";
+
+          card.innerHTML = `
+            <div>
+              ${urgent ? `<div class="fflw-urgent-badge"><span>🔥 Muss schnell raus${fristText}</span><span>Eilig</span></div>` : ""}
+              ${imgUrl ? `<img src="${imgUrl}" alt="${item.titel || "Möbelstück"}" class="fflw-offer-img">` : ""}
+              <div class="fflw-offer-body">
+                <h3 style="margin: 0 0 8px 0; font-size: 1.12rem; color: #fff;">${item.titel || item.pfad || "Sachspende"}</h3>
+                <div style="margin-bottom: 8px;">
+                  ${item.ort ? `<span class="fflw-tag">📍 ${item.ort}</span>` : ""}
+                  ${item.transportInfo ? `<span class="fflw-tag">${item.transportInfo}</span>` : ""}
+                  ${item.zerlegbar ? `<span class="fflw-tag">🔧 ${item.zerlegbar}</span>` : ""}
+                </div>
+                <p style="margin: 0; font-size: 0.92rem; color: #e0e0e0; white-space: pre-line;">${item.beschreibung || ""}</p>
+              </div>
+            </div>
+            <div class="fflw-offer-footer">
+              <button type="button" class="fflw-btn-req">🔵 Dieses Stück anfragen</button>
+            </div>
+          `;
+
+          card.querySelector(".fflw-btn-req").addEventListener("click", () => {
+            selectedOffer = item;
+            document.getElementById("fflw-req-item-title").textContent = item.titel || item.pfad;
+            document.getElementById("fflw-req-feedback").textContent = "";
+            document.getElementById("fflw-req-modal").style.display = "flex";
+          });
+
+          container.appendChild(card);
+        });
+      }
+
+      [fText, fRoom, fTransport, fUrgent].forEach(el => {
+        el.addEventListener("input", renderOffers);
+        el.addEventListener("change", renderOffers);
       });
 
-      function createTrennBalken() {
-        const balken = document.createElement("div");
-        balken.className = "fflw-logo-trennbalken";
-        balken.setAttribute("aria-hidden", "true");
-        return balken;
-      }
-
-      function pruefeExklusivVorschau() {
-        const params = new URLSearchParams(window.location.search);
-        const vorschauId = params.get("vorschau");
-        if (!vorschauId) return;
-
-        exklusivVorschauEl.style.display = "block";
-        exklusivVorschauEl.innerHTML = "⏳ Lade persönliche Exklusiv-Vorschau …";
-
-        fetch(WEB_APP_URL + "?action=getPreviewItem&vorschau=" + encodeURIComponent(vorschauId) + "&t=" + Date.now(), {
-          method: "GET",
-          redirect: "follow"
+      const urlVorschau = new URLSearchParams(window.location.search).get("vorschau") || "";
+      fetch(`${WEB_APP_URL}?vorschau=${encodeURIComponent(urlVorschau)}&t=${Date.now()}`, { method: "GET", redirect: "follow" })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.ok && Array.isArray(data.items)) {
+            allOffers = data.items;
+            renderOffers();
+          } else {
+            countEl.textContent = "Keine Angebote geladen.";
+          }
         })
-          .then(r => r.json())
-          .then(data => {
-            const items = data.previewItems || [];
-            if (!data.success || items.length === 0) {
-              exklusivVorschauEl.innerHTML = "<p>Dieser persönliche Vorschaulink ist nicht mehr verfügbar.</p>";
-              return;
-            }
-            exklusivVorschauEl.innerHTML = "";
-            const badge = document.createElement("div");
-            badge.style.cssText = "font-weight: bold; color: #ffd700; margin-bottom: 10px; font-size: 1.08rem;";
-            badge.textContent = "⭐ Persönliche Exklusiv-Vorschau für dich vorab (" + items.length + " Position/en):";
-            exklusivVorschauEl.appendChild(badge);
+        .catch(err => {
+          countEl.textContent = "Verbindungsfehler beim Laden.";
+        });
 
-            items.forEach((item, idx) => {
-              if (idx > 0) exklusivVorschauEl.appendChild(createTrennBalken());
-              const card = document.createElement("div");
-              card.style.marginBottom = "12px";
+      const reqModal = document.getElementById("fflw-req-modal");
+      document.getElementById("fflw-req-close").addEventListener("click", () => { reqModal.style.display = "none"; });
 
-              const titel = document.createElement("h3");
-              titel.style.margin = "0 0 8px 0";
-              titel.textContent = item.folderName;
-              card.appendChild(titel);
-
-              if (item.description) {
-                const p = document.createElement("p");
-                p.style.cssText = "white-space: pre-line; margin: 6px 0 12px 0; padding: 10px 12px; background: rgba(255,255,255,0.08); border-radius: 6px;";
-                p.textContent = item.description;
-                card.appendChild(p);
-              }
-
-              const grid = document.createElement("div");
-              grid.className = "fflw-bilder-grid";
-              (item.images || []).forEach(src => {
-                const img = document.createElement("img");
-                img.src = src;
-                grid.appendChild(img);
-              });
-              card.appendChild(grid);
-
-              const label = document.createElement("label");
-              label.className = "fflw-checkbox-label";
-              const cb = document.createElement("input");
-              cb.type = "checkbox";
-              cb.value = "[VORSCHAU:" + item.folderId + "] " + item.folderName;
-              cb.checked = items.length === 1;
-              cb.addEventListener("change", updateAuswahlCounter);
-              const span = document.createElement("span");
-              span.textContent = "▲ Dieses Exklusiv-Möbelstück oben auswählen & unten anfragen";
-              label.appendChild(cb);
-              label.appendChild(span);
-              card.appendChild(label);
-
-              exklusivVorschauEl.appendChild(card);
-            });
-
-            formEl.style.display = "block";
-            updateAuswahlCounter();
-            retranslate(exklusivVorschauEl);
-          });
-      }
-
-      // =========================================================================
-      // GALERIE AUS GOOGLE DRIVE LADEN (INKL. STÜCKZAHL-ZÄHLER & BADGES)
-      // =========================================================================
-      function ladeAngebote() {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 120000);
-
-        fetch(WEB_APP_URL + "?t=" + Date.now(), {
-          method: "GET",
-          redirect: "follow",
-          signal: controller.signal
-        })
-          .then(res => {
-            clearTimeout(timeoutId);
-            return res.text();
-          })
-          .then(text => {
-            let data = null;
-            try {
-              data = JSON.parse(text);
-            } catch (e) {
-              throw new Error("Antwort war kein JSON.");
-            }
-
-            if (!data || !data.ok || !Array.isArray(data.items)) {
-              container.innerHTML = "<p>Die Angebote konnten gerade nicht geladen werden (" + (data && data.error ? data.error : "unbekannter Fehler") + ").</p>";
-              return;
-            }
-
-            if (data.items.length === 0) {
-              container.innerHTML = "<p><strong>Aktuell sind keine freien Möbelstücke verfügbar.</strong> Schau bitte bald wieder vorbei – oder melde deinen Bedarf direkt unter <a href='suche-sachen.html'><strong>Sachen suchen</strong></a> an!</p>";
-              formEl.style.display = "none";
-              return;
-            }
-
-            container.innerHTML = "";
-
-            data.items.forEach((item, index) => {
-              if (index > 0) {
-                container.appendChild(createTrennBalken());
-              }
-
-              const karte = document.createElement("article");
-              karte.className = "fflw-artikel-karte";
-
-              const titel = document.createElement("h3");
-              titel.style.margin = "0 0 6px 0";
-              titel.textContent = item.titel ? `${item.titel} (${item.pfad})` : item.pfad;
-              karte.appendChild(titel);
-
-              // Übersichtliche Badges (Stückzahl, Transport, Lagerung)
-              const verfuegbar = Math.max(1, parseInt(item.anzahlVerfuegbar || 1, 10) || 1);
-              const gesamt = Math.max(verfuegbar, parseInt(item.anzahlGesamt || verfuegbar, 10) || verfuegbar);
-
-              const badgesRow = document.createElement("div");
-              badgesRow.className = "fflw-badges-row";
-
-              if (gesamt > 1) {
-                const bQty = document.createElement("span");
-                bQty.className = "fflw-badge fflw-badge-qty";
-                bQty.textContent = `📦 Noch ${verfuegbar} von ${gesamt} Stück verfügbar`;
-                badgesRow.appendChild(bQty);
-              }
-              if (item.transportGroesse) {
-                const bTrans = document.createElement("span");
-                bTrans.className = "fflw-badge fflw-badge-trans";
-                bTrans.textContent = item.transportGroesse;
-                badgesRow.appendChild(bTrans);
-              }
-              if (item.lagerStatus) {
-                const bLager = document.createElement("span");
-                bLager.className = "fflw-badge fflw-badge-lager";
-                bLager.textContent = item.lagerStatus;
-                badgesRow.appendChild(bLager);
-              }
-              if (badgesRow.children.length > 0) {
-                karte.appendChild(badgesRow);
-              }
-
-              if (item.beschreibung && item.beschreibung.trim() !== "") {
-                const beschr = document.createElement("p");
-                beschr.style.cssText = "white-space: pre-line; margin: 6px 0 12px 0; padding: 10px 12px; background: rgba(255,255,255,0.08); border-radius: 6px;";
-                beschr.textContent = item.beschreibung;
-                karte.appendChild(beschr);
-              }
-
-              const grid = document.createElement("div");
-              grid.className = "fflw-bilder-grid";
-
-              (item.bilder || []).forEach((b, bIdx) => {
-                const img = document.createElement("img");
-                img.src = b.url;
-                img.alt = item.pfad + " (Bild " + (bIdx + 1) + ")";
-                img.loading = "lazy";
-                img.onerror = function () {
-                  if (b.fallback && this.src !== b.fallback) {
-                    this.src = b.fallback;
-                  }
-                };
-                grid.appendChild(img);
-              });
-              karte.appendChild(grid);
-
-              const label = document.createElement("label");
-              label.className = "fflw-checkbox-label";
-
-              const cb = document.createElement("input");
-              cb.type = "checkbox";
-              cb.value = item.pfad;
-              cb.addEventListener("change", updateAuswahlCounter);
-
-              const span = document.createElement("span");
-              span.textContent = "▲ Diesen Artikel darüber reservieren";
-
-              label.appendChild(cb);
-              label.appendChild(span);
-
-              // Wenn mehr als 1 identisches Stück verfügbar ist (z. B. 4 Stühle), Mengenauswahl anzeigen!
-              if (verfuegbar > 1) {
-                const qtyWrap = document.createElement("span");
-                qtyWrap.style.cssText = "display: inline-flex; align-items: center; gap: 6px; margin-left: auto;";
-                qtyWrap.innerHTML = `<span>Menge:</span>`;
-                const qtySel = document.createElement("select");
-                qtySel.className = "fflw-qty-select";
-                for (let q = 1; q <= verfuegbar; q++) {
-                  const opt = document.createElement("option");
-                  opt.value = String(q);
-                  opt.textContent = q + " Stück";
-                  qtySel.appendChild(opt);
-                }
-                qtySel.addEventListener("click", e => e.stopPropagation());
-                qtySel.addEventListener("change", () => {
-                  cb.checked = true;
-                  updateAuswahlCounter();
-                });
-                qtyWrap.appendChild(qtySel);
-                label.appendChild(qtyWrap);
-              }
-
-              karte.appendChild(label);
-              container.appendChild(karte);
-            });
-
-            formEl.style.display = "block";
-            updateAuswahlCounter();
-            retranslate(container);
-            retranslate(formEl);
-          })
-          .catch(err => {
-            clearTimeout(timeoutId);
-            const grund = err.name === "AbortError"
-              ? "Zeitüberschreitung beim Laden der Bilder (bitte Seite neu laden)."
-              : err.message;
-            container.innerHTML = "<p><strong>Fehler beim Laden der Angebote:</strong> " + grund + "</p>";
-          });
-      }
-
-      // =========================================================================
-      // RESERVIERUNG ABSENDEN (INKL. STÜCKZAHL-DEKREMENT)
-      // =========================================================================
-      formEl.addEventListener("submit", function (e) {
+      document.getElementById("fflw-req-form").addEventListener("submit", async function (e) {
         e.preventDefault();
-        feedbackEl.textContent = "";
-        feedbackEl.style.color = "#ffffff";
+        if (!selectedOffer) return;
+        const fb = document.getElementById("fflw-req-feedback");
+        const btn = document.getElementById("fflw-req-submit");
+        btn.disabled = true;
+        btn.textContent = "⏳ Wird gesendet …";
 
-        if (istMasterCode(codeInputEl.value)) {
-          const c = codeInputEl.value.trim();
-          codeInputEl.value = "";
-          ladeReservierteFuerMaster(c);
-          ladeEingereichteSpendenFuerMaster(c);
-          return;
-        }
-
-        if (!istZugangsCodeGueltig()) {
-          feedbackEl.style.color = "#ff8a80";
-          feedbackEl.textContent = "❌ Bitte gib den gültigen Zugangscode vom Freundeskreis ein.";
-          codeInputEl.focus();
-          retranslate(feedbackEl);
-          return;
-        }
-
-        const checkedBoxes = Array.from(document.querySelectorAll('#fflw-angebote-galerie input[type="checkbox"]:checked, #fflw-exklusiv-vorschau input[type="checkbox"]:checked'));
-        if (checkedBoxes.length === 0) {
-          feedbackEl.style.color = "#ff8a80";
-          feedbackEl.textContent = "❌ Bitte wähle oben mindestens ein Möbelstück durch Häkchen aus.";
-          retranslate(feedbackEl);
-          return;
-        }
-
-        const gewaehlteArtikel = [];
-        const mengenMap = {};
-        checkedBoxes.forEach(cb => {
-          gewaehlteArtikel.push(cb.value);
-          const karte = cb.closest(".fflw-artikel-karte") || cb.parentElement;
-          const qtySel = karte ? karte.querySelector(".fflw-qty-select") : null;
-          mengenMap[cb.value] = qtySel ? (parseInt(qtySel.value, 10) || 1) : 1;
-        });
-
-        const name = document.getElementById("fflw-res-name").value.trim();
-        const telefon = document.getElementById("fflw-res-telefon").value.trim();
-        const email = document.getElementById("fflw-res-email").value.trim();
-        const lieferung = document.getElementById("fflw-res-lieferung").value;
-        const bemerkung = document.getElementById("fflw-res-bemerkung").value.trim();
-
-        if (!name || (!telefon && !email)) {
-          feedbackEl.style.color = "#ff8a80";
-          feedbackEl.textContent = "❌ Bitte gib deinen Namen sowie Telefonnummer oder E-Mail-Adresse an.";
-          retranslate(feedbackEl);
-          return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.style.backgroundColor = "#666666";
-        submitBtn.textContent = "⏳ Reservierung wird gespeichert …";
-
-        fetch(WEB_APP_URL, {
-          method: "POST",
-          redirect: "follow",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({
-            name: name,
-            telefon: telefon,
-            email: email,
-            lieferung: lieferung,
-            bemerkung: bemerkung,
-            artikel: gewaehlteArtikel,
-            mengen: mengenMap
-          })
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data && data.ok) {
-              feedbackEl.style.color = "#a5d6a7";
-              const listeText = (data.reserviertePfade && data.reserviertePfade.length) ? data.reserviertePfade.join(", ") : gewaehlteArtikel.join(", ");
-              feedbackEl.textContent = "✅ Vielen Dank! Deine Auswahl (" + listeText + ") wurde verbindlich für dich reserviert. Wir melden uns in Kürze bei dir!";
-              formEl.reset();
-              ladeAngebote();
-            } else {
-              feedbackEl.style.color = "#ff8a80";
-              feedbackEl.textContent = "❌ Fehler: " + (data && data.error ? data.error : "Reservierung konnte nicht gespeichert werden.");
-            }
-          })
-          .catch(err => {
-            feedbackEl.style.color = "#ff8a80";
-            feedbackEl.textContent = "❌ Verbindungsfehler beim Absenden: " + err.message;
-          })
-          .finally(() => {
-            submitBtn.disabled = false;
-            submitBtn.style.backgroundColor = "#2e7d32";
-            submitBtn.textContent = "Verbindlich reservieren";
-            retranslate(feedbackEl);
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "reserveItem",
+              itemId: selectedOffer.id || selectedOffer.pfad,
+              titel: selectedOffer.titel || selectedOffer.pfad,
+              name: document.getElementById("fflw-req-name").value.trim(),
+              kontakt: document.getElementById("fflw-req-kontakt").value.trim(),
+              notiz: document.getElementById("fflw-req-note").value.trim()
+            })
           });
+          const res = await resp.json();
+          if (res && res.ok) {
+            fb.style.color = "#a5d6a7";
+            fb.textContent = "✅ Anfrage eingegangen! Unser Team meldet sich in Kürze bei dir.";
+            setTimeout(() => { reqModal.style.display = "none"; }, 1600);
+          } else {
+            fb.style.color = "#ff8a80";
+            fb.textContent = "❌ Fehler: " + (res && res.error ? res.error : "Unbekannt");
+          }
+        } catch (err) {
+          fb.style.color = "#ff8a80";
+          fb.textContent = "❌ Verbindungsfehler: " + err.message;
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "✅ Unverbindliche Anfrage absenden";
+        }
       });
-
-      pruefeExklusivVorschau();
-      ladeAngebote();
     });
   </script>
 </body>
