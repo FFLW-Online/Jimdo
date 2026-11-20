@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FFLW Zentrale Steuerung, Koordination &amp; Copilot</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .m-card {
+      background: #141c24;
+      color: #fff;
+      border: 2px solid #ffd700;
+      border-radius: 12px;
+      padding: 18px;
+      margin: 16px 0;
+    }
+    .m-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .m-tab-btn {
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: 2px solid #555;
+      background: #222d38;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .m-tab-btn.active {
+      background: #004080;
+      border-color: #ffd700;
+      color: #ffd700;
+    }
+    /* Barrierefreier Großtasten- & Sprachsteuerungs-Modus */
+    body.accessible-mode .m-tab-btn,
+    body.accessible-mode .m-btn {
+      min-height: 58px !important;
+      font-size: 1.08rem !important;
+      padding: 14px 20px !important;
+      margin: 6px 4px !important;
+    }
+    .m-btn {
+      padding: 8px 13px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.4);
+      font-weight: bold;
+      cursor: pointer;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+    .m-btn-green { background: #2e7d32; }
+    .m-btn-blue { background: #1565c0; }
+    .m-btn-orange { background: #ef6c00; }
+    .m-btn-red { background: #c62828; }
+    .m-btn-purple { background: #6a1b9a; }
+    .m-box {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 9px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .m-copilot-bar {
+      background: rgba(255, 215, 0, 0.14);
+      border: 1px solid #ffd700;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .m-checklist {
+      background: rgba(21, 101, 192, 0.25);
+      border: 1px solid #90caf9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+    .m-input {
+      padding: 9px 11px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      color: #111;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>⚙️ Zentrale Steuerung, Koordination &amp; Copilot</h2>
+
+      <!-- LOGIN-BEREICH -->
+      <section id="m-login-box" class="m-card">
+        <h3 style="margin-top:0; color:#ffd700;">🔑 Zugangscode eingeben</h3>
+        <p style="font-size:0.94rem;">
+          Je nach Zugangs-Code öffnen sich die passenden Werkzeuge (Haupt-Master, Möbel-Freischaltung, Brückenbauer/Koordinator oder Copilot-Mitflug).
+        </p>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+          <input type="password" id="m-code-input" class="m-input" placeholder="Zugangscode …" style="max-width:220px;">
+          <button type="button" id="m-login-btn" class="m-btn m-btn-green">Anmelden</button>
+        </div>
+        <div id="m-login-msg" style="margin-top:10px; font-weight:bold; color:#ff8a80;"></div>
+      </section>
+
+      <!-- COCKPIT NACH LOGIN -->
+      <section id="m-cockpit" style="display:none;">
+        <!-- COPILOT & BARRIEREFREIHEITS-LEISTE -->
+        <div class="m-copilot-bar">
+          <div>
+            <strong style="color:#ffd700;">Rolle: <span id="m-role-label">Haupt-Master</span></strong>
+            <div style="font-size:0.86rem; color:#e0e0e0;" id="m-role-desc">Vollzugriff auf alle Bereiche</div>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+            <label style="font-size:0.88rem; font-weight:bold;">🧑‍✈️ Modus:</label>
+            <select id="m-copilot-mode" class="m-input" style="padding:6px 10px; font-size:14px;">
+              <option value="full">🛫 Voller Disponent</option>
+              <option value="copilot">🧑‍✈️ Copilot (mit Checkliste &amp; Tipps)</option>
+              <option value="observer">👀 Beobachter / Mitflug (Nur-Lesen)</option>
+            </select>
+
+            <button type="button" id="m-toggle-accessible" class="m-btn m-btn-purple" aria-label="Großtasten und Sprachsteuerungs-Modus umschalten">
+              ♿ Großtasten / Sprach-Modus
+            </button>
+          </div>
+        </div>
+
+        <!-- NAVIGATIONSTABS -->
+        <div class="m-tabs" id="m-tabs-bar">
+          <button type="button" class="m-tab-btn active" data-tab="eingang">📥 Spenden-Eingang &amp; Termin-Freigabe</button>
+          <button type="button" class="m-tab-btn" data-tab="online">🟢 Online-Angebote (Pausieren / Ent-Reservieren)</button>
+          <button type="button" class="m-tab-btn" data-tab="bedarfe">🔵 Bedarfe &amp; „Vor Deponie“-Abgleich</button>
+          <button type="button" class="m-tab-btn" data-tab="katalog">💡 Katalog-Vorschläge &amp; Versteckte Seiten</button>
+          <button type="button" class="m-tab-btn" data-tab="settings" id="m-tab-settings-btn">🌐 Webseiten-Einstellungen</button>
+        </div>
+
+        <div id="m-status-banner" style="margin-bottom:12px; font-weight:bold; color:#ffd700;">⏳ Lade Live-Daten …</div>
+
+        <!-- TAB 1: SPENDEN-EINGANG & TERMIN-FREIGABE -->
+        <div id="tab-eingang" class="m-tab-panel m-card">
+          <h3 style="margin-top:0; color:#a5d6a7;">📥 Eingereichte Spenden &amp; Wartepositionen</h3>
+          <p style="font-size:0.9rem;">
+            Hier stehen neue Spenden (auch per E-Mail eingegangene) sowie pausierte Angebote (<em>„Umzug verschoben“</em>). Du kannst sie <strong>sofort freischalten</strong> oder <strong>ab einem festen Datum</strong> einplanen.
+          </p>
+          <div id="m-eingang-list"></div>
+        </div>
+
+        <!-- TAB 2: ONLINE-ANGEBOTE (PAUSIEREN / ENT-RESERVIEREN) -->
+        <div id="tab-online" class="m-tab-panel m-card" style="display:none;">
+          <h3 style="margin-top:0; color:#81c784;">🟢 Aktuell online sichtbare Angebote</h3>
+          <p style="font-size:0.9rem;">
+            Hier kannst du Reservierungen wieder aufheben oder einzelne Teile bzw. ganze Wohnungen <strong>mit einem Klick in die Warteposition setzen</strong> (z. B. wenn sich ein Umzug verschiebt).
+          </p>
+          <div id="m-online-list"></div>
+        </div>
+
+        <!-- TAB 3: BEDARFE & ZWEITE CHANCE VOR DEPONIE -->
+        <div id="tab-bedarfe" class="m-tab-panel m-card" style="display:none;">
+          <h3 style="margin-top:0; color:#90caf9;">🔵 Angemeldete Bedarfe (Stufe 1 Vor Ort → Stufe 4 International)</h3>
+          <p style="font-size:0.9rem;">
+            Sortiert nach Priorität: <strong>1. Vor Ort</strong> hat immer Vorrang. Wenn vor Ort kein Abnehmer passt, kontaktiere hier Stufe 2–4 (<em>„Zweite Chance vor der Deponie“</em>) mit 1 Klick per E-Mail oder WhatsApp-Text.
+          </p>
+          <div id="m-bedarfe-list"></div>
+        </div>
+
+        <!-- TAB 4: KATALOG-VORSCHLÄGE & VERSTECKTE SEITEN -->
+        <div id="tab-katalog" class="m-tab-panel m-card" style="display:none;">
+          <h3 style="margin-top:0; color:#ffd700;">💡 Neue „Sonstiges“-Vorschläge von Spendern</h3>
+          <div id="m-katalog-list" style="margin-bottom:20px;"></div>
+
+          <h3 style="color:#ffd700;">🔒 Versteckte &amp; interne Seiten (aus Sitemap)</h3>
+          <ul style="line-height:1.8;">
+            <li><a href="der-versteckte-obstgarten.html" style="color:#90caf9;">🌳 Der versteckte Obstgarten</a></li>
+            <li><a href="intern-statistik.html" style="color:#90caf9;">📊 Interne Statistik (SA)</a></li>
+            <li><a href="beispielbilder.html" style="color:#90caf9;">🖼️ BeispielBilder</a></li>
+            <li><a href="bilder-selbst-hochladen.html" style="color:#90caf9;">📤 Bilder selbst hochladen</a></li>
+            <li><a href="wie-man-den-tragegurt-einsetzt.html" style="color:#90caf9;">🪢 Wie man den Tragegurt einsetzt</a></li>
+            <li><a href="tipps-und-tricks.html" style="color:#90caf9;">💡 Tipps und Tricks...</a></li>
+            <li><a href="sitemap.html" style="color:#90caf9;">🗺️ Komplette Sitemap öffnen</a></li>
+          </ul>
+        </div>
+
+        <!-- TAB 5: WEBSEITEN-EINSTELLUNGEN -->
+        <div id="tab-settings" class="m-tab-panel m-card" style="display:none;">
+          <h3 style="margin-top:0; color:#ffd700;">🌐 Webseiten-Einstellungen &amp; Wartungsmodus</h3>
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-weight:bold; margin-bottom:5px;">Flaggen-Laufband unter dem Logo:</label>
+            <select id="m-set-flag" class="m-input">
+              <option value="A">Stil A (Radar-Wellen)</option>
+              <option value="B">Stil B (3D-Chip)</option>
+              <option value="C">Stil C (Minimalistisch)</option>
+              <option value="OFF">Ausgeblendet</option>
+            </select>
+          </div>
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-weight:bold; margin-bottom:5px;">Besucher-Zugangscode für Angebote (leer = offen):</label>
+            <input type="text" id="m-set-code" class="m-input" placeholder="z. B. 11">
+          </div>
+          <button type="button" id="m-save-settings-btn" class="m-btn m-btn-green">💾 Einstellungen speichern</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="sitemap.html">Sitemap</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+
+      // Rollen-Definitionen (erweiterbar in Code.gs)
+      const ROLLEN = {
+        "FFLW-99": { role: "master", label: "👑 Haupt-Master", desc: "Vollzugriff auf alle Bereiche & Einstellungen", defaultMode: "full" },
+        "FFLW-TEAM": { role: "freischalter", label: "📦 Möbel-Freischalter", desc: "Spenden freischalten & Reservierungen verwalten", defaultMode: "full" },
+        "FFLW-KOORD": { role: "koordinator", label: "🤝 Brückenbauer & Koordinator", desc: "Rückfragen & Bedarfe klären (Großtasten-freundlich)", defaultMode: "copilot" },
+        "FFLW-COPILOT": { role: "copilot", label: "👀 Copilot / Mitflug", desc: "Einarbeitungs-Modus (Nur-Lesen zur Begleitung)", defaultMode: "observer" }
+      };
+
+      let activeCode = "";
+      let activeRole = null;
+      let copilotMode = "full";
+
+      const loginBtn = document.getElementById("m-login-btn");
+      const codeInput = document.getElementById("m-code-input");
+      const loginMsg = document.getElementById("m-login-msg");
+      const cockpit = document.getElementById("m-cockpit");
+      const copilotSel = document.getElementById("m-copilot-mode");
+
+      document.getElementById("m-toggle-accessible").addEventListener("click", () => {
+        document.body.classList.toggle("accessible-mode");
+      });
+
+      copilotSel.addEventListener("change", () => {
+        copilotMode = copilotSel.value;
+        loadMasterDashboard();
+      });
+
+      // Tabs umschalten
+      document.querySelectorAll(".m-tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".m-tab-btn").forEach(b => b.classList.remove("active"));
+          document.querySelectorAll(".m-tab-panel").forEach(p => p.style.display = "none");
+          btn.classList.add("active");
+          document.getElementById("tab-" + btn.getAttribute("data-tab")).style.display = "block";
+        });
+      });
+
+      loginBtn.addEventListener("click", () => {
+        const val = codeInput.value.trim().toUpperCase();
+        if (!ROLLEN[val]) {
+          loginMsg.textContent = "❌ Unbekannter Zugangscode.";
+          return;
+        }
+        activeCode = val;
+        activeRole = ROLLEN[val];
+        copilotMode = activeRole.defaultMode;
+        copilotSel.value = copilotMode;
+
+        document.getElementById("m-role-label").textContent = activeRole.label;
+        document.getElementById("m-role-desc").textContent = activeRole.desc;
+
+        if (activeRole.role === "koordinator") {
+          document.body.classList.add("accessible-mode");
+        }
+        if (activeRole.role !== "master") {
+          document.getElementById("m-tab-settings-btn").style.display = "none";
+        }
+
+        document.getElementById("m-login-box").style.display = "none";
+        cockpit.style.display = "block";
+        loadMasterDashboard();
+      });
+
+      async function callMasterApi(payload) {
+        if (copilotMode === "observer") {
+          alert("👀 Du bist aktuell im Beobachter-/Mitflug-Modus (Nur-Lesen). Zum Ausführen oben auf Copilot oder Disponent umschalten.");
+          return null;
+        }
+        const resp = await fetch(WEB_APP_URL, {
+          method: "POST",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(Object.assign({ masterCode: activeCode }, payload))
+        });
+        return await resp.json();
+      }
+
+      async function loadMasterDashboard() {
+        const banner = document.getElementById("m-status-banner");
+        banner.textContent = "⏳ Lade aktuelle Daten aus Google Drive …";
+
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=master_overview&code=${encodeURIComponent(activeCode)}&t=${Date.now()}`, {
+            method: "GET",
+            redirect: "follow"
+          });
+          const data = await resp.json();
+          if (!data || !data.ok) {
+            banner.textContent = "❌ Fehler beim Laden: " + (data && data.error ? data.error : "Unbekannt");
+            return;
+          }
+
+          banner.textContent = `✅ Verbunden (${new Date().toLocaleTimeString("de-DE")})`;
+          renderEingang(data.eingang || []);
+          renderOnline(data.online || []);
+          renderBedarfe(data.bedarfe || []);
+          renderKatalog(data.katalogVorschlaege || []);
+        } catch (err) {
+          banner.textContent = "❌ Verbindungsfehler: " + err.message;
+        }
+      }
+
+      function renderCopilotChecklist(hintText) {
+        if (copilotMode !== "copilot") return "";
+        return `
+          <div class="m-checklist">
+            <strong>🧑‍✈️ Disponenten-Checkliste (Copilot):</strong><br>
+            💡 <em>${hintText}</em><br>
+            <label style="display:block; margin-top:4px;"><input type="checkbox"> 1. Maße &amp; Treppenhaus / Transportmittel geprüft</label>
+            <label style="display:block;"><input type="checkbox"> 2. Priorität „Vor Ort“ (Stufe 1) berücksichtigt</label>
+          </div>
+        `;
+      }
+
+      function renderEingang(list) {
+        const el = document.getElementById("m-eingang-list");
+        if (!list.length) {
+          el.innerHTML = "<p>Keine wartenden Spenden im Eingang.</p>";
+          return;
+        }
+        el.innerHTML = "";
+        list.forEach(sp => {
+          const box = document.createElement("div");
+          box.className = "m-box";
+          const geplantBadge = sp.freischaltenAb ? `<span style="background:#ef6c00; padding:3px 8px; border-radius:5px; font-size:0.84rem;">📅 Geplant ab: ${sp.freischaltenAb}</span>` : "";
+          const pauseBadge = sp.pausiert ? `<span style="background:#6a1b9a; padding:3px 8px; border-radius:5px; font-size:0.84rem;">⏸️ In Warteposition</span>` : "";
+
+          box.innerHTML = `
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; margin-bottom:8px;">
+              <strong>📦 ${sp.titel || sp.ordnerName} (${sp.ort || ""})</strong>
+              <div>${geplantBadge} ${pauseBadge}</div>
+            </div>
+            <div style="font-size:0.9rem; color:#ddd; margin-bottom:10px;">
+              Spender: ${sp.spenderName || "-"} · Tel: ${sp.telefon || "-"} · Frist: ${sp.lagerStatus || "Auf Abruf"}
+            </div>
+            ${renderCopilotChecklist("Prüfe vor Freischaltung, ob ein fester Auszugstermin angegeben ist oder ob das Stück erst ab einem späteren Datum frei wird.")}
+            <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:10px;">
+              <button type="button" class="m-btn m-btn-green btn-release-now">✓ Sofort freischalten</button>
+              <input type="date" class="m-input inp-release-date" value="${sp.freischaltenAb || ""}" style="padding:6px; font-size:14px;">
+              <button type="button" class="m-btn m-btn-orange btn-release-date">📅 Freischalten ab Datum</button>
+            </div>
+          `;
+
+          box.querySelector(".btn-release-now").addEventListener("click", async () => {
+            const res = await callMasterApi({ action: "approveDonation", folderId: sp.folderId });
+            if (res && res.ok) loadMasterDashboard();
+          });
+
+          box.querySelector(".btn-release-date").addEventListener("click", async () => {
+            const dt = box.querySelector(".inp-release-date").value;
+            if (!dt) { alert("Bitte zuerst ein Startdatum auswählen."); return; }
+            const res = await callMasterApi({ action: "scheduleDonation", folderId: sp.folderId, freischaltenAb: dt });
+            if (res && res.ok) {
+              alert("📅 Gespeichert! Das Angebot wird am " + dt + " automatisch freigeschaltet.");
+              loadMasterDashboard();
+            }
+          });
+
+          el.appendChild(box);
+        });
+      }
+
+      function renderOnline(list) {
+        const el = document.getElementById("m-online-list");
+        if (!list.length) {
+          el.innerHTML = "<p>Aktuell keine Angebote online.</p>";
+          return;
+        }
+        el.innerHTML = "";
+        list.forEach(item => {
+          const box = document.createElement("div");
+          box.className = "m-box";
+          box.innerHTML = `
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px;">
+              <strong>${item.titel || item.pfad} (${item.ort || ""})</strong>
+              <span>${item.reserviert ? "🔒 Reserviert" : "🟢 Frei"}</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
+              ${item.reserviert ? `<button type="button" class="m-btn m-btn-blue btn-unreserve">🔓 Reservierung aufheben</button>` : ""}
+              <button type="button" class="m-btn m-btn-orange btn-pause-item">⏸️ Dieses Teil auf Warteposition</button>
+              ${item.spenderFolderId ? `<button type="button" class="m-btn m-btn-purple btn-pause-all">⏸️ Komplettes Angebot / Wohnung pausieren</button>` : ""}
+            </div>
+          `;
+
+          const unresBtn = box.querySelector(".btn-unreserve");
+          if (unresBtn) {
+            unresBtn.addEventListener("click", async () => {
+              const res = await callMasterApi({ action: "unreserveItem", itemId: item.id || item.pfad });
+              if (res && res.ok) loadMasterDashboard();
+            });
+          }
+
+          box.querySelector(".btn-pause-item").addEventListener("click", async () => {
+            const grund = prompt("Optionaler Hinweis für die Warteposition (z. B. Umzug verschoben):", "Umzug verschoben");
+            if (grund === null) return;
+            const res = await callMasterApi({ action: "pauseOffer", itemId: item.id || item.pfad, scope: "single", grund });
+            if (res && res.ok) loadMasterDashboard();
+          });
+
+          const pauseAllBtn = box.querySelector(".btn-pause-all");
+          if (pauseAllBtn) {
+            pauseAllBtn.addEventListener("click", async () => {
+              const grund = prompt("Komplettes Angebot dieser Familie/Wohnung pausieren? Hinweis:", "Umzug verschoben");
+              if (grund === null) return;
+              const res = await callMasterApi({ action: "pauseOffer", spenderFolderId: item.spenderFolderId, scope: "family", grund });
+              if (res && res.ok) loadMasterDashboard();
+            });
+          }
+
+          el.appendChild(box);
+        });
+      }
+
+      function renderBedarfe(list) {
+        const el = document.getElementById("m-bedarfe-list");
+        if (!list.length) {
+          el.innerHTML = "<p>Keine offenen Bedarfsanmeldungen.</p>";
+          return;
+        }
+        // Sortierung: Stufe 1 (Vor Ort) -> Stufe 2 -> Stufe 3 -> Stufe 4 (International)
+        list.sort((a, b) => String(a.bedarfsStufe || "1").localeCompare(String(b.bedarfsStufe || "1")));
+        el.innerHTML = "";
+
+        list.forEach(b => {
+          const box = document.createElement("div");
+          box.className = "m-box";
+          const waText = encodeURIComponent(`Hallo ${b.name || ""}, hier ist der Freundeskreis Flüchtlinge Leutenbach & Winnenden. Wir hätten aktuell ein passendes Stück (${b.artikelName}) bevor es entsorgt werden muss – besteht dein Bedarf noch?`);
+          box.innerHTML = `
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px;">
+              <strong>${b.artikelName} – ${b.name}</strong>
+              <span style="background:#0d47a1; padding:3px 8px; border-radius:5px; font-size:0.84rem;">${b.ortTyp || "Stufe 1: Vor Ort"}</span>
+            </div>
+            <div style="font-size:0.9rem; color:#ddd; margin:6px 0;">
+              Ort: ${b.ortDetails || "-"} · Kontakt: ${b.kontakt || "-"} · ${b.prioritaet || ""}
+            </div>
+            <div style="font-size:0.88rem; color:#bbb; margin-bottom:10px;">${b.begruendung || ""}</div>
+            ${renderCopilotChecklist("Kläre kurz per WhatsApp/Anruf, ob der Bedarf noch aktuell ist und ob die Maße in die Wohnung passen.")}
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
+              <a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener" class="m-btn m-btn-green" style="text-decoration:none;">💬 WhatsApp-Nachricht („Ist Bedarf noch da?“)</a>
+              <button type="button" class="m-btn m-btn-blue btn-mail-demand">✉️ Per E-Mail anfragen</button>
+              <button type="button" class="m-btn m-btn-purple btn-verify-demand">✅ Bedarf &amp; Identität geklärt</button>
+            </div>
+          `;
+
+          box.querySelector(".btn-mail-demand").addEventListener("click", async () => {
+            const res = await callMasterApi({ action: "sendDemandPing", demandId: b.id, kontakt: b.kontakt, artikelName: b.artikelName, name: b.name });
+            if (res && res.ok) alert("✉️ Anfrage-E-Mail wurde versendet!");
+          });
+
+          box.querySelector(".btn-verify-demand").addEventListener("click", async () => {
+            const res = await callMasterApi({ action: "markDemandVerified", demandId: b.id, bearbeiter: activeRole.label });
+            if (res && res.ok) loadMasterDashboard();
+          });
+
+          el.appendChild(box);
+        });
+      }
+
+      function renderKatalog(list) {
+        const el = document.getElementById("m-katalog-list");
+        if (!list.length) {
+          el.innerHTML = "<p>Keine offenen „Sonstiges“-Vorschläge vorhanden.</p>";
+          return;
+        }
+        el.innerHTML = "";
+        list.forEach(v => {
+          const box = document.createElement("div");
+          box.className = "m-box";
+          box.innerHTML = `
+            <strong>${v.titel}</strong> <span style="color:#ffd700;">(${v.count || 1}× vorgeschlagen)</span>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button type="button" class="m-btn m-btn-green btn-kat-ok">✓ In Katalog übernehmen</button>
+              <button type="button" class="m-btn m-btn-red btn-kat-del">✕ Verwerfen</button>
+            </div>
+          `;
+          box.querySelector(".btn-kat-ok").addEventListener("click", async () => {
+            const res = await callMasterApi({ action: "manageCatalogSuggestion", titel: v.titel, decision: "accept" });
+            if (res && res.ok) loadMasterDashboard();
+          });
+          box.querySelector(".btn-kat-del").addEventListener("click", async () => {
+            const res = await callMasterApi({ action: "manageCatalogSuggestion", titel: v.titel, decision: "reject" });
+            if (res && res.ok) loadMasterDashboard();
+          });
+          el.appendChild(box);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
