@@ -1,9 +1,49 @@
 const FFLW_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
 const FFLW_GLOBAL_MASTER_CODE = "FFLW99";
-const FFLW_STATUS_CACHE_KEY = "fflw_site_status_cache_v2";
+const FFLW_STATUS_CACHE_KEY = "fflw_site_status_cache_v3";
 const FFLW_GITHUB_OWNER = "FFLW-Online";
 const FFLW_GITHUB_REPO = "Jimdo";
 const FFLW_GITHUB_BRANCH = "main";
+
+// ============================================================================
+// SELEKTIVE ADRESSLEISTEN-TARNUNG (history.replaceState auf index.html)
+// ============================================================================
+function applySelectiveUrlMasking(currentPage, maskierteSeiten) {
+  try {
+    const liste = Array.isArray(maskierteSeiten) ? maskierteSeiten : ["unterlagen.html", "master.html"];
+    if (!liste.includes(currentPage)) return;
+    if (currentPage === "index.html") return;
+
+    // Vor dem Maskieren eventuellen Einmal-Code (?c=... oder ?code=...) für die Seite sichern
+    const params = new URLSearchParams(window.location.search);
+    const cVal = params.get("c") || params.get("code") || "";
+    if (cVal) {
+      sessionStorage.setItem("fflw_masked_case_code", cVal.trim());
+    }
+
+    const baseDir = window.location.pathname.replace(/[^/]*$/, "");
+    const maskedPath = baseDir + "index.html";
+    if (window.location.pathname !== maskedPath || window.location.search) {
+      window.history.replaceState({ fflwMaskedFrom: currentPage }, "", maskedPath);
+    }
+  } catch (e) {}
+}
+
+// Sofort beim Laden ausführen, falls Seite bereits im Cache als maskiert markiert ist
+(function immediateMaskFromCache() {
+  try {
+    const currentPage = window.location.pathname.split("/").pop() || "index.html";
+    const raw = sessionStorage.getItem(FFLW_STATUS_CACHE_KEY);
+    let maskList = ["unterlagen.html", "master.html"];
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.maskierteSeiten)) {
+        maskList = parsed.maskierteSeiten;
+      }
+    }
+    applySelectiveUrlMasking(currentPage, maskList);
+  } catch (e) {}
+})();
 
 // ============================================================================
 // GLOBALE BUTTON-RÜCKMELDUNG (ROTIERENDES ZEICHEN + FARBWECHSEL BEI ERFOLG)
@@ -86,7 +126,8 @@ window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
     "transport-alternativen.html",
     "sitemap.html",
     "fflw-international.html",
-    "master.html"
+    "master.html",
+    "unterlagen.html"
   ];
 
   const extraHiddenSet = new Set(Array.isArray(extraHiddenFiles) ? extraHiddenFiles : []);
@@ -133,6 +174,10 @@ window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
   if (!repoHtmlFiles.length) {
     source = "fallback";
     repoHtmlFiles = Array.from(new Set([...navMap.keys(), ...hiddenManualFallback]));
+  } else {
+    hiddenManualFallback.forEach(hf => {
+      if (!repoHtmlFiles.includes(hf)) repoHtmlFiles.push(hf);
+    });
   }
 
   const systemExclude = new Set(["404.html"]);
@@ -232,7 +277,7 @@ function getFflwMaintenanceSvg() {
 }
 
 // ============================================================================
-// 2. ZENTRALES STATUS-MANAGEMENT (WARTUNG, MENÜ-VERSTECKEN & FLAGGENBAND)
+// 2. ZENTRALES STATUS-MANAGEMENT (WARTUNG, MENÜ-VERSTECKEN, URL-TARNUNG & FLAGGEN)
 // ============================================================================
 function getCachedSiteStatus() {
   try {
@@ -242,14 +287,21 @@ function getCachedSiteStatus() {
       if (parsed && typeof parsed === "object") {
         return {
           wartungSeiten: Array.isArray(parsed.wartungSeiten) ? parsed.wartungSeiten : [],
-          versteckteSeiten: Array.isArray(parsed.versteckteSeiten) ? parsed.versteckteSeiten : [],
+          versteckteSeiten: Array.isArray(parsed.versteckteSeiten) ? parsed.versteckteSeiten : ["unterlagen.html"],
+          maskierteSeiten: Array.isArray(parsed.maskierteSeiten) ? parsed.maskierteSeiten : ["unterlagen.html", "master.html"],
           flaggenStil: ["A", "B", "C", "OFF"].includes(parsed.flaggenStil) ? parsed.flaggenStil : "A",
           zugangscode: typeof parsed.zugangscode === "string" ? parsed.zugangscode : "11"
         };
       }
     }
   } catch (e) {}
-  return { wartungSeiten: [], versteckteSeiten: [], flaggenStil: "A", zugangscode: "11" };
+  return {
+    wartungSeiten: [],
+    versteckteSeiten: ["unterlagen.html"],
+    maskierteSeiten: ["unterlagen.html", "master.html"],
+    flaggenStil: "A",
+    zugangscode: "11"
+  };
 }
 
 function setCachedSiteStatus(statusObj) {
@@ -261,7 +313,7 @@ function setCachedSiteStatus(statusObj) {
 function applyHiddenNavItems(versteckteSeiten) {
   const navContainer = document.getElementById("main-nav");
   if (!navContainer) return;
-  const hiddenSet = new Set(Array.isArray(versteckteSeiten) ? versteckteSeiten : []);
+  const hiddenSet = new Set(Array.isArray(versteckteSeiten) ? versteckteSeiten : ["unterlagen.html"]);
 
   navContainer.querySelectorAll("li").forEach(li => {
     const link = li.querySelector("a[href]");
@@ -325,7 +377,7 @@ function updateStickyHeaderOffset() {
 let fflwOriginalMainHtml = null;
 
 function applyMaintenanceStateToPage(currentPage, wartungSeiten) {
-  const protectedLegal = ["impressum.html", "datenschutz.html", "master.html"];
+  const protectedLegal = ["impressum.html", "datenschutz.html", "master.html", "unterlagen.html"];
   if (protectedLegal.includes(currentPage)) return;
 
   const mainContent = document.querySelector("main.content");
@@ -369,6 +421,7 @@ function syncGlobalSiteStatus(currentPage) {
   renderGlobalFlagBar(currentPage, cached.flaggenStil);
   applyMaintenanceStateToPage(currentPage, cached.wartungSeiten);
   applyHiddenNavItems(cached.versteckteSeiten);
+  applySelectiveUrlMasking(currentPage, cached.maskierteSeiten);
   updateStickyHeaderOffset();
 
   fetch(`${FFLW_WEB_APP_URL}?action=site_status&t=${Date.now()}`, {
@@ -380,7 +433,8 @@ function syncGlobalSiteStatus(currentPage) {
       if (!data || !data.ok) return;
       const fresh = {
         wartungSeiten: Array.isArray(data.wartungSeiten) ? data.wartungSeiten : [],
-        versteckteSeiten: Array.isArray(data.versteckteSeiten) ? data.versteckteSeiten : [],
+        versteckteSeiten: Array.isArray(data.versteckteSeiten) ? data.versteckteSeiten : ["unterlagen.html"],
+        maskierteSeiten: Array.isArray(data.maskierteSeiten) ? data.maskierteSeiten : ["unterlagen.html", "master.html"],
         flaggenStil: ["A", "B", "C", "OFF"].includes(data.flaggenStil) ? data.flaggenStil : "A",
         zugangscode: typeof data.zugangscode === "string" ? data.zugangscode : "11"
       };
@@ -388,6 +442,7 @@ function syncGlobalSiteStatus(currentPage) {
       renderGlobalFlagBar(currentPage, fresh.flaggenStil);
       applyMaintenanceStateToPage(currentPage, fresh.wartungSeiten);
       applyHiddenNavItems(fresh.versteckteSeiten);
+      applySelectiveUrlMasking(currentPage, fresh.maskierteSeiten);
       updateStickyHeaderOffset();
     })
     .catch(() => {});
@@ -397,7 +452,7 @@ function syncGlobalSiteStatus(currentPage) {
 // 3. EIGENER BESUCHERZÄHLER & LIVE-ANWESENHEIT (OHNE COOKIES)
 // ============================================================================
 function trackFflwVisitor(currentPage) {
-  if (!currentPage || currentPage === "master.html") return;
+  if (!currentPage || currentPage === "master.html" || currentPage === "unterlagen.html") return;
   try {
     let vid = sessionStorage.getItem("fflw_anon_vid");
     if (!vid) {
@@ -477,7 +532,9 @@ function getActiveLanguage() {
 }
 
 function setLanguage(langCode) {
-  const currentFile = window.location.pathname.split("/").pop() || "index.html";
+  const currentFile = (window.history.state && window.history.state.fflwMaskedFrom)
+    || window.location.pathname.split("/").pop()
+    || "index.html";
   const storedReturn = sessionStorage.getItem("fflw_return_page");
 
   let targetPage = currentFile;
@@ -583,7 +640,7 @@ function startGoogleTranslate(activeLang) {
   if (!activeLang || activeLang === "de") return;
 
   if (!window.location.hash.includes(`googtrans(de|${activeLang})`)) {
-    history.replaceState(null, "", `${window.location.pathname}${window.location.search}#googtrans(de|${activeLang})`);
+    history.replaceState(window.history.state, "", `${window.location.pathname}${window.location.search}#googtrans(de|${activeLang})`);
   }
 
   if (document.getElementById("google_translate_hidden")) {
@@ -837,10 +894,12 @@ window.addEventListener("pageshow", function (event) {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  const currentPage = window.location.pathname.split("/").pop() || "index.html";
+  const realPage = (window.history.state && window.history.state.fflwMaskedFrom)
+    || window.location.pathname.split("/").pop()
+    || "index.html";
 
-  syncGlobalSiteStatus(currentPage);
-  trackFflwVisitor(currentPage);
+  syncGlobalSiteStatus(realPage);
+  trackFflwVisitor(realPage);
   window.addEventListener("resize", updateStickyHeaderOffset);
   const siteHeader = document.querySelector(".site-header");
   if (siteHeader && "ResizeObserver" in window) {
@@ -909,7 +968,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const links = navContainer.querySelectorAll("a");
         links.forEach(link => {
           const href = link.getAttribute("href");
-          if (href === currentPage) {
+          if (href === realPage) {
             link.setAttribute("aria-current", "page");
             link.classList.add("active");
             const parentDetails = link.closest("details");
@@ -917,8 +976,8 @@ document.addEventListener("DOMContentLoaded", function () {
               parentDetails.setAttribute("open", "");
             }
           }
-          if (href === "fflw-international.html" && currentPage !== "fflw-international.html") {
-            link.setAttribute("href", `fflw-international.html?return=${encodeURIComponent(currentPage)}`);
+          if (href === "fflw-international.html" && realPage !== "fflw-international.html") {
+            link.setAttribute("href", `fflw-international.html?return=${encodeURIComponent(realPage)}`);
           }
         });
 
@@ -952,7 +1011,7 @@ document.addEventListener("DOMContentLoaded", function () {
           resetLi.style.borderBottom = "1px solid rgba(255, 255, 255, 0.3)";
 
           const resetLink = document.createElement("a");
-          resetLink.href = currentPage;
+          resetLink.href = realPage;
           resetLink.className = "notranslate";
           resetLink.setAttribute("translate", "no");
           resetLink.textContent = "🇩🇪 Deutsch (Original)";
