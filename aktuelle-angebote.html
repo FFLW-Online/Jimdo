@@ -1,160 +1,134 @@
-<!-- ==========================================================================
-  DATEI: aktuelle-angebote.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-20 19:08 CET
-  BESCHREIBUNG: Aktuelle Angebote & Reservierung
-    - Kontrastreiche, helle Karten mit tiefschwarzer Schrift
-    - Konkrete Filter nach Bereich, Gegenstand & Ort + animierte Lade-Sanduhr
-    - Mengen-Auswahl bei Mehrfach-Artikeln (z. B. Stühle)
-========================================================================== -->
 <!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aktuelle Angebote ansehen - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <title>Aktuelle Angebote - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .aa-filter-bar {
-      background: #eef6fc;
-      border: 1px solid #b8d4ec;
-      border-left: 6px solid #004080;
-      border-radius: 10px;
+    .fflw-filter-bar {
+      margin: 18px 0;
       padding: 16px 18px;
-      margin: 16px 0 20px 0;
+      border-radius: 10px;
+      background: #eef6fc;
+      border: 2px solid #90caf9;
       color: #111111;
     }
-    .aa-filter-grid {
+    .fflw-filter-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
     }
-    .aa-label {
-      display: block;
-      font-weight: bold;
-      color: #003366;
-      font-size: 0.92rem;
-      margin-bottom: 4px;
-    }
-    .aa-input, .aa-select {
+    .fflw-filter-input, .fflw-filter-select {
       width: 100%;
       padding: 9px 11px;
-      border-radius: 7px;
+      border-radius: 6px;
       border: 1px solid #8faadc;
-      font-size: 16px;
+      font-size: 15px;
       color: #111111;
       background: #ffffff;
+      box-sizing: border-box;
     }
-    .aa-grid {
+    .fflw-offers-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
       gap: 18px;
-      margin: 18px 0;
+      margin-top: 18px;
     }
-    .fflw-artikel-karte {
+    .fflw-offer-card {
       background: #ffffff;
-      border: 1px solid #b8d4ec;
-      border-top: 5px solid #004080;
+      color: #111111;
+      border: 2px solid #c5d7eb;
       border-radius: 10px;
-      padding: 15px;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 12px;
-      color: #111111;
       box-shadow: 0 3px 10px rgba(0, 64, 128, 0.08);
     }
-    .fflw-artikel-karte.is-selected {
-      border-color: #2e7d32;
-      border-top-color: #2e7d32;
-      background: #f3fbf4;
+    .fflw-offer-card.urgent {
+      border: 2px solid #d84315;
+      box-shadow: 0 4px 14px rgba(216, 67, 21, 0.22);
     }
-    .aa-img-box {
-      position: relative;
-      background: #f4f8fc;
-      border-radius: 8px;
-      overflow: hidden;
-      height: 210px;
+    .fflw-urgent-badge {
+      background: #d84315;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 0.86rem;
+      padding: 6px 10px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      cursor: zoom-in;
+      justify-content: space-between;
     }
-    .aa-img-box img {
+    .fflw-offer-img {
       width: 100%;
-      height: 210px !important;
+      height: 210px;
       object-fit: cover;
+      background: #f4f4f4;
       display: block;
     }
-    .aa-img-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 6px;
-      font-size: 0.86rem;
-      color: #003366;
+    .fflw-offer-body {
+      padding: 14px 16px;
+      flex: 1;
     }
-    .aa-mini-nav-btn {
-      background: #eef6fc;
-      border: 1px solid #8faadc;
-      color: #003366;
-      font-weight: bold;
+    .fflw-tag {
+      display: inline-block;
+      font-size: 0.82rem;
+      padding: 3px 8px;
       border-radius: 5px;
-      padding: 4px 10px;
-      cursor: pointer;
-    }
-    .aa-select-btn {
-      width: 100%;
-      padding: 11px 14px;
-      border-radius: 7px;
-      border: 2px solid #004080;
       background: #eef6fc;
+      border: 1px solid #b8d4ec;
       color: #003366;
       font-weight: bold;
-      cursor: pointer;
-      font-size: 0.96rem;
+      margin: 2px 4px 4px 0;
     }
-    .aa-select-btn.selected {
-      background: #2e7d32;
-      border-color: #1b5e20;
-      color: #ffffff;
+    .fflw-offer-footer {
+      padding: 12px 16px;
+      background: #f4f8fc;
+      border-top: 1px solid #d8e3f0;
     }
-    .aa-reserve-box {
-      background: #eaf6ec;
-      border: 2px solid #2e7d32;
-      border-radius: 10px;
-      padding: 18px 20px;
-      margin: 24px 0;
-      color: #111111;
-    }
-    .aa-btn-green {
-      background: #2e7d32;
+    .fflw-btn-req {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      text-align: center;
+      background: #004080;
       color: #ffffff;
       border: none;
-      padding: 13px 22px;
+      padding: 11px 14px;
       border-radius: 7px;
       font-weight: bold;
-      font-size: 1.02rem;
+      font-size: 15px;
       cursor: pointer;
+      text-decoration: none;
+      box-sizing: border-box;
     }
-    .aa-btn-green:disabled { opacity: 0.6; cursor: wait; }
-
-    /* Lightbox */
-    .aa-lightbox {
+    .fflw-btn-req:hover {
+      background: #002b59;
+    }
+    #fflw-req-modal {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.85);
-      z-index: 10000;
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 2147483645;
       display: none;
       align-items: center;
       justify-content: center;
       padding: 16px;
-      cursor: zoom-out;
     }
-    .aa-lightbox img {
-      max-width: 95vw;
-      max-height: 90vh;
-      border-radius: 8px;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+    .fflw-req-box {
+      background: #ffffff;
+      color: #111111;
+      border: 2px solid #004080;
+      border-top: 6px solid #004080;
+      border-radius: 12px;
+      max-width: 480px;
+      width: 100%;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     }
   </style>
 </head>
@@ -171,124 +145,90 @@
     <main class="content">
       <h2>Aktuelle Angebote im Virtuellen Warenhaus</h2>
 
-      <p style="margin: 12px 0 18px 0;">
-        <a href="fflw-international.html?return=aktuelle-angebote.html"
-           style="display: inline-flex; align-items: center; gap: 10px; background-color: #eef6fc; color: #003366; border: 2px solid #004080; padding: 8px 16px; font-size: 15px; font-weight: bold; text-decoration: none; border-radius: 6px;">
-           <span>Sprache wählen / ÜbersetzungsTool</span>
-           <span>🇩🇪 🇺🇦 🇹🇷</span>
-        </a>
+      <p>
+        Hier findest du gut erhaltene Möbel und Haushaltssachen, die uns aktuell zur Vermittlung an bedürftige Personen und Familien zur Verfügung gestellt wurden. <strong>Angebote, die schnell abgeholt werden müssen, stehen ganz oben.</strong>
       </p>
 
-      <!-- Filter-Leiste -->
-      <section class="aa-filter-bar">
-        <div class="aa-filter-grid">
-          <div>
-            <label class="aa-label" for="aa-filter-raum">Bereich / Zimmer</label>
-            <select id="aa-filter-raum" class="aa-select">
-              <option value="">Alle Bereiche</option>
-              <option value="Schlafzimmer">Schlafzimmer</option>
-              <option value="Wohnzimmer">Wohnzimmer &amp; Essbereich</option>
-              <option value="Küche">Küche &amp; Elektrogeräte</option>
-              <option value="Kinder">Kinder &amp; Baby</option>
-              <option value="Arbeitszimmer">Arbeitszimmer &amp; Flur</option>
-            </select>
-          </div>
-          <div>
-            <label class="aa-label" for="aa-filter-gegenstand">Konkreter Gegenstand</label>
-            <select id="aa-filter-gegenstand" class="aa-select">
-              <option value="">Alle Gegenstände</option>
-              <option value="bett">Bett / Matratze / Lattenrost</option>
-              <option value="schrank">Kleiderschrank / Kommode</option>
-              <option value="tisch">Esstisch / Schreibtisch / Tisch</option>
-              <option value="stuhl">Stuhl / Stühle</option>
-              <option value="sofa">Sofa / Couch / Sessel</option>
-              <option value="waschmaschine">Waschmaschine</option>
-              <option value="kühlschrank">Kühlschrank / Gefrierschrank</option>
-              <option value="geschirr">Kochtöpfe / Geschirr / Haushalt</option>
-              <option value="kinderwagen">Kinderwagen / Hochstuhl</option>
-            </select>
-          </div>
-          <div>
-            <label class="aa-label" for="aa-filter-search">Freitext-Suche (Ort, Maß, Stichwort)</label>
-            <input type="text" id="aa-filter-search" class="aa-input" placeholder="z. B. Winnenden, 140, Buche …">
-          </div>
+      <section class="fflw-filter-bar" aria-label="Angebote filtern">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+          <strong style="font-size: 1.02rem; color: #003366;">Angebote durchsuchen &amp; filtern</strong>
+          <span id="fflw-offer-count" style="font-size: 0.92rem; font-weight: bold; color: #004080; display: inline-flex; align-items: center; gap: 6px;">
+            <span class="fflw-spinner"></span> <span>Lade Angebote …</span>
+          </span>
+        </div>
+
+        <div class="fflw-filter-grid">
+          <input type="text" id="fflw-f-text" class="fflw-filter-input" placeholder="Stichwort (z. B. Schrank, Bett, 90x200) …">
+
+          <select id="fflw-f-room" class="fflw-filter-select">
+            <option value="">Alle Bereiche / Zimmer</option>
+            <option value="Schlafzimmer">Schlafzimmer</option>
+            <option value="Wohnzimmer">Wohnzimmer</option>
+            <option value="Küche">Küche &amp; Esszimmer</option>
+            <option value="Kinderzimmer">Kinderzimmer &amp; Familie</option>
+            <option value="Haushalt">Haushalt, Flur &amp; Sonstiges</option>
+          </select>
+
+          <select id="fflw-f-transport" class="fflw-filter-select">
+            <option value="">Alle Transport-Größen</option>
+            <option value="Tasche">Passt in Tasche / zu Fuß</option>
+            <option value="Fahrrad">Passt auf Fahrrad-Anhänger</option>
+            <option value="PKW">Passt in normalen PKW</option>
+            <option value="Transporter">Transporter / Hänger nötig</option>
+          </select>
+
+          <select id="fflw-f-urgent" class="fflw-filter-select">
+            <option value="urgent_first">Sortierung: Dringend zuerst</option>
+            <option value="only_urgent">Nur „Muss schnell raus“</option>
+            <option value="flexible">Nur „Auf Abruf“ (flexibel)</option>
+          </select>
         </div>
       </section>
 
-      <div id="aa-status" style="font-weight: bold; color: #004080; display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-        <span class="fflw-spinner"></span> <span>Lade aktuelle Möbel &amp; Sachen …</span>
-      </div>
+      <div id="fflw-offers-container" class="fflw-offers-grid"></div>
 
-      <div id="aa-gallery" class="aa-grid"></div>
-
-      <!-- Hinweis falls nichts Passendes dabei -->
-      <div style="background: #eef6fc; border: 1px solid #b8d4ec; border-radius: 8px; padding: 14px 18px; margin: 18px 0; color: #111111;">
-        <strong>Nicht das Richtige dabei?</strong> Dann melden Sie Ihren Wunsch gerne unverbindlich über unser <a href="suche-sachen.html"><strong>Bedarfs-Formular</strong></a> an.
-      </div>
-
-      <!-- RESERVIERUNGS-FORMULAR -->
-      <section class="aa-reserve-box" id="aa-reserve-section">
-        <h3 style="margin-top: 0; color: #1b5e20;">Ausgewählte Sachen unverbindlich reservieren</h3>
-        <p style="font-size: 0.96rem; color: #111111;">
-          Wählen Sie oben ein oder mehrere Stücke aus und tragen Sie hier Ihre Kontaktdaten ein. Wir melden uns zeitnah wegen der Abholung oder Lieferung.
+      <div style="margin-top: 26px; padding: 16px; border-radius: 10px; background: #eef6fc; border: 1px solid #b8d4ec; border-left: 6px solid #004080;">
+        <strong>Nichts Passendes dabei?</strong>
+        <p style="margin: 6px 0 0 0;">
+          Melde deinen konkreten Bedarf einfach über <a href="suche-sachen.html"><strong>Sachen suchen / Bedarf anmelden</strong></a> – wir informieren dich, sobald etwas Passendes eingeht.
         </p>
-
-        <div id="aa-selected-summary" style="background: #ffffff; border: 1px solid #a5d6a7; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; font-weight: bold; color: #003366;">
-          Noch kein Gegenstand ausgewählt.
-        </div>
-
-        <form id="aa-reserve-form">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px;">
-            <div>
-              <label class="aa-label" for="aa-res-name">Ihr Name *</label>
-              <input type="text" id="aa-res-name" class="aa-input" required placeholder="Vor- und Nachname">
-            </div>
-            <div>
-              <label class="aa-label" for="aa-res-tel">Telefon / WhatsApp *</label>
-              <input type="tel" id="aa-res-tel" class="aa-input" required placeholder="z. B. 0171 1234567">
-            </div>
-            <div>
-              <label class="aa-label" for="aa-res-email">E-Mail (optional)</label>
-              <input type="email" id="aa-res-email" class="aa-input" placeholder="name@beispiel.de">
-            </div>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 12px;">
-            <div>
-              <label class="aa-label" for="aa-res-transport">Wie erfolgt der Transport?</label>
-              <select id="aa-res-transport" class="aa-select">
-                <option value="Selbstabholung möglich">Selbstabholung möglich</option>
-                <option value="Transporthilfe durch Freundeskreis gewünscht">Transporthilfe durch Freundeskreis gewünscht</option>
-              </select>
-            </div>
-            <div>
-              <label class="aa-label" for="aa-res-note">Wohnort &amp; Bemerkung (z. B. Helfer/Sozialarbeiter)</label>
-              <input type="text" id="aa-res-note" class="aa-input" placeholder="z. B. Winnenden, Unterkunft …">
-            </div>
-          </div>
-
-          <button type="submit" id="aa-res-submit" class="aa-btn-green">Jetzt reservieren</button>
-          <span id="aa-res-msg" style="margin-left: 12px; font-weight: bold; color: #003366;"></span>
-        </form>
-      </section>
+      </div>
     </main>
   </div>
 
-  <!-- Lightbox für Großansicht -->
-  <div class="aa-lightbox" id="aa-lightbox">
-    <img id="aa-lightbox-img" src="" alt="Großansicht">
+  <div id="fflw-req-modal">
+    <div class="fflw-req-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <strong style="color:#003366; font-size:1.1rem;">Interesse / Bedarf anmelden</strong>
+        <button type="button" id="fflw-req-close" style="background:#e2e8f0; color:#111; border:none; border-radius:5px; padding:5px 11px; font-weight:bold; cursor:pointer;">✕</button>
+      </div>
+      <p id="fflw-req-item-title" style="font-weight:bold; color:#004080; margin:0 0 12px 0;"></p>
+      <form id="fflw-req-form">
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-weight:bold; margin-bottom:4px;">Dein Name (oder Name des Paten/Helfers) *</label>
+          <input type="text" id="fflw-req-name" required class="fflw-filter-input">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-weight:bold; margin-bottom:4px;">Telefon / WhatsApp oder E-Mail *</label>
+          <input type="text" id="fflw-req-kontakt" required class="fflw-filter-input">
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-weight:bold; margin-bottom:4px;">Wohnort &amp; kurzer Hinweis (z. B. Transportmöglichkeit) *</label>
+          <textarea id="fflw-req-note" rows="3" required class="fflw-filter-input" placeholder="z. B. Für Familie in Winnenden, eigener PKW vorhanden"></textarea>
+        </div>
+        <div id="fflw-req-feedback" style="margin:8px 0; font-weight:bold;"></div>
+        <button type="submit" id="fflw-req-submit" class="fflw-btn-req" style="background:#2e7d32;">
+          Unverbindliche Anfrage absenden
+        </button>
+      </form>
+    </div>
   </div>
 
   <section class="contact-block">
-    <p><strong>Du möchtest aktiv werden? Oder einfach mal den Kontakt zum Freundeskreis aufnehmen? Dann schreib uns doch, wir freuen uns!</strong></p>
     <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
     <p>
-      <strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a><br>
-      <strong>Sachen-Spenden (Infos, Kontakt):</strong> <a href="mailto:Warenhaus@freundeleuwi.org">Warenhaus@freundeleuwi.org</a><br>
-      <strong>Sachen-Suchen (Infos, Kontakt):</strong> <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
-      <strong>Transport-Mithilfe (Infos, Kontakt):</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a><br>
-      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong> <a href="mailto:Rad-Werkstatt@freundeleuwi.org">Rad-Werkstatt@freundeleuwi.org</a><br>
-      <strong>Geldspenden und Spendenbescheinigungen:</strong> <a href="mailto:Kasse-FFLW@freundeleuwi.org">Kasse-FFLW@freundeleuwi.org</a>
+      <strong>Sachen-Suchen:</strong> <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
+      <strong>Transport-Mithilfe:</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a>
     </p>
   </section>
 
@@ -300,202 +240,156 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      const container = document.getElementById("fflw-offers-container");
+      const countEl = document.getElementById("fflw-offer-count");
+      const fText = document.getElementById("fflw-f-text");
+      const fRoom = document.getElementById("fflw-f-room");
+      const fTransport = document.getElementById("fflw-f-transport");
+      const fUrgent = document.getElementById("fflw-f-urgent");
 
-      let allItems = [];
-      const selectedMap = {}; // pfad -> menge
+      let allOffers = [];
+      let selectedOffer = null;
 
-      const galleryEl = document.getElementById("aa-gallery");
-      const statusEl = document.getElementById("aa-status");
-      const summaryEl = document.getElementById("aa-selected-summary");
-      const lightbox = document.getElementById("aa-lightbox");
-      const lightboxImg = document.getElementById("aa-lightbox-img");
-
-      lightbox.addEventListener("click", () => { lightbox.style.display = "none"; });
-
-      function updateSummary() {
-        const keys = Object.keys(selectedMap);
-        if (!keys.length) {
-          summaryEl.textContent = "Noch kein Gegenstand ausgewählt.";
-          return;
-        }
-        summaryEl.innerHTML = "Ausgewählt zur Reservierung:<br>" + keys.map(k => {
-          const m = selectedMap[k];
-          return `• ${m > 1 ? m + "× " : ""}${k}`;
-        }).join("<br>");
+      function isItemUrgent(item) {
+        const s = `${item.lagerStatus || ""} ${item.beschreibung || ""} ${item.abholFrist || ""}`.toLowerCase();
+        return s.includes("festen datum") || s.includes("dringend") || s.includes("7 tage") || Boolean(item.abholFrist);
       }
 
-      function renderGallery() {
-        const raumVal = document.getElementById("aa-filter-raum").value.toLowerCase();
-        const gegVal = document.getElementById("aa-filter-gegenstand").value.toLowerCase();
-        const searchVal = document.getElementById("aa-filter-search").value.trim().toLowerCase();
+      function renderOffers() {
+        const q = fText.value.trim().toLowerCase();
+        const room = fRoom.value.toLowerCase();
+        const trans = fTransport.value.toLowerCase();
+        const urgMode = fUrgent.value;
 
-        const filtered = allItems.filter(it => {
-          const hay = `${it.titel || ""} ${it.pfad || ""} ${it.beschreibung || ""} ${it.ort || ""} ${it.raumKategorie || ""}`.toLowerCase();
-          if (raumVal && !hay.includes(raumVal)) return false;
-          if (gegVal && !hay.includes(gegVal)) return false;
-          if (searchVal && !hay.includes(searchVal)) return false;
+        let filtered = allOffers.filter(it => {
+          const full = `${it.titel || ""} ${it.raumKategorie || ""} ${it.beschreibung || ""} ${it.ort || ""} ${it.transportInfo || ""}`.toLowerCase();
+          if (q && !full.includes(q)) return false;
+          if (room && !full.includes(room)) return false;
+          if (trans && !full.includes(trans)) return false;
+          const urg = isItemUrgent(it);
+          if (urgMode === "only_urgent" && !urg) return false;
+          if (urgMode === "flexible" && urg) return false;
           return true;
         });
 
-        galleryEl.innerHTML = "";
-        if (!filtered.length) {
-          galleryEl.innerHTML = `<p style="grid-column: 1/-1; color: #222222;">Keine passenden Angebote für diese Filterauswahl gefunden.</p>`;
+        filtered.sort((a, b) => {
+          const ua = isItemUrgent(a) ? 0 : 1;
+          const ub = isItemUrgent(b) ? 0 : 1;
+          if (ua !== ub) return ua - ub;
+          if (a.abholFrist && b.abholFrist) return a.abholFrist.localeCompare(b.abholFrist);
+          return 0;
+        });
+
+        countEl.textContent = `${filtered.length} Angebot(e) angezeigt`;
+        container.innerHTML = "";
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<div style="grid-column: 1/-1; padding: 20px; background: #f4f8fc; border: 1px solid #c5d7eb; border-radius: 8px; color: #111;">Keine passenden Angebote für diese Filterauswahl gefunden.</div>`;
           return;
         }
 
-        filtered.forEach(it => {
-          let imgIndex = 0;
-          const bilder = it.bilder || [];
-          const isSel = Boolean(selectedMap[it.pfad]);
-
+        filtered.forEach(item => {
+          const urgent = isItemUrgent(item);
           const card = document.createElement("article");
-          card.className = "fflw-artikel-karte" + (isSel ? " is-selected" : "");
-          card.setAttribute("data-pfad", it.pfad);
+          card.className = "fflw-offer-card" + (urgent ? " urgent" : "");
 
-          const anzeigeTitel = it.titel || it.pfad.split("/").pop().replace(/^\d+_/, "").replace(/_/g, " ");
-          const beschreibungHtml = (it.beschreibung || "").replace(/\n/g, "<br>");
-          const verfuegbar = Math.max(1, parseInt(it.anzahlVerfuegbar || 1, 10) || 1);
+          const imgUrl = (item.bilder && item.bilder.length > 0) ? item.bilder[0].url : "";
+          const fristText = item.abholFrist ? ` bis ${item.abholFrist}` : "";
 
           card.innerHTML = `
             <div>
-              <div class="aa-img-box">
-                ${bilder.length ? `<img src="${bilder[0].url}" onerror="this.onerror=null;this.src='${bilder[0].fallback}';" alt="${anzeigeTitel}">` : `<span>Kein Foto</span>`}
+              ${urgent ? `<div class="fflw-urgent-badge"><span>Muss schnell raus${fristText}</span><span>Eilig</span></div>` : ""}
+              ${imgUrl ? `<img src="${imgUrl}" alt="${item.titel || "Möbelstück"}" class="fflw-offer-img">` : ""}
+              <div class="fflw-offer-body">
+                <h3 style="margin: 0 0 8px 0; font-size: 1.12rem; color: #003366;">${item.titel || item.pfad || "Sachspende"}</h3>
+                <div style="margin-bottom: 8px;">
+                  ${item.ort ? `<span class="fflw-tag">${item.ort}</span>` : ""}
+                  ${item.transportInfo ? `<span class="fflw-tag">${item.transportInfo}</span>` : ""}
+                  ${item.zerlegbar ? `<span class="fflw-tag">${item.zerlegbar}</span>` : ""}
+                </div>
+                <p style="margin: 0; font-size: 0.94rem; color: #222222; white-space: pre-line;">${item.beschreibung || ""}</p>
               </div>
-              ${bilder.length > 1 ? `
-                <div class="aa-img-nav">
-                  <button type="button" class="aa-mini-nav-btn btn-prev">◀</button>
-                  <span class="img-counter">Bild 1 / ${bilder.length}</span>
-                  <button type="button" class="aa-mini-nav-btn btn-next">▶</button>
-                </div>
-              ` : ""}
-              <h3 style="margin: 12px 0 6px 0; font-size: 1.08rem; color: #003366;">${anzeigeTitel}</h3>
-              ${it.ort ? `<div style="font-size: 0.9rem; font-weight: bold; color: #1b5e20; margin-bottom: 6px;">Abholort: ${it.ort}</div>` : ""}
-              <div style="font-size: 0.92rem; line-height: 1.48; color: #222222;">${beschreibungHtml}</div>
             </div>
-
-            <div>
-              ${verfuegbar > 1 ? `
-                <div style="margin-bottom: 8px; font-size: 0.9rem; font-weight: bold; color: #003366;">
-                  Gewünschte Stückzahl (max. ${verfuegbar}):
-                  <input type="number" class="aa-input inp-qty" min="1" max="${verfuegbar}" value="${selectedMap[it.pfad] || 1}" style="width: 75px; padding: 5px 8px; margin-left: 6px;">
-                </div>
-              ` : ""}
-              <button type="button" class="aa-select-btn ${isSel ? "selected" : ""}">
-                ${isSel ? "✓ Ausgewählt" : "Für Reservierung vormerken"}
-              </button>
+            <div class="fflw-offer-footer">
+              <button type="button" class="fflw-btn-req">Dieses Stück anfragen</button>
             </div>
           `;
 
-          const imgEl = card.querySelector(".aa-img-box img");
-          if (imgEl) {
-            imgEl.addEventListener("click", () => {
-              lightboxImg.src = bilder[imgIndex].fallback || bilder[imgIndex].url;
-              lightbox.style.display = "flex";
-            });
-          }
-
-          if (bilder.length > 1) {
-            const counterEl = card.querySelector(".img-counter");
-            card.querySelector(".btn-prev").addEventListener("click", () => {
-              imgIndex = (imgIndex - 1 + bilder.length) % bilder.length;
-              imgEl.src = bilder[imgIndex].url;
-              counterEl.textContent = `Bild ${imgIndex + 1} / ${bilder.length}`;
-            });
-            card.querySelector(".btn-next").addEventListener("click", () => {
-              imgIndex = (imgIndex + 1) % bilder.length;
-              imgEl.src = bilder[imgIndex].url;
-              counterEl.textContent = `Bild ${imgIndex + 1} / ${bilder.length}`;
-            });
-          }
-
-          const qtyInput = card.querySelector(".inp-qty");
-          if (qtyInput) {
-            qtyInput.addEventListener("input", () => {
-              if (selectedMap[it.pfad]) {
-                selectedMap[it.pfad] = Math.min(verfuegbar, Math.max(1, parseInt(qtyInput.value, 10) || 1));
-                updateSummary();
-              }
-            });
-          }
-
-          card.querySelector(".aa-select-btn").addEventListener("click", () => {
-            if (selectedMap[it.pfad]) {
-              delete selectedMap[it.pfad];
-            } else {
-              const m = qtyInput ? Math.min(verfuegbar, Math.max(1, parseInt(qtyInput.value, 10) || 1)) : 1;
-              selectedMap[it.pfad] = m;
-            }
-            updateSummary();
-            renderGallery();
+          card.querySelector(".fflw-btn-req").addEventListener("click", () => {
+            selectedOffer = item;
+            document.getElementById("fflw-req-item-title").textContent = item.titel || item.pfad;
+            document.getElementById("fflw-req-feedback").textContent = "";
+            document.getElementById("fflw-req-modal").style.display = "flex";
           });
 
-          galleryEl.appendChild(card);
+          container.appendChild(card);
         });
       }
 
-      ["aa-filter-raum", "aa-filter-gegenstand", "aa-filter-search"].forEach(id => {
-        document.getElementById(id).addEventListener("input", renderGallery);
-        document.getElementById(id).addEventListener("change", renderGallery);
+      [fText, fRoom, fTransport, fUrgent].forEach(el => {
+        el.addEventListener("input", renderOffers);
+        el.addEventListener("change", renderOffers);
       });
 
-      async function loadItems() {
-        try {
-          const resp = await fetch(`${WEB_APP_URL}?t=${Date.now()}`, { method: "GET", redirect: "follow" });
-          const data = await resp.json();
-          if (!data || !data.ok) {
-            statusEl.innerHTML = `<span style="color:#c62828;">Angebote konnten nicht geladen werden.</span>`;
-            return;
+      const urlVorschau = new URLSearchParams(window.location.search).get("vorschau") || "";
+      fetch(`${WEB_APP_URL}?vorschau=${encodeURIComponent(urlVorschau)}&t=${Date.now()}`, { method: "GET", redirect: "follow" })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.ok && Array.isArray(data.items)) {
+            allOffers = data.items;
+            renderOffers();
+          } else {
+            countEl.textContent = "Keine Angebote geladen.";
           }
-          allItems = data.items || [];
-          statusEl.innerHTML = `<span style="color:#1b5e20;">Aktuell ${allItems.length} Angebot(e) verfügbar</span>`;
-          renderGallery();
-        } catch (err) {
-          statusEl.innerHTML = `<span style="color:#c62828;">Verbindungsfehler: ${err.message}</span>`;
-        }
-      }
+        })
+        .catch(() => {
+          countEl.textContent = "Verbindungsfehler beim Laden.";
+        });
 
-      loadItems();
+      const reqModal = document.getElementById("fflw-req-modal");
+      document.getElementById("fflw-req-close").addEventListener("click", () => { reqModal.style.display = "none"; });
 
-      document.getElementById("aa-reserve-form").addEventListener("submit", async e => {
+      document.getElementById("fflw-req-form").addEventListener("submit", async function (e) {
         e.preventDefault();
-        const artikelKeys = Object.keys(selectedMap);
-        if (!artikelKeys.length) {
-          alert("Bitte wählen Sie zuerst oben mindestens einen Gegenstand aus.");
-          return;
-        }
-        const btn = document.getElementById("aa-res-submit");
-        const msg = document.getElementById("aa-res-msg");
-        btn.disabled = true;
-        msg.innerHTML = `<span class="fflw-spinner"></span> <span>Reserviere ausgewählte Sachen …</span>`;
+        if (!selectedOffer) return;
+        const fb = document.getElementById("fflw-req-feedback");
+        const btn = document.getElementById("fflw-req-submit");
 
-        try {
+        const sendTask = async () => {
           const resp = await fetch(WEB_APP_URL, {
             method: "POST",
             redirect: "follow",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({
-              name: document.getElementById("aa-res-name").value.trim(),
-              telefon: document.getElementById("aa-res-tel").value.trim(),
-              email: document.getElementById("aa-res-email").value.trim(),
-              lieferung: document.getElementById("aa-res-transport").value,
-              bemerkung: document.getElementById("aa-res-note").value.trim(),
-              artikel: artikelKeys,
-              mengen: selectedMap
+              action: "reserveItem",
+              itemId: selectedOffer.id || selectedOffer.pfad,
+              titel: selectedOffer.titel || selectedOffer.pfad,
+              name: document.getElementById("fflw-req-name").value.trim(),
+              kontakt: document.getElementById("fflw-req-kontakt").value.trim(),
+              notiz: document.getElementById("fflw-req-note").value.trim()
             })
           });
           const res = await resp.json();
           if (res && res.ok) {
-            msg.innerHTML = `<span style="color:#1b5e20;">Vielen Dank! Ihre Reservierung wurde eingetragen. Wir melden uns bei Ihnen.</span>`;
-            Object.keys(selectedMap).forEach(k => delete selectedMap[k]);
-            updateSummary();
-            loadItems();
+            fb.style.color = "#1b5e20";
+            fb.textContent = "✓ Anfrage eingegangen! Unser Team meldet sich in Kürze bei dir.";
+            setTimeout(() => { reqModal.style.display = "none"; }, 1600);
+            return { ok: true };
           } else {
-            msg.innerHTML = `<span style="color:#c62828;">${res && res.error ? res.error : "Reservierung fehlgeschlagen."}</span>`;
+            fb.style.color = "#c62828";
+            fb.textContent = "Fehler: " + (res && res.error ? res.error : "Unbekannt");
+            return { ok: false };
           }
-        } catch (err) {
-          msg.innerHTML = `<span style="color:#c62828;">Fehler: ${err.message}</span>`;
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(btn, sendTask, {
+            loadingText: "Wird gesendet …",
+            successText: "✓ Anfrage gesendet!"
+          });
+        } else {
+          await sendTask();
         }
-        btn.disabled = false;
       });
     });
   </script>
