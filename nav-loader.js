@@ -204,7 +204,7 @@ window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
   const pages = repoHtmlFiles
     .filter(f => !systemExclude.has(f))
     .map(file => {
-      const inNavHtml = navMap.has(file);
+      const inNavHtml = navMap.has(file) || file === "schatzsuche.html";
       const isManuallyHidden = extraHiddenSet.has(file);
       const inMenu = inNavHtml && !isManuallyHidden;
       const isLegal = (file === "impressum.html" || file === "datenschutz.html");
@@ -335,10 +335,12 @@ function applyHiddenNavItems(versteckteSeiten) {
   if (!navContainer) return;
   const hiddenSet = new Set(Array.isArray(versteckteSeiten) ? versteckteSeiten : ["unterlagen.html"]);
 
+  let hasSchatzLink = false;
   navContainer.querySelectorAll("li").forEach(li => {
     const link = li.querySelector("a[href]");
     if (!link) return;
     const rawHref = (link.getAttribute("href") || "").split("?")[0].split("#")[0].trim();
+    if (rawHref === "schatzsuche.html") hasSchatzLink = true;
     if (!rawHref.endsWith(".html")) return;
 
     const hasSubMenu = li.querySelector("details") !== null;
@@ -346,6 +348,27 @@ function applyHiddenNavItems(versteckteSeiten) {
       li.style.display = hiddenSet.has(rawHref) ? "none" : "";
     }
   });
+
+  // Falls schatzsuche.html nicht versteckt ist, aber in nav.html noch nicht verlinkt wurde:
+  // automatisch im Menü einblenden!
+  const navList = navContainer.querySelector("#nav-list") || navContainer.querySelector("ul");
+  if (navList && !hiddenSet.has("schatzsuche.html") && !hasSchatzLink) {
+    const li = document.createElement("li");
+    li.id = "auto-nav-schatzsuche";
+    const a = document.createElement("a");
+    a.href = "schatzsuche.html";
+    a.textContent = "✨ Schatzsuche";
+    const cur = (window.location.pathname.split("/").pop() || "index.html");
+    if (cur === "schatzsuche.html") {
+      a.setAttribute("aria-current", "page");
+      a.classList.add("active");
+    }
+    li.appendChild(a);
+    navList.appendChild(li);
+  } else if (hasSchatzLink && hiddenSet.has("schatzsuche.html")) {
+    const autoLi = document.getElementById("auto-nav-schatzsuche");
+    if (autoLi) autoLi.style.display = "none";
+  }
 }
 
 function renderGlobalFlagBar(currentPage, flaggenStil) {

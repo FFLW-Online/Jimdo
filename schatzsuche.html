@@ -326,6 +326,16 @@
 
           <label class="sz-q-title" for="sz-beruf">Welchen Beruf oder welche Berufe hast du ausgeübt – und was sind deine Berufswünsche?</label>
           <textarea id="sz-beruf" class="sz-textarea" rows="2" placeholder="Erzähle gerne kurz, was du gelernt oder gearbeitet hast und wovon du beruflich träumst …"></textarea>
+
+          <div style="margin-top:12px; padding:12px 14px; background:#f8fafc; border:1px dashed #94a3b8; border-radius:8px;">
+            <label class="sz-q-title" for="sz-foto" style="margin-top:0;">📷 Freiwilliges Foto von dir (optional – hilft beim Kennenlernen, keine Pflicht)</label>
+            <input type="file" id="sz-foto" class="sz-input" accept="image/*" style="padding:6px;">
+            <div id="sz-foto-preview-wrap" style="margin-top:8px; display:none; align-items:center; gap:10px;">
+              <img id="sz-foto-preview" src="" alt="Vorschau" style="width:68px; height:68px; object-fit:cover; border-radius:50%; border:2px solid #004080;">
+              <button type="button" id="sz-foto-clear" class="sz-close-domain">Foto entfernen</button>
+            </div>
+          </div>
+
         </section>
 
         <!-- SCHRITT 2: THEMEN-KACHELN ZUM FREIEN AUSWÄHLEN -->
@@ -558,6 +568,49 @@
 
       let activeSchatzCode = "";
 
+      let currentFotoDataUrl = "";
+      const fotoInput = document.getElementById("sz-foto");
+      const fotoPrevWrap = document.getElementById("sz-foto-preview-wrap");
+      const fotoPrevImg = document.getElementById("sz-foto-preview");
+
+      function updateFotoPreview(dataUrl) {
+        currentFotoDataUrl = dataUrl || "";
+        if (currentFotoDataUrl) {
+          fotoPrevImg.src = currentFotoDataUrl;
+          fotoPrevWrap.style.display = "flex";
+        } else {
+          fotoPrevImg.src = "";
+          fotoPrevWrap.style.display = "none";
+          if (fotoInput) fotoInput.value = "";
+        }
+      }
+
+      document.getElementById("sz-foto-clear").addEventListener("click", () => updateFotoPreview(""));
+
+      fotoInput.addEventListener("change", function () {
+        const f = this.files && this.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          const img = new Image();
+          img.onload = () => {
+            const maxDim = 420;
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+              else { w = Math.round(w * maxDim / h); h = maxDim; }
+            }
+            const c = document.createElement("canvas");
+            c.width = w; c.height = h;
+            c.getContext("2d").drawImage(img, 0, 0, w, h);
+            updateFotoPreview(c.toDataURL("image/jpeg", 0.82));
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(f);
+      });
+
+
       const loadInput = document.getElementById("sz-load-code");
       const aktenInput = document.getElementById("sz-aktencode");
       if (typeof window.fflwNeutralizeCodeInput === "function") {
@@ -675,6 +728,7 @@
           document.getElementById("sz-aktencode").value = d.aktenCode || "";
           document.getElementById("sz-beruf").value = d.beruf || "";
           if (d.sichtbarkeit) document.getElementById("sz-sichtbarkeit").value = d.sichtbarkeit;
+          if (d.fotoDataUrl) updateFotoPreview(d.fotoDataUrl);
 
           // Alle Häkchen zurücksetzen und gespeicherte Werte wiederherstellen
           document.querySelectorAll(".sz-lvl-chk, .sz-sub-chk").forEach(c => { c.checked = false; });
@@ -765,6 +819,7 @@
           aktenCode: document.getElementById("sz-aktencode").value.trim(),
           beruf: document.getElementById("sz-beruf").value.trim(),
           sichtbarkeit: document.getElementById("sz-sichtbarkeit").value,
+          fotoDataUrl: currentFotoDataUrl,
           domainDetails: domainDetails
         };
 

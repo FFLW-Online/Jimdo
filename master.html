@@ -231,6 +231,7 @@
           <button type="button" class="m-tab-btn active" data-tab="eingang">📥 Eingangs-Prüfung (<span id="cnt-eingang">0</span>)</button>
           <button type="button" class="m-tab-btn" data-tab="online">🌐 Online &amp; Reserviert (<span id="cnt-online">0</span>)</button>
           <button type="button" class="m-tab-btn" data-tab="bedarfe">📋 Offene Bedarfe (<span id="cnt-bedarfe">0</span>)</button>
+          <button type="button" class="m-tab-btn" id="tab-btn-kiimport" data-tab="kiimport" style="display:none; background:#eef2ff; color:#312e81; border-color:#a5b4fc;">🪄 Wohnungs-Import (KI)</button>
           <button type="button" class="m-tab-btn secret-tab" id="tab-btn-akten" data-tab="akten" style="display:none;">🗂️ Personen-Akten (<span id="cnt-akten">0</span>)</button>
           <button type="button" class="m-tab-btn treasure-tab" id="tab-btn-schatz" data-tab="schatz" style="display:none;">✨ Schatzkiste (<span id="cnt-schatz">0</span>)</button>
           <button type="button" class="m-tab-btn" id="tab-btn-system" data-tab="system" style="display:none;">⚙ Seitenschutz, URL-Tarnung &amp; Codes</button>
@@ -249,6 +250,92 @@
 
         <!-- TAB 3: BEDARFE -->
         <section id="tab-bedarfe" class="m-tab-panel" style="display:none;"><div id="list-bedarfe"></div></section>
+
+        <!-- TAB 3B: WOHNUNGS-IMPORT & KI-GRÖSSENSCHÄTZUNG -->
+        <section id="tab-kiimport" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#4338ca; background:#f8f9ff;">
+            <h3 style="margin-top:0; color:#312e81;">🪄 Wohnungs-Bilder &amp; KI-Größenschätzung (Schnell-Befüllung)</h3>
+            <p style="margin-top:0; font-size:0.93rem;">
+              Lade mehrere Raum- oder Möbelfotos einer kompletten Wohnung hoch. Die KI erkennt alle verwertbaren Gegenstände, schätzt die ungefähren Maße (<strong>ca. B × T × H in cm</strong>) aus den Raumproportionen und bereitet alle Angebote zur Prüfung und Übernahme ins Warenhaus vor.
+            </p>
+
+            <!-- Schritt 1: Gemeinsame Anbieter-/Wohnungsdaten -->
+            <div style="background:#ffffff; border:1px solid #c7d2fe; border-radius:8px; padding:12px 14px; margin-bottom:12px;">
+              <strong style="color:#312e81;">1. Gemeinsame Angaben für diese Wohnung / Spende:</strong>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:8px;">
+                <div>
+                  <label style="font-size:0.84rem; font-weight:bold;">Spender-Name / Kürzel *</label>
+                  <input type="text" id="ki-spender" class="m-input" placeholder="z. B. Familie Müller / Haushaltsauflösung">
+                </div>
+                <div>
+                  <label style="font-size:0.84rem; font-weight:bold;">Ort / Stadtteil *</label>
+                  <input type="text" id="ki-ort" class="m-input" placeholder="z. B. Leutenbach / Winnenden">
+                </div>
+                <div>
+                  <label style="font-size:0.84rem; font-weight:bold;">Telefon / Kontakt (intern)</label>
+                  <input type="text" id="ki-telefon" class="m-input" placeholder="z. B. 0171 1234567">
+                </div>
+                <div>
+                  <label style="font-size:0.84rem; font-weight:bold;">Ziel-Status nach Import</label>
+                  <select id="ki-ziel-status" class="m-select">
+                    <option value="online">🌐 Direkt öffentlich im Warenhaus freischalten</option>
+                    <option value="eingang">📥 Zuerst in Eingangs-Prüfung ablegen</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Schritt 2: Fotos hochladen -->
+            <div style="background:#ffffff; border:1px solid #c7d2fe; border-radius:8px; padding:12px 14px; margin-bottom:12px;">
+              <strong style="color:#312e81;">2. Wohnungsfotos auswählen (mehrere Bilder gleichzeitig möglich):</strong>
+              <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+                <input type="file" id="ki-photos-input" class="m-input" accept="image/*" multiple style="max-width:420px; padding:6px;">
+                <span id="ki-photos-count" style="font-weight:bold; color:#312e81;">0 Bilder geladen</span>
+              </div>
+              <div id="ki-thumbs-grid" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
+            </div>
+
+            <!-- Schritt 3: KI-Erkennung starten ODER Text/JSON einfügen -->
+            <div style="background:#ffffff; border:1px solid #c7d2fe; border-radius:8px; padding:12px 14px;">
+              <strong style="color:#312e81;">3. Automatische KI-Analyse &amp; Größenschätzung starten:</strong>
+              <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+                <input type="password" id="ki-gemini-key" class="m-input" placeholder="Google Gemini API-Key (AIza…) – wird lokal gemerkt" style="max-width:340px;">
+                <button type="button" id="ki-analyze-btn" class="m-btn" style="background:#4338ca;">🪄 Bilder mit KI analysieren &amp; Maße schätzen</button>
+                <span id="ki-status-msg" style="font-weight:bold;"></span>
+              </div>
+              <div style="font-size:0.82rem; color:#475569; margin-top:6px;">
+                Tipp: Ein kostenloser Gemini API-Key unter <code>aistudio.google.com</code> genügt. Alternativ kannst du unten auch eine fertige JSON-Liste einfügen oder Artikel manuell hinzufügen:
+              </div>
+              <details style="margin-top:8px;">
+                <summary style="cursor:pointer; font-size:0.88rem; font-weight:bold; color:#312e81;">📋 Alternative: Fertige KI-Liste (JSON) einfügen oder leere Zeile hinzufügen</summary>
+                <div style="margin-top:8px;">
+                  <textarea id="ki-raw-json" class="m-textarea" rows="4" placeholder='[{"titel":"Kleiderschrank 3-türig","kategorie":"Schlafzimmer","beschreibung":"Helles Holz, guter Zustand","masse":"ca. 150 x 60 x 205 cm","bildIndex":1}]'></textarea>
+                  <div style="margin-top:6px; display:flex; gap:8px;">
+                    <button type="button" id="ki-parse-json-btn" class="m-btn m-btn-grey">JSON übernehmen</button>
+                    <button type="button" id="ki-add-empty-row-btn" class="m-btn">+ Leere Artikel-Zeile hinzufügen</button>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <!-- Schritt 4: Vorschau & Feinschliff vor dem Import -->
+          <div id="ki-preview-card" class="m-card" style="display:none; border-left-color:#2e7d32;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+              <h3 style="margin:0; color:#1b5e20;">4. Erkannte Gegenstände prüfen &amp; ins Warenhaus übernehmen (<span id="ki-items-count">0</span>)</h3>
+              <button type="button" id="ki-import-all-btn" class="m-btn m-btn-green" style="font-size:0.98rem; padding:10px 16px;">⬆ Alle ausgewählten Artikel jetzt speichern</button>
+            </div>
+            <p style="font-size:0.88rem; color:#333; margin:6px 0 10px 0;">
+              Du kannst jeden Titel, die geschätzten Maße (<strong>ca. B × T × H</strong>), die Beschreibung und das zugeordnete Foto vor dem Speichern noch kurz anpassen oder unerwünschte Gegenstände abwählen.
+            </p>
+            <div id="ki-items-list"></div>
+            <div style="margin-top:12px; display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
+              <button type="button" id="ki-import-all-btn-bottom" class="m-btn m-btn-green" style="font-size:0.98rem; padding:10px 16px;">⬆ Alle ausgewählten Artikel jetzt speichern</button>
+              <span id="ki-import-msg" style="font-weight:bold;"></span>
+            </div>
+          </div>
+        </section>
+
 
         <!-- TAB 4: PERSONEN-AKTEN MIT FAMILIEN-VERKNÜPFUNG (NUR SUPERMASTER!) -->
         <section id="tab-akten" class="m-tab-panel" style="display:none;">
@@ -340,8 +427,21 @@
               </div>
             </div>
             <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-              <input type="text" id="sz-search" class="m-input" placeholder="Nach Talent, Beruf, Sprache, Hobby oder Land suchen …" style="max-width:380px;">
-              <select id="sz-level-filter" class="m-select" style="max-width:300px;">
+              <input type="text" id="sz-search" class="m-input" placeholder="Stichwort (z. B. Chor, Hotel, Löten, Arabisch, Garten) …" style="max-width:310px;">
+              <select id="sz-domain-filter" class="m-select" style="max-width:250px;">
+                <option value="">Alle Themenbereiche</option>
+                <option value="musik">🎵 Musik, Chor &amp; Gesang</option>
+                <option value="kochen">🍳 Kochen, Backen &amp; Gastronomie</option>
+                <option value="it">📱 Handy, Computer &amp; Technik</option>
+                <option value="reparatur">🔧 Handwerk, Bau &amp; Reparatur</option>
+                <option value="garten">🌿 Garten, Natur &amp; Landwirtschaft</option>
+                <option value="mobilitaet">🚲 Mobilität (Fahrrad, Auto, LKW)</option>
+                <option value="kunst">🎨 Malerei, Bildhauerei &amp; Ton</option>
+                <option value="naehen">🧵 Nähen, Schneidern &amp; Textil</option>
+                <option value="papier">📄 Papierkram, Übersetzen &amp; Behörden</option>
+                <option value="ehrenamt">🤝 Bisheriges Ehrenamt &amp; Vereine</option>
+              </select>
+              <select id="sz-level-filter" class="m-select" style="max-width:270px;">
                 <option value="">Alle 5 Stufen anzeigen</option>
                 <option value="dream">✨ Traum &amp; Neugier (möchte einarbeiten)</option>
                 <option value="everyday">🏠 Alltag &amp; Eigenbedarf</option>
@@ -349,6 +449,7 @@
                 <option value="experienced">🛠️ Erfahrene Fachkraft</option>
                 <option value="master">🎓 Meister / Lehrer / Spezialist</option>
               </select>
+              <button type="button" id="sz-invite-filtered-btn" class="m-btn m-btn-green">✉️ Gefilterte Gruppe per E-Mail einladen</button>
             </div>
           </div>
           <div id="list-schatz"></div>
@@ -504,7 +605,9 @@
         }
 
         const isSuper = data.role === "master";
+        const canPublish = isSuper || data.role === "freischalter";
         const canSeeTreasure = isSuper || data.role === "koordinator" || data.role === "freischalter";
+        document.getElementById("tab-btn-kiimport").style.display = canPublish ? "inline-block" : "none";
         document.getElementById("tab-btn-akten").style.display = isSuper ? "inline-block" : "none";
         document.getElementById("tab-btn-schatz").style.display = canSeeTreasure ? "inline-block" : "none";
         document.getElementById("tab-btn-system").style.display = isSuper ? "inline-block" : "none";
@@ -1074,14 +1177,20 @@
         });
       }
 
+      let lastFilteredSchatz = [];
       function renderSchatzListe(liste) {
         const q = (document.getElementById("sz-search").value || "").trim().toLowerCase();
+        const domFilter = document.getElementById("sz-domain-filter").value;
         const lvlFilter = document.getElementById("sz-level-filter").value;
         const normQ = normalizeTranslit(q);
 
         const filtered = liste.filter(s => {
           const detMap = s.domainDetails || {};
-          if (lvlFilter) {
+          if (domFilter) {
+            const domObj = detMap[domFilter];
+            if (!domObj) return false;
+            if (lvlFilter && (!Array.isArray(domObj.levels) || !domObj.levels.includes(lvlFilter))) return false;
+          } else if (lvlFilter) {
             const hasLevel = Object.values(detMap).some(d => Array.isArray(d.levels) && d.levels.includes(lvlFilter));
             if (!hasLevel) return false;
           }
@@ -1103,22 +1212,30 @@
 
         const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
 
+        lastFilteredSchatz = filtered;
         container.innerHTML = filtered.map(s => {
           const detMap = s.domainDetails || {};
           const domainKeys = Object.keys(detMap);
           const editLink = s.schatzCode ? `${baseDir}schatzsuche.html?sc=${encodeURIComponent(s.schatzCode)}` : "";
+          const mailHref = s.email
+            ? `mailto:${encodeURIComponent(s.email)}?subject=${encodeURIComponent("Einladung vom Freundeskreis Leutenbach & Winnenden")}&body=${encodeURIComponent("Hallo " + (s.name || "") + ",\n\nvielen Dank für deinen Eintrag in unserer Schatzsuche! Wir würden dich gerne einladen …")}`
+            : "";
 
           return `
             <div class="m-card" style="border-left-color:#b45309;">
-              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:8px;">
-                <div>
-                  <strong style="font-size:1.08rem; color:#003366;">${s.name}</strong>
-                  <span class="m-badge" style="background:#e3f2fd; color:#0d47a1; margin-left:6px;">🌍 ${s.herkunftsland || "-"}</span>
-                  ${s.schatzCode ? `<span class="m-badge" style="background:#fef3c7; color:#92400e; margin-left:4px;">Schatz-Code: ${s.schatzCode}</span>` : ""}
-                  ${s.aktenCode ? `<span class="m-badge" style="background:#f3e5f5; color:#4a148c; margin-left:4px;">Akte: ${s.aktenCode}</span>` : ""}
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  ${s.fotoDataUrl ? `<img src="${s.fotoDataUrl}" alt="${s.name}" style="width:54px; height:54px; border-radius:50%; object-fit:cover; border:2px solid #b45309; flex-shrink:0;">` : ""}
+                  <div>
+                    <strong style="font-size:1.08rem; color:#003366;">${s.name}</strong>
+                    <span class="m-badge" style="background:#e3f2fd; color:#0d47a1; margin-left:6px;">🌍 ${s.herkunftsland || "-"}</span>
+                    ${s.schatzCode ? `<span class="m-badge" style="background:#fef3c7; color:#92400e; margin-left:4px;">Schatz-Code: ${s.schatzCode}</span>` : ""}
+                    ${s.aktenCode ? `<span class="m-badge" style="background:#f3e5f5; color:#4a148c; margin-left:4px;">Akte: ${s.aktenCode}</span>` : ""}
+                  </div>
                 </div>
                 <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
-                  <span style="font-size:0.88rem; color:#333;">Kontakt: <strong>${s.kontakt || "-"}</strong></span>
+                  <span style="font-size:0.88rem; color:#333;">Kontakt: <strong>${s.kontakt || "-"}</strong>${s.email ? ` · ${s.email}` : ""}</span>
+                  ${mailHref ? `<a href="${mailHref}" class="m-btn m-btn-green">✉️ E-Mail</a>` : ""}
                   ${editLink ? `<button type="button" class="m-btn btn-copy-sz-edit" data-link="${editLink}" data-code="${s.schatzCode}">📋 Ergänzungs-Link</button>` : ""}
                 </div>
               </div>
@@ -1155,8 +1272,21 @@
       document.getElementById("sz-search").addEventListener("input", () => {
         if (currentData && currentData.schatzkiste) renderSchatzListe(currentData.schatzkiste);
       });
+      document.getElementById("sz-domain-filter").addEventListener("change", () => {
+        if (currentData && currentData.schatzkiste) renderSchatzListe(currentData.schatzkiste);
+      });
       document.getElementById("sz-level-filter").addEventListener("change", () => {
         if (currentData && currentData.schatzkiste) renderSchatzListe(currentData.schatzkiste);
+      });
+      document.getElementById("sz-invite-filtered-btn").addEventListener("click", () => {
+        const emails = Array.from(new Set(lastFilteredSchatz.map(x => String(x.email || "").trim()).filter(e => e.includes("@"))));
+        if (!emails.length) {
+          alert("In der aktuellen Filter-Auswahl sind keine E-Mail-Adressen hinterlegt.");
+          return;
+        }
+        const subject = encodeURIComponent("Einladung vom Freundeskreis Flüchtlinge Leutenbach & Winnenden");
+        const body = encodeURIComponent("Hallo zusammen,\n\nwir freuen uns über euer Interesse in unserer Schatzsuche und möchten euch herzlich einladen …");
+        window.location.href = `mailto:?bcc=${encodeURIComponent(emails.join(","))}&subject=${subject}&body=${body}`;
       });
 
       document.getElementById("sz-copy-link-btn").addEventListener("click", async function () {
@@ -1287,6 +1417,346 @@
         await postAction({ action: "admin_release_all" });
         loadMasterData(currentCode, false);
       });
+
+      // =====================================================================
+      // WOHNUNGS-IMPORT & KI-GRÖSSENSCHÄTZUNG (VARIANTE B)
+      // =====================================================================
+      let kiLoadedPhotos = []; // [{ name, dataUrl, base64, mimeType }]
+      let kiDetectedItems = []; // [{ selected, titel, kategorie, beschreibung, masse, bildIndex }]
+
+      const kiKeyInput = document.getElementById("ki-gemini-key");
+      try {
+        const savedKey = localStorage.getItem("fflw_gemini_api_key");
+        if (savedKey) kiKeyInput.value = savedKey;
+      } catch (e) {}
+
+      function compressKiPhoto(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = ev => {
+            const img = new Image();
+            img.onload = () => {
+              const maxDim = 1280;
+              let w = img.width, h = img.height;
+              if (w > maxDim || h > maxDim) {
+                if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                else { w = Math.round(w * maxDim / h); h = maxDim; }
+              }
+              const c = document.createElement("canvas");
+              c.width = w; c.height = h;
+              c.getContext("2d").drawImage(img, 0, 0, w, h);
+              const dataUrl = c.toDataURL("image/jpeg", 0.82);
+              resolve({
+                name: file.name,
+                dataUrl: dataUrl,
+                mimeType: "image/jpeg",
+                base64: dataUrl.split(",")[1]
+              });
+            };
+            img.onerror = reject;
+            img.src = ev.target.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      document.getElementById("ki-photos-input").addEventListener("change", async function () {
+        const files = Array.from(this.files || []);
+        if (!files.length) return;
+        const countEl = document.getElementById("ki-photos-count");
+        const thumbsEl = document.getElementById("ki-thumbs-grid");
+        countEl.textContent = "Verarbeite Bilder …";
+        kiLoadedPhotos = [];
+        for (let i = 0; i < files.length; i++) {
+          kiLoadedPhotos.push(await compressKiPhoto(files[i]));
+        }
+        countEl.textContent = `${kiLoadedPhotos.length} Bild(er) bereit`;
+        thumbsEl.innerHTML = kiLoadedPhotos.map((p, idx) => `
+          <div style="border:1px solid #cbd5e1; border-radius:6px; padding:4px; background:#f8fafc; text-align:center; width:96px;">
+            <img src="${p.dataUrl}" alt="Bild ${idx + 1}" style="width:86px; height:64px; object-fit:cover; border-radius:4px;">
+            <div style="font-size:0.75rem; font-weight:bold; color:#003366;">Bild #${idx + 1}</div>
+          </div>
+        `).join("");
+        renderKiPreviewTable();
+      });
+
+      function renderKiPreviewTable() {
+        const card = document.getElementById("ki-preview-card");
+        const listEl = document.getElementById("ki-items-list");
+        const cntEl = document.getElementById("ki-items-count");
+        if (!kiDetectedItems.length) {
+          card.style.display = "none";
+          return;
+        }
+        card.style.display = "block";
+        cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
+
+        const photoOptionsHtml = (selIdx) => {
+          const opts = [`<option value="0" ${!selIdx ? "selected" : ""}>– Kein Foto –</option>`];
+          kiLoadedPhotos.forEach((p, i) => {
+            const num = i + 1;
+            opts.push(`<option value="${num}" ${Number(selIdx) === num ? "selected" : ""}>Bild #${num} (${p.name.substring(0, 18)})</option>`);
+          });
+          return opts.join("");
+        };
+
+        listEl.innerHTML = kiDetectedItems.map((item, idx) => {
+          const pIdx = Number(item.bildIndex || 0);
+          const thumbHtml = (pIdx >= 1 && kiLoadedPhotos[pIdx - 1])
+            ? `<img src="${kiLoadedPhotos[pIdx - 1].dataUrl}" style="width:90px; height:70px; object-fit:cover; border-radius:6px; border:1px solid #94a3b8;">`
+            : `<div style="width:90px; height:70px; background:#f1f5f9; border:1px dashed #94a3b8; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#64748b;">Ohne Bild</div>`;
+
+          return `
+            <div class="m-card" style="padding:12px 14px; margin:10px 0; border-left-color:${item.selected !== false ? "#2e7d32" : "#94a3b8"}; background:${item.selected !== false ? "#ffffff" : "#f8fafc"};">
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                  <label style="font-size:0.82rem; font-weight:bold; cursor:pointer;">
+                    <input type="checkbox" class="ki-row-chk" data-idx="${idx}" ${item.selected !== false ? "checked" : ""}> Übernehmen
+                  </label>
+                  ${thumbHtml}
+                </div>
+                <div style="flex:1; min-width:250px; display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Artikel-Titel *</label>
+                    <input type="text" class="m-input ki-row-titel" data-idx="${idx}" value="${String(item.titel || "").replace(/"/g, "&quot;")}">
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Kategorie</label>
+                    <select class="m-select ki-row-kat" data-idx="${idx}">
+                      ${["Wohnzimmer", "Schlafzimmer", "Küche & Haushalt", "Kinderzimmer", "Elektro & Technik", "Garten & Fahrrad", "Sonstiges"].map(k =>
+                        `<option value="${k}" ${item.kategorie === k ? "selected" : ""}>${k}</option>`
+                      ).join("")}
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Geschätzte Maße (ca. B × T × H)</label>
+                    <input type="text" class="m-input ki-row-masse" data-idx="${idx}" value="${String(item.masse || "").replace(/"/g, "&quot;")}" placeholder="z. B. ca. 180 x 90 x 75 cm">
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Zugeordnetes Foto</label>
+                    <select class="m-select ki-row-bild" data-idx="${idx}">${photoOptionsHtml(pIdx)}</select>
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <label style="font-size:0.78rem; font-weight:bold;">Beschreibung &amp; Zustand</label>
+                    <input type="text" class="m-input ki-row-beschr" data-idx="${idx}" value="${String(item.beschreibung || "").replace(/"/g, "&quot;")}">
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        listEl.querySelectorAll(".ki-row-chk").forEach(el => {
+          el.addEventListener("change", () => {
+            kiDetectedItems[Number(el.dataset.idx)].selected = el.checked;
+            cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
+          });
+        });
+        listEl.querySelectorAll(".ki-row-titel").forEach(el => {
+          el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].titel = el.value; });
+        });
+        listEl.querySelectorAll(".ki-row-kat").forEach(el => {
+          el.addEventListener("change", () => { kiDetectedItems[Number(el.dataset.idx)].kategorie = el.value; });
+        });
+        listEl.querySelectorAll(".ki-row-masse").forEach(el => {
+          el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].masse = el.value; });
+        });
+        listEl.querySelectorAll(".ki-row-beschr").forEach(el => {
+          el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].beschreibung = el.value; });
+        });
+        listEl.querySelectorAll(".ki-row-bild").forEach(el => {
+          el.addEventListener("change", () => {
+            kiDetectedItems[Number(el.dataset.idx)].bildIndex = Number(el.value);
+            renderKiPreviewTable();
+          });
+        });
+      }
+
+      document.getElementById("ki-analyze-btn").addEventListener("click", async function () {
+        const apiKey = kiKeyInput.value.trim();
+        const statusEl = document.getElementById("ki-status-msg");
+        if (!kiLoadedPhotos.length) {
+          statusEl.style.color = "#c62828";
+          statusEl.textContent = "Bitte zuerst mindestens ein Foto auswählen.";
+          return;
+        }
+        if (!apiKey) {
+          statusEl.style.color = "#c62828";
+          statusEl.textContent = "Bitte Gemini API-Key eingeben (oder unten JSON einfügen).";
+          return;
+        }
+        try { localStorage.setItem("fflw_gemini_api_key", apiKey); } catch (e) {}
+
+        const task = async () => {
+          statusEl.style.color = "#312e81";
+          statusEl.textContent = "KI analysiert Räume und schätzt Möbelmaße …";
+
+          const parts = [
+            {
+              text:
+                "Du hilfst einem ehrenamtlichen Flüchtlings-Freundeskreis bei der Wohnungsausstattung. " +
+                "Analysiere die folgenden Wohnungsbilder (nummeriert als Bild #1, Bild #2, ...). " +
+                "Liste ALLE gut erkennbaren, sinnvollen Möbelstücke, Haushaltsgeräte und Einrichtungsgegenstände auf, " +
+                "die sich als Sachspende eignen (keine Müllteile oder winzige Deko). " +
+                "Schätze für jeden Gegenstand anhand von Standard-Türhöhen (ca. 200 cm), Sitzhöhen (ca. 45 cm) und Raumproportionen " +
+                "realistische ungefähre Außenmaße im Format 'ca. B x T x H cm' (z. B. 'ca. 160 x 80 x 75 cm'). " +
+                "Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array ohne Markdown-Blöcke in diesem Schema: " +
+                '[{"titel":"...","kategorie":"Wohnzimmer|Schlafzimmer|Küche & Haushalt|Kinderzimmer|Elektro & Technik|Garten & Fahrrad|Sonstiges","beschreibung":"...","masse":"ca. ... cm","bildIndex":1}]'
+            }
+          ];
+
+          kiLoadedPhotos.forEach((p, idx) => {
+            parts.push({ text: `Bild #${idx + 1}:` });
+            parts.push({ inline_data: { mime_type: p.mimeType, data: p.base64 } });
+          });
+
+          const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: parts }],
+              generationConfig: { temperature: 0.2 }
+            })
+          });
+          const data = await resp.json();
+          if (!resp.ok || !data.candidates || !data.candidates[0]) {
+            const errMsg = (data && data.error && data.error.message) ? data.error.message : "KI-Anfrage fehlgeschlagen.";
+            statusEl.style.color = "#c62828";
+            statusEl.textContent = "Fehler: " + errMsg;
+            return { ok: false };
+          }
+
+          let rawText = data.candidates[0].content.parts.map(pt => pt.text || "").join("").trim();
+          rawText = rawText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+          const parsed = JSON.parse(rawText);
+          if (!Array.isArray(parsed)) throw new Error("Antwort war keine Liste.");
+
+          kiDetectedItems = parsed.map(x => ({
+            selected: true,
+            titel: x.titel || "Gegenstand",
+            kategorie: x.kategorie || "Sonstiges",
+            beschreibung: x.beschreibung || "",
+            masse: x.masse || "",
+            bildIndex: Number(x.bildIndex || 1)
+          }));
+
+          statusEl.style.color = "#1b5e20";
+          statusEl.textContent = `✓ ${kiDetectedItems.length} Gegenstände erkannt & Maße geschätzt!`;
+          renderKiPreviewTable();
+          return { ok: true };
+        };
+
+        try {
+          if (typeof window.fflwRunButtonAction === "function") {
+            await window.fflwRunButtonAction(this, task, { loadingText: "Analysiere Bilder …", successText: "✓ Fertig!" });
+          } else {
+            await task();
+          }
+        } catch (err) {
+          statusEl.style.color = "#c62828";
+          statusEl.textContent = "Fehler bei der Auswertung: " + err.message;
+        }
+      });
+
+      document.getElementById("ki-parse-json-btn").addEventListener("click", () => {
+        try {
+          const arr = JSON.parse(document.getElementById("ki-raw-json").value.trim());
+          if (!Array.isArray(arr)) throw new Error("Bitte ein JSON-Array [...] eingeben.");
+          kiDetectedItems = arr.map(x => ({
+            selected: true,
+            titel: x.titel || "Gegenstand",
+            kategorie: x.kategorie || "Sonstiges",
+            beschreibung: x.beschreibung || "",
+            masse: x.masse || "",
+            bildIndex: Number(x.bildIndex || (kiLoadedPhotos.length ? 1 : 0))
+          }));
+          renderKiPreviewTable();
+        } catch (e) {
+          alert("JSON ungültig: " + e.message);
+        }
+      });
+
+      document.getElementById("ki-add-empty-row-btn").addEventListener("click", () => {
+        kiDetectedItems.push({
+          selected: true,
+          titel: "",
+          kategorie: "Wohnzimmer",
+          beschreibung: "",
+          masse: "ca. ",
+          bildIndex: kiLoadedPhotos.length ? 1 : 0
+        });
+        renderKiPreviewTable();
+      });
+
+      async function executeBulkKiImport(triggerBtn) {
+        const spenderName = document.getElementById("ki-spender").value.trim() || "Wohnungsauflösung / Sachspende";
+        const ort = document.getElementById("ki-ort").value.trim() || "Leutenbach / Winnenden";
+        const telefon = document.getElementById("ki-telefon").value.trim();
+        const zielStatus = document.getElementById("ki-ziel-status").value;
+        const msgEl = document.getElementById("ki-import-msg");
+
+        const toImport = kiDetectedItems
+          .filter(x => x.selected !== false && String(x.titel || "").trim())
+          .map(x => {
+            const pIdx = Number(x.bildIndex || 0);
+            const photoObj = (pIdx >= 1 && kiLoadedPhotos[pIdx - 1]) ? kiLoadedPhotos[pIdx - 1] : null;
+            const fullDesc = [
+              x.beschreibung || "",
+              x.masse ? `Geschätzte Maße (KI): ${x.masse}` : ""
+            ].filter(Boolean).join(" | ");
+
+            return {
+              titel: String(x.titel).trim(),
+              kategorie: x.kategorie || "Sonstiges",
+              beschreibung: fullDesc,
+              masse: x.masse || "",
+              photoBase64: photoObj ? photoObj.base64 : "",
+              photoMime: photoObj ? photoObj.mimeType : "",
+              photoName: photoObj ? photoObj.name : ""
+            };
+          });
+
+        if (!toImport.length) {
+          alert("Bitte mindestens einen Artikel mit Titel auswählen.");
+          return;
+        }
+
+        const task = async () => {
+          msgEl.style.color = "#312e81";
+          msgEl.textContent = `Speichere ${toImport.length} Artikel im System …`;
+          const res = await postAction({
+            action: "bulkImportApartmentItems",
+            spenderName: spenderName,
+            ort: ort,
+            telefon: telefon,
+            zielStatus: zielStatus,
+            items: toImport
+          });
+          if (res && res.ok) {
+            msgEl.style.color = "#1b5e20";
+            msgEl.textContent = `✓ ${res.importedCount} Artikel erfolgreich übernommen!`;
+            loadMasterData(currentCode, false);
+            return { ok: true };
+          }
+          msgEl.style.color = "#c62828";
+          msgEl.textContent = "Fehler beim Import: " + (res && res.error ? res.error : "Unbekannt");
+          return { ok: false };
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(triggerBtn, task, {
+            loadingText: "Speichere Artikel …",
+            successText: "✓ Übernommen!"
+          });
+        } else {
+          await task();
+        }
+      }
+
+      document.getElementById("ki-import-all-btn").addEventListener("click", function () { executeBulkKiImport(this); });
+      document.getElementById("ki-import-all-btn-bottom").addEventListener("click", function () { executeBulkKiImport(this); });
+
     });
   </script>
 </body>
