@@ -1,10 +1,10 @@
 <!-- ==========================================================================
   DATEI: suche-sachen.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-20 19:08 CET
-  BESCHREIBUNG: Bedarf anmelden (wenn in den aktuellen Angeboten nichts Passendes war)
-    - Kontrastreiche hellblaue/weiße Karten mit schwarzer Schrift
+  ERSTELLT VON GEMINI AM: 2026-11-21 13:35 CET
+  BESCHREIBUNG: Bedarf anmelden & per 5-stelligem reinem Zahlencode wieder aufrufen
+    - 5-stelliger reiner Zahlencode (ohne Bindestrich) nach Absenden
+    - Nachtragen von E-Mail-Adresse, Telefon, Maßen oder Hinweisen (auch via Team-Code)
     - Vorrang für Familien in Leutenbach & Winnenden
-    - Optionales Foto des Stellplatzes & maximale Raummaße
 ========================================================================== -->
 <!doctype html>
 <html lang="de">
@@ -23,6 +23,11 @@
       margin: 16px 0;
       color: #111111;
     }
+    .su-card-return {
+      background: #f4f8fc;
+      border: 2px solid #90caf9;
+      border-left: 6px solid #1565c0;
+    }
     .su-label {
       display: block;
       font-weight: bold;
@@ -38,6 +43,7 @@
       font-size: 16px;
       color: #111111;
       background: #ffffff;
+      box-sizing: border-box;
     }
     .su-row-2 {
       display: grid;
@@ -54,7 +60,50 @@
       font-size: 1.02rem;
       cursor: pointer;
     }
-    .su-btn-blue:disabled { opacity: 0.6; cursor: wait; }
+    .su-btn-green {
+      background: #2e7d32;
+      color: #ffffff;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 7px;
+      font-weight: bold;
+      font-size: 0.96rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .su-btn-orange {
+      background: #d97706;
+      color: #ffffff;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 7px;
+      font-weight: bold;
+      font-size: 0.96rem;
+      cursor: pointer;
+    }
+    .su-btn-blue:disabled, .su-btn-green:disabled { opacity: 0.65; cursor: wait; }
+    .su-code-box {
+      background: #eaf6ec;
+      border: 2px solid #2e7d32;
+      border-left: 7px solid #2e7d32;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-top: 16px;
+      color: #111111;
+    }
+    .su-code-pill {
+      display: inline-block;
+      background: #ffffff;
+      border: 2px solid #2e7d32;
+      color: #1b5e20;
+      font-size: 1.55rem;
+      font-weight: bold;
+      letter-spacing: 3px;
+      padding: 6px 16px;
+      border-radius: 8px;
+      margin: 6px 0;
+    }
   </style>
 </head>
 <body>
@@ -70,15 +119,109 @@
     <main class="content">
       <h2>Nichts gefunden? Bedarf anmelden</h2>
 
-
       <div class="su-card">
         <p style="margin: 0; font-size: 0.97rem; color: #111111;">
           Wenn in unseren <a href="aktuelle-angebote.html"><strong>aktuellen Angeboten</strong></a> gerade kein passendes Möbelstück oder Gerät dabei ist, können Sie hier Ihren Bedarf vormerken. Menschen und Familien aus <strong>Leutenbach und Winnenden</strong> werden dabei vorrangig berücksichtigt.
         </p>
       </div>
 
+      <!-- Bestehenden Bedarf per 5-stelligem reinem Zahlencode aufrufen / ergänzen -->
+      <section class="su-card su-card-return" aria-label="Bestehenden Bedarf aufrufen">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
+          <strong style="color:#003366; font-size:1.03rem;">Bestehenden Bedarf aufrufen oder E-Mail / Infos nachtragen</strong>
+          <span style="font-size:0.86rem; color:#444;">5-stelliger Zahlencode (ohne Bindestrich)</span>
+        </div>
+        <p style="margin:6px 0 10px 0; font-size:0.92rem; color:#222;">
+          Haben Sie bereits einen Bedarf gemeldet und möchten Ihre E-Mail-Adresse, Telefonnummer oder Maße nachtragen (oder den Bedarf als erledigt melden)? Geben Sie hier Ihren <strong>5-stelligen Zahlencode</strong> ein:
+        </p>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+          <input type="text" id="su-lookup-code" class="su-input" inputmode="numeric" placeholder="z. B. 48291" style="max-width:210px; font-weight:bold; letter-spacing:1px;">
+          <button type="button" id="su-lookup-btn" class="su-btn-blue" style="padding:10px 18px;">Bedarf aufrufen</button>
+          <span id="su-lookup-msg" style="font-weight:bold; color:#003366;"></span>
+        </div>
+
+        <!-- Team-Auswahl, falls Team-Code eingegeben wurde -->
+        <div id="su-team-picker" style="display:none; margin-top:14px; padding-top:12px; border-top:1px solid #b8d4ec;">
+          <label class="su-label" for="su-team-select" style="margin-top:0;">Team-Modus aktiv – offenen Bedarf zum Bearbeiten auswählen:</label>
+          <select id="su-team-select" class="su-select"></select>
+        </div>
+
+        <!-- Bearbeitungsformular für aufgerufenen Bedarf -->
+        <div id="su-edit-box" style="display:none; margin-top:16px; padding:16px; background:#ffffff; border:2px solid #1565c0; border-radius:9px;">
+          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
+            <strong id="su-edit-headline" style="color:#003366; font-size:1.05rem;">Bedarf bearbeiten</strong>
+            <span id="su-edit-code-badge" style="background:#e3f2fd; color:#0d47a1; border:1px solid #90caf9; padding:3px 10px; border-radius:6px; font-weight:bold; font-size:0.88rem;"></span>
+          </div>
+
+          <div class="su-row-2">
+            <div>
+              <label class="su-label" for="su-edit-artikel">Gesuchter Gegenstand</label>
+              <input type="text" id="su-edit-artikel" class="su-input">
+            </div>
+            <div>
+              <label class="su-label" for="su-edit-prio">Dringlichkeit</label>
+              <select id="su-edit-prio" class="su-select">
+                <option value="Sehr dringend (fehlt komplett)">Sehr dringend (fehlt komplett)</option>
+                <option value="Wichtig, hat etwas Zeit">Wichtig, hat etwas Zeit</option>
+                <option value="Wäre schön als Ergänzung">Wäre schön als Ergänzung</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="su-row-2">
+            <div>
+              <label class="su-label" for="su-edit-kontakt">Telefon / WhatsApp</label>
+              <input type="text" id="su-edit-kontakt" class="su-input" placeholder="z. B. 0171 1234567">
+            </div>
+            <div>
+              <label class="su-label" for="su-edit-email">E-Mail-Adresse nachtragen / ändern</label>
+              <input type="email" id="su-edit-email" class="su-input" placeholder="name@beispiel.de">
+            </div>
+          </div>
+
+          <div class="su-row-2">
+            <div>
+              <label class="su-label" for="su-edit-ort">Genauer Ort / Unterkunft</label>
+              <input type="text" id="su-edit-ort" class="su-input">
+            </div>
+            <div>
+              <label class="su-label" for="su-edit-wohnsit">Wohnsituation</label>
+              <input type="text" id="su-edit-wohnsit" class="su-input">
+            </div>
+          </div>
+
+          <div class="su-row-2">
+            <div>
+              <label class="su-label" for="su-edit-max-b">Maximale Breite in cm</label>
+              <input type="number" id="su-edit-max-b" class="su-input">
+            </div>
+            <div>
+              <label class="su-label" for="su-edit-max-h">Maximale Höhe in cm</label>
+              <input type="number" id="su-edit-max-h" class="su-input">
+            </div>
+          </div>
+
+          <label class="su-label" for="su-edit-grund">Zusätzliche Hinweise</label>
+          <textarea id="su-edit-grund" class="su-textarea" rows="2"></textarea>
+
+          <div id="su-team-regen-wrap" style="display:none; margin-top:10px;">
+            <label style="display:inline-flex; align-items:center; gap:7px; font-weight:bold; color:#003366; cursor:pointer;">
+              <input type="checkbox" id="su-edit-regen-code">
+              <span>Neuen 5-stelligen Zahlencode vergeben (falls alter vergessen wurde)</span>
+            </label>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:14px;">
+            <button type="button" id="su-edit-save-btn" class="su-btn-green">Änderungen speichern</button>
+            <button type="button" id="su-edit-done-btn" class="su-btn-orange">Bedarf ist erledigt / abmelden</button>
+            <span id="su-edit-feedback" style="font-weight:bold; color:#1b5e20;"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Neues Bedarfsformular -->
       <form id="su-demand-form" class="su-card" style="background: #ffffff;">
-        <h3 style="margin-top: 0; color: #003366;">Was wird dringend benötigt?</h3>
+        <h3 style="margin-top: 0; color: #003366;">Neuen Bedarf anmelden – Was wird benötigt?</h3>
 
         <div class="su-row-2">
           <div>
@@ -148,12 +291,16 @@
             <input type="text" id="su-name" class="su-input" required placeholder="Vor- und Nachname">
           </div>
           <div>
-            <label class="su-label" for="su-kontakt">Telefon / WhatsApp oder E-Mail *</label>
-            <input type="text" id="su-kontakt" class="su-input" required placeholder="z. B. 0171 1234567 oder E-Mail">
+            <label class="su-label" for="su-kontakt">Telefon / WhatsApp *</label>
+            <input type="text" id="su-kontakt" class="su-input" required placeholder="z. B. 0171 1234567">
           </div>
         </div>
 
         <div class="su-row-2">
+          <div>
+            <label class="su-label" for="su-email">E-Mail-Adresse (optional – kann auch später mit Code ergänzt werden)</label>
+            <input type="email" id="su-email" class="su-input" placeholder="name@beispiel.de">
+          </div>
           <div>
             <label class="su-label" for="su-rolle">Wer meldet den Bedarf?</label>
             <select id="su-rolle" class="su-select">
@@ -162,16 +309,19 @@
               <option value="Sozialarbeit / Integrationsmanagement">Sozialarbeit / Integrationsmanagement</option>
             </select>
           </div>
-          <div>
-            <label class="su-label" for="su-photo">Optionales Foto vom Stellplatz</label>
-            <input type="file" id="su-photo" accept="image/*" class="su-input" style="padding: 7px;">
-          </div>
+        </div>
+
+        <div>
+          <label class="su-label" for="su-photo">Optionales Foto vom Stellplatz</label>
+          <input type="file" id="su-photo" accept="image/*" class="su-input" style="padding: 7px;">
         </div>
 
         <div style="margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
           <button type="submit" id="su-submit-btn" class="su-btn-blue">Bedarf absenden</button>
           <span id="su-feedback" style="font-weight: bold; color: #003366;"></span>
         </div>
+
+        <div id="su-code-result" class="su-code-box" style="display:none;"></div>
       </form>
     </main>
   </div>
@@ -203,6 +353,205 @@
         document.getElementById("su-artikel").value = params.get("artikel");
       }
 
+      let currentLookupCode = "";
+      let currentEditDemand = null;
+      let teamItemsCache = [];
+
+      function fillEditForm(item, isTeamMode) {
+        currentEditDemand = item;
+        document.getElementById("su-edit-box").style.display = "block";
+        document.getElementById("su-edit-headline").textContent = `Bedarf von ${item.name || "Unbekannt"}`;
+        document.getElementById("su-edit-code-badge").textContent = `Code: ${item.editCode || "-"}`;
+        document.getElementById("su-edit-artikel").value = item.artikelName || "";
+        document.getElementById("su-edit-prio").value = item.prioritaet || "Wichtig, hat etwas Zeit";
+        document.getElementById("su-edit-kontakt").value = item.kontakt || "";
+        document.getElementById("su-edit-email").value = item.email || "";
+        document.getElementById("su-edit-ort").value = item.ortDetails || "";
+        document.getElementById("su-edit-wohnsit").value = item.wohnsituation || "";
+        document.getElementById("su-edit-max-b").value = item.maxBreiteCm || "";
+        document.getElementById("su-edit-max-h").value = item.maxHoeheCm || "";
+        document.getElementById("su-edit-grund").value = item.begruendung || "";
+        document.getElementById("su-edit-regen-code").checked = false;
+        document.getElementById("su-team-regen-wrap").style.display = isTeamMode ? "block" : "none";
+        document.getElementById("su-edit-feedback").textContent = "";
+      }
+
+      async function lookupDemandByCode(codeOverride) {
+        const inputEl = document.getElementById("su-lookup-code");
+        const msgEl = document.getElementById("su-lookup-msg");
+        const btn = document.getElementById("su-lookup-btn");
+        const code = String(codeOverride || inputEl.value || "").trim();
+        if (!code) {
+          msgEl.style.color = "#c62828";
+          msgEl.textContent = "Bitte Zahlencode eingeben.";
+          return { ok: false };
+        }
+        inputEl.value = code;
+        msgEl.style.color = "#004080";
+        msgEl.textContent = "Suche Bedarf …";
+
+        const task = async () => {
+          const resp = await fetch(`${WEB_APP_URL}?action=getDemandByCode&code=${encodeURIComponent(code)}&t=${Date.now()}`, {
+            method: "GET",
+            redirect: "follow"
+          });
+          const res = await resp.json();
+          if (!res || !res.ok) {
+            msgEl.style.color = "#c62828";
+            msgEl.textContent = (res && res.error) ? res.error : "Code nicht gefunden.";
+            document.getElementById("su-edit-box").style.display = "none";
+            document.getElementById("su-team-picker").style.display = "none";
+            return { ok: false };
+          }
+
+          currentLookupCode = code;
+          if (res.mode === "team") {
+            teamItemsCache = res.items || [];
+            if (!teamItemsCache.length) {
+              msgEl.style.color = "#1b5e20";
+              msgEl.textContent = "Team-Code erkannt, aber aktuell sind keine offenen Bedarfe vorhanden.";
+              document.getElementById("su-team-picker").style.display = "none";
+              document.getElementById("su-edit-box").style.display = "none";
+              return { ok: true };
+            }
+            msgEl.style.color = "#1b5e20";
+            msgEl.textContent = `✓ Team-Zugang (${teamItemsCache.length} offene Bedarfe)`;
+            const sel = document.getElementById("su-team-select");
+            sel.innerHTML = "";
+            teamItemsCache.forEach((it, idx) => {
+              const opt = document.createElement("option");
+              opt.value = String(idx);
+              opt.textContent = `${it.artikelName} – ${it.name} (Code: ${it.editCode || "-"})`;
+              sel.appendChild(opt);
+            });
+            document.getElementById("su-team-picker").style.display = "block";
+            fillEditForm(teamItemsCache[0], true);
+            return { ok: true };
+          }
+
+          document.getElementById("su-team-picker").style.display = "none";
+          msgEl.style.color = "#1b5e20";
+          msgEl.textContent = "✓ Bedarf geladen!";
+          fillEditForm(res.item, false);
+          return { ok: true };
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          return await window.fflwRunButtonAction(btn, task, {
+            loadingText: "Suche …",
+            successText: "✓ Gefunden!",
+            resetAfterMs: 1800
+          });
+        }
+        return await task();
+      }
+
+      document.getElementById("su-lookup-btn").addEventListener("click", () => lookupDemandByCode());
+      document.getElementById("su-lookup-code").addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          lookupDemandByCode();
+        }
+      });
+
+      document.getElementById("su-team-select").addEventListener("change", function () {
+        const idx = parseInt(this.value, 10);
+        if (!isNaN(idx) && teamItemsCache[idx]) {
+          fillEditForm(teamItemsCache[idx], true);
+        }
+      });
+
+      if (params.get("code")) {
+        lookupDemandByCode(params.get("code"));
+      }
+
+      document.getElementById("su-edit-save-btn").addEventListener("click", async function () {
+        if (!currentEditDemand) return;
+        const fb = document.getElementById("su-edit-feedback");
+        const task = async () => {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "updateDemand",
+              demandId: currentEditDemand.id,
+              code: currentLookupCode,
+              artikelName: document.getElementById("su-edit-artikel").value.trim(),
+              prioritaet: document.getElementById("su-edit-prio").value,
+              kontakt: document.getElementById("su-edit-kontakt").value.trim(),
+              email: document.getElementById("su-edit-email").value.trim(),
+              ortDetails: document.getElementById("su-edit-ort").value.trim(),
+              wohnsituation: document.getElementById("su-edit-wohnsit").value.trim(),
+              maxBreiteCm: document.getElementById("su-edit-max-b").value.trim(),
+              maxHoeheCm: document.getElementById("su-edit-max-h").value.trim(),
+              begruendung: document.getElementById("su-edit-grund").value.trim(),
+              regenerateCode: document.getElementById("su-edit-regen-code").checked
+            })
+          });
+          const res = await resp.json();
+          if (res && res.ok) {
+            if (res.item) {
+              currentEditDemand = res.item;
+              document.getElementById("su-edit-code-badge").textContent = `Code: ${res.item.editCode || "-"}`;
+            }
+            fb.style.color = "#1b5e20";
+            fb.textContent = "✓ Angaben erfolgreich gespeichert!";
+            return { ok: true };
+          }
+          fb.style.color = "#c62828";
+          fb.textContent = "Fehler: " + (res && res.error ? res.error : "Unbekannt");
+          return { ok: false };
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(this, task, {
+            loadingText: "Speichere …",
+            successText: "✓ Gespeichert!",
+            resetAfterMs: 2400
+          });
+        } else {
+          await task();
+        }
+      });
+
+      document.getElementById("su-edit-done-btn").addEventListener("click", async function () {
+        if (!currentEditDemand) return;
+        if (!confirm("Möchten Sie diesen Bedarf wirklich als erledigt abmelden?")) return;
+        const fb = document.getElementById("su-edit-feedback");
+        const task = async () => {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "updateDemand",
+              demandId: currentEditDemand.id,
+              code: currentLookupCode,
+              alsErledigtMarkieren: true
+            })
+          });
+          const res = await resp.json();
+          if (res && res.ok) {
+            fb.style.color = "#1b5e20";
+            fb.textContent = "✓ Bedarf wurde als erledigt abgemeldet.";
+            setTimeout(() => { document.getElementById("su-edit-box").style.display = "none"; }, 1400);
+            return { ok: true };
+          }
+          return { ok: false };
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(this, task, {
+            loadingText: "Melde ab …",
+            successText: "✓ Erledigt!",
+            resetAfterMs: 2000
+          });
+        } else {
+          await task();
+        }
+      });
+
       function fileToCompressed(file) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
@@ -233,6 +582,7 @@
         e.preventDefault();
         const btn = document.getElementById("su-submit-btn");
         const fb = document.getElementById("su-feedback");
+        const codeBox = document.getElementById("su-code-result");
         btn.disabled = true;
         fb.innerHTML = `<span class="fflw-spinner"></span> <span>Bedarf wird übermittelt …</span>`;
 
@@ -243,6 +593,7 @@
             photos.push(await fileToCompressed(fileInput.files[0]));
           }
 
+          const artikelVal = document.getElementById("su-artikel").value.trim();
           const resp = await fetch(WEB_APP_URL, {
             method: "POST",
             redirect: "follow",
@@ -250,7 +601,7 @@
             body: JSON.stringify({
               action: "submitDemand",
               raumKategorie: document.getElementById("su-raum").value,
-              artikelName: document.getElementById("su-artikel").value.trim(),
+              artikelName: artikelVal,
               prioritaet: document.getElementById("su-prio").value,
               ortTyp: document.getElementById("su-ort-typ").value,
               ortDetails: document.getElementById("su-ort-details").value.trim(),
@@ -260,13 +611,29 @@
               begruendung: document.getElementById("su-grund").value.trim(),
               name: document.getElementById("su-name").value.trim(),
               kontakt: document.getElementById("su-kontakt").value.trim(),
+              email: document.getElementById("su-email").value.trim(),
               rolle: document.getElementById("su-rolle").value,
               photos: photos
             })
           });
           const res = await resp.json();
           if (res && res.ok) {
-            fb.innerHTML = `<span style="color:#1b5e20;">Vielen Dank! Ihr Bedarf wurde gespeichert und erscheint jetzt auch im Live-Zähler.</span>`;
+            const code = res.editCode || "";
+            const directLink = `${window.location.origin}${window.location.pathname}?code=${encodeURIComponent(code)}`;
+            const waShare = encodeURIComponent(`Mein FFLW-Bedarf (${artikelVal}) – Rückkehr-Code: ${code}\nDirektlink zum Ergänzen: ${directLink}`);
+
+            fb.innerHTML = `<span style="color:#1b5e20;">✓ Vielen Dank! Ihr Bedarf wurde gespeichert.</span>`;
+            codeBox.style.display = "block";
+            codeBox.innerHTML = `
+              <strong style="color:#1b5e20; font-size:1.05rem;">Ihr persönlicher 5-stelliger Rückkehr-Code (ohne Bindestrich):</strong><br>
+              <div class="su-code-pill">${code}</div>
+              <p style="margin:6px 0 10px 0; font-size:0.93rem;">
+                Bitte notieren Sie sich diese 5 Ziffern. Damit können Sie Ihren Bedarf jederzeit oben auf dieser Seite wieder öffnen und z. B. Ihre E-Mail-Adresse oder Maße nachtragen.
+              </p>
+              <a href="https://wa.me/?text=${waShare}" target="_blank" rel="noopener" class="su-btn-green">
+                📲 Code per WhatsApp an mich selbst senden
+              </a>
+            `;
             document.getElementById("su-demand-form").reset();
           } else {
             fb.innerHTML = `<span style="color:#c62828;">Fehler beim Speichern.</span>`;

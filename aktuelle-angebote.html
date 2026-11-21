@@ -36,6 +36,30 @@
       gap: 18px;
       margin-top: 18px;
     }
+    .fflw-provider-group {
+      grid-column: 1 / -1;
+      background: #f4f8fc;
+      border: 2px solid #90caf9;
+      border-left: 7px solid #004080;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 8px;
+    }
+    .fflw-provider-group-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid #c5d7eb;
+    }
+    .fflw-provider-group-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
     .fflw-offer-card {
       background: #ffffff;
       color: #111111;
@@ -82,6 +106,21 @@
       color: #003366;
       font-weight: bold;
       margin: 2px 4px 4px 0;
+    }
+    .fflw-provider-link {
+      display: inline-block;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #004080;
+      background: #e3f2fd;
+      border: 1px solid #90caf9;
+      border-radius: 5px;
+      padding: 4px 9px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .fflw-provider-link:hover {
+      background: #bbdefb;
     }
     .fflw-offer-footer {
       padding: 12px 16px;
@@ -146,12 +185,12 @@
       <h2>Aktuelle Angebote im Virtuellen Warenhaus</h2>
 
       <p>
-        Hier findest du gut erhaltene Möbel und Haushaltssachen, die uns aktuell zur Vermittlung an bedürftige Personen und Familien zur Verfügung gestellt wurden. <strong>Angebote, die schnell abgeholt werden müssen, stehen ganz oben.</strong>
+        Hier findest du gut erhaltene Möbel und Haushaltssachen, die uns aktuell zur Vermittlung an bedürftige Personen und Familien zur Verfügung gestellt wurden. <strong>Angebote, die schnell abgeholt werden müssen, stehen ganz oben.</strong> Über die Ansicht <em>„Nach Anbieter / Haushalt gruppieren“</em> siehst du sofort, welche Sachen am selben Abholort stehen.
       </p>
 
       <section class="fflw-filter-bar" aria-label="Angebote filtern">
         <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
-          <strong style="font-size: 1.02rem; color: #003366;">Angebote durchsuchen &amp; filtern</strong>
+          <strong style="font-size: 1.02rem; color: #003366;">Angebote durchsuchen &amp; gruppieren</strong>
           <span id="fflw-offer-count" style="font-size: 0.92rem; font-weight: bold; color: #004080; display: inline-flex; align-items: center; gap: 6px;">
             <span class="fflw-spinner"></span> <span>Lade Angebote …</span>
           </span>
@@ -177,8 +216,13 @@
             <option value="Transporter">Transporter / Hänger nötig</option>
           </select>
 
+          <select id="fflw-f-provider" class="fflw-filter-select">
+            <option value="">Alle Anbieter / Haushalte</option>
+          </select>
+
           <select id="fflw-f-urgent" class="fflw-filter-select">
-            <option value="urgent_first">Sortierung: Dringend zuerst</option>
+            <option value="urgent_first">Ansicht: Dringend zuerst</option>
+            <option value="group_provider">Ansicht: Nach Anbieter / Haushalt gruppieren</option>
             <option value="only_urgent">Nur „Muss schnell raus“</option>
             <option value="flexible">Nur „Auf Abruf“ (flexibel)</option>
           </select>
@@ -245,9 +289,11 @@
       const fText = document.getElementById("fflw-f-text");
       const fRoom = document.getElementById("fflw-f-room");
       const fTransport = document.getElementById("fflw-f-transport");
+      const fProvider = document.getElementById("fflw-f-provider");
       const fUrgent = document.getElementById("fflw-f-urgent");
 
       let allOffers = [];
+      let providerCounts = {};
       let selectedOffer = null;
 
       function isItemUrgent(item) {
@@ -255,17 +301,98 @@
         return s.includes("festen datum") || s.includes("dringend") || s.includes("7 tage") || Boolean(item.abholFrist);
       }
 
+      function populateProviderDropdown(items) {
+        const map = new Map();
+        providerCounts = {};
+        items.forEach(it => {
+          const pid = it.spenderFolderId || "einzel";
+          const label = it.anbieterLabel || "Einzelangebot";
+          providerCounts[pid] = (providerCounts[pid] || 0) + 1;
+          if (!map.has(pid)) map.set(pid, label);
+        });
+
+        const currentVal = fProvider.value;
+        fProvider.innerHTML = `<option value="">Alle Anbieter / Haushalte (${map.size})</option>`;
+        Array.from(map.entries())
+          .sort((a, b) => (providerCounts[b[0]] - providerCounts[a[0]]) || a[1].localeCompare(b[1], "de"))
+          .forEach(([pid, label]) => {
+            const cnt = providerCounts[pid] || 1;
+            const opt = document.createElement("option");
+            opt.value = pid;
+            opt.textContent = `${label} (${cnt} ${cnt === 1 ? "Teil" : "Teile"})`;
+            fProvider.appendChild(opt);
+          });
+        fProvider.value = currentVal;
+      }
+
+      function createOfferCard(item, hideProviderJump) {
+        const urgent = isItemUrgent(item);
+        const card = document.createElement("article");
+        card.className = "fflw-offer-card" + (urgent ? " urgent" : "");
+
+        const imgUrl = (item.bilder && item.bilder.length > 0) ? item.bilder[0].url : "";
+        const fristText = item.abholFrist ? ` bis ${item.abholFrist}` : "";
+        const pid = item.spenderFolderId || "einzel";
+        const siblingCount = providerCounts[pid] || 1;
+
+        card.innerHTML = `
+          <div>
+            ${urgent ? `<div class="fflw-urgent-badge"><span>Muss schnell raus${fristText}</span><span>Eilig</span></div>` : ""}
+            ${imgUrl ? `<img src="${imgUrl}" alt="${item.titel || "Möbelstück"}" class="fflw-offer-img">` : ""}
+            <div class="fflw-offer-body">
+              <h3 style="margin: 0 0 8px 0; font-size: 1.12rem; color: #003366;">${item.titel || item.pfad || "Sachspende"}</h3>
+              <div style="margin-bottom: 8px;">
+                ${item.ort ? `<span class="fflw-tag">${item.ort}</span>` : ""}
+                ${item.transportInfo ? `<span class="fflw-tag">${item.transportInfo}</span>` : ""}
+                ${item.zerlegbar ? `<span class="fflw-tag">${item.zerlegbar}</span>` : ""}
+              </div>
+              <p style="margin: 0; font-size: 0.94rem; color: #222222; white-space: pre-line;">${item.beschreibung || ""}</p>
+              ${(!hideProviderJump && siblingCount > 1) ? `
+                <div>
+                  <button type="button" class="fflw-provider-link" data-pid="${pid}">
+                    🚚 Weitere Sachen von diesem Haushalt (${siblingCount} Teile)
+                  </button>
+                </div>
+              ` : ""}
+            </div>
+          </div>
+          <div class="fflw-offer-footer">
+            <button type="button" class="fflw-btn-req">Dieses Stück anfragen</button>
+          </div>
+        `;
+
+        const jumpBtn = card.querySelector(".fflw-provider-link");
+        if (jumpBtn) {
+          jumpBtn.addEventListener("click", () => {
+            fProvider.value = pid;
+            renderOffers();
+            fProvider.scrollIntoView({ behavior: "smooth", block: "center" });
+          });
+        }
+
+        card.querySelector(".fflw-btn-req").addEventListener("click", () => {
+          selectedOffer = item;
+          document.getElementById("fflw-req-item-title").textContent = item.titel || item.pfad;
+          document.getElementById("fflw-req-feedback").textContent = "";
+          document.getElementById("fflw-req-modal").style.display = "flex";
+        });
+
+        return card;
+      }
+
       function renderOffers() {
         const q = fText.value.trim().toLowerCase();
         const room = fRoom.value.toLowerCase();
         const trans = fTransport.value.toLowerCase();
+        const provFilter = fProvider.value;
         const urgMode = fUrgent.value;
 
         let filtered = allOffers.filter(it => {
-          const full = `${it.titel || ""} ${it.raumKategorie || ""} ${it.beschreibung || ""} ${it.ort || ""} ${it.transportInfo || ""}`.toLowerCase();
+          const full = `${it.titel || ""} ${it.raumKategorie || ""} ${it.beschreibung || ""} ${it.ort || ""} ${it.transportInfo || ""} ${it.anbieterLabel || ""}`.toLowerCase();
           if (q && !full.includes(q)) return false;
           if (room && !full.includes(room)) return false;
           if (trans && !full.includes(trans)) return false;
+          if (provFilter && (it.spenderFolderId || "einzel") !== provFilter) return false;
           const urg = isItemUrgent(it);
           if (urgMode === "only_urgent" && !urg) return false;
           if (urgMode === "flexible" && urg) return false;
@@ -288,45 +415,64 @@
           return;
         }
 
-        filtered.forEach(item => {
-          const urgent = isItemUrgent(item);
-          const card = document.createElement("article");
-          card.className = "fflw-offer-card" + (urgent ? " urgent" : "");
-
-          const imgUrl = (item.bilder && item.bilder.length > 0) ? item.bilder[0].url : "";
-          const fristText = item.abholFrist ? ` bis ${item.abholFrist}` : "";
-
-          card.innerHTML = `
-            <div>
-              ${urgent ? `<div class="fflw-urgent-badge"><span>Muss schnell raus${fristText}</span><span>Eilig</span></div>` : ""}
-              ${imgUrl ? `<img src="${imgUrl}" alt="${item.titel || "Möbelstück"}" class="fflw-offer-img">` : ""}
-              <div class="fflw-offer-body">
-                <h3 style="margin: 0 0 8px 0; font-size: 1.12rem; color: #003366;">${item.titel || item.pfad || "Sachspende"}</h3>
-                <div style="margin-bottom: 8px;">
-                  ${item.ort ? `<span class="fflw-tag">${item.ort}</span>` : ""}
-                  ${item.transportInfo ? `<span class="fflw-tag">${item.transportInfo}</span>` : ""}
-                  ${item.zerlegbar ? `<span class="fflw-tag">${item.zerlegbar}</span>` : ""}
-                </div>
-                <p style="margin: 0; font-size: 0.94rem; color: #222222; white-space: pre-line;">${item.beschreibung || ""}</p>
-              </div>
-            </div>
-            <div class="fflw-offer-footer">
-              <button type="button" class="fflw-btn-req">Dieses Stück anfragen</button>
-            </div>
-          `;
-
-          card.querySelector(".fflw-btn-req").addEventListener("click", () => {
-            selectedOffer = item;
-            document.getElementById("fflw-req-item-title").textContent = item.titel || item.pfad;
-            document.getElementById("fflw-req-feedback").textContent = "";
-            document.getElementById("fflw-req-modal").style.display = "flex";
+        if (urgMode === "group_provider" || provFilter) {
+          const groups = new Map();
+          filtered.forEach(item => {
+            const pid = item.spenderFolderId || "einzel";
+            if (!groups.has(pid)) {
+              groups.set(pid, {
+                pid: pid,
+                label: item.anbieterLabel || "Einzelangebot",
+                ort: item.ort || "",
+                items: []
+              });
+            }
+            groups.get(pid).items.push(item);
           });
 
-          container.appendChild(card);
+          const sortedGroups = Array.from(groups.values()).sort((a, b) => b.items.length - a.items.length);
+          sortedGroups.forEach(grp => {
+            const section = document.createElement("section");
+            section.className = "fflw-provider-group";
+            const multiHint = grp.items.length > 1
+              ? `<span style="background:#2e7d32; color:#ffffff; padding:4px 10px; border-radius:6px; font-size:0.85rem; font-weight:bold;">🚚 ${grp.items.length} Artikel aus diesem Haushalt – ideal für eine gemeinsame Fahrt</span>`
+              : `<span style="background:#e3f2fd; color:#003366; padding:4px 10px; border-radius:6px; font-size:0.85rem; font-weight:bold;">1 Artikel</span>`;
+
+            section.innerHTML = `
+              <div class="fflw-provider-group-header">
+                <div>
+                  <strong style="font-size:1.1rem; color:#003366;">${grp.label}</strong>
+                  ${grp.ort ? `<span style="margin-left:8px; color:#333; font-size:0.92rem;">· Abholort: ${grp.ort}</span>` : ""}
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                  ${multiHint}
+                  ${provFilter ? `<button type="button" class="fflw-provider-link btn-reset-prov" style="margin-top:0;">Alle Haushalte zeigen</button>` : ""}
+                </div>
+              </div>
+              <div class="fflw-provider-group-grid"></div>
+            `;
+
+            const resetBtn = section.querySelector(".btn-reset-prov");
+            if (resetBtn) {
+              resetBtn.addEventListener("click", () => {
+                fProvider.value = "";
+                renderOffers();
+              });
+            }
+
+            const grid = section.querySelector(".fflw-provider-group-grid");
+            grp.items.forEach(it => grid.appendChild(createOfferCard(it, true)));
+            container.appendChild(section);
+          });
+          return;
+        }
+
+        filtered.forEach(item => {
+          container.appendChild(createOfferCard(item, false));
         });
       }
 
-      [fText, fRoom, fTransport, fUrgent].forEach(el => {
+      [fText, fRoom, fTransport, fProvider, fUrgent].forEach(el => {
         el.addEventListener("input", renderOffers);
         el.addEventListener("change", renderOffers);
       });
@@ -337,6 +483,7 @@
         .then(data => {
           if (data && data.ok && Array.isArray(data.items)) {
             allOffers = data.items;
+            populateProviderDropdown(allOffers);
             renderOffers();
           } else {
             countEl.textContent = "Keine Angebote geladen.";

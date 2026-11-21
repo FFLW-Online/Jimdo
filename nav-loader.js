@@ -394,6 +394,22 @@ function syncGlobalSiteStatus(currentPage) {
 }
 
 // ============================================================================
+// 3. EIGENER BESUCHERZÄHLER & LIVE-ANWESENHEIT (OHNE COOKIES)
+// ============================================================================
+function trackFflwVisitor(currentPage) {
+  if (!currentPage || currentPage === "master.html") return;
+  try {
+    let vid = sessionStorage.getItem("fflw_anon_vid");
+    if (!vid) {
+      vid = "v_" + Math.random().toString(36).slice(2, 11) + Date.now().toString(36).slice(-4);
+      sessionStorage.setItem("fflw_anon_vid", vid);
+    }
+    const url = `${FFLW_WEB_APP_URL}?action=track_visit&page=${encodeURIComponent(currentPage)}&vid=${encodeURIComponent(vid)}&t=${Date.now()}`;
+    fetch(url, { method: "GET", redirect: "follow", keepalive: true }).catch(() => {});
+  } catch (e) {}
+}
+
+// ============================================================================
 // 4. GOOGLE TRANSLATE, POPUPS & PWA
 // ============================================================================
 function applyGoogleTranslateCookie(langCode) {
@@ -824,6 +840,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const currentPage = window.location.pathname.split("/").pop() || "index.html";
 
   syncGlobalSiteStatus(currentPage);
+  trackFflwVisitor(currentPage);
   window.addEventListener("resize", updateStickyHeaderOffset);
   const siteHeader = document.querySelector(".site-header");
   if (siteHeader && "ResizeObserver" in window) {
@@ -846,7 +863,6 @@ document.addEventListener("DOMContentLoaded", function () {
     link.href = cleanDocuSealUrl;
   });
 
-  // Alte doppelte Übersetzungs-Widgets auf Unterseiten (z. B. #google_translate_element) entfernen
   document.querySelectorAll("#google_translate_element, .google-translate-box, .translate-widget, .goog-te-gadget").forEach(el => {
     const parentBox = el.closest(".translate-container, .language-switcher");
     if (parentBox) parentBox.remove();
@@ -957,13 +973,6 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     startGoogleTranslate(activeLang);
   }
-
-  const goatCounterSite = "fflw";
-  const gcScript = document.createElement("script");
-  gcScript.async = true;
-  gcScript.src = "//gc.zgo.at/count.js";
-  gcScript.setAttribute("data-goatcounter", `https://${goatCounterSite}.goatcounter.com/count`);
-  document.body.appendChild(gcScript);
 
   const legalFooter = document.querySelector(".legal-footer");
   if (legalFooter) {

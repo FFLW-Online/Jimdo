@@ -1,11 +1,10 @@
 <!-- ==========================================================================
   DATEI: master.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-21 08:40 CET
-  BESCHREIBUNG: Steuerungs-Cockpit mit klarer visueller Rückmeldung auf jedem Knopf:
-    - Jeder geklickte Button zeigt sofort ein rotierendes Ladezeichen und wechselt
-      nach Ausführung sichtbar die Farbe + Häkchen ("✓ Gespeichert / ✓ Erledigt")
-    - Eindeutiger Hinweisbalken bei ungespeicherten Änderungen (Häkchen/Codes),
-      damit sofort klar ist, was sofort wirkt und was erst gespeichert werden muss
+  ERSTELLT VON GEMINI AM: 2026-11-21 13:35 CET
+  BESCHREIBUNG: Steuerungs-Cockpit mit:
+    - Live- & Besucher-Überblick (Gerade online + Tag/Woche/Monat/Jahr/Gesamt + Pull-down)
+    - Vollständiger Bedarfs-Detail- & Bearbeitungsansicht inkl. 5-stelligem Zahlencode
+    - Anbieter-Gruppierung & Ein-Klick-Sammelauswahl bei Angeboten
 ========================================================================== -->
 <!doctype html>
 <html lang="de">
@@ -31,6 +30,46 @@
     .m-card-green {
       background: #eaf6ec;
       border-color: #2e7d32;
+    }
+    .m-stats-bar {
+      background: #f4f8fc;
+      border: 2px solid #90caf9;
+      border-left: 6px solid #004080;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      color: #111111;
+    }
+    .m-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .m-stat-pill {
+      background: #ffffff;
+      border: 1px solid #c5d7eb;
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+    .m-stat-pill.is-live {
+      background: #eaf6ec;
+      border: 2px solid #2e7d32;
+    }
+    .m-stat-val {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #003366;
+      display: block;
+    }
+    .m-stat-pill.is-live .m-stat-val {
+      color: #1b5e20;
+    }
+    .m-stat-lbl {
+      font-size: 0.78rem;
+      color: #444444;
+      font-weight: bold;
     }
     .m-tabs {
       display: flex;
@@ -84,6 +123,7 @@
     .m-btn-orange { background: #d97706; }
     .m-btn-red { background: #c62828; }
     .m-btn-purple { background: #5e35b1; }
+    .m-btn-slate { background: #475569; }
     .m-btn:disabled { opacity: 0.85; cursor: wait; }
 
     .m-box {
@@ -94,6 +134,54 @@
       padding: 14px 16px;
       margin-bottom: 12px;
       color: #111111;
+    }
+    .m-box.is-selected {
+      background: #fffde7;
+      border-color: #fbc02d;
+      border-left-color: #f57f17;
+    }
+    .m-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid #c5d7eb;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .m-detail-item {
+      padding: 4px 6px;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+    .m-missing-val {
+      color: #b71c1c;
+      font-style: italic;
+    }
+    .m-edit-drawer {
+      background: #eef6fc;
+      border: 1px solid #90caf9;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 10px;
+    }
+    .m-bulk-bar {
+      position: sticky;
+      bottom: 12px;
+      z-index: 940;
+      background: #003366;
+      color: #ffffff;
+      border: 2px solid #ffd700;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-top: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
     }
     .m-copilot-bar {
       background: #eef6fc;
@@ -220,7 +308,6 @@
       color: #003366;
     }
 
-    /* Warnbalken für ungespeicherte Einstellungen */
     .m-unsaved-bar {
       position: sticky;
       bottom: 12px;
@@ -293,6 +380,59 @@
           </div>
         </div>
 
+        <!-- Eigener Live- & Besucher-Überblick mit Pull-down & Statistik-Link -->
+        <section class="m-stats-bar" aria-label="Besucher-Überblick">
+          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
+            <strong style="color:#003366; font-size:1rem;">📊 Besucher-Überblick (eigene Zählung ohne Cookies)</strong>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+              <a href="intern-statistik.html" class="m-btn m-btn-sm m-btn-blue" style="text-decoration:none;">Zur Statistik-Seite</a>
+              <button type="button" id="m-open-pages-btn" class="m-btn m-btn-sm m-btn-purple" style="display:none;">Seiten sperren / verstecken</button>
+            </div>
+          </div>
+
+          <div class="m-stats-grid">
+            <div class="m-stat-pill is-live">
+              <span class="m-stat-val" id="stat-online">0</span>
+              <span class="m-stat-lbl">Gerade online</span>
+            </div>
+            <div class="m-stat-pill">
+              <span class="m-stat-val" id="stat-today">0</span>
+              <span class="m-stat-lbl">Heute (Tag)</span>
+            </div>
+            <div class="m-stat-pill">
+              <span class="m-stat-val" id="stat-week">0</span>
+              <span class="m-stat-lbl">7 Tage (Woche)</span>
+            </div>
+            <div class="m-stat-pill">
+              <span class="m-stat-val" id="stat-month">0</span>
+              <span class="m-stat-lbl">30 Tage (Monat)</span>
+            </div>
+            <div class="m-stat-pill">
+              <span class="m-stat-val" id="stat-year">0</span>
+              <span class="m-stat-lbl">Jahr</span>
+            </div>
+            <div class="m-stat-pill">
+              <span class="m-stat-val" id="stat-total">0</span>
+              <span class="m-stat-lbl">Gesamt (Absolut)</span>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:8px;">
+            <label for="m-stat-dropdown" style="font-weight:bold; font-size:0.9rem; color:#003366;">Beliebte Seiten &amp; Details:</label>
+            <select id="m-stat-dropdown" class="m-input" style="padding:6px 10px; font-size:14px; flex:1; min-width:240px;">
+              <option value="today">Beliebteste Seiten – Heute</option>
+              <option value="week">Beliebteste Seiten – Letzte 7 Tage</option>
+              <option value="month" selected>Beliebteste Seiten – Letzte 30 Tage</option>
+              <option value="year">Beliebteste Seiten – Letztes Jahr</option>
+              <option value="all">Beliebteste Seiten – Gesamt (Absolut)</option>
+              <option value="live">Aktuell geöffnete Seiten (Gerade online)</option>
+            </select>
+          </div>
+          <div id="m-stat-ranking" style="margin-top:8px; font-size:0.9rem; color:#222222; background:#ffffff; border:1px solid #c5d7eb; border-radius:7px; padding:8px 12px;">
+            Wird geladen …
+          </div>
+        </section>
+
         <div class="m-tabs" id="m-tabs-bar">
           <button type="button" class="m-tab-btn active" data-tab="eingang" id="m-tab-eingang-btn">Spenden-Eingang &amp; Termine</button>
           <button type="button" class="m-tab-btn" data-tab="online" id="m-tab-online-btn">Online &amp; Reservierte</button>
@@ -315,15 +455,38 @@
         <div id="tab-online" class="m-tab-panel m-card" style="display:none;">
           <h3 style="margin-top:0; color:#003366;">Aktuelle Online-Angebote &amp; Reservierungen</h3>
           <p style="font-size:0.94rem; color:#222222;">
-            Hier können Reservierungen wieder aufgehoben oder einzelne Stücke bzw. komplette Wohnungen in die Warteposition gesetzt werden (wird beim Klick sofort aktiv).
+            Hier kannst du nach Anbieter / Haushalt gruppieren, mit einem Klick <strong>alle Sachen eines Anbieters markieren</strong>, einzelne Stücke wieder abwählen und gesammelt in die Warteposition setzen.
           </p>
+
+          <div class="m-filter-bar">
+            <select id="m-online-provider-filter" class="m-input" style="padding:7px 10px; font-size:14px; flex:1; min-width:210px;">
+              <option value="">Alle Anbieter / Haushalte anzeigen</option>
+            </select>
+            <select id="m-online-view-mode" class="m-input" style="padding:7px 10px; font-size:14px;">
+              <option value="grouped">Gruppiert nach Anbieter / Haushalt</option>
+              <option value="flat">Einzelliste (chronologisch)</option>
+            </select>
+            <button type="button" id="m-online-clear-sel" class="m-btn m-btn-sm m-btn-slate" style="display:none;">Auswahl aufheben</button>
+          </div>
+
           <div id="m-online-list"></div>
+
+          <div id="m-online-bulk-bar" class="m-bulk-bar" style="display:none;">
+            <div>
+              <strong id="m-bulk-count-text" style="font-size:1rem;">0 Artikel markiert</strong><br>
+              <span style="font-size:0.85rem; opacity:0.9;">Du kannst einzelne Häkchen oben flexibel anpassen.</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <button type="button" id="m-bulk-pause-btn" class="m-btn m-btn-orange">Markierte in Warteposition setzen</button>
+              <button type="button" id="m-bulk-unreserve-btn" class="m-btn m-btn-green">Markierte Reservierungen aufheben</button>
+            </div>
+          </div>
         </div>
 
         <div id="tab-bedarfe" class="m-tab-panel m-card m-card-blue" style="display:none;">
           <h3 style="margin-top:0; color:#003366;">Angemeldete Bedarfe (Vor Ort zuerst)</h3>
           <p style="font-size:0.94rem; color:#222222;">
-            Anfragen aus Leutenbach &amp; Winnenden stehen immer oben. Per Klick lässt sich direkt nachfragen, ob der Bedarf noch aktuell ist.
+            Anfragen aus Leutenbach &amp; Winnenden stehen immer oben. Über <strong>„Alle Formular-Angaben anzeigen“</strong> siehst du sämtliche eingetragenen und leeren Felder; über <strong>„Angaben / E-Mail ergänzen“</strong> kannst du fehlende Infos direkt eintragen.
           </p>
           <div id="m-bedarfe-list"></div>
         </div>
@@ -339,110 +502,116 @@
           </p>
 
           <div class="m-filter-bar">
-            <button type="button" class="m-filter-btn active" data-page-filter="hidden" id="btn-filter-hidden">
-              Nur versteckte Seiten (<span id="count-hidden">0</span>)
-            </button>
-            <button type="button" class="m-filter-btn" data-page-filter="menu" id="btn-filter-menu">
-              Nur Menü-Seiten (<span id="count-menu">0</span>)
-            </button>
-            <button type="button" class="m-filter-btn" data-page-filter="all" id="btn-filter-all">
-              Alle Seiten (<span id="count-all">0</span>)
-            </button>
-            <input type="search" id="m-page-search" class="m-input" placeholder="Seite suchen …" style="padding:7px 10px; font-size:14px; flex:1; min-width:160px;">
+            <button type="button" class="m-filter-btn active" data-page-filter="all">Alle Seiten (<span id="cnt-pages-all">0</span>)</button>
+            <button type="button" class="m-filter-btn" data-page-filter="hidden">Versteckte Seiten (<span id="cnt-pages-hidden">0</span>)</button>
+            <button type="button" class="m-filter-btn" data-page-filter="menu">Sichtbar im Menü (<span id="cnt-pages-menu">0</span>)</button>
+            <button type="button" class="m-filter-btn" data-page-filter="locked">Gesperrte Seiten (<span id="cnt-pages-locked">0</span>)</button>
+            <input type="text" id="m-pages-search" class="m-input" placeholder="Seite suchen …" style="padding:7px 10px; font-size:14px; flex:1; min-width:170px;">
           </div>
 
-          <div style="margin-bottom:12px;">
-            <label class="m-lock-item" style="background:#fff3e0; border-color:#ffb74d; font-weight:bold; display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:7px; cursor:pointer;">
-              <input type="checkbox" id="m-lock-all-pages" value="*">
-              <span>Notfall-Sperre: Komplette Webseite für Besucher sperren</span>
-            </label>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+            <button type="button" id="m-lock-all-btn" class="m-btn m-btn-red">Alle Seiten sperren (außer Impressum/Datenschutz)</button>
+            <button type="button" id="m-unlock-all-btn" class="m-btn m-btn-green">Alle Sperren aufheben</button>
           </div>
 
-          <div id="m-dynamic-pages-list">
-            <div style="display:flex; align-items:center; gap:8px; color:#004080; font-weight:bold;">
-              <span class="fflw-spinner"></span> <span>Lese Verzeichnis von GitHub …</span>
+          <div id="m-pages-list">
+            <div style="padding:14px; color:#004080; display:flex; align-items:center; gap:8px;">
+              <span class="fflw-spinner"></span> <span>Lade Seitenliste live aus GitHub …</span>
             </div>
           </div>
 
-          <hr style="margin:24px 0; border:none; border-top:2px solid #c5d7eb;">
+          <hr style="margin:22px 0; border:none; border-top:1px solid #c5d7eb;">
 
-          <h3 style="color:#003366;">2. Zugangs-Codes &amp; Passwörter selbst verwalten</h3>
-          <p style="font-size:0.93rem; color:#222222;">
-            Hier siehst du alle aktuellen Zugangs-Codes für die verschiedenen Berechtigungsstufen und kannst sie jederzeit selbst ändern:
+          <h3 style="color:#003366;">2. Zugangscodes (Supermaster &amp; Untermaster)</h3>
+          <p style="font-size:0.94rem; color:#222222;">
+            Hier kannst du den Besucher-Code für die Angebotegalerie sowie alle Team-Codes einsehen und ändern:
           </p>
 
           <table class="m-codes-table">
             <thead>
               <tr>
-                <th>Kategorie / Zugriffsebene</th>
+                <th>Rolle / Bereich</th>
                 <th>Berechtigung</th>
-                <th>Aktueller Code (änderbar)</th>
+                <th>Aktueller Code</th>
               </tr>
             </thead>
             <tbody>
-              <tr style="background:#f4f8fc;">
-                <td><strong>Supermaster (Du selbst)</strong></td>
-                <td>Vollzugriff, versteckte Seiten, Codes &amp; Seitenschutz</td>
-                <td><input type="text" id="m-code-master" class="m-input m-dirty-watch" style="max-width:170px; font-weight:bold;" value="FFLW99"></td>
+              <tr>
+                <td><strong>Besucher-Galerie</strong><br><span style="font-size:0.84rem; color:#444;">aktuelle-angebote.html</span></td>
+                <td>Öffentlicher Ansichtscode für Suchende &amp; Familien</td>
+                <td><input type="text" id="m-gallery-code" class="m-input" style="max-width:160px; font-weight:bold;"></td>
               </tr>
               <tr>
-                <td><strong>Untermaster: Spenden-Team</strong></td>
-                <td>Spenden prüfen, freischalten &amp; Reservierungen verwalten</td>
-                <td><input type="text" id="m-code-freischalter" class="m-input m-dirty-watch" style="max-width:170px;" value="FFLWTEAM"></td>
+                <td><strong>Supermaster</strong><br><span style="font-size:0.84rem; color:#444;">Haupt-Admin</span></td>
+                <td>Vollzugriff auf alles, Seitenschutz &amp; alle Codes</td>
+                <td><input type="text" id="m-code-master" class="m-input" style="max-width:160px; font-weight:bold;"></td>
               </tr>
               <tr>
-                <td><strong>Untermaster: Bedarfs-Koordination</strong></td>
-                <td>Bedarfsanmeldungen prüfen &amp; koordinieren</td>
-                <td><input type="text" id="m-code-koordinator" class="m-input m-dirty-watch" style="max-width:170px;" value="FFLWKOORD"></td>
+                <td><strong>Untermaster: Freischalter</strong><br><span style="font-size:0.84rem; color:#444;">Spenden-Team</span></td>
+                <td>Spenden prüfen, freischalten, Termine setzen &amp; pausieren</td>
+                <td><input type="text" id="m-code-freischalter" class="m-input" style="max-width:160px; font-weight:bold;"></td>
               </tr>
               <tr>
-                <td><strong>Untermaster: Mitflug / Copilot</strong></td>
-                <td>Nur-Lesen / Einarbeitung</td>
-                <td><input type="text" id="m-code-copilot" class="m-input m-dirty-watch" style="max-width:170px;" value="FFLWCOPILOT"></td>
+                <td><strong>Untermaster: Koordinator</strong><br><span style="font-size:0.84rem; color:#444;">Bedarfs-Team</span></td>
+                <td>Bedarfe prüfen, abhaken &amp; Nachfrage-Mails senden</td>
+                <td><input type="text" id="m-code-koordinator" class="m-input" style="max-width:160px; font-weight:bold;"></td>
               </tr>
-              <tr style="background:#eaf6ec;">
-                <td><strong>Besucher-Zugangscode (Warenhaus)</strong></td>
-                <td>Code für <em>aktuelle-angebote.html</em> (leer = offen für alle)</td>
-                <td><input type="text" id="m-set-code" class="m-input m-dirty-watch" style="max-width:170px;" placeholder="z. B. 11"></td>
+              <tr>
+                <td><strong>Untermaster: Copilot</strong><br><span style="font-size:0.84rem; color:#444;">Einarbeitung</span></td>
+                <td>Nur-Lesen mit Checkliste (keine Änderungen möglich)</td>
+                <td><input type="text" id="m-code-copilot" class="m-input" style="max-width:160px; font-weight:bold;"></td>
               </tr>
             </tbody>
           </table>
 
-          <div style="display:flex; flex-wrap:wrap; gap:18px; margin-bottom:16px; align-items:flex-end;">
-            <div>
-              <label for="m-set-flag" style="display:block; font-weight:bold; margin-bottom:5px; color:#003366;">Flaggen-Laufband unter Logo:</label>
-              <select id="m-set-flag" class="m-input m-dirty-watch">
-                <option value="A">Stil A (Radar-Wellen)</option>
-                <option value="B">Stil B (3D-Chip)</option>
-                <option value="C">Stil C (Minimalistisch)</option>
-                <option value="OFF">Ausgeblendet</option>
-              </select>
-            </div>
+          <div style="margin-bottom:16px;">
+            <label for="m-flag-style" style="font-weight:bold; display:block; margin-bottom:4px; color:#003366;">Flaggenband-Stil oben im Header:</label>
+            <select id="m-flag-style" class="m-input">
+              <option value="A">Stil A: Dezentes Band unter dem Logo</option>
+              <option value="B">Stil B: Dunkelblaues Band</option>
+              <option value="C">Stil C: Kompakt</option>
+              <option value="OFF">Ausgeblendet</option>
+            </select>
           </div>
 
-          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-            <button type="button" id="m-save-settings-btn" class="m-btn m-btn-green">Alle Einstellungen &amp; Codes speichern</button>
-            <button type="button" id="m-register-bio-btn" class="m-btn m-btn-purple">Dieses Gerät für Fingerabdruck-Login merken</button>
-            <span id="m-settings-msg" style="font-weight:bold; color:#1b5e20;"></span>
-          </div>
-          <div id="m-bio-status" style="margin-top:8px; font-size:0.88rem; color:#333333;"></div>
+          <button type="button" id="m-save-config-btn" class="m-btn m-btn-green">Alle Einstellungen &amp; Codes speichern</button>
+          <span id="m-config-msg" style="margin-left:10px; font-weight:bold;"></span>
 
           <div id="m-unsaved-bar" class="m-unsaved-bar" style="display:none;">
             <div>
-              <strong style="color:#e65100;">⚠️ Du hast Änderungen vorgenommen, die noch nicht gespeichert sind.</strong><br>
-              <span style="font-size:0.88rem;">Erst nach dem Speichern werden sie für alle Besucher wirksam.</span>
+              <strong>Du hast ungespeicherte Änderungen!</strong><br>
+              <span style="font-size:0.9rem;">Damit Sperren, versteckte Seiten oder Codes aktiv werden, bitte jetzt speichern:</span>
             </div>
-            <button type="button" id="m-save-settings-btn-floating" class="m-btn m-btn-orange">Jetzt speichern</button>
+            <button type="button" id="m-save-config-floating-btn" class="m-btn m-btn-green">
+              Jetzt Änderungen speichern
+            </button>
           </div>
 
-          <hr style="margin:24px 0; border:none; border-top:1px solid #c5d7eb;">
+          <hr style="margin:22px 0; border:none; border-top:1px solid #c5d7eb;">
 
-          <h3 style="color:#003366;">3. Neue „Sonstiges“-Vorschläge von Spendern</h3>
-          <div id="m-katalog-list"></div>
+          <h3 style="color:#003366;">3. Neue Möbel-Vorschläge aus „Sonstiges“ übernehmen</h3>
+          <p style="font-size:0.93rem; color:#222222;">
+            Wenn Spender mehrfach einen eigenen Gegenstand eingetragen haben, kannst du ihn hier freigeben.
+          </p>
+          <div id="m-suggestions-list"></div>
+
+          <hr style="margin:22px 0; border:none; border-top:1px solid #c5d7eb;">
+
+          <h3 style="color:#003366;">4. Schnellanmeldung per Fingerabdruck / FaceID einrichten</h3>
+          <p style="font-size:0.93rem; color:#222222;">
+            Speichere deinen Zugang sicher auf diesem Gerät, damit du künftig ohne Code-Eintippen starten kannst.
+          </p>
+          <button type="button" id="m-register-bio-btn" class="m-btn m-btn-purple">Fingerabdruck / FaceID für dieses Gerät aktivieren</button>
+          <span id="m-bio-msg" style="margin-left:10px; font-weight:bold;"></span>
         </div>
       </section>
     </main>
   </div>
+
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Kontakt:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
 
   <footer class="legal-footer">
     <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="sitemap.html">Sitemap</a>
@@ -452,781 +621,1049 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
-      const BIO_STORAGE_KEY = "fflw_supermaster_passkey_v2";
 
-      let activeCode = "";
-      let activeRole = null;
-      let copilotMode = "full";
+      let currentCode = sessionStorage.getItem("fflw_master_code") || "";
+      let currentRole = "";
+      let overviewCache = null;
 
-      let allDynamicPages = [];
+      let dynamicPagesList = [];
       let lockedPagesSet = new Set();
-      let hiddenNavPagesSet = new Set();
-      let currentPageFilter = "hidden";
+      let hiddenPagesSet = new Set();
+      let currentPageFilter = "all";
       let hasUnsavedSettings = false;
 
-      const loginBtn = document.getElementById("m-login-btn");
-      const bioLoginBtn = document.getElementById("m-bio-login-btn");
-      const codeInput = document.getElementById("m-code-input");
-      const loginMsg = document.getElementById("m-login-msg");
+      let selectedOnlineIds = new Set();
+      let expandedDemandIds = new Set();
+      let editingDemandIds = new Set();
+
+      const loginBox = document.getElementById("m-login-box");
       const cockpit = document.getElementById("m-cockpit");
-      const copilotSel = document.getElementById("m-copilot-mode");
-      const bioStatusEl = document.getElementById("m-bio-status");
-      const unsavedBar = document.getElementById("m-unsaved-bar");
+      const statusBanner = document.getElementById("m-status-banner");
+
+      const ROLE_META = {
+        master: {
+          label: "Supermaster (Vollzugriff)",
+          desc: "Alle Freigaben, Seitenschutz, versteckte Seiten, Codes & Bedarfe",
+          tabs: ["eingang", "online", "bedarfe", "supermaster"],
+          defaultMode: "full"
+        },
+        freischalter: {
+          label: "Untermaster: Spenden-Freischalter",
+          desc: "Darf Spenden prüfen, freischalten, Termine setzen & pausieren",
+          tabs: ["eingang", "online"],
+          defaultMode: "full"
+        },
+        koordinator: {
+          label: "Untermaster: Bedarfs-Koordinator",
+          desc: "Darf angemeldete Bedarfe prüfen, abhaken & Rückfragen senden",
+          tabs: ["bedarfe"],
+          defaultMode: "full"
+        },
+        copilot: {
+          label: "Untermaster: Copilot (Einarbeitung / Nur-Lesen)",
+          desc: "Übersicht mit Checkliste – keine Schreibrechte",
+          tabs: ["eingang", "online", "bedarfe"],
+          defaultMode: "observer"
+        }
+      };
 
       function markSettingsDirty(isDirty) {
         hasUnsavedSettings = Boolean(isDirty);
-        if (unsavedBar) {
-          unsavedBar.style.display = hasUnsavedSettings ? "flex" : "none";
+        const bar = document.getElementById("m-unsaved-bar");
+        if (bar) {
+          bar.style.display = hasUnsavedSettings ? "flex" : "none";
         }
       }
 
-      document.querySelectorAll(".m-dirty-watch").forEach(el => {
-        el.addEventListener("input", () => markSettingsDirty(true));
-        el.addEventListener("change", () => markSettingsDirty(true));
+      window.addEventListener("beforeunload", function (e) {
+        if (hasUnsavedSettings) {
+          e.preventDefault();
+          e.returnValue = "";
+        }
       });
 
-      function runWithFeedback(btn, asyncFn, opts) {
-        if (typeof window.fflwRunButtonAction === "function") {
-          return window.fflwRunButtonAction(btn, asyncFn, opts);
-        }
-        return asyncFn();
+      if (localStorage.getItem("fflw_bio_saved_code") && window.PublicKeyCredential) {
+        document.getElementById("m-bio-login-btn").style.display = "inline-flex";
       }
 
-      // Fingerabdruck / Passkey Verfügbarkeit prüfen
-      function getStoredPasskey() {
+      document.getElementById("m-bio-login-btn").addEventListener("click", async () => {
         try {
-          const raw = localStorage.getItem(BIO_STORAGE_KEY);
-          return raw ? JSON.parse(raw) : null;
-        } catch (e) {
-          return null;
+          const savedCode = localStorage.getItem("fflw_bio_saved_code");
+          if (!savedCode) return;
+          const challenge = new Uint8Array(32);
+          crypto.getRandomValues(challenge);
+          await navigator.credentials.get({
+            publicKey: { challenge, userVerification: "preferred", timeout: 60000 }
+          });
+          currentCode = savedCode;
+          sessionStorage.setItem("fflw_master_code", currentCode);
+          loadCockpit();
+        } catch (err) {
+          document.getElementById("m-login-msg").textContent = "Biometrie abgebrochen – bitte Code eingeben.";
         }
-      }
-
-      if (getStoredPasskey() && window.PublicKeyCredential) {
-        bioLoginBtn.style.display = "inline-flex";
-      }
-
-      if (window.PublicKeyCredential && window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
-        window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(avail => {
-          if (avail) {
-            const existing = getStoredPasskey();
-            bioStatusEl.textContent = existing
-              ? "Fingerabdruck / Biometrie ist auf diesem Gerät aktiv eingerichtet."
-              : "Dieses Gerät unterstützt Fingerabdruck / Gesichtserkennung – klicke oben zum Einrichten.";
-          } else {
-            bioStatusEl.textContent = "Hinweis: Auf diesem Gerät/Browser ist kein Fingerabdruck-Sensor hinterlegt.";
-          }
-        }).catch(() => {});
-      }
-
-      async function verifyDeviceBiometrics() {
-        const stored = getStoredPasskey();
-        if (!stored || !window.PublicKeyCredential) return null;
-        const credIdBytes = Uint8Array.from(atob(stored.credId), c => c.charCodeAt(0));
-        const challenge = new Uint8Array(32);
-        window.crypto.getRandomValues(challenge);
-
-        const assertion = await navigator.credentials.get({
-          publicKey: {
-            challenge: challenge,
-            allowCredentials: [{ id: credIdBytes, type: "public-key" }],
-            userVerification: "required",
-            timeout: 60000
-          }
-        });
-        return assertion ? (stored.masterCode || "FFLW99") : null;
-      }
-
-      bioLoginBtn.addEventListener("click", async () => {
-        loginMsg.textContent = "";
-        await runWithFeedback(bioLoginBtn, async () => {
-          const savedMasterCode = await verifyDeviceBiometrics();
-          if (savedMasterCode) {
-            codeInput.value = savedMasterCode;
-            await performLogin();
-            return { ok: true };
-          }
-          loginMsg.textContent = "Fingerabdruck-Prüfung nicht bestätigt. Bitte Zugangscode eingeben.";
-          return { ok: false };
-        }, { loadingText: "Prüfe Fingerabdruck …", successText: "✓ Erkannt!" });
       });
 
       document.getElementById("m-register-bio-btn").addEventListener("click", async function () {
-        const btn = this;
+        const msg = document.getElementById("m-bio-msg");
         if (!window.PublicKeyCredential) {
-          alert("Dieser Browser unterstützt keinen Fingerabdruck-/Passkey-Login.");
+          msg.style.color = "#c62828";
+          msg.textContent = "Dieses Gerät unterstützt keine Biometrie.";
           return;
         }
-        if (window.location.protocol !== "https:" && window.location.hostname !== "localhost") {
-          alert("Fingerabdruck-Login funktioniert nur über die echte HTTPS-Webseite (nicht als lokale Datei).");
-          return;
-        }
-        await runWithFeedback(btn, async () => {
+        try {
           const challenge = new Uint8Array(32);
+          crypto.getRandomValues(challenge);
           const userId = new Uint8Array(16);
-          window.crypto.getRandomValues(challenge);
-          window.crypto.getRandomValues(userId);
-
-          const cred = await navigator.credentials.create({
+          crypto.getRandomValues(userId);
+          await navigator.credentials.create({
             publicKey: {
-              challenge: challenge,
-              rp: { name: "FFLW Steuerung", id: window.location.hostname },
-              user: { id: userId, name: "supermaster@freundeleuwi.org", displayName: "FFLW Supermaster" },
-              pubKeyCredParams: [
-                { type: "public-key", alg: -7 },
-                { type: "public-key", alg: -257 }
-              ],
-              authenticatorSelection: {
-                authenticatorAttachment: "platform",
-                userVerification: "required"
-              },
+              challenge,
+              rp: { name: "FFLW Warenhaus" },
+              user: { id: userId, name: "team@freundeleuwi.org", displayName: "FFLW Team" },
+              pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+              authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "preferred" },
               timeout: 60000
             }
           });
-
-          const rawIdArr = new Uint8Array(cred.rawId);
-          const credIdB64 = btoa(String.fromCharCode.apply(null, rawIdArr));
-          const currentMaster = document.getElementById("m-code-master").value.trim().toUpperCase() || activeCode || "FFLW99";
-
-          localStorage.setItem(BIO_STORAGE_KEY, JSON.stringify({
-            credId: credIdB64,
-            masterCode: currentMaster,
-            createdAt: new Date().toISOString()
-          }));
-          bioStatusEl.textContent = "Fingerabdruck / Biometrie ist auf diesem Gerät aktiv eingerichtet.";
-          return { ok: true };
-        }, { loadingText: "Bitte Sensor berühren …", successText: "✓ Gerät gespeichert!" });
+          localStorage.setItem("fflw_bio_saved_code", currentCode);
+          msg.style.color = "#1b5e20";
+          msg.textContent = "✓ Fingerabdruck / FaceID gespeichert!";
+        } catch (err) {
+          msg.style.color = "#c62828";
+          msg.textContent = "Einrichtung abgebrochen.";
+        }
       });
 
-      document.getElementById("m-toggle-accessible").addEventListener("click", function () {
+      if (localStorage.getItem("fflw_accessible_mode") === "1") {
+        document.body.classList.add("accessible-mode");
+      }
+      document.getElementById("m-toggle-accessible").addEventListener("click", () => {
         document.body.classList.toggle("accessible-mode");
-        const active = document.body.classList.contains("accessible-mode");
-        this.classList.toggle("fflw-btn-confirmed", active);
-        this.textContent = active ? "✓ Großtasten aktiv" : "Großtasten-Modus";
+        localStorage.setItem("fflw_accessible_mode", document.body.classList.contains("accessible-mode") ? "1" : "0");
       });
 
-      document.getElementById("m-refresh-btn").addEventListener("click", async function () {
-        await runWithFeedback(this, async () => {
-          await loadMasterDashboard();
-          return { ok: true };
-        }, { loadingText: "Aktualisiere …", successText: "✓ Aktuell!" });
-      });
-
-      copilotSel.addEventListener("change", () => {
-        copilotMode = copilotSel.value;
-        loadMasterDashboard();
-      });
-
-      function activateTab(tabName) {
-        document.querySelectorAll(".m-tab-btn").forEach(b => b.classList.remove("active"));
-        document.querySelectorAll(".m-tab-panel").forEach(p => p.style.display = "none");
-        const btn = document.querySelector(`.m-tab-btn[data-tab="${tabName}"]`);
-        const panel = document.getElementById("tab-" + tabName);
-        if (btn) btn.classList.add("active");
-        if (panel) panel.style.display = "block";
+      function showTab(tabName) {
+        document.querySelectorAll(".m-tab-btn").forEach(b => {
+          b.classList.toggle("active", b.dataset.tab === tabName);
+        });
+        document.querySelectorAll(".m-tab-panel").forEach(p => {
+          p.style.display = (p.id === "tab-" + tabName) ? "block" : "none";
+        });
       }
 
       document.querySelectorAll(".m-tab-btn").forEach(btn => {
-        btn.addEventListener("click", () => activateTab(btn.getAttribute("data-tab")));
-      });
-
-      document.querySelectorAll(".m-filter-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-          document.querySelectorAll(".m-filter-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          currentPageFilter = btn.getAttribute("data-page-filter");
-          renderDynamicPagesList();
+          showTab(btn.dataset.tab);
         });
       });
 
-      document.getElementById("m-page-search").addEventListener("input", () => {
-        renderDynamicPagesList();
+      document.getElementById("m-open-pages-btn").addEventListener("click", () => {
+        showTab("supermaster");
+        document.getElementById("tab-supermaster").scrollIntoView({ behavior: "smooth", block: "start" });
       });
 
-      document.getElementById("m-lock-all-pages").addEventListener("change", function () {
-        if (this.checked) lockedPagesSet.add("*");
-        else lockedPagesSet.delete("*");
-        markSettingsDirty(true);
-      });
-
-      function buildAbsolutePageUrl(file) {
-        try {
-          return new URL(file, window.location.href).href;
-        } catch (e) {
-          return file;
+      function renderVisitStats(vStats) {
+        if (!vStats || !vStats.counts) {
+          document.getElementById("m-stat-ranking").textContent = "Noch keine Besucherdaten erfasst.";
+          return;
         }
+        document.getElementById("stat-online").textContent = vStats.onlineNow || 0;
+        document.getElementById("stat-today").textContent = vStats.counts.today || 0;
+        document.getElementById("stat-week").textContent = vStats.counts.week || 0;
+        document.getElementById("stat-month").textContent = vStats.counts.month || 0;
+        document.getElementById("stat-year").textContent = vStats.counts.year || 0;
+        document.getElementById("stat-total").textContent = vStats.counts.total || 0;
+
+        const mode = document.getElementById("m-stat-dropdown").value;
+        const box = document.getElementById("m-stat-ranking");
+
+        if (mode === "live") {
+          const active = vStats.activePages || [];
+          box.innerHTML = active.length
+            ? `<strong>Gerade aktiv geöffnet (letzte 5 Min.):</strong> ${active.map(p => `<code>${p}</code>`).join(", ")}`
+            : "Aktuell keine aktiven Besucher auf den öffentlichen Seiten.";
+          return;
+        }
+
+        const list = (vStats.popular && vStats.popular[mode]) ? vStats.popular[mode] : [];
+        if (!list.length) {
+          box.textContent = "Für diesen Zeitraum liegen noch keine Seitenaufrufe vor.";
+          return;
+        }
+        const top = list.slice(0, 6).map((x, idx) => `${idx + 1}. <strong>${x.page}</strong> (${x.count}×)`).join(" &nbsp;|&nbsp; ");
+        box.innerHTML = top;
       }
 
-      async function copyTextToClipboard(text, btnEl) {
-        await runWithFeedback(btnEl, async () => {
-          try {
-            await navigator.clipboard.writeText(text);
-          } catch (e) {
-            const ta = document.createElement("textarea");
-            ta.value = text;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand("copy");
-            ta.remove();
-          }
-          return { ok: true };
-        }, { loadingText: "Kopiere …", successText: "✓ Link kopiert!", resetAfterMs: 2200 });
+      document.getElementById("m-stat-dropdown").addEventListener("change", () => {
+        if (overviewCache && overviewCache.visitStats) {
+          renderVisitStats(overviewCache.visitStats);
+        }
+      });
+
+      async function apiPost(payload) {
+        const resp = await fetch(WEB_APP_URL, {
+          method: "POST",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(Object.assign({ masterCode: currentCode }, payload))
+        });
+        return await resp.json();
       }
 
-      async function initDynamicGitHubPages() {
-        if (typeof window.fetchFflwDynamicPages !== "function") return;
-        const res = await window.fetchFflwDynamicPages(Array.from(hiddenNavPagesSet));
-        allDynamicPages = res.pages || [];
+      function renderPagesManager() {
+        const container = document.getElementById("m-pages-list");
+        const searchTerm = (document.getElementById("m-pages-search").value || "").trim().toLowerCase();
 
-        const hiddenCount = allDynamicPages.filter(p => p.isHidden).length;
-        const menuCount = allDynamicPages.filter(p => p.inMenu).length;
-        document.getElementById("count-hidden").textContent = hiddenCount;
-        document.getElementById("count-menu").textContent = menuCount;
-        document.getElementById("count-all").textContent = allDynamicPages.length;
+        const cntAll = dynamicPagesList.length;
+        const cntHidden = dynamicPagesList.filter(p => !p.inNavHtml || hiddenPagesSet.has(p.file)).length;
+        const cntMenu = dynamicPagesList.filter(p => p.inNavHtml && !hiddenPagesSet.has(p.file)).length;
+        const cntLocked = dynamicPagesList.filter(p => lockedPagesSet.has(p.file)).length;
 
-        renderDynamicPagesList();
-      }
+        document.getElementById("cnt-pages-all").textContent = cntAll;
+        document.getElementById("cnt-pages-hidden").textContent = cntHidden;
+        document.getElementById("cnt-pages-menu").textContent = cntMenu;
+        document.getElementById("cnt-pages-locked").textContent = cntLocked;
 
-      function renderDynamicPagesList() {
-        const container = document.getElementById("m-dynamic-pages-list");
-        const query = (document.getElementById("m-page-search").value || "").trim().toLowerCase();
-
-        const filtered = allDynamicPages.filter(p => {
-          const isCurrentlyHidden = !p.isLegal && (!p.inNavHtml || hiddenNavPagesSet.has(p.file));
-          const isCurrentlyInMenu = p.inNavHtml && !hiddenNavPagesSet.has(p.file);
-
-          if (currentPageFilter === "hidden" && !isCurrentlyHidden) return false;
-          if (currentPageFilter === "menu" && !isCurrentlyInMenu) return false;
-          if (query && !p.file.toLowerCase().includes(query) && !p.title.toLowerCase().includes(query)) return false;
+        const filtered = dynamicPagesList.filter(p => {
+          const isHidden = !p.inNavHtml || hiddenPagesSet.has(p.file);
+          const isLocked = lockedPagesSet.has(p.file);
+          if (currentPageFilter === "hidden" && !isHidden) return false;
+          if (currentPageFilter === "menu" && isHidden) return false;
+          if (currentPageFilter === "locked" && !isLocked) return false;
+          if (searchTerm && !`${p.file} ${p.title}`.toLowerCase().includes(searchTerm)) return false;
           return true;
         });
 
         if (!filtered.length) {
-          container.innerHTML = "<p>Keine Seiten für diesen Filter gefunden.</p>";
+          container.innerHTML = `<p style="color:#444;">Keine Seiten in dieser Filteransicht gefunden.</p>`;
           return;
         }
 
         container.innerHTML = "";
         filtered.forEach(p => {
+          const isNativeHidden = !p.inNavHtml;
+          const isHidden = isNativeHidden || hiddenPagesSet.has(p.file);
           const isLocked = lockedPagesSet.has(p.file);
-          const isHiddenFromMenu = hiddenNavPagesSet.has(p.file);
-          const isCurrentlyHidden = !p.isLegal && (!p.inNavHtml || isHiddenFromMenu);
-          const canBeManaged = !p.isLegal && p.file !== "master.html";
-          const fullUrl = buildAbsolutePageUrl(p.file);
+          const isProtectedLegal = p.isLegal || p.file === "master.html";
 
           const row = document.createElement("div");
-          row.className = "m-page-row" + (isCurrentlyHidden ? " is-hidden-page" : "") + (isLocked ? " is-locked-page" : "");
+          row.className = "m-page-row" + (isHidden ? " is-hidden-page" : "") + (isLocked ? " is-locked-page" : "");
 
-          const badgeHtml = isCurrentlyHidden
-            ? `<span class="m-badge m-badge-hidden">${isHiddenFromMenu ? "Aus Menü versteckt" : "Versteckt (nicht in nav.html)"}</span>`
+          const badgeHtml = isHidden
+            ? `<span class="m-badge m-badge-hidden">${isNativeHidden ? "Versteckte Seite (nur Direktlink)" : "Im Menü versteckt"}</span>`
             : `<span class="m-badge m-badge-menu">Im Menü sichtbar</span>`;
 
-          row.innerHTML = `
-            <div style="flex:1; min-width:210px;">
-              <div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:2px;">
-                <a href="${p.file}" target="_blank" rel="noopener" style="font-weight:bold; color:#003366; text-decoration:underline; font-size:0.98rem;">
-                  ${p.title}
-                </a>
-                ${badgeHtml}
+          const lockedBadge = isLocked
+            ? `<span class="m-badge" style="background:#ffebee; color:#b71c1c; border:1px solid #ef9a9a; margin-left:4px;">Gesperrt (Wartung)</span>`
+            : "";
+
+          let controlsHtml = "";
+          if (isProtectedLegal) {
+            controlsHtml = `<span style="font-size:0.84rem; color:#555; font-weight:bold;">Geschützte System-/Rechtsseite</span>`;
+          } else {
+            const hideCheckboxHtml = isNativeHidden
+              ? `<span style="font-size:0.82rem; color:#4527a0;">Nicht in nav.html</span>`
+              : `<label class="m-lock-toggle">
+                   <input type="checkbox" class="cb-page-hide" data-file="${p.file}" ${hiddenPagesSet.has(p.file) ? "checked" : ""}>
+                   <span>Im Menü verstecken</span>
+                 </label>`;
+
+            controlsHtml = `
+              <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                <a href="${p.file}" target="_blank" style="font-size:0.86rem; font-weight:bold; color:#004080; text-decoration:underline; margin-right:4px;">Öffnen</a>
+                ${hideCheckboxHtml}
+                <label class="m-lock-toggle" style="${isLocked ? "border-color:#c62828; background:#ffebee; color:#b71c1c;" : ""}">
+                  <input type="checkbox" class="cb-page-lock" data-file="${p.file}" ${isLocked ? "checked" : ""}>
+                  <span>Sperren</span>
+                </label>
               </div>
-              <div style="font-size:0.82rem; color:#555555;">${p.file}</div>
-            </div>
+            `;
+          }
 
-            <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-              <button type="button" class="m-btn m-btn-sm m-btn-blue btn-copy-link">Link kopieren</button>
-              ${(canBeManaged && p.inNavHtml) ? `
-                <label class="m-lock-toggle" style="border-color:#b39ddb; background:${isHiddenFromMenu ? '#ede7f6' : '#f8fafc'};">
-                  <input type="checkbox" class="cb-hide-menu-page" value="${p.file}" ${isHiddenFromMenu ? "checked" : ""}>
-                  <span>${isHiddenFromMenu ? "Versteckt" : "Im Menü verstecken"}</span>
-                </label>
-              ` : ""}
-              ${canBeManaged ? `
-                <label class="m-lock-toggle" style="border-color:#ef9a9a; background:${isLocked ? '#ffebee' : '#f8fafc'};">
-                  <input type="checkbox" class="cb-lock-page" value="${p.file}" ${isLocked ? "checked" : ""}>
-                  <span>${isLocked ? "Gesperrt" : "Sperren"}</span>
-                </label>
-              ` : ""}
+          row.innerHTML = `
+            <div>
+              <strong style="color:#003366; font-size:0.98rem;">${p.title}</strong>
+              <span style="font-size:0.85rem; color:#555555; margin-left:6px;">(${p.file})</span>
+              <div style="margin-top:4px;">${badgeHtml}${lockedBadge}</div>
             </div>
+            ${controlsHtml}
           `;
-
-          row.querySelector(".btn-copy-link").addEventListener("click", function () {
-            copyTextToClipboard(fullUrl, this);
-          });
-
-          const cbHide = row.querySelector(".cb-hide-menu-page");
-          if (cbHide) {
-            cbHide.addEventListener("change", function () {
-              if (this.checked) {
-                hiddenNavPagesSet.add(p.file);
-              } else {
-                hiddenNavPagesSet.delete(p.file);
-              }
-              markSettingsDirty(true);
-              const hiddenCount = allDynamicPages.filter(x => !x.isLegal && (!x.inNavHtml || hiddenNavPagesSet.has(x.file))).length;
-              const menuCount = allDynamicPages.filter(x => x.inNavHtml && !hiddenNavPagesSet.has(x.file)).length;
-              document.getElementById("count-hidden").textContent = hiddenCount;
-              document.getElementById("count-menu").textContent = menuCount;
-              renderDynamicPagesList();
-            });
-          }
-
-          const cbLock = row.querySelector(".cb-lock-page");
-          if (cbLock) {
-            cbLock.addEventListener("change", function () {
-              if (this.checked) {
-                lockedPagesSet.add(p.file);
-              } else {
-                lockedPagesSet.delete(p.file);
-              }
-              markSettingsDirty(true);
-              renderDynamicPagesList();
-            });
-          }
-
           container.appendChild(row);
         });
-      }
 
-      const ROLE_META = {
-        master: { role: "master", label: "Supermaster (Vollzugriff)", desc: "Zugriff auf alle Bereiche, versteckte Unterseiten, Codes & Seitenschutz", defaultMode: "full" },
-        freischalter: { role: "freischalter", label: "Untermaster: Spenden-Team", desc: "Spenden prüfen, freischalten, pausieren & Reservierungen verwalten", defaultMode: "full" },
-        koordinator: { role: "koordinator", label: "Untermaster: Bedarfs-Koordination", desc: "Bedarfsanmeldungen prüfen und abstimmen", defaultMode: "copilot" },
-        copilot: { role: "copilot", label: "Untermaster: Mitflug / Einarbeitung", desc: "Ansicht zur Einarbeitung (Nur-Lesen)", defaultMode: "observer" }
-      };
-
-      async function performLogin() {
-        const val = codeInput.value.trim().toUpperCase();
-        if (!val) {
-          loginMsg.textContent = "Bitte Zugangscode eingeben.";
-          return { ok: false };
-        }
-        loginMsg.style.color = "#004080";
-        loginMsg.textContent = "Prüfe Zugangscode …";
-
-        try {
-          const resp = await fetch(`${WEB_APP_URL}?action=master_overview&code=${encodeURIComponent(val)}&t=${Date.now()}`, {
-            method: "GET",
-            redirect: "follow"
+        container.querySelectorAll(".cb-page-hide").forEach(cb => {
+          cb.addEventListener("change", function () {
+            if (this.checked) hiddenPagesSet.add(this.dataset.file);
+            else hiddenPagesSet.delete(this.dataset.file);
+            markSettingsDirty(true);
+            renderPagesManager();
           });
-          const data = await resp.json();
-
-          if (!data || !data.ok || !ROLE_META[data.role]) {
-            loginMsg.style.color = "#c62828";
-            loginMsg.textContent = "Unbekannter Zugangscode. Bitte Eingabe prüfen.";
-            return { ok: false };
-          }
-
-          loginMsg.textContent = "";
-          activeCode = val;
-          activeRole = ROLE_META[data.role];
-          copilotMode = activeRole.defaultMode;
-          copilotSel.value = copilotMode;
-
-          document.getElementById("m-role-label").textContent = activeRole.label;
-          document.getElementById("m-role-desc").textContent = activeRole.desc;
-
-          const btnEingang = document.getElementById("m-tab-eingang-btn");
-          const btnOnline = document.getElementById("m-tab-online-btn");
-          const btnBedarfe = document.getElementById("m-tab-bedarfe-btn");
-          const btnSuper = document.getElementById("m-tab-supermaster-btn");
-
-          if (activeRole.role === "master") {
-            btnSuper.style.display = "inline-block";
-            activateTab("eingang");
-          } else if (activeRole.role === "freischalter") {
-            btnBedarfe.style.display = "none";
-            btnSuper.style.display = "none";
-            activateTab("eingang");
-          } else if (activeRole.role === "koordinator") {
-            btnEingang.style.display = "none";
-            btnOnline.style.display = "none";
-            btnSuper.style.display = "none";
-            document.body.classList.add("accessible-mode");
-            activateTab("bedarfe");
-          } else {
-            btnSuper.style.display = "none";
-            activateTab("eingang");
-          }
-
-          document.getElementById("m-login-box").style.display = "none";
-          cockpit.style.display = "block";
-          applyOverviewDataToUI(data);
-          return { ok: true };
-        } catch (err) {
-          loginMsg.style.color = "#c62828";
-          loginMsg.textContent = "Verbindungsfehler: " + err.message;
-          return { ok: false };
-        }
-      }
-
-      loginBtn.addEventListener("click", () => {
-        runWithFeedback(loginBtn, performLogin, {
-          loadingText: "Anmelden …",
-          successText: "✓ Angemeldet!"
-        });
-      });
-      codeInput.addEventListener("keydown", e => {
-        if (e.key === "Enter") {
-          runWithFeedback(loginBtn, performLogin, {
-            loadingText: "Anmelden …",
-            successText: "✓ Angemeldet!"
-          });
-        }
-      });
-
-      async function callMasterApi(payload, triggerBtn, feedbackOpts) {
-        if (copilotMode === "observer") {
-          alert("Sie befinden sich aktuell im Mitflug-Modus (Nur-Lesen). Bitte oben auf 'Voller Disponent' umstellen.");
-          return null;
-        }
-        return await runWithFeedback(triggerBtn, async () => {
-          const resp = await fetch(WEB_APP_URL, {
-            method: "POST",
-            redirect: "follow",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(Object.assign({ masterCode: activeCode }, payload))
-          });
-          return await resp.json();
-        }, feedbackOpts);
-      }
-
-      function applyOverviewDataToUI(data) {
-        const banner = document.getElementById("m-status-banner");
-        banner.innerHTML = `<span style="color:#1b5e20;">✓ Verbunden (Stand: ${new Date().toLocaleTimeString("de-DE")})</span>`;
-        renderEingang(data.eingang || []);
-        renderOnline(data.online || []);
-        renderBedarfe(data.bedarfe || []);
-        renderKatalog(data.katalogVorschlaege || []);
-
-        if (data.teamCodes) {
-          document.getElementById("m-code-master").value = data.teamCodes.master || "FFLW99";
-          document.getElementById("m-code-freischalter").value = data.teamCodes.freischalter || "FFLWTEAM";
-          document.getElementById("m-code-koordinator").value = data.teamCodes.koordinator || "FFLWKOORD";
-          document.getElementById("m-code-copilot").value = data.teamCodes.copilot || "FFLWCOPILOT";
-        }
-
-        if (data.siteConfig) {
-          document.getElementById("m-set-code").value = data.siteConfig.zugangscode || "";
-          document.getElementById("m-set-flag").value = data.siteConfig.flaggenStil || "A";
-          lockedPagesSet = new Set(Array.isArray(data.siteConfig.wartungSeiten) ? data.siteConfig.wartungSeiten : []);
-          hiddenNavPagesSet = new Set(Array.isArray(data.siteConfig.versteckteSeiten) ? data.siteConfig.versteckteSeiten : []);
-          document.getElementById("m-lock-all-pages").checked = lockedPagesSet.has("*");
-          markSettingsDirty(false);
-          if (activeRole && activeRole.role === "master") {
-            initDynamicGitHubPages();
-          }
-        }
-      }
-
-      async function loadMasterDashboard() {
-        const banner = document.getElementById("m-status-banner");
-        banner.innerHTML = `<span class="fflw-spinner"></span> <span>Lade aktuelle Daten …</span>`;
-
-        try {
-          const resp = await fetch(`${WEB_APP_URL}?action=master_overview&code=${encodeURIComponent(activeCode)}&t=${Date.now()}`, {
-            method: "GET",
-            redirect: "follow"
-          });
-          const data = await resp.json();
-          if (!data || !data.ok) {
-            banner.innerHTML = `<span style="color:#c62828;">Fehler beim Laden: ${data && data.error ? data.error : "Unbekannt"}</span>`;
-            return;
-          }
-          applyOverviewDataToUI(data);
-        } catch (err) {
-          banner.innerHTML = `<span style="color:#c62828;">Verbindungsfehler: ${err.message}</span>`;
-        }
-      }
-
-      async function handleSaveAllSettings(triggerBtn) {
-        const msgEl = document.getElementById("m-settings-msg");
-        const newMasterCode = document.getElementById("m-code-master").value.trim().toUpperCase();
-        if (!newMasterCode) {
-          alert("Das Supermaster-Passwort darf nicht leer sein.");
-          return;
-        }
-        msgEl.textContent = "";
-
-        const res = await callMasterApi({
-          action: "save_site_status",
-          zugangscode: document.getElementById("m-set-code").value,
-          flaggenStil: document.getElementById("m-set-flag").value,
-          wartungSeiten: Array.from(lockedPagesSet),
-          versteckteSeiten: Array.from(hiddenNavPagesSet),
-          teamCodes: {
-            master: newMasterCode,
-            freischalter: document.getElementById("m-code-freischalter").value.trim().toUpperCase(),
-            koordinator: document.getElementById("m-code-koordinator").value.trim().toUpperCase(),
-            copilot: document.getElementById("m-code-copilot").value.trim().toUpperCase()
-          }
-        }, triggerBtn, {
-          loadingText: "Speichere Einstellungen …",
-          successText: "✓ Gespeichert!",
-          resetAfterMs: 3200
         });
 
-        if (res && res.ok) {
-          activeCode = newMasterCode;
-          const storedBio = getStoredPasskey();
-          if (storedBio) {
-            storedBio.masterCode = newMasterCode;
-            localStorage.setItem(BIO_STORAGE_KEY, JSON.stringify(storedBio));
+        container.querySelectorAll(".cb-page-lock").forEach(cb => {
+          cb.addEventListener("change", function () {
+            if (this.checked) lockedPagesSet.add(this.dataset.file);
+            else lockedPagesSet.delete(this.dataset.file);
+            markSettingsDirty(true);
+            renderPagesManager();
+          });
+        });
+      }
+
+      document.querySelectorAll(".m-filter-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+          document.querySelectorAll(".m-filter-btn").forEach(b => b.classList.remove("active"));
+          this.classList.add("active");
+          currentPageFilter = this.dataset.pageFilter;
+          renderPagesManager();
+        });
+      });
+
+      document.getElementById("m-pages-search").addEventListener("input", renderPagesManager);
+
+      document.getElementById("m-lock-all-btn").addEventListener("click", () => {
+        dynamicPagesList.forEach(p => {
+          if (!p.isLegal && p.file !== "master.html") {
+            lockedPagesSet.add(p.file);
           }
-          markSettingsDirty(false);
-          msgEl.textContent = "✓ Alle Einstellungen & Codes wurden dauerhaft gespeichert!";
-          setTimeout(() => { msgEl.textContent = ""; }, 4500);
+        });
+        markSettingsDirty(true);
+        renderPagesManager();
+      });
+
+      document.getElementById("m-unlock-all-btn").addEventListener("click", () => {
+        lockedPagesSet.clear();
+        markSettingsDirty(true);
+        renderPagesManager();
+      });
+
+      async function initDynamicPagesList(siteConfig) {
+        const cfg = siteConfig || {};
+        lockedPagesSet = new Set(Array.isArray(cfg.wartungSeiten) ? cfg.wartungSeiten : []);
+        hiddenPagesSet = new Set(Array.isArray(cfg.versteckteSeiten) ? cfg.versteckteSeiten : []);
+
+        if (typeof window.fetchFflwDynamicPages === "function") {
+          const res = await window.fetchFflwDynamicPages(Array.from(hiddenPagesSet));
+          dynamicPagesList = res.pages || [];
+        }
+        renderPagesManager();
+      }
+
+      function renderAll(data) {
+        overviewCache = data;
+        currentRole = data.role || "master";
+        const meta = ROLE_META[currentRole] || ROLE_META.master;
+
+        document.getElementById("m-role-label").textContent = meta.label;
+        document.getElementById("m-role-desc").textContent = meta.desc;
+
+        renderVisitStats(data.visitStats);
+
+        const openPagesBtn = document.getElementById("m-open-pages-btn");
+        openPagesBtn.style.display = (currentRole === "master") ? "inline-flex" : "none";
+
+        const allTabs = ["eingang", "online", "bedarfe", "supermaster"];
+        allTabs.forEach(t => {
+          const btn = document.getElementById("m-tab-" + t + "-btn");
+          if (btn) btn.style.display = meta.tabs.includes(t) ? "inline-block" : "none";
+        });
+
+        const activeBtn = document.querySelector(".m-tab-btn.active");
+        if (!activeBtn || activeBtn.style.display === "none") {
+          showTab(meta.tabs[0]);
+        }
+
+        const modeSelect = document.getElementById("m-copilot-mode");
+        if (currentRole === "copilot") {
+          modeSelect.value = "observer";
+          modeSelect.disabled = true;
         } else {
-          msgEl.style.color = "#c62828";
-          msgEl.textContent = "Fehler beim Speichern.";
+          modeSelect.disabled = false;
+        }
+
+        const mode = modeSelect.value;
+        const readOnly = (mode === "observer" || currentRole === "copilot");
+        const showCheck = (mode === "copilot");
+
+        // 1. Spenden-Eingang
+        const eingangEl = document.getElementById("m-eingang-list");
+        const eingangItems = data.eingang || [];
+        if (!eingangItems.length) {
+          eingangEl.innerHTML = `<p style="color:#333;">Aktuell keine offenen Spenden im Eingangs-Ordner.</p>`;
+        } else {
+          eingangEl.innerHTML = "";
+          eingangItems.forEach(item => {
+            const box = document.createElement("div");
+            box.className = "m-box";
+            const imgHtml = (item.images && item.images[0])
+              ? `<img src="${item.images[0]}" alt="" style="width:90px; height:90px; object-fit:cover; border-radius:6px; border:1px solid #ccc;">`
+              : "";
+            const pauseHint = item.pausiert ? `<span style="background:#fff3e0; color:#b71c1c; padding:2px 8px; border-radius:4px; font-weight:bold; font-size:0.84rem;">Pausiert: ${item.pauseGrund || "Warteposition"}</span>` : "";
+            const schedHint = item.freischaltenAb ? `<span style="background:#e8f5e9; color:#1b5e20; padding:2px 8px; border-radius:4px; font-weight:bold; font-size:0.84rem;">Geplant ab: ${item.freischaltenAb}</span>` : "";
+
+            box.innerHTML = `
+              <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-start;">
+                ${imgHtml}
+                <div style="flex:1; min-width:220px;">
+                  <strong style="font-size:1.05rem; color:#003366;">${item.titel || item.ordnerName}</strong> ${pauseHint} ${schedHint}
+                  <div style="font-size:0.9rem; color:#222; margin-top:4px;">
+                    Spender: <strong>${item.spenderName || "-"}</strong> | Ort: <strong>${item.ort || "-"}</strong> | Tel: ${item.telefon || "-"}
+                  </div>
+                  <div style="font-size:0.88rem; color:#333; margin-top:3px;">Lagerung: ${item.lagerStatus || "-"}</div>
+                  ${showCheck ? `<div class="m-checklist"><strong>Copilot-Prüfpunkte:</strong> 1. Foto erkennbar? 2. Maße/Ort vorhanden? 3. Keine verbotenen Artikel?</div>` : ""}
+                  ${!readOnly ? `
+                    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                      <button type="button" class="m-btn m-btn-green btn-pub">Sofort freischalten</button>
+                      <input type="date" class="m-input inp-date" style="padding:6px 8px; font-size:14px;" value="${item.freischaltenAb || ""}">
+                      <button type="button" class="m-btn m-btn-blue btn-sched">Ab Datum freischalten</button>
+                      <button type="button" class="m-btn m-btn-red btn-arch">Ablehnen / Archiv</button>
+                    </div>
+                  ` : ""}
+                </div>
+              </div>
+            `;
+
+            if (!readOnly) {
+              box.querySelector(".btn-pub").addEventListener("click", async function () {
+                await window.fflwRunButtonAction(this, async () => {
+                  const res = await apiPost({ action: "publishDonationItem", folderId: item.folderId, isWholeProvider: Boolean(item.isWholeProvider) });
+                  if (res && res.ok) setTimeout(loadCockpit, 500);
+                  return res;
+                }, { loadingText: "Schalte frei …", successText: "✓ Online!" });
+              });
+
+              box.querySelector(".btn-sched").addEventListener("click", async function () {
+                const dt = box.querySelector(".inp-date").value;
+                if (!dt) { alert("Bitte zuerst ein Datum auswählen."); return; }
+                await window.fflwRunButtonAction(this, async () => {
+                  const res = await apiPost({ action: "scheduleDonation", folderId: item.folderId, freischaltenAb: dt });
+                  if (res && res.ok) setTimeout(loadCockpit, 500);
+                  return res;
+                }, { loadingText: "Plane ein …", successText: "✓ Eingeplant!" });
+              });
+
+              box.querySelector(".btn-arch").addEventListener("click", async function () {
+                if (!confirm("Dieses Teil wirklich ins Archiv verschieben?")) return;
+                await window.fflwRunButtonAction(this, async () => {
+                  const res = await apiPost({ action: "archiveDonationItem", folderId: item.folderId });
+                  if (res && res.ok) setTimeout(loadCockpit, 500);
+                  return res;
+                }, { loadingText: "Archiviere …", successText: "✓ Archiviert!" });
+              });
+            }
+
+            eingangEl.appendChild(box);
+          });
+        }
+
+        // 2. Online & Reservierte (mit Anbieter-Gruppierung & 1-Klick-Sammelauswahl)
+        renderOnlineSection(data.online || [], readOnly);
+
+        // 3. Angemeldete Bedarfe (mit allen Formular-Angaben & direkter Bearbeitung)
+        renderBedarfeSection(data.bedarfe || [], readOnly);
+
+        // 4. Supermaster
+        if (currentRole === "master") {
+          if (data.siteConfig) {
+            document.getElementById("m-gallery-code").value = data.siteConfig.zugangscode || "";
+            document.getElementById("m-flag-style").value = data.siteConfig.flaggenStil || "A";
+            initDynamicPagesList(data.siteConfig);
+          }
+          if (data.teamCodes) {
+            document.getElementById("m-code-master").value = data.teamCodes.master || "FFLW99";
+            document.getElementById("m-code-freischalter").value = data.teamCodes.freischalter || "FFLWTEAM";
+            document.getElementById("m-code-koordinator").value = data.teamCodes.koordinator || "FFLWKOORD";
+            document.getElementById("m-code-copilot").value = data.teamCodes.copilot || "FFLWCOPILOT";
+          }
+          markSettingsDirty(false);
+
+          const sugEl = document.getElementById("m-suggestions-list");
+          const sugs = data.katalogVorschlaege || [];
+          if (!sugs.length) {
+            sugEl.innerHTML = `<p style="color:#333;">Aktuell keine offenen Vorschläge aus „Sonstiges“.</p>`;
+          } else {
+            sugEl.innerHTML = "";
+            sugs.forEach(s => {
+              const row = document.createElement("div");
+              row.className = "m-box";
+              row.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                  <div><strong>${s.titel}</strong> <span style="color:#444;">(${s.count}× eingetragen)</span></div>
+                  <div style="display:flex; gap:8px;">
+                    <button type="button" class="m-btn m-btn-green btn-acc">In Katalog übernehmen</button>
+                    <button type="button" class="m-btn m-btn-red btn-rej">Verwerfen</button>
+                  </div>
+                </div>
+              `;
+              row.querySelector(".btn-acc").addEventListener("click", async function () {
+                await window.fflwRunButtonAction(this, async () => {
+                  const res = await apiPost({ action: "manageCatalogSuggestion", titel: s.titel, decision: "accept" });
+                  if (res && res.ok) setTimeout(loadCockpit, 500);
+                  return res;
+                }, { loadingText: "Übernehme …", successText: "✓ Übernommen!" });
+              });
+              row.querySelector(".btn-rej").addEventListener("click", async function () {
+                await window.fflwRunButtonAction(this, async () => {
+                  const res = await apiPost({ action: "manageCatalogSuggestion", titel: s.titel, decision: "reject" });
+                  if (res && res.ok) setTimeout(loadCockpit, 500);
+                  return res;
+                }, { loadingText: "Verwerfe …", successText: "✓ Verworfen!" });
+              });
+              sugEl.appendChild(row);
+            });
+          }
         }
       }
 
-      document.getElementById("m-save-settings-btn").addEventListener("click", function () {
-        handleSaveAllSettings(this);
-      });
-      document.getElementById("m-save-settings-btn-floating").addEventListener("click", function () {
-        handleSaveAllSettings(this);
-      });
-
-      function renderCopilotChecklist(hintText) {
-        if (copilotMode !== "copilot") return "";
-        return `
-          <div class="m-checklist">
-            <strong>Checkliste:</strong> <em>${hintText}</em><br>
-            <label style="display:block; margin-top:4px;"><input type="checkbox"> 1. Maße &amp; Transportmöglichkeit geprüft</label>
-            <label style="display:block;"><input type="checkbox"> 2. Vorrang vor Ort (Leutenbach/Winnenden) beachtet</label>
-          </div>
-        `;
-      }
-
-      function renderEingang(list) {
-        const el = document.getElementById("m-eingang-list");
-        if (!list.length) {
-          el.innerHTML = "<p>Keine wartenden Spenden im Eingang.</p>";
+      // ======================================================================
+      // RENDER-FUNKTION: ONLINE & RESERVIERTE MIT ANBIETER-SAMMELAUSWAHL
+      // ======================================================================
+      function updateOnlineBulkBar(onlineItems) {
+        const bar = document.getElementById("m-online-bulk-bar");
+        const clearBtn = document.getElementById("m-online-clear-sel");
+        const count = selectedOnlineIds.size;
+        if (count === 0) {
+          bar.style.display = "none";
+          clearBtn.style.display = "none";
           return;
         }
-        el.innerHTML = "";
-        list.forEach(sp => {
+        bar.style.display = "flex";
+        clearBtn.style.display = "inline-flex";
+        document.getElementById("m-bulk-count-text").textContent = `${count} Artikel ausgewählt`;
+
+        const selectedObjs = onlineItems.filter(x => selectedOnlineIds.has(x.id));
+        const hasUnreserved = selectedObjs.some(x => !x.reserviert);
+        const hasReserved = selectedObjs.some(x => x.reserviert);
+
+        document.getElementById("m-bulk-pause-btn").style.display = hasUnreserved ? "inline-flex" : "none";
+        document.getElementById("m-bulk-unreserve-btn").style.display = hasReserved ? "inline-flex" : "none";
+      }
+
+      function renderOnlineSection(onlineItems, readOnly) {
+        const onlineEl = document.getElementById("m-online-list");
+        const provSelect = document.getElementById("m-online-provider-filter");
+        const viewMode = document.getElementById("m-online-view-mode").value;
+
+        const provMap = new Map();
+        const provCounts = {};
+        onlineItems.forEach(it => {
+          const pid = it.spenderFolderId || (it.reserviert ? "res_" + it.id : "einzel_" + it.id);
+          const lbl = it.anbieterLabel || "Einzelangebot";
+          provCounts[pid] = (provCounts[pid] || 0) + 1;
+          if (!provMap.has(pid)) provMap.set(pid, lbl);
+        });
+
+        const prevProv = provSelect.value;
+        provSelect.innerHTML = `<option value="">Alle Anbieter / Haushalte (${provMap.size})</option>`;
+        Array.from(provMap.entries())
+          .sort((a, b) => (provCounts[b[0]] - provCounts[a[0]]) || a[1].localeCompare(b[1], "de"))
+          .forEach(([pid, lbl]) => {
+            const opt = document.createElement("option");
+            opt.value = pid;
+            opt.textContent = `${lbl} (${provCounts[pid]} ${provCounts[pid] === 1 ? "Teil" : "Teile"})`;
+            provSelect.appendChild(opt);
+          });
+        provSelect.value = prevProv;
+
+        const filtered = onlineItems.filter(it => {
+          if (!provSelect.value) return true;
+          const pid = it.spenderFolderId || (it.reserviert ? "res_" + it.id : "einzel_" + it.id);
+          return pid === provSelect.value;
+        });
+
+        if (!filtered.length) {
+          onlineEl.innerHTML = `<p style="color:#333;">Aktuell keine online sichtbaren oder reservierten Angebote.</p>`;
+          updateOnlineBulkBar(onlineItems);
+          return;
+        }
+
+        function createOnlineItemCard(item) {
+          const isChecked = selectedOnlineIds.has(item.id);
           const box = document.createElement("div");
-          box.className = "m-box";
-          const geplantBadge = sp.freischaltenAb ? `<span style="background:#fff3e0; color:#e65100; border:1px solid #ffb74d; padding:3px 8px; border-radius:5px; font-size:0.84rem; font-weight:bold;">Geplant ab: ${sp.freischaltenAb}</span>` : "";
-          const pauseBadge = sp.pausiert ? `<span style="background:#ede7f6; color:#4527a0; border:1px solid #b39ddb; padding:3px 8px; border-radius:5px; font-size:0.84rem; font-weight:bold;">Warteposition${sp.pauseGrund ? " (" + sp.pauseGrund + ")" : ""}</span>` : "";
+          box.className = "m-box" + (isChecked ? " is-selected" : "");
+          const resBadge = item.reserviert
+            ? `<span style="background:#fff3e0; color:#e65100; padding:2px 8px; border-radius:4px; font-weight:bold; font-size:0.84rem;">Reserviert (${item.empfaenger || "Interessent"})</span>`
+            : `<span style="background:#e8f5e9; color:#1b5e20; padding:2px 8px; border-radius:4px; font-weight:bold; font-size:0.84rem;">Online sichtbar</span>`;
 
           box.innerHTML = `
-            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; margin-bottom:6px;">
-              <strong style="font-size:1.02rem; color:#003366;">${sp.titel || sp.ordnerName} ${sp.ort ? "(" + sp.ort + ")" : ""}</strong>
-              <div>${geplantBadge} ${pauseBadge}</div>
-            </div>
-            <div style="font-size:0.92rem; color:#333333; margin-bottom:10px;">
-              Spender: <strong>${sp.spenderName || "-"}</strong> · Tel: ${sp.telefon || "-"} · Lagerung: ${sp.lagerStatus || "Auf Abruf"}
-            </div>
-            ${renderCopilotChecklist("Prüfen, ob das Stück sofort online gehen darf oder erst ab einem festen Termin.")}
-            <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:10px;">
-              <button type="button" class="m-btn m-btn-green btn-release-now">Sofort freischalten</button>
-              <input type="date" class="m-input inp-release-date" value="${sp.freischaltenAb || ""}" style="padding:6px 8px; font-size:14px;">
-              <button type="button" class="m-btn m-btn-orange btn-release-date">Ab Datum planen</button>
-              <button type="button" class="m-btn m-btn-red btn-archive-item">Archivieren</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:220px;">
+                ${!readOnly ? `<input type="checkbox" class="cb-online-item" data-id="${item.id}" ${isChecked ? "checked" : ""} style="width:20px; height:20px; cursor:pointer;">` : ""}
+                <div>
+                  <strong style="color:#003366;">${item.titel || item.pfad}</strong> ${resBadge}
+                  <div style="font-size:0.88rem; color:#333;">Ort / Status: ${item.ort || "-"} · Anbieter: ${item.anbieterLabel || "-"}</div>
+                </div>
+              </div>
+              ${!readOnly ? `
+                <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                  ${item.reserviert ? `<button type="button" class="m-btn m-btn-sm m-btn-green btn-unres">Reservierung aufheben</button>` : ""}
+                  ${!item.reserviert ? `<button type="button" class="m-btn m-btn-sm m-btn-orange btn-pause-one">In Warteposition</button>` : ""}
+                </div>
+              ` : ""}
             </div>
           `;
 
-          box.querySelector(".btn-release-now").addEventListener("click", async function () {
-            const res = await callMasterApi({
-              action: "approveDonation",
-              folderId: sp.folderId,
-              isWholeProvider: Boolean(sp.isWholeProvider)
-            }, this, { loadingText: "Schalte frei …", successText: "✓ Freigeschaltet!", keepConfirmedColor: true });
-            if (res && res.ok) setTimeout(loadMasterDashboard, 650);
+          const cb = box.querySelector(".cb-online-item");
+          if (cb) {
+            cb.addEventListener("change", function () {
+              if (this.checked) selectedOnlineIds.add(item.id);
+              else selectedOnlineIds.delete(item.id);
+              box.classList.toggle("is-selected", this.checked);
+              updateOnlineBulkBar(onlineItems);
+            });
+          }
+
+          if (!readOnly) {
+            const btnUnres = box.querySelector(".btn-unres");
+            if (btnUnres) {
+              btnUnres.addEventListener("click", async function () {
+                await window.fflwRunButtonAction(this, async () => {
+                  const res = await apiPost({ action: "unreserveItem", itemId: item.id });
+                  if (res && res.ok) setTimeout(loadCockpit, 500);
+                  return res;
+                }, { loadingText: "Hebe auf …", successText: "✓ Wieder online!" });
+              });
+            }
+
+            const btnPauseOne = box.querySelector(".btn-pause-one");
+            if (btnPauseOne) {
+              btnPauseOne.addEventListener("click", async function () {
+                await window.fflwRunButtonAction(this, async () => {
+                  const res = await apiPost({ action: "pauseOffer", scope: "single", itemId: item.id, grund: "Warteposition" });
+                  if (res && res.ok) setTimeout(loadCockpit, 500);
+                  return res;
+                }, { loadingText: "Pausiere …", successText: "✓ In Warteposition!" });
+              });
+            }
+          }
+          return box;
+        }
+
+        onlineEl.innerHTML = "";
+        if (viewMode === "grouped") {
+          const groups = new Map();
+          filtered.forEach(it => {
+            const pid = it.spenderFolderId || (it.reserviert ? "res_" + it.id : "einzel_" + it.id);
+            if (!groups.has(pid)) {
+              groups.set(pid, { pid: pid, label: it.anbieterLabel || "Einzelangebot", items: [] });
+            }
+            groups.get(pid).items.push(it);
           });
 
-          box.querySelector(".btn-release-date").addEventListener("click", async function () {
-            const dt = box.querySelector(".inp-release-date").value;
-            if (!dt) { alert("Bitte zuerst ein Startdatum auswählen."); return; }
-            const res = await callMasterApi({
-              action: "scheduleDonation",
-              folderId: sp.folderId,
-              freischaltenAb: dt
-            }, this, { loadingText: "Plane Termin …", successText: "✓ Geplant ab " + dt, keepConfirmedColor: true });
-            if (res && res.ok) setTimeout(loadMasterDashboard, 750);
-          });
+          Array.from(groups.values())
+            .sort((a, b) => b.items.length - a.items.length)
+            .forEach(grp => {
+              const wrap = document.createElement("div");
+              wrap.style.cssText = "background:#f4f8fc; border:2px solid #90caf9; border-left:6px solid #004080; border-radius:10px; padding:12px 14px; margin-bottom:14px;";
+              const allGrpSelected = grp.items.every(x => selectedOnlineIds.has(x.id));
 
-          box.querySelector(".btn-archive-item").addEventListener("click", async function () {
-            if (!confirm("Diesen Eintrag ins Archiv verschieben?")) return;
-            const res = await callMasterApi({
-              action: "archiveDonationItem",
-              folderId: sp.folderId
-            }, this, { loadingText: "Archiviere …", successText: "✓ Archiviert!", keepConfirmedColor: true });
-            if (res && res.ok) setTimeout(loadMasterDashboard, 650);
-          });
+              wrap.innerHTML = `
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
+                  <div>
+                    <strong style="color:#003366; font-size:1.02rem;">${grp.label}</strong>
+                    <span style="margin-left:8px; font-size:0.86rem; color:#333;">(${grp.items.length} ${grp.items.length === 1 ? "Artikel" : "Artikel"})</span>
+                  </div>
+                  ${!readOnly ? `
+                    <button type="button" class="m-btn m-btn-sm ${allGrpSelected ? "m-btn-slate" : "m-btn-blue"} btn-select-provider">
+                      ${allGrpSelected ? "✕ Auswahl für diesen Anbieter aufheben" : "☑ Alle von diesem Anbieter markieren"}
+                    </button>
+                  ` : ""}
+                </div>
+                <div class="grp-items-slot"></div>
+              `;
 
-          el.appendChild(box);
-        });
+              const selBtn = wrap.querySelector(".btn-select-provider");
+              if (selBtn) {
+                selBtn.addEventListener("click", () => {
+                  if (allGrpSelected) {
+                    grp.items.forEach(x => selectedOnlineIds.delete(x.id));
+                  } else {
+                    grp.items.forEach(x => selectedOnlineIds.add(x.id));
+                  }
+                  renderOnlineSection(onlineItems, readOnly);
+                });
+              }
+
+              const slot = wrap.querySelector(".grp-items-slot");
+              grp.items.forEach(it => slot.appendChild(createOnlineItemCard(it)));
+              onlineEl.appendChild(wrap);
+            });
+        } else {
+          filtered.forEach(it => onlineEl.appendChild(createOnlineItemCard(it)));
+        }
+
+        updateOnlineBulkBar(onlineItems);
       }
 
-      function renderOnline(list) {
-        const el = document.getElementById("m-online-list");
-        if (!list.length) {
-          el.innerHTML = "<p>Aktuell keine Angebote online.</p>";
-          return;
-        }
-        el.innerHTML = "";
-        list.forEach(item => {
-          const box = document.createElement("div");
-          box.className = "m-box";
-          box.innerHTML = `
-            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px;">
-              <strong style="color:#003366;">${item.titel || item.pfad} ${item.ort ? "(" + item.ort + ")" : ""}</strong>
-              <span style="font-weight:bold; color:${item.reserviert ? "#c62828" : "#1b5e20"};">${item.reserviert ? "Reserviert" : "Online sichtbar"}</span>
-            </div>
-            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;">
-              ${item.reserviert ? `<button type="button" class="m-btn m-btn-blue btn-unreserve">Reservierung aufheben</button>` : ""}
-              ${!item.reserviert ? `<button type="button" class="m-btn m-btn-orange btn-pause-item">In Warteposition setzen</button>` : ""}
-              ${(!item.reserviert && item.spenderFolderId) ? `<button type="button" class="m-btn m-btn-purple btn-pause-all">Komplettes Angebot pausieren</button>` : ""}
-            </div>
-          `;
+      document.getElementById("m-online-provider-filter").addEventListener("change", () => {
+        if (overviewCache) renderOnlineSection(overviewCache.online || [], currentRole === "copilot");
+      });
+      document.getElementById("m-online-view-mode").addEventListener("change", () => {
+        if (overviewCache) renderOnlineSection(overviewCache.online || [], currentRole === "copilot");
+      });
+      document.getElementById("m-online-clear-sel").addEventListener("click", () => {
+        selectedOnlineIds.clear();
+        if (overviewCache) renderOnlineSection(overviewCache.online || [], currentRole === "copilot");
+      });
 
-          const unresBtn = box.querySelector(".btn-unreserve");
-          if (unresBtn) {
-            unresBtn.addEventListener("click", async function () {
-              const res = await callMasterApi({
-                action: "unreserveItem",
-                itemId: item.id
-              }, this, { loadingText: "Hebe auf …", successText: "✓ Aufgehoben!", keepConfirmedColor: true });
-              if (res && res.ok) setTimeout(loadMasterDashboard, 650);
-            });
+      document.getElementById("m-bulk-pause-btn").addEventListener("click", async function () {
+        if (!overviewCache) return;
+        const ids = (overviewCache.online || []).filter(x => selectedOnlineIds.has(x.id) && !x.reserviert).map(x => x.id);
+        if (!ids.length) return;
+        await window.fflwRunButtonAction(this, async () => {
+          const res = await apiPost({ action: "pauseOffer", scope: "bulk", itemIds: ids, grund: "Warteposition (Sammelauswahl)" });
+          if (res && res.ok) {
+            selectedOnlineIds.clear();
+            setTimeout(loadCockpit, 500);
           }
+          return res;
+        }, { loadingText: `Pausiere ${ids.length} Teil(e) …`, successText: "✓ Alle in Warteposition!" });
+      });
 
-          const pauseItemBtn = box.querySelector(".btn-pause-item");
-          if (pauseItemBtn) {
-            pauseItemBtn.addEventListener("click", async function () {
-              const grund = prompt("Optionaler Hinweis für die Warteposition (z. B. Umzug verschoben):", "Umzug verschoben");
-              if (grund === null) return;
-              const res = await callMasterApi({
-                action: "pauseOffer",
-                itemId: item.id,
-                scope: "single",
-                grund
-              }, this, { loadingText: "Pausiere …", successText: "✓ In Warteposition!", keepConfirmedColor: true });
-              if (res && res.ok) setTimeout(loadMasterDashboard, 650);
-            });
+      document.getElementById("m-bulk-unreserve-btn").addEventListener("click", async function () {
+        if (!overviewCache) return;
+        const ids = (overviewCache.online || []).filter(x => selectedOnlineIds.has(x.id) && x.reserviert).map(x => x.id);
+        if (!ids.length) return;
+        await window.fflwRunButtonAction(this, async () => {
+          const res = await apiPost({ action: "unreserveBulk", itemIds: ids });
+          if (res && res.ok) {
+            selectedOnlineIds.clear();
+            setTimeout(loadCockpit, 500);
           }
+          return res;
+        }, { loadingText: `Gebe ${ids.length} Teil(e) frei …`, successText: "✓ Wieder online!" });
+      });
 
-          const pauseAllBtn = box.querySelector(".btn-pause-all");
-          if (pauseAllBtn) {
-            pauseAllBtn.addEventListener("click", async function () {
-              const grund = prompt("Komplettes Angebot dieser Familie/Wohnung pausieren? Hinweis:", "Umzug verschoben");
-              if (grund === null) return;
-              const res = await callMasterApi({
-                action: "pauseOffer",
-                spenderFolderId: item.spenderFolderId,
-                scope: "family",
-                grund
-              }, this, { loadingText: "Pausiere alles …", successText: "✓ Pausiert!", keepConfirmedColor: true });
-              if (res && res.ok) setTimeout(loadMasterDashboard, 650);
-            });
-          }
-
-          el.appendChild(box);
+      // ======================================================================
+      // RENDER-FUNKTION: BEDARFE MIT ALLEN ANGABEN & TEAM-BEARBEITUNG
+      // ======================================================================
+      function renderBedarfeSection(rawBedarfe, readOnly) {
+        const bedarfeEl = document.getElementById("m-bedarfe-list");
+        const bedarfe = rawBedarfe.slice().sort((a, b) => {
+          const la = (a.ortTyp || "").includes("Leutenbach") ? 0 : 1;
+          const lb = (b.ortTyp || "").includes("Leutenbach") ? 0 : 1;
+          return la - lb;
         });
-      }
 
-      function renderBedarfe(list) {
-        const el = document.getElementById("m-bedarfe-list");
-        if (!list.length) {
-          el.innerHTML = "<p>Keine offenen Bedarfsanmeldungen.</p>";
+        if (!bedarfe.length) {
+          bedarfeEl.innerHTML = `<p style="color:#333;">Aktuell keine offenen Bedarfe.</p>`;
           return;
         }
-        el.innerHTML = "";
 
-        list.forEach(b => {
+        bedarfeEl.innerHTML = "";
+        bedarfe.forEach(d => {
           const box = document.createElement("div");
           box.className = "m-box";
-          const waText = encodeURIComponent(`Hallo ${b.name || ""}, hier ist der Freundeskreis Flüchtlinge Leutenbach & Winnenden. Zu Ihrer Bedarfsanmeldung (${b.artikelName}): Besteht der Bedarf aktuell noch?`);
-          const geprueftTag = b.geprueft ? `<span style="background:#e8f5e9; color:#1b5e20; border:1px solid #a5d6a7; padding:3px 8px; border-radius:5px; font-size:0.84rem; font-weight:bold;">Geprüft (${b.geprueftVon || "Team"})</span>` : "";
+          const localTag = (d.ortTyp || "").includes("Leutenbach")
+            ? `<span style="background:#e8f5e9; color:#1b5e20; padding:2px 8px; border-radius:4px; font-weight:bold; font-size:0.84rem;">Vor Ort</span>`
+            : "";
+          const checkTag = d.geprueft
+            ? `<span style="background:#e3f2fd; color:#0d47a1; padding:2px 8px; border-radius:4px; font-weight:bold; font-size:0.84rem;">Geprüft</span>`
+            : "";
+          const codeTag = d.editCode
+            ? `<span style="background:#fff3e0; color:#e65100; border:1px solid #ffcc80; padding:2px 8px; border-radius:4px; font-weight:bold; font-size:0.84rem;">Code: ${d.editCode}</span>`
+            : "";
+
+          const isExpanded = expandedDemandIds.has(d.id);
+          const isEditing = editingDemandIds.has(d.id);
+          const createdFormatted = d.createdAt ? new Date(d.createdAt).toLocaleString("de-DE") : "-";
+
+          function fmtField(val, fallback) {
+            return (val && String(val).trim() !== "")
+              ? `<span>${val}</span>`
+              : `<span class="m-missing-val">${fallback || "nicht angegeben"}</span>`;
+          }
 
           box.innerHTML = `
-            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px;">
-              <strong style="color:#003366;">${b.artikelName} – ${b.name}</strong>
-              <div>
-                ${geprueftTag}
-                <span style="background:#e3f2fd; color:#0d47a1; border:1px solid #90caf9; padding:3px 8px; border-radius:5px; font-size:0.84rem; font-weight:bold;">${b.ortTyp || "Vor Ort"}</span>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+              <div style="flex:1; min-width:250px;">
+                <strong style="font-size:1.05rem; color:#003366;">${d.artikelName}</strong> ${localTag} ${checkTag} ${codeTag}
+                <div style="font-size:0.9rem; color:#222; margin-top:4px;">
+                  Name: <strong>${d.name || "-"}</strong> | Kontakt: <strong>${d.kontakt || "-"}</strong> | E-Mail: ${fmtField(d.email, "fehlt")}
+                </div>
+                <div style="font-size:0.88rem; color:#333; margin-top:2px;">
+                  Ort: ${d.ortTyp || "-"} ${d.ortDetails ? "(" + d.ortDetails + ")" : ""} | Dringlichkeit: ${d.prioritaet || "-"}
+                </div>
+
+                <div style="margin-top:9px; display:flex; flex-wrap:wrap; gap:7px;">
+                  <button type="button" class="m-btn m-btn-sm m-btn-slate btn-toggle-details">
+                    ${isExpanded ? "▲ Formular-Angaben ausblenden" : "▼ Alle Formular-Angaben anzeigen"}
+                  </button>
+                  ${!readOnly ? `
+                    <button type="button" class="m-btn m-btn-sm m-btn-purple btn-toggle-edit">
+                      ${isEditing ? "✕ Bearbeitung schließen" : "✎ Angaben / E-Mail ergänzen"}
+                    </button>
+                    <button type="button" class="m-btn m-btn-sm m-btn-blue btn-ping">Nachfrage-Mail senden</button>
+                    <button type="button" class="m-btn m-btn-sm m-btn-green btn-ver">Als geprüft abhaken</button>
+                  ` : ""}
+                </div>
+
+                ${isExpanded ? `
+                  <div class="m-detail-grid">
+                    <div class="m-detail-item"><strong>Rückkehr-Code (5-stellig):</strong> ${fmtField(d.editCode)}</div>
+                    <div class="m-detail-item"><strong>Eingegangen am:</strong> ${createdFormatted}</div>
+                    <div class="m-detail-item"><strong>Bereich / Raum:</strong> ${fmtField(d.raumKategorie)}</div>
+                    <div class="m-detail-item"><strong>Wer meldet:</strong> ${fmtField(d.rolle)}</div>
+                    <div class="m-detail-item"><strong>Telefon / WhatsApp:</strong> ${fmtField(d.kontakt)}</div>
+                    <div class="m-detail-item"><strong>E-Mail-Adresse:</strong> ${fmtField(d.email, "fehlt – oben ergänzbar")}</div>
+                    <div class="m-detail-item"><strong>Region / Typ:</strong> ${fmtField(d.ortTyp)}</div>
+                    <div class="m-detail-item"><strong>Genauer Ort / Unterkunft:</strong> ${fmtField(d.ortDetails)}</div>
+                    <div class="m-detail-item"><strong>Wohnsituation:</strong> ${fmtField(d.wohnsituation)}</div>
+                    <div class="m-detail-item"><strong>Max. Breite / Höhe:</strong> ${d.maxBreiteCm || "-"} cm / ${d.maxHoeheCm || "-"} cm</div>
+                    <div class="m-detail-item"><strong>Stellplatz-Fotos:</strong> ${d.fotoAnzahl || 0} Foto(s)</div>
+                    <div class="m-detail-item" style="grid-column: 1 / -1;"><strong>Zusätzliche Hinweise:</strong> ${fmtField(d.begruendung, "keine")}</div>
+                  </div>
+                ` : ""}
+
+                ${(!readOnly && isEditing) ? `
+                  <div class="m-edit-drawer">
+                    <strong style="color:#003366; display:block; margin-bottom:8px;">Fehlende Angaben oder E-Mail-Adresse direkt ergänzen:</strong>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:8px;">
+                      <div>
+                        <label style="font-size:0.84rem; font-weight:bold;">E-Mail-Adresse</label>
+                        <input type="email" class="m-input ed-email" style="width:100%; box-sizing:border-box;" value="${d.email || ""}" placeholder="name@beispiel.de">
+                      </div>
+                      <div>
+                        <label style="font-size:0.84rem; font-weight:bold;">Telefon / WhatsApp</label>
+                        <input type="text" class="m-input ed-kontakt" style="width:100%; box-sizing:border-box;" value="${d.kontakt || ""}">
+                      </div>
+                      <div>
+                        <label style="font-size:0.84rem; font-weight:bold;">Genauer Ort / Unterkunft</label>
+                        <input type="text" class="m-input ed-ort" style="width:100%; box-sizing:border-box;" value="${d.ortDetails || ""}">
+                      </div>
+                      <div>
+                        <label style="font-size:0.84rem; font-weight:bold;">Wohnsituation</label>
+                        <input type="text" class="m-input ed-wohnsit" style="width:100%; box-sizing:border-box;" value="${d.wohnsituation || ""}">
+                      </div>
+                      <div>
+                        <label style="font-size:0.84rem; font-weight:bold;">Max. Breite (cm)</label>
+                        <input type="number" class="m-input ed-maxb" style="width:100%; box-sizing:border-box;" value="${d.maxBreiteCm || ""}">
+                      </div>
+                      <div>
+                        <label style="font-size:0.84rem; font-weight:bold;">Max. Höhe (cm)</label>
+                        <input type="number" class="m-input ed-maxh" style="width:100%; box-sizing:border-box;" value="${d.maxHoeheCm || ""}">
+                      </div>
+                    </div>
+                    <div style="margin-top:8px;">
+                      <label style="font-size:0.84rem; font-weight:bold;">Zusätzliche Hinweise</label>
+                      <input type="text" class="m-input ed-grund" style="width:100%; box-sizing:border-box;" value="${d.begruendung || ""}">
+                    </div>
+                    <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                      <button type="button" class="m-btn m-btn-sm m-btn-green btn-save-demand-edit">Angaben speichern</button>
+                      <button type="button" class="m-btn m-btn-sm m-btn-orange btn-regen-code">Neuen 5-stelligen Code erzeugen</button>
+                      <button type="button" class="m-btn m-btn-sm m-btn-red btn-done-demand">Bedarf erledigt / archivieren</button>
+                    </div>
+                  </div>
+                ` : ""}
               </div>
             </div>
-            <div style="font-size:0.92rem; color:#333333; margin:6px 0;">
-              Ort: ${b.ortDetails || "-"} · Kontakt: <strong>${b.kontakt || "-"}</strong> · ${b.prioritaet || ""}
-            </div>
-            ${b.begruendung ? `<div style="font-size:0.9rem; color:#444444; margin-bottom:10px;">${b.begruendung}</div>` : ""}
-            ${renderCopilotChecklist("Kurz klären, ob der Bedarf noch aktuell ist und die Maße passen.")}
-            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
-              <a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener" class="m-btn m-btn-green btn-wa-demand" style="text-decoration:none;">WhatsApp-Nachfrage</a>
-              <button type="button" class="m-btn m-btn-blue btn-mail-demand">Per E-Mail nachfragen</button>
-              <button type="button" class="m-btn m-btn-purple btn-verify-demand">Als geklärt markieren</button>
-            </div>
           `;
 
-          box.querySelector(".btn-wa-demand").addEventListener("click", function () {
-            this.classList.add("fflw-btn-confirmed");
-            this.textContent = "✓ WhatsApp geöffnet";
+          box.querySelector(".btn-toggle-details").addEventListener("click", () => {
+            if (expandedDemandIds.has(d.id)) expandedDemandIds.delete(d.id);
+            else expandedDemandIds.add(d.id);
+            renderBedarfeSection(rawBedarfe, readOnly);
           });
 
-          box.querySelector(".btn-mail-demand").addEventListener("click", async function () {
-            const res = await callMasterApi({
-              action: "sendDemandPing",
-              demandId: b.id,
-              kontakt: b.kontakt,
-              artikelName: b.artikelName,
-              name: b.name
-            }, this, { loadingText: "Sende E-Mail …", successText: "✓ E-Mail gesendet!", keepConfirmedColor: true });
-            if (res && !res.ok && res.error) alert(res.error);
-          });
+          if (!readOnly) {
+            box.querySelector(".btn-toggle-edit").addEventListener("click", () => {
+              if (editingDemandIds.has(d.id)) editingDemandIds.delete(d.id);
+              else editingDemandIds.add(d.id);
+              renderBedarfeSection(rawBedarfe, readOnly);
+            });
 
-          box.querySelector(".btn-verify-demand").addEventListener("click", async function () {
-            const res = await callMasterApi({
-              action: "markDemandVerified",
-              demandId: b.id,
-              bearbeiter: activeRole.label
-            }, this, { loadingText: "Markiere …", successText: "✓ Geklärt!", keepConfirmedColor: true });
-            if (res && res.ok) setTimeout(loadMasterDashboard, 650);
-          });
+            box.querySelector(".btn-ping").addEventListener("click", async function () {
+              await window.fflwRunButtonAction(this, async () => {
+                const res = await apiPost({
+                  action: "sendDemandPing",
+                  name: d.name,
+                  email: d.email || "",
+                  kontakt: d.kontakt,
+                  artikelName: d.artikelName
+                });
+                if (!res || !res.ok) alert(res && res.error ? res.error : "Keine E-Mail-Adresse hinterlegt.");
+                return res;
+              }, { loadingText: "Sende Mail …", successText: "✓ Mail gesendet!" });
+            });
 
-          el.appendChild(box);
+            box.querySelector(".btn-ver").addEventListener("click", async function () {
+              await window.fflwRunButtonAction(this, async () => {
+                const res = await apiPost({ action: "markDemandVerified", demandId: d.id, bearbeiter: currentRole });
+                if (res && res.ok) setTimeout(loadCockpit, 500);
+                return res;
+              }, { loadingText: "Speichere …", successText: "✓ Geprüft!" });
+            });
+
+            if (isEditing) {
+              box.querySelector(".btn-save-demand-edit").addEventListener("click", async function () {
+                await window.fflwRunButtonAction(this, async () => {
+                  const res = await apiPost({
+                    action: "updateDemand",
+                    demandId: d.id,
+                    email: box.querySelector(".ed-email").value.trim(),
+                    kontakt: box.querySelector(".ed-kontakt").value.trim(),
+                    ortDetails: box.querySelector(".ed-ort").value.trim(),
+                    wohnsituation: box.querySelector(".ed-wohnsit").value.trim(),
+                    maxBreiteCm: box.querySelector(".ed-maxb").value.trim(),
+                    maxHoeheCm: box.querySelector(".ed-maxh").value.trim(),
+                    begruendung: box.querySelector(".ed-grund").value.trim()
+                  });
+                  if (res && res.ok) setTimeout(loadCockpit, 500);
+                  return res;
+                }, { loadingText: "Speichere …", successText: "✓ Gespeichert!" });
+              });
+
+              box.querySelector(".btn-regen-code").addEventListener("click", async function () {
+                await window.fflwRunButtonAction(this, async () => {
+                  const res = await apiPost({
+                    action: "updateDemand",
+                    demandId: d.id,
+                    regenerateCode: true
+                  });
+                  if (res && res.ok) setTimeout(loadCockpit, 500);
+                  return res;
+                }, { loadingText: "Erzeuge Code …", successText: "✓ Neuer Code!" });
+              });
+
+              box.querySelector(".btn-done-demand").addEventListener("click", async function () {
+                if (!confirm("Diesen Bedarf als erledigt markieren und archivieren?")) return;
+                await window.fflwRunButtonAction(this, async () => {
+                  const res = await apiPost({
+                    action: "updateDemand",
+                    demandId: d.id,
+                    alsErledigtMarkieren: true
+                  });
+                  if (res && res.ok) {
+                    editingDemandIds.delete(d.id);
+                    setTimeout(loadCockpit, 500);
+                  }
+                  return res;
+                }, { loadingText: "Archiviere …", successText: "✓ Erledigt!" });
+              });
+            }
+          }
+
+          bedarfeEl.appendChild(box);
         });
       }
 
-      function renderKatalog(list) {
-        const el = document.getElementById("m-katalog-list");
-        if (!list.length) {
-          el.innerHTML = "<p>Keine offenen „Sonstiges“-Vorschläge vorhanden.</p>";
-          return;
+      document.getElementById("m-copilot-mode").addEventListener("change", () => {
+        if (overviewCache) renderAll(overviewCache);
+      });
+
+      ["m-gallery-code", "m-code-master", "m-code-freischalter", "m-code-koordinator", "m-code-copilot", "m-flag-style"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener("input", () => markSettingsDirty(true));
+          el.addEventListener("change", () => markSettingsDirty(true));
         }
-        el.innerHTML = "";
-        list.forEach(v => {
-          const box = document.createElement("div");
-          box.className = "m-box";
-          box.innerHTML = `
-            <strong>${v.titel}</strong> <span style="color:#004080; font-weight:bold;">(${v.count || 1}× vorgeschlagen)</span>
-            <div style="display:flex; gap:8px; margin-top:8px;">
-              <button type="button" class="m-btn m-btn-green btn-kat-ok">In Katalog übernehmen</button>
-              <button type="button" class="m-btn m-btn-red btn-kat-del">Verwerfen</button>
-            </div>
-          `;
-          box.querySelector(".btn-kat-ok").addEventListener("click", async function () {
-            const res = await callMasterApi({
-              action: "manageCatalogSuggestion",
-              titel: v.titel,
-              decision: "accept"
-            }, this, { loadingText: "Übernehme …", successText: "✓ Übernommen!", keepConfirmedColor: true });
-            if (res && res.ok) setTimeout(loadMasterDashboard, 650);
+      });
+
+      async function saveSupermasterSettings(triggerBtn) {
+        const msg = document.getElementById("m-config-msg");
+        const task = async () => {
+          const res = await apiPost({
+            action: "save_site_status",
+            zugangscode: document.getElementById("m-gallery-code").value.trim(),
+            flaggenStil: document.getElementById("m-flag-style").value,
+            wartungSeiten: Array.from(lockedPagesSet),
+            versteckteSeiten: Array.from(hiddenPagesSet),
+            teamCodes: {
+              master: document.getElementById("m-code-master").value.trim().toUpperCase(),
+              freischalter: document.getElementById("m-code-freischalter").value.trim().toUpperCase(),
+              koordinator: document.getElementById("m-code-koordinator").value.trim().toUpperCase(),
+              copilot: document.getElementById("m-code-copilot").value.trim().toUpperCase()
+            }
           });
-          box.querySelector(".btn-kat-del").addEventListener("click", async function () {
-            const res = await callMasterApi({
-              action: "manageCatalogSuggestion",
-              titel: v.titel,
-              decision: "reject"
-            }, this, { loadingText: "Verwerfe …", successText: "✓ Verworfen!", keepConfirmedColor: true });
-            if (res && res.ok) setTimeout(loadMasterDashboard, 650);
+          if (res && res.ok) {
+            if (res.teamCodes && res.teamCodes.master) {
+              currentCode = res.teamCodes.master;
+              sessionStorage.setItem("fflw_master_code", currentCode);
+            }
+            markSettingsDirty(false);
+            msg.style.color = "#1b5e20";
+            msg.textContent = "✓ Alle Seiten-Einstellungen & Codes dauerhaft gespeichert!";
+            setTimeout(() => { msg.textContent = ""; }, 4000);
+          } else {
+            msg.style.color = "#c62828";
+            msg.textContent = "Fehler: " + (res && res.error ? res.error : "Unbekannt");
+          }
+          return res;
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(triggerBtn, task, {
+            loadingText: "Speichere Einstellungen …",
+            successText: "✓ Gespeichert!",
+            resetAfterMs: 2800
           });
-          el.appendChild(box);
-        });
+        } else {
+          await task();
+        }
+      }
+
+      document.getElementById("m-save-config-btn").addEventListener("click", function () {
+        saveSupermasterSettings(this);
+      });
+
+      document.getElementById("m-save-config-floating-btn").addEventListener("click", function () {
+        saveSupermasterSettings(this);
+      });
+
+      async function loadCockpit(triggerBtn) {
+        statusBanner.innerHTML = `<span class="fflw-spinner"></span> <span>Lade Live-Daten …</span>`;
+        const task = async () => {
+          const resp = await fetch(`${WEB_APP_URL}?action=master_overview&code=${encodeURIComponent(currentCode)}&t=${Date.now()}`, {
+            method: "GET",
+            redirect: "follow"
+          });
+          const data = await resp.json();
+          if (data && data.ok) {
+            loginBox.style.display = "none";
+            cockpit.style.display = "block";
+            statusBanner.innerHTML = `<span style="color:#1b5e20;">✓ Live-Daten aktuell (${new Date().toLocaleTimeString("de-DE")})</span>`;
+            renderAll(data);
+            return { ok: true };
+          } else {
+            sessionStorage.removeItem("fflw_master_code");
+            loginBox.style.display = "block";
+            cockpit.style.display = "none";
+            document.getElementById("m-login-msg").textContent = (data && data.error) ? data.error : "Code ungültig.";
+            return { ok: false };
+          }
+        };
+
+        if (triggerBtn && typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(triggerBtn, task, {
+            loadingText: "Aktualisiere …",
+            successText: "✓ Aktuell!",
+            resetAfterMs: 1800
+          });
+        } else {
+          await task();
+        }
+      }
+
+      document.getElementById("m-login-btn").addEventListener("click", function () {
+        currentCode = document.getElementById("m-code-input").value.trim();
+        sessionStorage.setItem("fflw_master_code", currentCode);
+        loadCockpit(this);
+      });
+
+      document.getElementById("m-code-input").addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          currentCode = document.getElementById("m-code-input").value.trim();
+          sessionStorage.setItem("fflw_master_code", currentCode);
+          loadCockpit(document.getElementById("m-login-btn"));
+        }
+      });
+
+      document.getElementById("m-refresh-btn").addEventListener("click", function () {
+        loadCockpit(this);
+      });
+
+      if (currentCode) {
+        loadCockpit();
       }
     });
   </script>
