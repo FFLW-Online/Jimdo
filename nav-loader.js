@@ -350,21 +350,48 @@ function applyHiddenNavItems(versteckteSeiten) {
   });
 
   // Falls schatzsuche.html nicht versteckt ist, aber in nav.html noch nicht verlinkt wurde:
-  // automatisch im Menü einblenden!
+  // unterhalb von "Mitmachen" im Menü einblenden ("Schatzsuche ✨" - Symbol hinten!)
   const navList = navContainer.querySelector("#nav-list") || navContainer.querySelector("ul");
   if (navList && !hiddenSet.has("schatzsuche.html") && !hasSchatzLink) {
     const li = document.createElement("li");
     li.id = "auto-nav-schatzsuche";
     const a = document.createElement("a");
     a.href = "schatzsuche.html";
-    a.textContent = "✨ Schatzsuche";
+    a.textContent = "Schatzsuche ✨";
     const cur = (window.location.pathname.split("/").pop() || "index.html");
     if (cur === "schatzsuche.html") {
       a.setAttribute("aria-current", "page");
       a.classList.add("active");
     }
     li.appendChild(a);
-    navList.appendChild(li);
+
+    // "Mitmachen" im Menü suchen (entweder als <details>-Untermenü oder als normaler Menüpunkt)
+    let mitmachenLi = null;
+    navList.querySelectorAll(":scope > li").forEach(topLi => {
+      const txt = (topLi.textContent || "").toLowerCase();
+      const link = topLi.querySelector("a[href]");
+      const href = link ? (link.getAttribute("href") || "").toLowerCase() : "";
+      if (txt.includes("mitmachen") || href.includes("mitmachen")) {
+        mitmachenLi = topLi;
+      }
+    });
+
+    if (mitmachenLi) {
+      const subUl = mitmachenLi.querySelector("ul");
+      if (subUl) {
+        // Wenn "Mitmachen" ein aufklappbares Untermenü (<details><ul>) hat, direkt dort einsortieren
+        subUl.appendChild(li);
+        if (cur === "schatzsuche.html") {
+          const det = mitmachenLi.querySelector("details");
+          if (det) det.setAttribute("open", "");
+        }
+      } else {
+        // Sonst direkt unterhalb von "Mitmachen" in die Hauptliste einfügen
+        mitmachenLi.insertAdjacentElement("afterend", li);
+      }
+    } else {
+      navList.appendChild(li);
+    }
   } else if (hasSchatzLink && hiddenSet.has("schatzsuche.html")) {
     const autoLi = document.getElementById("auto-nav-schatzsuche");
     if (autoLi) autoLi.style.display = "none";
