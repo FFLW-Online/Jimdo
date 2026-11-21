@@ -1,6 +1,6 @@
 const FFLW_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
-const FFLW_GLOBAL_MASTER_CODE = "FFLW-99";
-const FFLW_STATUS_CACHE_KEY = "fflw_site_status_cache_v1";
+const FFLW_GLOBAL_MASTER_CODE = "FFLW99";
+const FFLW_STATUS_CACHE_KEY = "fflw_site_status_cache_v2";
 const FFLW_GITHUB_OWNER = "FFLW-Online";
 const FFLW_GITHUB_REPO = "Jimdo";
 const FFLW_GITHUB_BRANCH = "main";
@@ -8,7 +8,7 @@ const FFLW_GITHUB_BRANCH = "main";
 // ============================================================================
 // 0. DYNAMISCHE GITHUB-ERKENNUNG (ALLE HTML-DATEIEN VS. MENÜ-NAVIGATION)
 // ============================================================================
-window.fetchFflwDynamicPages = async function () {
+window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
   const hiddenManualFallback = [
     "zusammenfinden.html",
     "der-versteckte-obstgarten.html",
@@ -23,7 +23,8 @@ window.fetchFflwDynamicPages = async function () {
     "master.html"
   ];
 
-  // 1. Menü-Links aus nav.html auslesen (um zu wissen, was öffentlich im Menü steht)
+  const extraHiddenSet = new Set(Array.isArray(extraHiddenFiles) ? extraHiddenFiles : []);
+
   const navMap = new Map();
   try {
     const navResp = await fetch("nav.html?t=" + Date.now());
@@ -40,7 +41,6 @@ window.fetchFflwDynamicPages = async function () {
     }
   } catch (e) {}
 
-  // Fallback aus bereits gerendertem #nav-list
   document.querySelectorAll("#nav-list a[href]").forEach(a => {
     const href = (a.getAttribute("href") || "").split("?")[0].split("#")[0].trim();
     const label = a.textContent.replace(/\s+/g, " ").trim();
@@ -49,7 +49,6 @@ window.fetchFflwDynamicPages = async function () {
     }
   });
 
-  // 2. Live-Dateiliste aus GitHub Repository (FFLW-Online/Jimdo) abrufen
   let repoHtmlFiles = [];
   let source = "github";
   try {
@@ -70,20 +69,23 @@ window.fetchFflwDynamicPages = async function () {
     repoHtmlFiles = Array.from(new Set([...navMap.keys(), ...hiddenManualFallback]));
   }
 
-  const systemExclude = new Set(["google", "404.html"]);
+  const systemExclude = new Set(["404.html"]);
   const pages = repoHtmlFiles
     .filter(f => !systemExclude.has(f))
     .map(file => {
-      const inMenu = navMap.has(file);
+      const inNavHtml = navMap.has(file);
+      const isManuallyHidden = extraHiddenSet.has(file);
+      const inMenu = inNavHtml && !isManuallyHidden;
       const isLegal = (file === "impressum.html" || file === "datenschutz.html");
       const isHidden = !inMenu && !isLegal;
-      const niceTitle = inMenu
+      const niceTitle = navMap.has(file)
         ? navMap.get(file)
         : file.replace(/\.html$/i, "").replace(/[-_]+/g, " ").replace(/\b\w/g, c => c.toUpperCase());
 
       return {
         file: file,
         title: niceTitle,
+        inNavHtml: inNavHtml,
         inMenu: inMenu,
         isHidden: isHidden,
         isLegal: isLegal
@@ -164,7 +166,7 @@ function getFflwMaintenanceSvg() {
 }
 
 // ============================================================================
-// 2. ZENTRALES STATUS-MANAGEMENT (WARTUNG & FLAGGENBAND-STIL)
+// 2. ZENTRALES STATUS-MANAGEMENT (WARTUNG, MENÜ-VERSTECKEN & FLAGGENBAND)
 // ============================================================================
 function getCachedSiteStatus() {
   try {
@@ -174,19 +176,39 @@ function getCachedSiteStatus() {
       if (parsed && typeof parsed === "object") {
         return {
           wartungSeiten: Array.isArray(parsed.wartungSeiten) ? parsed.wartungSeiten : [],
+          versteckteSeiten: Array.isArray(parsed.versteckteSeiten) ? parsed.versteckteSeiten : [],
           flaggenStil: ["A", "B", "C", "OFF"].includes(parsed.flaggenStil) ? parsed.flaggenStil : "A",
           zugangscode: typeof parsed.zugangscode === "string" ? parsed.zugangscode : "11"
         };
       }
     }
   } catch (e) {}
-  return { wartungSeiten: [], flaggenStil: "A", zugangscode: "11" };
+  return { wartungSeiten: [], versteckteSeiten: [], flaggenStil: "A", zugangscode: "11" };
 }
 
 function setCachedSiteStatus(statusObj) {
   try {
     sessionStorage.setItem(FFLW_STATUS_CACHE_KEY, JSON.stringify(statusObj));
   } catch (e) {}
+}
+
+function applyHiddenNavItems(versteckteSeiten) {
+  const navContainer = document.getElementById("main-nav");
+  if (!navContainer) return;
+  const hiddenSet = new Set(Array.isArray(versteckteSeiten) ? versteckteSeiten : []);
+
+  navContainer.querySelectorAll("li").forEach(li => {
+    const link = li.querySelector("a[href]");
+    if (!link) return;
+    const rawHref = (link.getAttribute("href") || "").split("?")[0].split("#")[0].trim();
+    if (!rawHref.endsWith(".html")) return;
+
+    // Nur blatt-Einträge (ohne eigenes Untermenü) ausblenden
+    const hasSubMenu = li.querySelector("details") !== null;
+    if (!hasSubMenu) {
+      li.style.display = hiddenSet.has(rawHref) ? "none" : "";
+    }
+  });
 }
 
 function renderGlobalFlagBar(currentPage, flaggenStil) {
@@ -281,6 +303,7 @@ function syncGlobalSiteStatus(currentPage) {
   const cached = getCachedSiteStatus();
   renderGlobalFlagBar(currentPage, cached.flaggenStil);
   applyMaintenanceStateToPage(currentPage, cached.wartungSeiten);
+  applyHiddenNavItems(cached.versteckteSeiten);
   updateStickyHeaderOffset();
 
   fetch(`${FFLW_WEB_APP_URL}?action=site_status&t=${Date.now()}`, {
@@ -292,12 +315,14 @@ function syncGlobalSiteStatus(currentPage) {
       if (!data || !data.ok) return;
       const fresh = {
         wartungSeiten: Array.isArray(data.wartungSeiten) ? data.wartungSeiten : [],
+        versteckteSeiten: Array.isArray(data.versteckteSeiten) ? data.versteckteSeiten : [],
         flaggenStil: ["A", "B", "C", "OFF"].includes(data.flaggenStil) ? data.flaggenStil : "A",
         zugangscode: typeof data.zugangscode === "string" ? data.zugangscode : "11"
       };
       setCachedSiteStatus(fresh);
       renderGlobalFlagBar(currentPage, fresh.flaggenStil);
       applyMaintenanceStateToPage(currentPage, fresh.wartungSeiten);
+      applyHiddenNavItems(fresh.versteckteSeiten);
       updateStickyHeaderOffset();
     })
     .catch(() => {});
@@ -781,6 +806,7 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .then(html => {
         navContainer.innerHTML = html;
+        applyHiddenNavItems(getCachedSiteStatus().versteckteSeiten);
 
         navContainer.querySelectorAll('a[href*="docuseal.com"]').forEach(link => {
           link.href = cleanDocuSealUrl;

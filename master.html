@@ -1,12 +1,12 @@
 <!-- ==========================================================================
   DATEI: master.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-21 07:33 CET
+  ERSTELLT VON GEMINI AM: 2026-11-21 08:00 CET
   BESCHREIBUNG: Aufgeräumtes Steuerungs-Cockpit für Supermaster & Untermaster
     - Dynamische GitHub-Erkennung (FFLW-Online/Jimdo) aller versteckten & Menü-Seiten
-    - Filter-Optionen: Nur versteckte Seiten / Nur Menü-Seiten / Alle zusammen
-    - 1-Klick-Link-Kopierfunktion für schnelle Weitergabe geheimer Seiten
-    - Einheitlicher Seitenschutz (Wartungsmodus) direkt in der dynamischen Liste
-    - Geräte-Erkennung & Fingerabdruck-Login (Passkey / WebAuthn) für Supermaster
+    - Seiten wahlweise "Sperren" (Wartung) ODER "Im Menü verstecken" (aus Menü entfernen)
+    - Alle Team- & Master-Codes (Standard: FFLW99 ohne Bindestrich) direkt im
+      Supermaster-Cockpit einsehbar und selbst änderbar
+    - Fingerabdruck- / Passkey-Login mit Geräte-Check & klarer Rückmeldung
 ========================================================================== -->
 <!doctype html>
 <html lang="de">
@@ -127,7 +127,6 @@
       background: #ffffff;
     }
 
-    /* Filter-Buttons & Dynamische Seiten-Karten */
     .m-filter-bar {
       display: flex;
       flex-wrap: wrap;
@@ -205,6 +204,22 @@
       font-size: 0.85rem;
       color: #111111;
     }
+    .m-codes-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0 16px 0;
+      background: #ffffff;
+    }
+    .m-codes-table th,
+    .m-codes-table td {
+      border: 1px solid #c5d7eb;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .m-codes-table th {
+      background: #eef6fc;
+      color: #003366;
+    }
   </style>
 </head>
 <body>
@@ -263,7 +278,7 @@
           <button type="button" class="m-tab-btn active" data-tab="eingang" id="m-tab-eingang-btn">Spenden-Eingang &amp; Termine</button>
           <button type="button" class="m-tab-btn" data-tab="online" id="m-tab-online-btn">Online &amp; Reservierte</button>
           <button type="button" class="m-tab-btn" data-tab="bedarfe" id="m-tab-bedarfe-btn">Angemeldete Bedarfe</button>
-          <button type="button" class="m-tab-btn" data-tab="supermaster" id="m-tab-supermaster-btn" style="display:none;">Versteckte Seiten &amp; Seitenschutz</button>
+          <button type="button" class="m-tab-btn" data-tab="supermaster" id="m-tab-supermaster-btn" style="display:none;">Versteckte Seiten, Codes &amp; Schutz</button>
         </div>
 
         <div id="m-status-banner" style="margin-bottom:12px; font-weight:bold; color:#004080; display:flex; align-items:center; gap:8px;">
@@ -295,9 +310,9 @@
         </div>
 
         <div id="tab-supermaster" class="m-tab-panel m-card" style="display:none;">
-          <h3 style="margin-top:0; color:#003366;">Seiten-Übersicht, Geheime Links &amp; Seitenschutz (Live aus GitHub)</h3>
+          <h3 style="margin-top:0; color:#003366;">1. Seiten-Übersicht: Im Menü verstecken &amp; Seitenschutz (Live aus GitHub)</h3>
           <p style="font-size:0.94rem; color:#222222;">
-            Alle HTML-Seiten aus <strong>FFLW-Online/Jimdo</strong> werden automatisch erkannt und mit dem Hauptmenü abgeglichen:
+            <strong>Unterschied:</strong> <em>„Im Menü verstecken“</em> blendet die Seite komplett aus der Navigation aus (sie bleibt aber per Direktlink erreichbar). <em>„Sperren“</em> zeigt Besuchern die Wartungsmeldung.
           </p>
 
           <div class="m-filter-bar">
@@ -326,13 +341,51 @@
             </div>
           </div>
 
-          <hr style="margin:22px 0; border:none; border-top:1px solid #c5d7eb;">
+          <hr style="margin:24px 0; border:none; border-top:2px solid #c5d7eb;">
 
-          <div style="display:flex; flex-wrap:wrap; gap:18px; margin-bottom:16px;">
-            <div>
-              <label for="m-set-code" style="display:block; font-weight:bold; margin-bottom:5px; color:#003366;">Besucher-Zugangscode (leer = offen):</label>
-              <input type="text" id="m-set-code" class="m-input" placeholder="z. B. 11" style="max-width:180px;">
-            </div>
+          <h3 style="color:#003366;">2. Zugangs-Codes &amp; Passwörter selbst verwalten</h3>
+          <p style="font-size:0.93rem; color:#222222;">
+            Hier siehst du alle aktuellen Zugangs-Codes für die verschiedenen Berechtigungsstufen und kannst sie jederzeit selbst ändern:
+          </p>
+
+          <table class="m-codes-table">
+            <thead>
+              <tr>
+                <th>Kategorie / Zugriffsebene</th>
+                <th>Berechtigung</th>
+                <th>Aktueller Code (änderbar)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background:#f4f8fc;">
+                <td><strong>Supermaster (Du selbst)</strong></td>
+                <td>Vollzugriff, versteckte Seiten, Codes &amp; Seitenschutz</td>
+                <td><input type="text" id="m-code-master" class="m-input" style="max-width:170px; font-weight:bold;" value="FFLW99"></td>
+              </tr>
+              <tr>
+                <td><strong>Untermaster: Spenden-Team</strong></td>
+                <td>Spenden prüfen, freischalten &amp; Reservierungen verwalten</td>
+                <td><input type="text" id="m-code-freischalter" class="m-input" style="max-width:170px;" value="FFLWTEAM"></td>
+              </tr>
+              <tr>
+                <td><strong>Untermaster: Bedarfs-Koordination</strong></td>
+                <td>Bedarfsanmeldungen prüfen &amp; koordinieren</td>
+                <td><input type="text" id="m-code-koordinator" class="m-input" style="max-width:170px;" value="FFLWKOORD"></td>
+              </tr>
+              <tr>
+                <td><strong>Untermaster: Mitflug / Copilot</strong></td>
+                <td>Nur-Lesen / Einarbeitung</td>
+                <td><input type="text" id="m-code-copilot" class="m-input" style="max-width:170px;" value="FFLWCOPILOT"></td>
+              </tr>
+              <tr style="background:#eaf6ec;">
+                <td><strong>Besucher-Zugangscode (Warenhaus)</strong></td>
+                <td>Code für <em>aktuelle-angebote.html</em> (leer = offen für alle)</td>
+                <td><input type="text" id="m-set-code" class="m-input" style="max-width:170px;" placeholder="z. B. 11"></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="display:flex; flex-wrap:wrap; gap:18px; margin-bottom:16px; align-items:flex-end;">
             <div>
               <label for="m-set-flag" style="display:block; font-weight:bold; margin-bottom:5px; color:#003366;">Flaggen-Laufband unter Logo:</label>
               <select id="m-set-flag" class="m-input">
@@ -345,14 +398,15 @@
           </div>
 
           <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-            <button type="button" id="m-save-settings-btn" class="m-btn m-btn-green">Seitenschutz &amp; Einstellungen speichern</button>
+            <button type="button" id="m-save-settings-btn" class="m-btn m-btn-green">Alle Einstellungen &amp; Codes speichern</button>
             <button type="button" id="m-register-bio-btn" class="m-btn m-btn-purple">Dieses Gerät für Fingerabdruck-Login merken</button>
             <span id="m-settings-msg" style="font-weight:bold; color:#1b5e20;"></span>
           </div>
+          <div id="m-bio-status" style="margin-top:8px; font-size:0.88rem; color:#333333;"></div>
 
-          <hr style="margin:22px 0; border:none; border-top:1px solid #c5d7eb;">
+          <hr style="margin:24px 0; border:none; border-top:1px solid #c5d7eb;">
 
-          <h3 style="color:#003366;">Neue „Sonstiges“-Vorschläge von Spendern</h3>
+          <h3 style="color:#003366;">3. Neue „Sonstiges“-Vorschläge von Spendern</h3>
           <div id="m-katalog-list"></div>
         </div>
       </section>
@@ -367,14 +421,7 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
-      const BIO_STORAGE_KEY = "fflw_supermaster_passkey_v1";
-
-      const ROLLEN = {
-        "FFLW-99": { role: "master", label: "Supermaster (Vollzugriff)", desc: "Zugriff auf alle Bereiche, versteckte Unterseiten & Seitenschutz", defaultMode: "full" },
-        "FFLW-TEAM": { role: "freischalter", label: "Untermaster: Spenden-Team", desc: "Spenden prüfen, freischalten, pausieren & Reservierungen verwalten", defaultMode: "full" },
-        "FFLW-KOORD": { role: "koordinator", label: "Untermaster: Bedarfs-Koordination", desc: "Bedarfsanmeldungen prüfen und abstimmen", defaultMode: "copilot" },
-        "FFLW-COPILOT": { role: "copilot", label: "Untermaster: Mitflug / Einarbeitung", desc: "Ansicht zur Einarbeitung (Nur-Lesen)", defaultMode: "observer" }
-      };
+      const BIO_STORAGE_KEY = "fflw_supermaster_passkey_v2";
 
       let activeCode = "";
       let activeRole = null;
@@ -382,6 +429,7 @@
 
       let allDynamicPages = [];
       let lockedPagesSet = new Set();
+      let hiddenNavPagesSet = new Set();
       let currentPageFilter = "hidden";
 
       const loginBtn = document.getElementById("m-login-btn");
@@ -390,24 +438,38 @@
       const loginMsg = document.getElementById("m-login-msg");
       const cockpit = document.getElementById("m-cockpit");
       const copilotSel = document.getElementById("m-copilot-mode");
+      const bioStatusEl = document.getElementById("m-bio-status");
 
-      // Fingerabdruck / Geräte-Erkennung prüfen
-      function hasStoredPasskey() {
+      // Fingerabdruck / Passkey Verfügbarkeit prüfen
+      function getStoredPasskey() {
         try {
-          return Boolean(localStorage.getItem(BIO_STORAGE_KEY) && window.PublicKeyCredential);
+          const raw = localStorage.getItem(BIO_STORAGE_KEY);
+          return raw ? JSON.parse(raw) : null;
         } catch (e) {
-          return false;
+          return null;
         }
       }
 
-      if (hasStoredPasskey()) {
+      if (getStoredPasskey() && window.PublicKeyCredential) {
         bioLoginBtn.style.display = "inline-flex";
       }
 
+      if (window.PublicKeyCredential && window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+        window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(avail => {
+          if (avail) {
+            const existing = getStoredPasskey();
+            bioStatusEl.textContent = existing
+              ? "Fingerabdruck / Biometrie ist auf diesem Gerät aktiv eingerichtet."
+              : "Dieses Gerät unterstützt Fingerabdruck / Gesichtserkennung – klicke oben zum Einrichten.";
+          } else {
+            bioStatusEl.textContent = "Hinweis: Auf diesem Gerät/Browser ist kein Fingerabdruck-Sensor hinterlegt.";
+          }
+        }).catch(() => {});
+      }
+
       async function verifyDeviceBiometrics() {
-        const storedRaw = localStorage.getItem(BIO_STORAGE_KEY);
-        if (!storedRaw || !window.PublicKeyCredential) return false;
-        const stored = JSON.parse(storedRaw);
+        const stored = getStoredPasskey();
+        if (!stored || !window.PublicKeyCredential) return null;
         const credIdBytes = Uint8Array.from(atob(stored.credId), c => c.charCodeAt(0));
         const challenge = new Uint8Array(32);
         window.crypto.getRandomValues(challenge);
@@ -417,28 +479,32 @@
             challenge: challenge,
             allowCredentials: [{ id: credIdBytes, type: "public-key" }],
             userVerification: "required",
-            timeout: 45000
+            timeout: 60000
           }
         });
-        return Boolean(assertion);
+        return assertion ? (stored.masterCode || "FFLW99") : null;
       }
 
       bioLoginBtn.addEventListener("click", async () => {
         loginMsg.textContent = "";
         try {
-          const ok = await verifyDeviceBiometrics();
-          if (ok) {
-            codeInput.value = "FFLW-99";
+          const savedMasterCode = await verifyDeviceBiometrics();
+          if (savedMasterCode) {
+            codeInput.value = savedMasterCode;
             performLogin();
           }
         } catch (err) {
-          loginMsg.textContent = "Fingerabdruck-Prüfung abgebrochen. Bitte Zugangscode eingeben.";
+          loginMsg.textContent = "Fingerabdruck-Prüfung nicht bestätigt (" + err.name + "). Bitte Zugangscode eingeben.";
         }
       });
 
       document.getElementById("m-register-bio-btn").addEventListener("click", async () => {
         if (!window.PublicKeyCredential) {
           alert("Dieser Browser unterstützt keinen Fingerabdruck-/Passkey-Login.");
+          return;
+        }
+        if (window.location.protocol !== "https:" && window.location.hostname !== "localhost") {
+          alert("Fingerabdruck-Login funktioniert nur über die echte HTTPS-Webseite (nicht als lokale Datei).");
           return;
         }
         try {
@@ -450,7 +516,7 @@
           const cred = await navigator.credentials.create({
             publicKey: {
               challenge: challenge,
-              rp: { name: "FFLW Steuerung" },
+              rp: { name: "FFLW Steuerung", id: window.location.hostname },
               user: { id: userId, name: "supermaster@freundeleuwi.org", displayName: "FFLW Supermaster" },
               pubKeyCredParams: [
                 { type: "public-key", alg: -7 },
@@ -460,19 +526,23 @@
                 authenticatorAttachment: "platform",
                 userVerification: "required"
               },
-              timeout: 45000
+              timeout: 60000
             }
           });
 
           const rawIdArr = new Uint8Array(cred.rawId);
           const credIdB64 = btoa(String.fromCharCode.apply(null, rawIdArr));
+          const currentMaster = document.getElementById("m-code-master").value.trim().toUpperCase() || activeCode || "FFLW99";
+
           localStorage.setItem(BIO_STORAGE_KEY, JSON.stringify({
             credId: credIdB64,
+            masterCode: currentMaster,
             createdAt: new Date().toISOString()
           }));
+          bioStatusEl.textContent = "Fingerabdruck / Biometrie ist auf diesem Gerät aktiv eingerichtet.";
           alert("Dieses Gerät wurde erfolgreich für den Fingerabdruck-Login gespeichert!");
         } catch (err) {
-          alert("Geräte-Registrierung nicht abgeschlossen: " + err.message);
+          alert("Geräte-Registrierung abgebrochen oder nicht möglich: " + err.message);
         }
       });
 
@@ -502,7 +572,6 @@
         btn.addEventListener("click", () => activateTab(btn.getAttribute("data-tab")));
       });
 
-      // Filter-Buttons für versteckte / Menü / alle Seiten
       document.querySelectorAll(".m-filter-btn").forEach(btn => {
         btn.addEventListener("click", () => {
           document.querySelectorAll(".m-filter-btn").forEach(b => b.classList.remove("active"));
@@ -552,7 +621,7 @@
 
       async function initDynamicGitHubPages() {
         if (typeof window.fetchFflwDynamicPages !== "function") return;
-        const res = await window.fetchFflwDynamicPages();
+        const res = await window.fetchFflwDynamicPages(Array.from(hiddenNavPagesSet));
         allDynamicPages = res.pages || [];
 
         const hiddenCount = allDynamicPages.filter(p => p.isHidden).length;
@@ -569,8 +638,11 @@
         const query = (document.getElementById("m-page-search").value || "").trim().toLowerCase();
 
         const filtered = allDynamicPages.filter(p => {
-          if (currentPageFilter === "hidden" && !p.isHidden) return false;
-          if (currentPageFilter === "menu" && !p.inMenu) return false;
+          const isCurrentlyHidden = !p.isLegal && (!p.inNavHtml || hiddenNavPagesSet.has(p.file));
+          const isCurrentlyInMenu = p.inNavHtml && !hiddenNavPagesSet.has(p.file);
+
+          if (currentPageFilter === "hidden" && !isCurrentlyHidden) return false;
+          if (currentPageFilter === "menu" && !isCurrentlyInMenu) return false;
           if (query && !p.file.toLowerCase().includes(query) && !p.title.toLowerCase().includes(query)) return false;
           return true;
         });
@@ -583,15 +655,17 @@
         container.innerHTML = "";
         filtered.forEach(p => {
           const isLocked = lockedPagesSet.has(p.file);
-          const canBeLocked = !p.isLegal && p.file !== "master.html";
+          const isHiddenFromMenu = hiddenNavPagesSet.has(p.file);
+          const isCurrentlyHidden = !p.isLegal && (!p.inNavHtml || isHiddenFromMenu);
+          const canBeManaged = !p.isLegal && p.file !== "master.html";
           const fullUrl = buildAbsolutePageUrl(p.file);
 
           const row = document.createElement("div");
-          row.className = "m-page-row" + (p.isHidden ? " is-hidden-page" : "") + (isLocked ? " is-locked-page" : "");
+          row.className = "m-page-row" + (isCurrentlyHidden ? " is-hidden-page" : "") + (isLocked ? " is-locked-page" : "");
 
-          const badgeHtml = p.isHidden
-            ? `<span class="m-badge m-badge-hidden">Versteckt</span>`
-            : `<span class="m-badge m-badge-menu">Im Menü</span>`;
+          const badgeHtml = isCurrentlyHidden
+            ? `<span class="m-badge m-badge-hidden">${isHiddenFromMenu ? "Aus Menü versteckt" : "Versteckt (nicht in nav.html)"}</span>`
+            : `<span class="m-badge m-badge-menu">Im Menü sichtbar</span>`;
 
           row.innerHTML = `
             <div style="flex:1; min-width:210px;">
@@ -606,8 +680,14 @@
 
             <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
               <button type="button" class="m-btn m-btn-sm m-btn-blue btn-copy-link">Link kopieren</button>
-              ${canBeLocked ? `
-                <label class="m-lock-toggle">
+              ${(canBeManaged && p.inNavHtml) ? `
+                <label class="m-lock-toggle" style="border-color:#b39ddb; background:${isHiddenFromMenu ? '#ede7f6' : '#f8fafc'};">
+                  <input type="checkbox" class="cb-hide-menu-page" value="${p.file}" ${isHiddenFromMenu ? "checked" : ""}>
+                  <span>${isHiddenFromMenu ? "Versteckt" : "Im Menü verstecken"}</span>
+                </label>
+              ` : ""}
+              ${canBeManaged ? `
+                <label class="m-lock-toggle" style="border-color:#ef9a9a; background:${isLocked ? '#ffebee' : '#f8fafc'};">
                   <input type="checkbox" class="cb-lock-page" value="${p.file}" ${isLocked ? "checked" : ""}>
                   <span>${isLocked ? "Gesperrt" : "Sperren"}</span>
                 </label>
@@ -619,9 +699,25 @@
             copyTextToClipboard(fullUrl, this);
           });
 
-          const cb = row.querySelector(".cb-lock-page");
-          if (cb) {
-            cb.addEventListener("change", function () {
+          const cbHide = row.querySelector(".cb-hide-menu-page");
+          if (cbHide) {
+            cbHide.addEventListener("change", function () {
+              if (this.checked) {
+                hiddenNavPagesSet.add(p.file);
+              } else {
+                hiddenNavPagesSet.delete(p.file);
+              }
+              const hiddenCount = allDynamicPages.filter(x => !x.isLegal && (!x.inNavHtml || hiddenNavPagesSet.has(x.file))).length;
+              const menuCount = allDynamicPages.filter(x => x.inNavHtml && !hiddenNavPagesSet.has(x.file)).length;
+              document.getElementById("count-hidden").textContent = hiddenCount;
+              document.getElementById("count-menu").textContent = menuCount;
+              renderDynamicPagesList();
+            });
+          }
+
+          const cbLock = row.querySelector(".cb-lock-page");
+          if (cbLock) {
+            cbLock.addEventListener("change", function () {
               if (this.checked) {
                 lockedPagesSet.add(p.file);
               } else {
@@ -635,47 +731,77 @@
         });
       }
 
-      function performLogin() {
+      const ROLE_META = {
+        master: { role: "master", label: "Supermaster (Vollzugriff)", desc: "Zugriff auf alle Bereiche, versteckte Unterseiten, Codes & Seitenschutz", defaultMode: "full" },
+        freischalter: { role: "freischalter", label: "Untermaster: Spenden-Team", desc: "Spenden prüfen, freischalten, pausieren & Reservierungen verwalten", defaultMode: "full" },
+        koordinator: { role: "koordinator", label: "Untermaster: Bedarfs-Koordination", desc: "Bedarfsanmeldungen prüfen und abstimmen", defaultMode: "copilot" },
+        copilot: { role: "copilot", label: "Untermaster: Mitflug / Einarbeitung", desc: "Ansicht zur Einarbeitung (Nur-Lesen)", defaultMode: "observer" }
+      };
+
+      async function performLogin() {
         const val = codeInput.value.trim().toUpperCase();
-        if (!ROLLEN[val]) {
-          loginMsg.textContent = "Unbekannter Zugangscode. Bitte Eingabe prüfen.";
+        if (!val) {
+          loginMsg.textContent = "Bitte Zugangscode eingeben.";
           return;
         }
-        activeCode = val;
-        activeRole = ROLLEN[val];
-        copilotMode = activeRole.defaultMode;
-        copilotSel.value = copilotMode;
+        loginBtn.disabled = true;
+        loginMsg.style.color = "#004080";
+        loginMsg.textContent = "Prüfe Zugangscode …";
 
-        document.getElementById("m-role-label").textContent = activeRole.label;
-        document.getElementById("m-role-desc").textContent = activeRole.desc;
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=master_overview&code=${encodeURIComponent(val)}&t=${Date.now()}`, {
+            method: "GET",
+            redirect: "follow"
+          });
+          const data = await resp.json();
+          loginBtn.disabled = false;
 
-        const btnEingang = document.getElementById("m-tab-eingang-btn");
-        const btnOnline = document.getElementById("m-tab-online-btn");
-        const btnBedarfe = document.getElementById("m-tab-bedarfe-btn");
-        const btnSuper = document.getElementById("m-tab-supermaster-btn");
+          if (!data || !data.ok || !ROLE_META[data.role]) {
+            loginMsg.style.color = "#c62828";
+            loginMsg.textContent = "Unbekannter Zugangscode. Bitte Eingabe prüfen.";
+            return;
+          }
 
-        if (activeRole.role === "master") {
-          btnSuper.style.display = "inline-block";
-          activateTab("eingang");
-          initDynamicGitHubPages();
-        } else if (activeRole.role === "freischalter") {
-          btnBedarfe.style.display = "none";
-          btnSuper.style.display = "none";
-          activateTab("eingang");
-        } else if (activeRole.role === "koordinator") {
-          btnEingang.style.display = "none";
-          btnOnline.style.display = "none";
-          btnSuper.style.display = "none";
-          document.body.classList.add("accessible-mode");
-          activateTab("bedarfe");
-        } else {
-          btnSuper.style.display = "none";
-          activateTab("eingang");
+          loginMsg.textContent = "";
+          activeCode = val;
+          activeRole = ROLE_META[data.role];
+          copilotMode = activeRole.defaultMode;
+          copilotSel.value = copilotMode;
+
+          document.getElementById("m-role-label").textContent = activeRole.label;
+          document.getElementById("m-role-desc").textContent = activeRole.desc;
+
+          const btnEingang = document.getElementById("m-tab-eingang-btn");
+          const btnOnline = document.getElementById("m-tab-online-btn");
+          const btnBedarfe = document.getElementById("m-tab-bedarfe-btn");
+          const btnSuper = document.getElementById("m-tab-supermaster-btn");
+
+          if (activeRole.role === "master") {
+            btnSuper.style.display = "inline-block";
+            activateTab("eingang");
+          } else if (activeRole.role === "freischalter") {
+            btnBedarfe.style.display = "none";
+            btnSuper.style.display = "none";
+            activateTab("eingang");
+          } else if (activeRole.role === "koordinator") {
+            btnEingang.style.display = "none";
+            btnOnline.style.display = "none";
+            btnSuper.style.display = "none";
+            document.body.classList.add("accessible-mode");
+            activateTab("bedarfe");
+          } else {
+            btnSuper.style.display = "none";
+            activateTab("eingang");
+          }
+
+          document.getElementById("m-login-box").style.display = "none";
+          cockpit.style.display = "block";
+          applyOverviewDataToUI(data);
+        } catch (err) {
+          loginBtn.disabled = false;
+          loginMsg.style.color = "#c62828";
+          loginMsg.textContent = "Verbindungsfehler: " + err.message;
         }
-
-        document.getElementById("m-login-box").style.display = "none";
-        cockpit.style.display = "block";
-        loadMasterDashboard();
       }
 
       loginBtn.addEventListener("click", performLogin);
@@ -697,6 +823,33 @@
         return await resp.json();
       }
 
+      function applyOverviewDataToUI(data) {
+        const banner = document.getElementById("m-status-banner");
+        banner.innerHTML = `<span style="color:#1b5e20;">Verbunden (Stand: ${new Date().toLocaleTimeString("de-DE")})</span>`;
+        renderEingang(data.eingang || []);
+        renderOnline(data.online || []);
+        renderBedarfe(data.bedarfe || []);
+        renderKatalog(data.katalogVorschlaege || []);
+
+        if (data.teamCodes) {
+          document.getElementById("m-code-master").value = data.teamCodes.master || "FFLW99";
+          document.getElementById("m-code-freischalter").value = data.teamCodes.freischalter || "FFLWTEAM";
+          document.getElementById("m-code-koordinator").value = data.teamCodes.koordinator || "FFLWKOORD";
+          document.getElementById("m-code-copilot").value = data.teamCodes.copilot || "FFLWCOPILOT";
+        }
+
+        if (data.siteConfig) {
+          document.getElementById("m-set-code").value = data.siteConfig.zugangscode || "";
+          document.getElementById("m-set-flag").value = data.siteConfig.flaggenStil || "A";
+          lockedPagesSet = new Set(Array.isArray(data.siteConfig.wartungSeiten) ? data.siteConfig.wartungSeiten : []);
+          hiddenNavPagesSet = new Set(Array.isArray(data.siteConfig.versteckteSeiten) ? data.siteConfig.versteckteSeiten : []);
+          document.getElementById("m-lock-all-pages").checked = lockedPagesSet.has("*");
+          if (activeRole && activeRole.role === "master") {
+            initDynamicGitHubPages();
+          }
+        }
+      }
+
       async function loadMasterDashboard() {
         const banner = document.getElementById("m-status-banner");
         banner.innerHTML = `<span class="fflw-spinner"></span> <span>Lade aktuelle Daten …</span>`;
@@ -711,20 +864,7 @@
             banner.innerHTML = `<span style="color:#c62828;">Fehler beim Laden: ${data && data.error ? data.error : "Unbekannt"}</span>`;
             return;
           }
-
-          banner.innerHTML = `<span style="color:#1b5e20;">Verbunden (Stand: ${new Date().toLocaleTimeString("de-DE")})</span>`;
-          renderEingang(data.eingang || []);
-          renderOnline(data.online || []);
-          renderBedarfe(data.bedarfe || []);
-          renderKatalog(data.katalogVorschlaege || []);
-
-          if (data.siteConfig) {
-            document.getElementById("m-set-code").value = data.siteConfig.zugangscode || "";
-            document.getElementById("m-set-flag").value = data.siteConfig.flaggenStil || "A";
-            lockedPagesSet = new Set(Array.isArray(data.siteConfig.wartungSeiten) ? data.siteConfig.wartungSeiten : []);
-            document.getElementById("m-lock-all-pages").checked = lockedPagesSet.has("*");
-            renderDynamicPagesList();
-          }
+          applyOverviewDataToUI(data);
         } catch (err) {
           banner.innerHTML = `<span style="color:#c62828;">Verbindungsfehler: ${err.message}</span>`;
         }
@@ -732,15 +872,34 @@
 
       document.getElementById("m-save-settings-btn").addEventListener("click", async () => {
         const msgEl = document.getElementById("m-settings-msg");
+        const newMasterCode = document.getElementById("m-code-master").value.trim().toUpperCase();
+        if (!newMasterCode) {
+          alert("Das Supermaster-Passwort darf nicht leer sein.");
+          return;
+        }
         msgEl.textContent = "Speichere …";
+
         const res = await callMasterApi({
           action: "save_site_status",
           zugangscode: document.getElementById("m-set-code").value,
           flaggenStil: document.getElementById("m-set-flag").value,
-          wartungSeiten: Array.from(lockedPagesSet)
+          wartungSeiten: Array.from(lockedPagesSet),
+          versteckteSeiten: Array.from(hiddenNavPagesSet),
+          teamCodes: {
+            master: newMasterCode,
+            freischalter: document.getElementById("m-code-freischalter").value.trim().toUpperCase(),
+            koordinator: document.getElementById("m-code-koordinator").value.trim().toUpperCase(),
+            copilot: document.getElementById("m-code-copilot").value.trim().toUpperCase()
+          }
         });
         if (res && res.ok) {
-          msgEl.textContent = "Gespeichert!";
+          activeCode = newMasterCode;
+          const storedBio = getStoredPasskey();
+          if (storedBio) {
+            storedBio.masterCode = newMasterCode;
+            localStorage.setItem(BIO_STORAGE_KEY, JSON.stringify(storedBio));
+          }
+          msgEl.textContent = "Alle Einstellungen & Codes gespeichert!";
           setTimeout(() => { msgEl.textContent = ""; }, 3500);
         } else {
           msgEl.textContent = "Fehler beim Speichern.";
