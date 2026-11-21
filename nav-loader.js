@@ -307,7 +307,7 @@ function getCachedSiteStatus() {
       if (parsed && typeof parsed === "object") {
         return {
           wartungSeiten: Array.isArray(parsed.wartungSeiten) ? parsed.wartungSeiten : [],
-          versteckteSeiten: Array.isArray(parsed.versteckteSeiten) ? parsed.versteckteSeiten : ["unterlagen.html", "schatzsuche.html"],
+          versteckteSeiten: Array.isArray(parsed.versteckteSeiten) ? parsed.versteckteSeiten : ["unterlagen.html"],
           maskierteSeiten: Array.isArray(parsed.maskierteSeiten) ? parsed.maskierteSeiten : ["unterlagen.html", "master.html"],
           flaggenStil: ["A", "B", "C", "OFF"].includes(parsed.flaggenStil) ? parsed.flaggenStil : "A",
           zugangscode: typeof parsed.zugangscode === "string" ? parsed.zugangscode : "11"
@@ -317,7 +317,7 @@ function getCachedSiteStatus() {
   } catch (e) {}
   return {
     wartungSeiten: [],
-    versteckteSeiten: ["unterlagen.html", "schatzsuche.html"],
+    versteckteSeiten: ["unterlagen.html"],
     maskierteSeiten: ["unterlagen.html", "master.html"],
     flaggenStil: "A",
     zugangscode: "11"
@@ -333,7 +333,7 @@ function setCachedSiteStatus(statusObj) {
 function applyHiddenNavItems(versteckteSeiten) {
   const navContainer = document.getElementById("main-nav");
   if (!navContainer) return;
-  const hiddenSet = new Set(Array.isArray(versteckteSeiten) ? versteckteSeiten : ["unterlagen.html", "schatzsuche.html"]);
+  const hiddenSet = new Set(Array.isArray(versteckteSeiten) ? versteckteSeiten : ["unterlagen.html"]);
 
   navContainer.querySelectorAll("li").forEach(li => {
     const link = li.querySelector("a[href]");
@@ -453,7 +453,7 @@ function syncGlobalSiteStatus(currentPage) {
       if (!data || !data.ok) return;
       const fresh = {
         wartungSeiten: Array.isArray(data.wartungSeiten) ? data.wartungSeiten : [],
-        versteckteSeiten: Array.isArray(data.versteckteSeiten) ? data.versteckteSeiten : ["unterlagen.html", "schatzsuche.html"],
+        versteckteSeiten: Array.isArray(data.versteckteSeiten) ? data.versteckteSeiten : ["unterlagen.html"],
         maskierteSeiten: Array.isArray(data.maskierteSeiten) ? data.maskierteSeiten : ["unterlagen.html", "master.html"],
         flaggenStil: ["A", "B", "C", "OFF"].includes(data.flaggenStil) ? data.flaggenStil : "A",
         zugangscode: typeof data.zugangscode === "string" ? data.zugangscode : "11"

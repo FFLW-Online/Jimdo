@@ -1227,7 +1227,7 @@
         document.getElementById("sys-flaggen").value = cfg.flaggenStil || "A";
 
         const wartungSet = new Set(cfg.wartungSeiten || []);
-        const hiddenSet = new Set(cfg.versteckteSeiten || ["unterlagen.html", "schatzsuche.html"]);
+        const hiddenSet = new Set(cfg.versteckteSeiten || ["unterlagen.html"]);
         const maskSet = new Set(cfg.maskierteSeiten || ["unterlagen.html", "master.html"]);
 
         const dyn = (typeof window.fetchFflwDynamicPages === "function")
