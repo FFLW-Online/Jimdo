@@ -1,11 +1,13 @@
 <!-- ==========================================================================
   DATEI: schatzsuche.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-21 15:55 CET
-  BESCHREIBUNG: Schatzsuche – Wo liegen deine Begabungen und Talente?
-    - Stärkenorientierter Fragebogen (Mobilität, Beruf, Ehrenamt, Haushalt & Reparatur,
-      IT & Papierkram, Garten & Landwirtschaft, Bildende Kunst, Bildhauerei/Ton, Musik)
-    - Automatisch übersetzbar über das Flaggenband oben
-    - Optional verknüpfbar mit persönlichem 6-stelligen Akten-Code
+  ERSTELLT VON GEMINI AM: 2026-11-21 16:35 CET
+  BESCHREIBUNG: Schatzsuche – Wo liegen deine Begabungen, Träume und Talente?
+    - Baukasten-System mit Themen-Kacheln (man öffnet nur, was interessiert!)
+    - 5 differenzierte Stufen inkl. ✨ Funkelnde Sterne (Traum & Neugier)
+    - Intelligente Detail-Vertiefung (z. B. Hotel-/Großküche, Smartphone vs. Löten,
+      Chor-Gesang & Musikinstrumente, Garten & Tiere, Mobilität & LKW)
+    - Persönlicher 6-stelliger Schatzsuche-Code zum späteren Weiterbearbeiten
+      und Verfeinern, ohne doppelte Einträge in der Datenbank zu erzeugen
 ========================================================================== -->
 <!doctype html>
 <html lang="de">
@@ -24,16 +26,16 @@
       margin: 14px 0 20px 0;
       color: #111111;
     }
-    .sz-section {
+    .sz-card {
       background: #ffffff;
       border: 2px solid #c5d7eb;
-      border-left: 6px solid #2e7d32;
+      border-left: 6px solid #004080;
       border-radius: 10px;
       padding: 18px 20px;
-      margin: 18px 0;
+      margin: 16px 0;
       box-shadow: 0 2px 8px rgba(0, 64, 128, 0.06);
     }
-    .sz-section h3 {
+    .sz-card h3 {
       margin-top: 0;
       color: #003366;
       border-bottom: 1px solid #dce6f2;
@@ -43,8 +45,8 @@
       display: block;
       font-weight: bold;
       color: #003366;
-      margin: 14px 0 6px 0;
-      font-size: 1rem;
+      margin: 12px 0 6px 0;
+      font-size: 0.98rem;
     }
     .sz-input, .sz-select, .sz-textarea {
       width: 100%;
@@ -56,33 +58,160 @@
       background: #ffffff;
       box-sizing: border-box;
     }
-    .sz-check-list {
+    /* Themen-Kacheln zum entspannten Antippen */
+    .sz-topic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .sz-topic-tile {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 13px 14px;
+      border: 2px solid #b8d4ec;
+      border-radius: 10px;
+      background: #f4f8fc;
+      color: #003366;
+      font-weight: bold;
+      font-size: 0.98rem;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.16s ease;
+    }
+    .sz-topic-tile:hover {
+      background: #e6eff9;
+      border-color: #004080;
+    }
+    .sz-topic-tile.selected {
+      background: #004080;
+      color: #ffffff;
+      border-color: #002b59;
+      box-shadow: 0 3px 10px rgba(0, 64, 128, 0.22);
+    }
+    .sz-topic-tile .sz-tile-badge {
+      font-size: 0.85rem;
+      padding: 2px 7px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.22);
+    }
+    /* Geöffnete Bereichs-Karte */
+    .sz-domain-panel {
+      display: none;
+      background: #ffffff;
+      border: 2px solid #81c784;
+      border-left: 7px solid #2e7d32;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 16px 0;
+      box-shadow: 0 3px 12px rgba(46, 125, 50, 0.08);
+    }
+    .sz-domain-panel.is-open {
+      display: block;
+    }
+    .sz-domain-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #d8e8da;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .sz-domain-header h4 {
+      margin: 0;
+      color: #1b5e20;
+      font-size: 1.12rem;
+    }
+    .sz-close-domain {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.84rem;
+      cursor: pointer;
+    }
+    /* 5 differenzierte Stufen */
+    .sz-levels-grid {
       display: grid;
       grid-template-columns: 1fr;
       gap: 7px;
-      margin: 6px 0 10px 0;
+      margin: 8px 0 14px 0;
     }
-    .sz-check-item {
+    .sz-level-opt {
       display: flex;
       align-items: flex-start;
       gap: 10px;
-      background: #f8fbff;
-      border: 1px solid #d8e3f0;
-      border-radius: 7px;
-      padding: 8px 11px;
+      padding: 9px 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      background: #f8fafc;
       cursor: pointer;
-      font-size: 0.95rem;
+      font-size: 0.94rem;
       line-height: 1.4;
     }
-    .sz-check-item:hover {
+    .sz-level-opt:hover {
       background: #eef6fc;
       border-color: #90caf9;
     }
-    .sz-check-item input[type="checkbox"] {
+    .sz-level-opt input[type="checkbox"] {
       width: 19px;
       height: 19px;
       margin-top: 2px;
       flex-shrink: 0;
+    }
+    .sz-level-opt[data-lvl="dream"] {
+      background: #fffbeb;
+      border-color: #fcd34d;
+    }
+    .sz-level-opt[data-lvl="pro"] {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+    /* Sub-Optionen & Vertiefung */
+    .sz-sub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 7px;
+      margin: 8px 0 12px 0;
+    }
+    .sz-sub-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      background: #f4f8fc;
+      border: 1px solid #d0e1f2;
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-size: 0.91rem;
+      cursor: pointer;
+    }
+    .sz-sub-item input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .sz-deep-box {
+      background: #f8fafc;
+      border: 1px dashed #94a3b8;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 10px;
+    }
+    .sz-btn-primary {
+      background: #004080;
+      color: #ffffff;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 7px;
+      font-weight: bold;
+      font-size: 0.96rem;
+      cursor: pointer;
     }
     .sz-btn-submit {
       background: #2e7d32;
@@ -107,44 +236,45 @@
     <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
 
     <main class="content">
-      <h2>Schatzsuche – Wo liegen deine Begabungen und Talente?</h2>
+      <h2>✨ Schatzsuche – Wo liegen deine Begabungen, Träume und Talente?</h2>
 
       <section class="sz-intro">
         <p style="margin-top:0;">
-          Wir sind der Überzeugung, dass jeder und jede bestimmte Begabungen hat und dass es schön ist, wenn man diese Begabungen für sich und für andere einbringen kann. Wie kannst du – wenn du möchtest – dich in das Netz des Ehrenamts in Winnenden und Leutenbach oder auch bei uns im Verein persönlich einbringen?
+          Wir sind der Überzeugung, dass jeder und jede bestimmte Begabungen – und oft auch unerfüllte Träume – in sich trägt. Es ist schön, wenn man diese Begabungen für sich und für andere einbringen oder Neues entdecken kann.
         </p>
         <p>
-          <strong>Niemand ist verpflichtet dazu, sich ehrenamtlich zu engagieren.</strong> Ehrenamtlich bedeutet: Man tut etwas – ohne dafür konkret bezahlt zu werden. Man macht es, weil man denkt: <em>Ich habe freie Zeit – und die Welt kann durch meine Hilfe etwas besser werden.</em>
+          <strong>Niemand ist verpflichtet dazu, sich ehrenamtlich zu engagieren.</strong> Arbeit, Geldverdienen, Deutschlernen und die Familie stehen an erster Stelle. Aber wenn du freie Zeit hast oder auf einen Kurs wartest, kann ein Ehrenamt guttun: Du lernst neue Menschen und die Sprache im Alltag kennen, andere erleben deine Zuverlässigkeit und deine Fähigkeiten – und oft entstehen daraus wertvolle Kontakte für Arbeit und Leben.
         </p>
-        <p>
-          Natürlich kann man denken: <em>Was bringt das mir? Ich muss arbeiten, ich muss Geld verdienen, ich muss Deutsch lernen, ich muss meine Familie ernähren und vielleicht meine Familie in meinem Heimatland unterstützen.</em> Das ist richtig, und das Ehrenamt soll nicht als Konkurrenz zur Arbeit oder zu Sprachkursen verstanden werden. Aber wenn man aktuell noch auf Arbeit oder einen Sprachkurs wartet, kann ein Ehrenamt guttun:
-        </p>
-        <ol style="margin: 8px 0 12px 20px; padding: 0;">
-          <li>Es tut gut, wenn man anderen hilft – man hat nicht das Gefühl „nutzlos“ zu sein.</li>
-          <li>Man lernt dabei neue Leute kennen.</li>
-          <li>Es ist hilfreich, um das Leben und die Kultur hier kennenzulernen.</li>
-          <li>Andere Menschen merken: Auf dich ist Verlass, du hast viele Begabungen – und oft entstehen daraus wertvolle Kontakte für Arbeit und Alltag.</li>
-          <li>Es hilft, die deutsche Sprache schneller im Alltag zu sprechen.</li>
-          <li>Für eine spätere Einbürgerung ist ehrenamtliches Engagement ein schönes Plus.</li>
-          <li>Viele Vereine und Gruppen freuen sich über neue Mitglieder.</li>
-        </ol>
         <p style="margin-bottom:0; background:#eaf6ec; border:1px solid #a5d6a7; padding:10px 12px; border-radius:7px;">
-          <strong>Alle Angaben sind komplett freiwillig.</strong> Du musst nicht alle Fragen beantworten – fülle einfach das aus, was dir Freude macht.
+          <strong>Kein langes Pflichtformular:</strong> Tippe unten einfach nur die Themen an, die dir Freude machen oder dich interessieren. Du erhältst am Ende einen <strong>persönlichen 6-stelligen Schatzsuche-Code</strong>, mit dem du deine Angaben jederzeit wieder öffnen, ergänzen oder verfeinern kannst!
         </p>
       </section>
 
-      <form id="sz-form">
-        <!-- ABSCHNITT 1: PERSÖNLICHE ANGABEN -->
-        <section class="sz-section" style="border-left-color:#004080;">
-          <h3>1. Über dich &amp; deine Sprachen</h3>
+      <!-- Optional: Bestehenden Schatzsuche-Code laden zum Weiterbearbeiten -->
+      <section class="sz-card" style="background:#fffdf7; border-left-color:#d97706;">
+        <details id="sz-resume-details">
+          <summary style="cursor:pointer; font-weight:bold; color:#78350f; font-size:1rem;">
+            🔑 Hast du schon einen Schatzsuche-Code und möchtest deine Angaben ergänzen oder verfeinern?
+          </summary>
+          <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+            <input type="text" id="sz-load-code" class="sz-input" inputmode="numeric" maxlength="10" placeholder="Dein 6-stelliger Schatzsuche-Code …" style="max-width:250px; font-weight:bold;">
+            <button type="button" id="sz-load-btn" class="sz-btn-primary">Meine Schatzsuche laden</button>
+            <span id="sz-load-msg" style="font-weight:bold;"></span>
+          </div>
+        </details>
+      </section>
 
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
+      <form id="sz-form">
+        <!-- SCHRITT 1: PERSÖNLICHE BASISDATEN -->
+        <section class="sz-card">
+          <h3>1. Über dich &amp; deine Sprachen</h3>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
             <div>
               <label class="sz-q-title" for="sz-name">Dein Name (Vorname, Nachname) *</label>
               <input type="text" id="sz-name" class="sz-input" required placeholder="Vorname Nachname">
             </div>
             <div>
-              <label class="sz-q-title" for="sz-herkunft">Wie heißt dein Heimatland? *</label>
+              <label class="sz-q-title" for="sz-herkunft">Dein Heimatland *</label>
               <input type="text" id="sz-herkunft" class="sz-input" list="sz-laender-list" required placeholder="z. B. Syrien, Ukraine, Afghanistan …">
               <datalist id="sz-laender-list">
                 <option value="Syrien"><option value="Ukraine"><option value="Afghanistan">
@@ -156,7 +286,7 @@
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
             <div>
               <label class="sz-q-title" for="sz-kontakt">Telefon / WhatsApp (oder E-Mail) *</label>
               <input type="text" id="sz-kontakt" class="sz-input" required placeholder="z. B. 0171 1234567">
@@ -169,10 +299,6 @@
 
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
             <div>
-              <label class="sz-q-title" for="sz-geburt">Geburtsjahr oder Geburtsdatum (optional)</label>
-              <input type="text" id="sz-geburt" class="sz-input" placeholder="z. B. 1992">
-            </div>
-            <div>
               <label class="sz-q-title" for="sz-muttersprache">Deine Muttersprache(n)</label>
               <input type="text" id="sz-muttersprache" class="sz-input" placeholder="z. B. Arabisch, Kurdisch, Ukrainisch">
             </div>
@@ -180,198 +306,76 @@
               <label class="sz-q-title" for="sz-sprachen">Welche anderen Sprachen sprichst du?</label>
               <input type="text" id="sz-sprachen" class="sz-input" placeholder="z. B. Deutsch, Englisch, Französisch">
             </div>
+            <div>
+              <label class="sz-q-title" for="sz-geburt">Geburtsjahr (optional)</label>
+              <input type="text" id="sz-geburt" class="sz-input" placeholder="z. B. 1992">
+            </div>
           </div>
 
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
             <div>
               <label class="sz-q-title" for="sz-familie">Familie / Kinder (optional)</label>
               <input type="text" id="sz-familie" class="sz-input" placeholder="z. B. verheiratet, 2 Kinder">
             </div>
             <div>
               <label class="sz-q-title" for="sz-aktencode">Falls vorhanden: Dein 6-stelliger Akten-Code</label>
-              <input type="text" id="sz-aktencode" class="sz-input" inputmode="numeric" maxlength="10" placeholder="Optional (ordnet direkt deiner Akte zu)">
+              <input type="text" id="sz-aktencode" class="sz-input" inputmode="numeric" maxlength="10" placeholder="Optional (verknüpft mit deiner Akte)">
             </div>
           </div>
-        </section>
-
-        <!-- ABSCHNITT 2: MOBILITÄT -->
-        <section class="sz-section">
-          <h3>2. Mobilität (Fahrrad &amp; Auto)</h3>
-          <span class="sz-q-title">Welche Möglichkeiten und Wünsche hast du im Bereich Mobilität? (Mehrfachauswahl möglich)</span>
-          <div class="sz-check-list" data-group="mobilitaet">
-            <label class="sz-check-item"><input type="checkbox" value="Kann noch nicht Fahrrad fahren, möchte es gerne lernen"> Ich kann (noch) nicht FAHRRAD fahren – aber ich würde es sehr gerne lernen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Kann Fahrrad fahren, habe aber kein Fahrrad"> Ich kann FAHRRAD fahren, habe hier aber kein FAHRRAD</label>
-            <label class="sz-check-item"><input type="checkbox" value="Hätte gerne ein Fahrrad"> Ich hätte gerne ein FAHRRAD</label>
-            <label class="sz-check-item"><input type="checkbox" value="Kann Fahrrad fahren und es anderen beibringen"> Ich kann Fahrrad fahren und freue mich, wenn ich es anderen beibringen kann!</label>
-            <label class="sz-check-item"><input type="checkbox" value="Kann noch nicht Auto fahren, möchte es lernen"> Ich kann (noch) nicht AUTO fahren, aber ich würde es gerne lernen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Führerschein aus Heimatland vorhanden"> Ich bin in meinem Heimatland schon AUTO gefahren und habe dort auch einen gültigen Führerschein</label>
-            <label class="sz-check-item"><input type="checkbox" value="Gültiger Führerschein für Deutschland, aber kein Auto"> Ich habe einen gültigen FÜHRERSCHEIN für Deutschland – aber ich habe KEIN AUTO</label>
-            <label class="sz-check-item"><input type="checkbox" value="Eigenes Auto in Deutschland vorhanden"> Ich habe sogar schon ein AUTO und kann hier in Deutschland damit fahren</label>
-            <label class="sz-check-item"><input type="checkbox" value="Beruflich mit Auto unterwegs gewesen"> Ich war in meinem Heimatland beruflich mit dem Auto unterwegs</label>
-            <label class="sz-check-item"><input type="checkbox" value="Erfahrung mit Anhänger"> Ich habe auch schon Erfahrung mit einem Auto mit ANHÄNGER</label>
-            <label class="sz-check-item"><input type="checkbox" value="Taxi-Fahrer"> Ich war TAXI-Fahrer</label>
-            <label class="sz-check-item"><input type="checkbox" value="Bus-Fahrer"> Ich war BUS-Fahrer</label>
-            <label class="sz-check-item"><input type="checkbox" value="LKW-Fahrer"> Ich war LKW-Fahrer</label>
-          </div>
-          <label class="sz-q-title" for="sz-mobil-notiz">Persönliche Ergänzung zum Thema Mobilität:</label>
-          <input type="text" id="sz-mobil-notiz" class="sz-input" placeholder="Optional …">
-        </section>
-
-        <!-- ABSCHNITT 3: BERUF & EHRENAMT -->
-        <section class="sz-section">
-          <h3>3. Beruf, Träume &amp; bisheriges Ehrenamt</h3>
 
           <label class="sz-q-title" for="sz-beruf">Welchen Beruf oder welche Berufe hast du ausgeübt – und was sind deine Berufswünsche?</label>
-          <textarea id="sz-beruf" class="sz-textarea" rows="3" placeholder="Schreibe gerne auch, wie lange du das gemacht hast oder wovon du beruflich träumst …"></textarea>
-
-          <label class="sz-q-title">In welchem Bereich hast du im Heimatland oder hier schon ehrenamtlich mitgeholfen?</label>
-          <div class="sz-check-list" data-group="ehrenamt">
-            <label class="sz-check-item"><input type="checkbox" value="Feuerwehr"> Bei der Feuerwehr</label>
-            <label class="sz-check-item"><input type="checkbox" value="Naturschutz"> Im Naturschutz</label>
-            <label class="sz-check-item"><input type="checkbox" value="Sportverein"> In einem Sportverein</label>
-            <label class="sz-check-item"><input type="checkbox" value="Musikverein"> In einem Musikverein</label>
-            <label class="sz-check-item"><input type="checkbox" value="Rettungswesen / Rotes Kreuz"> Im Rettungswesen (z. B. Rotes Kreuz / Roter Halbmond)</label>
-            <label class="sz-check-item"><input type="checkbox" value="Kirche oder Moschee"> In der Kirche oder in der Moschee</label>
-            <label class="sz-check-item"><input type="checkbox" value="Altenhilfe"> In der Altenhilfe</label>
-            <label class="sz-check-item"><input type="checkbox" value="Krankenhaus"> Im Krankenhaus</label>
-            <label class="sz-check-item"><input type="checkbox" value="Tierschutz"> Im Tierschutz</label>
-          </div>
-          <label class="sz-q-title" for="sz-ehrenamt-notiz">Eigene Worte zu deinen Erfahrungen im Ehrenamt:</label>
-          <input type="text" id="sz-ehrenamt-notiz" class="sz-input" placeholder="Optional …">
+          <textarea id="sz-beruf" class="sz-textarea" rows="2" placeholder="Erzähle gerne kurz, was du gelernt oder gearbeitet hast und wovon du beruflich träumst …"></textarea>
         </section>
 
-        <!-- ABSCHNITT 4: HAUSHALT, HANDWERK, TECHNIK & PAPIER -->
-        <section class="sz-section">
-          <h3>4. Praktische Talente (Kochen, Nähen, Reparatur, Computer &amp; Papierkram)</h3>
-
-          <span class="sz-q-title">Kochen &amp; Backen</span>
-          <div class="sz-check-list" data-group="kochen">
-            <label class="sz-check-item"><input type="checkbox" value="Koche sehr gerne"> Ich KOCHE sehr gerne für mich und andere</label>
-            <label class="sz-check-item"><input type="checkbox" value="Zusammen kochen & Rezepte tauschen"> Ich würde auch gerne zusammen mit anderen KOCHEN und Rezepte austauschen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Kochkurse geben"> Ich würde gerne auch anderen zeigen und Kurse geben zum Thema „KOCHEN“</label>
-          </div>
-
-          <span class="sz-q-title">Nähen &amp; Handarbeit</span>
-          <div class="sz-check-list" data-group="naehen">
-            <label class="sz-check-item"><input type="checkbox" value="Nähe sehr gerne"> Ich NÄHE sehr gerne für mich und andere</label>
-            <label class="sz-check-item"><input type="checkbox" value="Zusammen nähen"> Ich würde auch gerne zusammen mit anderen NÄHEN</label>
-            <label class="sz-check-item"><input type="checkbox" value="Nähkurse geben"> Ich würde gerne auch anderen zeigen und Kurse geben zum Thema „NÄHEN“</label>
-          </div>
-
-          <span class="sz-q-title">Reparatur, Handwerk &amp; Technik</span>
-          <div class="sz-check-list" data-group="reparatur">
-            <label class="sz-check-item"><input type="checkbox" value="Technische Dinge im Haushalt"> Ich habe schon immer gerne TECHNISCHE DINGE im Haushalt erledigt</label>
-            <label class="sz-check-item"><input type="checkbox" value="Fahrrad-Reparatur"> Ich kenne mich gut mit der REPARATUR von FAHRRÄDERN aus</label>
-            <label class="sz-check-item"><input type="checkbox" value="Waschmaschine / Spülmaschine anschließen"> Ich kann z. B. eine WASCHMASCHINE oder GESCHIRRSPÜLMASCHINE anschließen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Möbel Auf-/Abbau & Transport"> Ich kann beim Aufbau, Abbau und Transport von MÖBELN helfen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Küche einbauen"> Ich kann beim Einbau einer KÜCHE helfen und habe das schon oft selbst gemacht</label>
-            <label class="sz-check-item"><input type="checkbox" value="Unterstützend mithelfen"> Ich kann helfen – aber nur unterstützend</label>
-            <label class="sz-check-item"><input type="checkbox" value="Anschluss elektrischer Geräte"> Ich habe Erfahrung beim Anschluss von ELEKTRISCHEN GERÄTEN</label>
-            <label class="sz-check-item"><input type="checkbox" value="Heizung, Wasser & Abwasser"> Im Bereich HEIZUNG, WASSER und ABWASSER kenne ich mich gut aus</label>
-          </div>
-
-          <span class="sz-q-title">Computer, Smartphone &amp; Programmieren</span>
-          <div class="sz-check-list" data-group="it">
-            <label class="sz-check-item"><input type="checkbox" value="Computer, Notebook & Drucker"> Ich kenne mich gut mit COMPUTERN (Notebook) und DRUCKER aus und kann helfen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Handys & Smartphones einrichten"> Ich kenne mich gut mit HANDYS und SMARTPHONES aus (Kauf &amp; Einrichten)</label>
-            <label class="sz-check-item"><input type="checkbox" value="Webseiten erstellen"> Ich kann Webseiten erstellen und programmieren (und anderen zeigen)</label>
-            <label class="sz-check-item"><input type="checkbox" value="Programme oder Apps programmieren"> Ich kann COMPUTER-Programme schreiben oder APPS programmieren</label>
-          </div>
-
-          <span class="sz-q-title">Papierkram &amp; Behörden</span>
-          <div class="sz-check-list" data-group="papier">
-            <label class="sz-check-item"><input type="checkbox" value="Kontakt mit Behörden"> Ich kenne mich gut mit dem Kontakt mit Behörden aus</label>
-            <label class="sz-check-item"><input type="checkbox" value="Papiersachen im Haushalt ordnen"> Ich kann unterstützen, wenn es um die Organisation mit Papiersachen im Haushalt geht</label>
-          </div>
-
-          <label class="sz-q-title" for="sz-handwerk-notiz">Eigene Ideen und Gedanken zu Haushalt, Technik oder IT:</label>
-          <input type="text" id="sz-handwerk-notiz" class="sz-input" placeholder="Optional …">
-        </section>
-
-        <!-- ABSCHNITT 5: GARTEN & LANDWIRTSCHAFT -->
-        <section class="sz-section">
-          <h3>5. Garten, Natur &amp; Landwirtschaft</h3>
-          <div class="sz-check-list" data-group="garten">
-            <label class="sz-check-item"><input type="checkbox" value="Gartenarbeit & Austausch"> Ich kenne mich gut mit Gartenarbeit aus und hätte Interesse an einem Austausch darüber</label>
-            <label class="sz-check-item"><input type="checkbox" value="Gartenbau-Verein"> Ein Kontakt zu einem Gartenbau-Verein würde mich freuen – ich könnte mir vorstellen dort mitzuarbeiten</label>
-            <label class="sz-check-item"><input type="checkbox" value="Eigener Garten zum Pachten"> Über einen eigenen Garten zum Pachten würde ich mich sehr freuen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Erfahrung in der Landwirtschaft"> Ich habe Erfahrung in der Landwirtschaft</label>
-            <label class="sz-check-item"><input type="checkbox" value="Haltung von Bienen"> Ich habe Erfahrung in der Haltung von Bienen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Erfahrung mit Pferden"> Ich habe Erfahrung mit Pferden und würde mich freuen, mit Pferden zu arbeiten</label>
-            <label class="sz-check-item"><input type="checkbox" value="Kühe, Ziegen, Schafe & Tiere"> Ich habe Erfahrung mit Kühen, Ziegen, Schafen oder anderen Tieren in der Landwirtschaft</label>
-            <label class="sz-check-item"><input type="checkbox" value="Obstbäume & Obstbaumschnitt"> Ich kenne mich gut mit Obstbäumen und Obstbaumschnitt aus</label>
-          </div>
-          <label class="sz-q-title" for="sz-garten-notiz">Sonstiges zum Thema Garten, Tiere &amp; Landwirtschaft:</label>
-          <input type="text" id="sz-garten-notiz" class="sz-input" placeholder="Optional …">
-        </section>
-
-        <!-- ABSCHNITT 6: KULTUR, KUNST & MUSIK -->
-        <section class="sz-section">
-          <h3>6. Kultur, Kunst, Handwerk &amp; Musik</h3>
-          <p style="margin-top:0; font-size:0.95rem;">
-            Das Leben besteht nicht nur aus Arbeit. Zum Menschsein gehört auch die Kunst und Musik.
+        <!-- SCHRITT 2: THEMEN-KACHELN ZUM FREIEN AUSWÄHLEN -->
+        <section class="sz-card" style="border-left-color:#2e7d32;">
+          <h3>2. Wähle die Bereiche aus, die dich interessieren oder in denen du etwas kannst</h3>
+          <p style="margin-top:0; font-size:0.94rem;">
+            Tippe einfach auf die Kacheln, die zu dir passen. Es öffnen sich dann nur diese Bereiche – alles andere kannst du überspringen!
           </p>
 
-          <span class="sz-q-title">Bildende Kunst &amp; Malerei</span>
-          <div class="sz-check-list" data-group="malerei">
-            <label class="sz-check-item"><input type="checkbox" value="Interesse an Malerei"> Ich interessiere mich für Malerei</label>
-            <label class="sz-check-item"><input type="checkbox" value="Viel Erfahrung in Malerei – weitergeben"> Ich habe selbst schon viel Erfahrung in Malerei und würde diese gerne weitergeben</label>
-            <label class="sz-check-item"><input type="checkbox" value="Andere Künstler kennenlernen"> Ich habe Interesse, andere Künstler im Bereich der Malerei kennenzulernen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Künstler / Unterricht an Schule oder Hochschule"> Ich bin selbst Künstler und unterrichte dieses Fach sogar an Schule oder Hochschule</label>
-          </div>
-
-          <span class="sz-q-title">Bildhauerei, Arbeiten mit Ton und Lehm</span>
-          <div class="sz-check-list" data-group="bildhauerei">
-            <label class="sz-check-item"><input type="checkbox" value="Interesse an Bildhauerei / Ton / Lehm"> Ich interessiere mich für Bildhauerei und für Arbeiten mit Ton und Lehm</label>
-            <label class="sz-check-item"><input type="checkbox" value="Erfahrung mit Bildhauerei / Ton / Lehm"> Ich habe schon Erfahrung mit Bildhauerei und mit Arbeiten mit Ton und Lehm</label>
-            <label class="sz-check-item"><input type="checkbox" value="Erfahrung in Bildhauerei weitergeben"> Ich möchte meine Erfahrung mit der Bildhauerei gerne weitergeben</label>
-            <label class="sz-check-item"><input type="checkbox" value="Bildhauerei an Schule/Hochschule unterrichtet"> Ich habe schon an einer Schule oder Hochschule im Bereich Bildhauerei unterrichtet</label>
-          </div>
-
-          <span class="sz-q-title">Musik &amp; Gesang</span>
-          <div class="sz-check-list" data-group="musik">
-            <label class="sz-check-item"><input type="checkbox" value="Möchte gerne im Chor mitsingen"> Ich interessiere mich für Musik und würde gerne in einem Chor mitsingen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Schon im Chor mitgesungen"> Ich habe schon in einem Chor mitgesungen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Singe halbprofessionell / professionell"> Ich singe halbprofessionell oder sogar professionell</label>
-            <label class="sz-check-item"><input type="checkbox" value="Erfahrung in Chorleitung"> Ich habe Erfahrung in „Chorleitung“ und würde das gerne einbringen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Möchte Musikinstrument lernen"> Ich würde sehr gerne ein Musikinstrument lernen</label>
-            <label class="sz-check-item"><input type="checkbox" value="Spiele bereits ein Musikinstrument"> Ich spiele bereits ein Musikinstrument und habe Freude daran</label>
-            <label class="sz-check-item"><input type="checkbox" value="Kann Musikinstrument unterrichten"> Ich spiele das Instrument so gut, dass ich auch andere unterrichten kann</label>
-          </div>
-
-          <label class="sz-q-title" for="sz-kunst-notiz">Welches Instrument spielst du / möchtest du lernen – oder Link zu deinen Werken / weitere Gedanken:</label>
-          <textarea id="sz-kunst-notiz" class="sz-textarea" rows="3" placeholder="z. B. Oud, Gitarre, Klavier, Geige, Webseiten-Link zu deinen Bildern …"></textarea>
+          <div class="sz-topic-grid" id="sz-topic-tiles"></div>
+          <div id="sz-active-domains-container"></div>
         </section>
 
-        <!-- DATENSCHUTZ & FREIGABE -->
-        <section class="sz-section" style="border-left-color:#004080; background:#f8fbff;">
-          <h3>7. Datenschutz &amp; Vertraulichkeit</h3>
-          <label class="sz-q-title" for="sz-sichtbarkeit">Wer im Freundeskreis darf deine Talente sehen, um passende Kontakte oder Arbeit zu vermitteln?</label>
+        <!-- SCHRITT 3: DATENSCHUTZ & ABSENDEN -->
+        <section class="sz-card" style="background:#f8fbff;">
+          <h3>3. Vertraulichkeit &amp; Absenden</h3>
+          <label class="sz-q-title" for="sz-sichtbarkeit">Wer im Freundeskreis darf deine Talente sehen?</label>
           <select id="sz-sichtbarkeit" class="sz-select">
-            <option value="team">Das Vermittlungs-Team (für Job- &amp; Ehrenamts-Kontakte im Freundeskreis)</option>
+            <option value="team">Das Vermittlungs-Team (für Job-, Chor-, Vereins- &amp; Ehrenamts-Kontakte)</option>
             <option value="nur_koordinator">Nur die Haupt-Koordination (streng vertraulich)</option>
           </select>
 
-          <label class="sz-check-item" style="margin-top:12px; background:#ffffff; border-color:#1565c0;">
+          <label class="sz-level-opt" style="margin-top:12px; background:#ffffff; border-color:#1565c0;">
             <input type="checkbox" id="sz-dsgvo" required>
             <span>
-              <strong>Einwilligung (DSGVO):</strong> Ich bin damit einverstanden, dass meine freiwilligen Angaben im <em>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</em> gespeichert und für die ehrenamtliche Unterstützung, Kontaktvermittlung und Jobsuche genutzt werden. Ich kann dies jederzeit widerrufen.
+              <strong>Einwilligung (DSGVO):</strong> Ich bin damit einverstanden, dass meine freiwilligen Angaben im <em>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</em> gespeichert und für die ehrenamtliche Unterstützung, Kontaktvermittlung und Jobsuche genutzt werden. Ich kann dies jederzeit ändern oder löschen lassen.
             </span>
           </label>
 
           <div style="margin-top:16px; display:flex; flex-wrap:wrap; align-items:center; gap:14px;">
-            <button type="submit" id="sz-submit-btn" class="sz-btn-submit">✨ Schatzsuche absenden</button>
+            <button type="submit" id="sz-submit-btn" class="sz-btn-submit">✨ Schatzsuche speichern</button>
             <span id="sz-msg" style="font-weight:bold;"></span>
           </div>
         </section>
       </form>
 
+      <!-- BESTÄTIGUNG MIT SCHATZSUCHE-CODE -->
       <section id="sz-done" class="sz-intro" style="display:none; background:#eaf6ec; border-color:#2e7d32; border-left-color:#2e7d32;">
-        <h3 style="margin-top:0; color:#1b5e20;">✓ Vielen herzlichen Dank für deine Schatzsuche!</h3>
-        <p style="margin-bottom:12px;">
-          Deine Begabungen, Interessen und Wünsche wurden sicher gespeichert. Wir freuen uns sehr darauf, dich und deine Talente noch besser kennenzulernen!
+        <h3 style="margin-top:0; color:#1b5e20;">✓ Vielen herzlichen Dank! Deine Schatzsuche ist gespeichert.</h3>
+        <p>
+          Wenn dir später noch weitere Talente, Ideen oder Wünsche einfallen, kannst du deine Schatzsuche jederzeit wieder öffnen und ergänzen.
         </p>
-        <a href="index.html" style="display:inline-block; background:#004080; color:#ffffff; padding:10px 18px; border-radius:7px; font-weight:bold; text-decoration:none;">Zur Startseite</a>
+        <div style="background:#ffffff; border:2px solid #2e7d32; border-radius:9px; padding:14px 16px; margin:12px 0;">
+          <div style="font-size:0.9rem; color:#333;">Dein persönlicher Schatzsuche-Code zum Weiterbearbeiten:</div>
+          <div id="sz-result-code" style="font-size:1.6rem; font-weight:bold; color:#004080; letter-spacing:3px; margin:4px 0;">------</div>
+          <button type="button" id="sz-copy-my-code" class="sz-btn-primary" style="padding:7px 14px; font-size:0.88rem;">📋 Code &amp; Link kopieren</button>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;">
+          <button type="button" id="sz-edit-again-btn" class="sz-btn-primary">✎ Jetzt noch etwas ergänzen</button>
+          <a href="index.html" style="display:inline-block; background:#ffffff; color:#004080; border:2px solid #004080; padding:9px 16px; border-radius:7px; font-weight:bold; text-decoration:none;">Zur Startseite</a>
+        </div>
       </section>
     </main>
   </div>
@@ -390,61 +394,377 @@
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
 
-      const codeInput = document.getElementById("sz-aktencode");
+      const LEVEL_DEFS = [
+        { id: "dream", label: "✨ Traum & Neugier – „Das war schon immer ein Traum von mir / Ich möchte mich gerne einarbeiten“" },
+        { id: "everyday", label: "🏠 Alltag & Eigenbedarf – „Ich mache das gerne für mich und meine Familie“" },
+        { id: "helper", label: "🤝 Helfende Hand – „Ich kenne mich gut aus und kann anderen im Alltag dabei helfen“" },
+        { id: "experienced", label: "🛠️ Erfahrene Fachkraft – „Ich habe darin viel Praxis oder beruflich gearbeitet“" },
+        { id: "master", label: "🎓 Meister / Lehrer / Spezialist – „Ich beherrsche das auf Profi-Niveau und kann andere anleiten oder unterrichten“" }
+      ];
+
+      const DOMAINS = [
+        {
+          key: "musik",
+          icon: "🎵",
+          title: "Musik, Chor & Gesang",
+          subOptions: [
+            "Im Chor mitsingen (z. B. offener Chor / Geflüchteten-Chor)",
+            "Solo-Gesang",
+            "Chorleitung / Musikgruppe anleiten",
+            "Musikinstrument spielen",
+            "Musikinstrument neu lernen",
+            "Anderen ein Instrument beibringen"
+          ],
+          deepLabel: "Vertiefung (Welches Instrument, welche Stimmlage, wie viele Jahre Erfahrung?):",
+          deepPlaceholder: "z. B. Ich möchte gerne im Chor singen, spiele seit 8 Jahren Oud / Klavier / Gitarre …"
+        },
+        {
+          key: "kochen",
+          icon: "🍳",
+          title: "Kochen, Backen & Gastronomie",
+          subOptions: [
+            "Für mich & Familie kochen",
+            "Gemeinsam mit anderen kochen & Rezepte tauschen",
+            "Kochkurse / Backkurse geben",
+            "Erfahrung in Restaurant / Großküche / Hotel / Bäckerei"
+          ],
+          deepLabel: "Vertiefung (z. B. Küchenrichtung, Großküche / Hotel / Bäckerei, Spezialitäten):",
+          deepPlaceholder: "z. B. 5 Jahre Koch in großem Hotel, syrische & arabische Küche, Backwaren …"
+        },
+        {
+          key: "it",
+          icon: "📱",
+          title: "Handy, Computer & Technik",
+          subOptions: [
+            "Smartphone im Alltag (WhatsApp, E-Mail, Apps einrichten)",
+            "Anderen beim Handykauf & Einrichten helfen",
+            "Computer, Notebook, WLAN & Drucker einrichten",
+            "Webseiten erstellen & gestalten",
+            "Software / Apps programmieren",
+            "Hardware reparieren / Elektronik löten"
+          ],
+          deepLabel: "Vertiefung (Was genau beherrschst du oder möchtest du lernen?):",
+          deepPlaceholder: "z. B. Android/iPhone Hilfe für Senioren, oder Webentwicklung, oder Platinen löten …"
+        },
+        {
+          key: "reparatur",
+          icon: "🔧",
+          title: "Handwerk, Bau & Reparatur",
+          subOptions: [
+            "Fahrräder reparieren",
+            "Möbel auf- und abbauen / Transport helfen",
+            "Küchen einbauen",
+            "Waschmaschine / Geschirrspüler anschließen",
+            "Elektrische Geräte & Leitungen",
+            "Heizung, Wasser & Abwasser",
+            "Maler-, Holz- oder Bauarbeiten"
+          ],
+          deepLabel: "Vertiefung (Gelerntes Handwerk, Werkzeuge, besondere Erfahrung):",
+          deepPlaceholder: "z. B. Elektriker, Schreiner, Klempner, Fahrradwerkstatt …"
+        },
+        {
+          key: "garten",
+          icon: "🌿",
+          title: "Garten, Natur & Landwirtschaft",
+          subOptions: [
+            "Gartenarbeit & Austausch",
+            "Mitarbeit in einem Gartenbau-Verein",
+            "Wunsch nach einem eigenen Garten zum Pachten",
+            "Erfahrung in der Landwirtschaft / Ackerbau",
+            "Bienenhaltung / Imkerei",
+            "Arbeit mit Pferden",
+            "Kühe, Ziegen, Schafe & Nutztiere",
+            "Obstbäume & Obstbaumschnitt"
+          ],
+          deepLabel: "Vertiefung (Welche Kulturen, Tiere oder Maschinen kennst du?):",
+          deepPlaceholder: "z. B. Obstbaumschnitt, Gemüseanbau, Schafhaltung, Traktor …"
+        },
+        {
+          key: "mobilitaet",
+          icon: "🚲",
+          title: "Mobilität (Fahrrad, Auto, LKW)",
+          subOptions: [
+            "Möchte gerne Fahrrad fahren lernen",
+            "Kann Fahrrad fahren, brauche aber ein Fahrrad",
+            "Kann anderen Fahrrad fahren beibringen",
+            "Möchte gerne Auto fahren lernen",
+            "Führerschein aus Heimatland vorhanden",
+            "Gültiger deutscher Führerschein (ohne eigenes Auto)",
+            "Eigenes Auto in Deutschland vorhanden",
+            "Erfahrung mit Anhänger",
+            "Berufskraftfahrer: Taxi / Bus / LKW"
+          ],
+          deepLabel: "Vertiefung (Führerscheinklassen, Berufserfahrung als Fahrer):",
+          deepPlaceholder: "z. B. Klasse B, C/CE (LKW), Busfahrer …"
+        },
+        {
+          key: "kunst",
+          icon: "🎨",
+          title: "Malerei, Bildhauerei & Ton",
+          subOptions: [
+            "Interesse an Malerei / Zeichnen",
+            "Erfahrung in Malerei & gerne weitergeben",
+            "Andere Künstler kennenlernen",
+            "Bildhauerei & Arbeiten mit Ton / Lehm / Keramik",
+            "Kunstunterricht an Schule oder Hochschule gegeben"
+          ],
+          deepLabel: "Vertiefung (Techniken, Materialien oder Link zu deinen Arbeiten):",
+          deepPlaceholder: "z. B. Ölmalerei, Kalligrafie, Töpfern, Steinbildhauerei …"
+        },
+        {
+          key: "naehen",
+          icon: "🧵",
+          title: "Nähen, Schneidern & Textil",
+          subOptions: [
+            "Nähe gerne für mich und meine Familie",
+            "Gemeinsam mit anderen nähen & ausbessern",
+            "Nähkurse geben / Schnittmuster erstellen",
+            "Berufserfahrung als Schneider(in)"
+          ],
+          deepLabel: "Vertiefung (Nähmaschine, Änderungsschneiderei, Stickerei):",
+          deepPlaceholder: "z. B. 10 Jahre Herrenschneider, Änderungen an Kleidung …"
+        },
+        {
+          key: "papier",
+          icon: "📄",
+          title: "Papierkram, Übersetzen & Behörden",
+          subOptions: [
+            "Unterstützung beim Ordnen von Briefen & Unterlagen",
+            "Begleitung / Sprachmittlung bei Terminen & Behörden",
+            "Hilfe beim Ausfüllen von Formularen"
+          ],
+          deepLabel: "Vertiefung (In welchen Sprachen oder Bereichen kannst du helfen?):",
+          deepPlaceholder: "z. B. Arabisch-Deutsch bei Arzt- oder Behördenterminen …"
+        },
+        {
+          key: "ehrenamt",
+          icon: "🤝",
+          title: "Bisheriges Ehrenamt & Vereine",
+          subOptions: [
+            "Feuerwehr / Katastrophenschutz",
+            "Rettungswesen (Rotes Kreuz / Roter Halbmond)",
+            "Sportverein / Trainer",
+            "Musikverein",
+            "Altenhilfe / Besuchsdienst",
+            "Krankenhaus / Pflege",
+            "Naturschutz / Tierschutz",
+            "Kirche / Moschee / Gemeinde"
+          ],
+          deepLabel: "Vertiefung (Was hast du dort genau gemacht?):",
+          deepPlaceholder: "z. B. Jugendtrainer Fußball, Sanitäter, Besuchsdienst …"
+        }
+      ];
+
+      let activeSchatzCode = "";
+
+      const loadInput = document.getElementById("sz-load-code");
+      const aktenInput = document.getElementById("sz-aktencode");
       if (typeof window.fflwNeutralizeCodeInput === "function") {
-        window.fflwNeutralizeCodeInput(codeInput);
+        window.fflwNeutralizeCodeInput(loadInput);
+        window.fflwNeutralizeCodeInput(aktenInput);
       }
 
-      const params = new URLSearchParams(window.location.search);
-      const urlCode = params.get("c") || params.get("code") || "";
-      if (urlCode) {
-        codeInput.value = urlCode.trim();
-        codeInput.dataset.userTyped = "1";
+      const tilesContainer = document.getElementById("sz-topic-tiles");
+      const domainsContainer = document.getElementById("sz-active-domains-container");
+
+      DOMAINS.forEach(dom => {
+        // Kachel erzeugen
+        const tile = document.createElement("button");
+        tile.type = "button";
+        tile.className = "sz-topic-tile";
+        tile.dataset.key = dom.key;
+        tile.innerHTML = `<span>${dom.icon} ${dom.title}</span><span class="sz-tile-badge">+ Öffnen</span>`;
+        tilesContainer.appendChild(tile);
+
+        // Bereichs-Panel erzeugen
+        const panel = document.createElement("div");
+        panel.className = "sz-domain-panel";
+        panel.id = `panel-${dom.key}`;
+        panel.innerHTML = `
+          <div class="sz-domain-header">
+            <h4>${dom.icon} ${dom.title}</h4>
+            <button type="button" class="sz-close-domain" data-key="${dom.key}">Bereich ausblenden</button>
+          </div>
+          <span class="sz-q-title" style="margin-top:0;">1. Wie sieht deine Verbindung zu diesem Thema aus? (Mehrfachauswahl möglich)</span>
+          <div class="sz-levels-grid">
+            ${LEVEL_DEFS.map(lv => `
+              <label class="sz-level-opt" data-lvl="${lv.id}">
+                <input type="checkbox" class="sz-lvl-chk" data-domain="${dom.key}" value="${lv.id}">
+                <span>${lv.label}</span>
+              </label>
+            `).join("")}
+          </div>
+
+          <span class="sz-q-title">2. Was genau passt hier für dich? (Optional antippen)</span>
+          <div class="sz-sub-grid">
+            ${dom.subOptions.map(opt => `
+              <label class="sz-sub-item">
+                <input type="checkbox" class="sz-sub-chk" data-domain="${dom.key}" value="${opt}">
+                <span>${opt}</span>
+              </label>
+            `).join("")}
+          </div>
+
+          <div class="sz-deep-box">
+            <label class="sz-q-title" for="deep-${dom.key}" style="margin-top:0;">3. ${dom.deepLabel}</label>
+            <textarea id="deep-${dom.key}" class="sz-textarea" rows="2" placeholder="${dom.deepPlaceholder}"></textarea>
+          </div>
+        `;
+        domainsContainer.appendChild(panel);
+
+        tile.addEventListener("click", () => {
+          const isOpen = panel.classList.toggle("is-open");
+          tile.classList.toggle("selected", isOpen);
+          tile.querySelector(".sz-tile-badge").textContent = isOpen ? "✓ Aktiv" : "+ Öffnen";
+          if (isOpen) {
+            panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+        });
+
+        panel.querySelector(".sz-close-domain").addEventListener("click", () => {
+          panel.classList.remove("is-open");
+          tile.classList.remove("selected");
+          tile.querySelector(".sz-tile-badge").textContent = "+ Öffnen";
+        });
+      });
+
+      function openDomainPanel(key) {
+        const panel = document.getElementById(`panel-${key}`);
+        const tile = tilesContainer.querySelector(`.sz-topic-tile[data-key="${key}"]`);
+        if (panel && tile) {
+          panel.classList.add("is-open");
+          tile.classList.add("selected");
+          tile.querySelector(".sz-tile-badge").textContent = "✓ Aktiv";
+        }
       }
 
-      function getCheckedValues(groupName) {
-        return Array.from(document.querySelectorAll(`.sz-check-list[data-group="${groupName}"] input[type="checkbox"]:checked`))
-          .map(cb => cb.value);
+      // Bestehenden Schatzsuche-Datensatz per Code laden
+      async function loadExistingSchatz(codeRaw) {
+        const code = String(codeRaw || loadInput.value || "").trim();
+        const msgEl = document.getElementById("sz-load-msg");
+        const btn = document.getElementById("sz-load-btn");
+        if (!code) {
+          msgEl.style.color = "#c62828";
+          msgEl.textContent = "Bitte Schatzsuche-Code eingeben.";
+          return { ok: false };
+        }
+
+        const task = async () => {
+          const resp = await fetch(`${WEB_APP_URL}?action=getTreasureEntry&code=${encodeURIComponent(code)}&t=${Date.now()}`, {
+            method: "GET",
+            redirect: "follow"
+          });
+          const res = await resp.json();
+          if (!res || !res.ok || !res.entry) {
+            msgEl.style.color = "#c62828";
+            msgEl.textContent = (res && res.error) ? res.error : "Code nicht gefunden.";
+            return { ok: false };
+          }
+
+          const d = res.entry;
+          activeSchatzCode = d.schatzCode || code;
+          document.getElementById("sz-name").value = d.name || "";
+          document.getElementById("sz-herkunft").value = d.herkunftsland || "";
+          document.getElementById("sz-kontakt").value = d.kontakt || "";
+          document.getElementById("sz-email").value = d.email || "";
+          document.getElementById("sz-muttersprache").value = d.muttersprache || "";
+          document.getElementById("sz-sprachen").value = d.sprachen || "";
+          document.getElementById("sz-geburt").value = d.geburt || "";
+          document.getElementById("sz-familie").value = d.familie || "";
+          document.getElementById("sz-aktencode").value = d.aktenCode || "";
+          document.getElementById("sz-beruf").value = d.beruf || "";
+          if (d.sichtbarkeit) document.getElementById("sz-sichtbarkeit").value = d.sichtbarkeit;
+
+          // Alle Häkchen zurücksetzen und gespeicherte Werte wiederherstellen
+          document.querySelectorAll(".sz-lvl-chk, .sz-sub-chk").forEach(c => { c.checked = false; });
+
+          const detailsMap = d.domainDetails || {};
+          Object.keys(detailsMap).forEach(key => {
+            const det = detailsMap[key];
+            if (!det) return;
+            const hasContent = (det.levels && det.levels.length) || (det.options && det.options.length) || (det.detail && det.detail.trim());
+            if (hasContent) {
+              openDomainPanel(key);
+              (det.levels || []).forEach(lv => {
+                const chk = document.querySelector(`.sz-lvl-chk[data-domain="${key}"][value="${lv}"]`);
+                if (chk) chk.checked = true;
+              });
+              (det.options || []).forEach(opt => {
+                const chk = document.querySelector(`.sz-sub-chk[data-domain="${key}"][value="${CSS.escape(opt)}"]`);
+                if (chk) chk.checked = true;
+              });
+              const ta = document.getElementById(`deep-${key}`);
+              if (ta) ta.value = det.detail || "";
+            }
+          });
+
+          msgEl.style.color = "#1b5e20";
+          msgEl.textContent = `✓ Deine bisherigen Angaben (Code ${activeSchatzCode}) wurden geladen!`;
+          return { ok: true };
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          return await window.fflwRunButtonAction(btn, task, {
+            loadingText: "Lade …",
+            successText: "✓ Geladen!",
+            resetAfterMs: 1400
+          });
+        }
+        return await task();
       }
 
+      document.getElementById("sz-load-btn").addEventListener("click", () => loadExistingSchatz());
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlSc = urlParams.get("sc") || urlParams.get("schatzcode");
+      const urlAc = urlParams.get("c") || urlParams.get("code");
+      if (urlAc) {
+        aktenInput.value = urlAc.trim();
+        aktenInput.dataset.userTyped = "1";
+      }
+      if (urlSc) {
+        document.getElementById("sz-resume-details").open = true;
+        loadInput.value = urlSc.trim();
+        loadInput.dataset.userTyped = "1";
+        loadExistingSchatz(urlSc.trim());
+      }
+
+      // Absenden / Aktualisieren
       document.getElementById("sz-form").addEventListener("submit", async function (e) {
         e.preventDefault();
         const btn = document.getElementById("sz-submit-btn");
         const msgEl = document.getElementById("sz-msg");
 
-        const bereiche = {
-          mobilitaet: getCheckedValues("mobilitaet"),
-          ehrenamt: getCheckedValues("ehrenamt"),
-          kochen: getCheckedValues("kochen"),
-          naehen: getCheckedValues("naehen"),
-          reparatur: getCheckedValues("reparatur"),
-          it: getCheckedValues("it"),
-          papier: getCheckedValues("papier"),
-          garten: getCheckedValues("garten"),
-          malerei: getCheckedValues("malerei"),
-          bildhauerei: getCheckedValues("bildhauerei"),
-          musik: getCheckedValues("musik")
-        };
+        const domainDetails = {};
+        DOMAINS.forEach(dom => {
+          const levels = Array.from(document.querySelectorAll(`.sz-lvl-chk[data-domain="${dom.key}"]:checked`)).map(c => c.value);
+          const options = Array.from(document.querySelectorAll(`.sz-sub-chk[data-domain="${dom.key}"]:checked`)).map(c => c.value);
+          const detail = (document.getElementById(`deep-${dom.key}`).value || "").trim();
+          if (levels.length || options.length || detail) {
+            domainDetails[dom.key] = {
+              title: dom.title,
+              levels: levels,
+              options: options,
+              detail: detail
+            };
+          }
+        });
 
         const payload = {
           action: "submitTreasureSurvey",
+          schatzCode: activeSchatzCode,
           name: document.getElementById("sz-name").value.trim(),
           herkunftsland: document.getElementById("sz-herkunft").value.trim(),
           kontakt: document.getElementById("sz-kontakt").value.trim(),
           email: document.getElementById("sz-email").value.trim(),
-          geburt: document.getElementById("sz-geburt").value.trim(),
           muttersprache: document.getElementById("sz-muttersprache").value.trim(),
           sprachen: document.getElementById("sz-sprachen").value.trim(),
+          geburt: document.getElementById("sz-geburt").value.trim(),
           familie: document.getElementById("sz-familie").value.trim(),
           aktenCode: document.getElementById("sz-aktencode").value.trim(),
           beruf: document.getElementById("sz-beruf").value.trim(),
-          mobilNotiz: document.getElementById("sz-mobil-notiz").value.trim(),
-          ehrenamtNotiz: document.getElementById("sz-ehrenamt-notiz").value.trim(),
-          handwerkNotiz: document.getElementById("sz-handwerk-notiz").value.trim(),
-          gartenNotiz: document.getElementById("sz-garten-notiz").value.trim(),
-          kunstNotiz: document.getElementById("sz-kunst-notiz").value.trim(),
           sichtbarkeit: document.getElementById("sz-sichtbarkeit").value,
-          bereiche: bereiche
+          domainDetails: domainDetails
         };
 
         const task = async () => {
@@ -456,6 +776,8 @@
           });
           const res = await resp.json();
           if (res && res.ok) {
+            activeSchatzCode = res.schatzCode || activeSchatzCode;
+            document.getElementById("sz-result-code").textContent = activeSchatzCode;
             document.getElementById("sz-form").style.display = "none";
             document.getElementById("sz-done").style.display = "block";
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -474,6 +796,19 @@
         } else {
           await task();
         }
+      });
+
+      document.getElementById("sz-copy-my-code").addEventListener("click", async function () {
+        const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
+        const link = `${baseDir}schatzsuche.html?sc=${encodeURIComponent(activeSchatzCode)}`;
+        await navigator.clipboard.writeText(`Meine Schatzsuche beim Freundeskreis:\nLink: ${link}\nPersönlicher Schatzsuche-Code: ${activeSchatzCode}`);
+        this.textContent = "✓ Kopiert!";
+        setTimeout(() => { this.textContent = "📋 Code & Link kopieren"; }, 2000);
+      });
+
+      document.getElementById("sz-edit-again-btn").addEventListener("click", function () {
+        document.getElementById("sz-done").style.display = "none";
+        document.getElementById("sz-form").style.display = "block";
       });
     });
   </script>

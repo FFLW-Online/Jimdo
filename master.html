@@ -1,13 +1,12 @@
 <!-- ==========================================================================
   DATEI: master.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-21 15:55 CET
+  ERSTELLT VON GEMINI AM: 2026-11-21 16:35 CET
   BESCHREIBUNG: Zentrale Steuerungs- & Koordinations-Konsole (Master & Untermaster)
-    - Kein Browser-Autofill (nie wieder heimliche Punkte im Code-Feld)
-    - Blitzschneller Start durch Sitzungs-Cache + gezieltes Nachladen
-    - Personen-Akten-Tresor gruppiert nach Herkunftsland + fehlertolerante
-      Transliterations-Suche (Mohamed / Mohammed / Al-Ahmad etc.)
-    - Eigener Datei-/Foto-Upload durch Supermaster + mehrstufige Foto-Einwilligung
-    - Integrierte „Schatzkiste“-Datenbank (Talente, Berufe, Ehrenamt, Hobbys)
+    - Familien-Verknüpfung in Personen-Akten (Hauptperson, Ehefrau/Ehegatte, Kinder,
+      nachträgliches Zuordnen & Rollentausch der Hauptakte)
+    - Länder-Gruppierung & fehlertolerante Namenssuche (Transliteration)
+    - Differenzierte Schatzkiste (5 Stufen inkl. ✨ Funkelnde Sterne + 6-stelliger
+      Weiterbearbeitungs-Code + Stufen-Filter)
 ========================================================================== -->
 <!doctype html>
 <html lang="de">
@@ -73,11 +72,11 @@
       background: #004080;
       color: #ffffff;
       border: none;
-      padding: 8px 13px;
+      padding: 7px 12px;
       border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       text-decoration: none;
       display: inline-block;
     }
@@ -95,30 +94,11 @@
       background: #ffffff;
       box-sizing: border-box;
     }
-    .m-table-wrap {
-      overflow-x: auto;
-      margin-top: 10px;
-    }
-    .m-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.92rem;
-      color: #111111;
-    }
-    .m-table th {
-      background: #004080;
-      color: #ffffff;
-      text-align: left;
-      padding: 9px 10px;
-    }
-    .m-table td {
-      padding: 8px 10px;
-      border-bottom: 1px solid #d8e3f0;
-      vertical-align: top;
-    }
-    .m-table tr:nth-child(even) td {
-      background: #f8fbff;
-    }
+    .m-table-wrap { overflow-x: auto; margin-top: 10px; }
+    .m-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; color: #111111; }
+    .m-table th { background: #004080; color: #ffffff; text-align: left; padding: 9px 10px; }
+    .m-table td { padding: 8px 10px; border-bottom: 1px solid #d8e3f0; vertical-align: top; }
+    .m-table tr:nth-child(even) td { background: #f8fbff; }
     .m-badge {
       display: inline-block;
       padding: 2px 8px;
@@ -153,6 +133,11 @@
       border-radius: 8px;
       padding: 14px 16px;
       margin: 12px;
+    }
+    .m-akte-card.is-family-member {
+      margin-left: 34px;
+      border-left: 6px solid #0284c7;
+      background: #fbfdff;
     }
     .m-file-row {
       display: flex;
@@ -218,7 +203,6 @@
     <main class="content">
       <h2>Zentrale Steuerung &amp; Koordination</h2>
 
-      <!-- Login-Box (Garantiert ohne Browser-Autofill-Punkte) -->
       <section id="m-login-box" class="m-card">
         <p style="margin-top:0;">
           Bitte gib deinen persönlichen Team- oder Master-Code ein, um die freigegebenen Bereiche zu laden.
@@ -230,7 +214,6 @@
         </div>
       </section>
 
-      <!-- Hauptbereich nach Login -->
       <div id="m-dashboard" style="display:none;">
         <div class="m-card" style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; background:#eef6fc;">
           <div>
@@ -254,29 +237,25 @@
         </div>
 
         <!-- TAB 1: EINGANG -->
-        <section id="tab-eingang" class="m-tab-panel">
-          <div id="list-eingang"></div>
-        </section>
+        <section id="tab-eingang" class="m-tab-panel"><div id="list-eingang"></div></section>
 
         <!-- TAB 2: ONLINE & RESERVIERT -->
         <section id="tab-online" class="m-tab-panel" style="display:none;">
-          <div style="margin-bottom:10px; display:flex; flex-wrap:wrap; gap:8px;">
+          <div style="margin-bottom:10px;">
             <button type="button" id="m-release-all-btn" class="m-btn m-btn-green">Alle reservierten Artikel wieder freigeben</button>
           </div>
           <div id="list-online"></div>
         </section>
 
         <!-- TAB 3: BEDARFE -->
-        <section id="tab-bedarfe" class="m-tab-panel" style="display:none;">
-          <div id="list-bedarfe"></div>
-        </section>
+        <section id="tab-bedarfe" class="m-tab-panel" style="display:none;"><div id="list-bedarfe"></div></section>
 
-        <!-- TAB 4: PERSONEN-AKTEN NACH HERKUNFTSLAND (NUR SUPERMASTER!) -->
+        <!-- TAB 4: PERSONEN-AKTEN MIT FAMILIEN-VERKNÜPFUNG (NUR SUPERMASTER!) -->
         <section id="tab-akten" class="m-tab-panel" style="display:none;">
           <div class="m-card" style="border-left-color:#8e1c24; background:#fffafa;">
-            <h3 style="margin-top:0; color:#8e1c24;">🔒 Vertraulicher Personen-Akten-Tresor (gruppiert nach Herkunftsland)</h3>
+            <h3 style="margin-top:0; color:#8e1c24;">🔒 Vertraulicher Personen-Akten-Tresor (mit Familien-Verbund &amp; Länder-Gruppierung)</h3>
             <p style="margin:0 0 12px 0; font-size:0.93rem;">
-              Akten werden automatisch nach <strong>Herkunftsland</strong> gruppiert und über eine fehlertolerante Namenssuche gefunden (gleicht z. B. <em>Mohamed / Mohammed / Muhammad</em> oder <em>Al-Ahmad / Alahmad</em> aus). Du kannst hier auch selbst Dateien oder Fotos zuordnen und direkt den <strong>Schatzsuche-Fragebogen</strong> mitgeben.
+              Lege eine Hauptakte an – oder ordne <strong>Ehefrau / Ehegatte</strong> sowie <strong>Kinder</strong> direkt einem bestehenden Familienverbund zu. Über <strong>„Familie &amp; Rolle verwalten“</strong> kannst du jederzeit nachträglich Personen verknüpfen oder die Hauptakte zwischen Ehepartnern wechseln.
             </p>
 
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
@@ -296,8 +275,22 @@
                 <input type="text" id="ak-new-name" class="m-input" placeholder="z. B. Al-Ahmad, Mohammed">
               </div>
               <div>
-                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Alternative Schreibweisen / Suchbegriffe</label>
-                <input type="text" id="ak-new-alias" class="m-input" placeholder="z. B. Mohamed, Abu Ali, Familie Schwaikheim">
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Rolle in der Familie</label>
+                <select id="ak-new-role" class="m-select">
+                  <option value="haupt">👤 Hauptperson / Familienoberhaupt</option>
+                  <option value="ehepartner">💍 Ehefrau / Ehegatte / Partner(in)</option>
+                  <option value="kind">👶 Kind / Jugendlicher</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Gehört zur Hauptakte von … (optional)</label>
+                <select id="ak-new-parent" class="m-select">
+                  <option value="">– Eigene Hauptakte (alleinstehend / Oberhaupt) –</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Alternative Schreibweisen / Suchwörter</label>
+                <input type="text" id="ak-new-alias" class="m-input" placeholder="z. B. Mohamed, Abu Ali">
               </div>
               <div>
                 <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Hauptthema</label>
@@ -331,14 +324,14 @@
           <div id="list-akten"></div>
         </section>
 
-        <!-- TAB 5: SCHATZKISTE (TALENTE, BERUFE, EHRENAMT & HOBBYS) -->
+        <!-- TAB 5: SCHATZKISTE (MIT 5 STUFEN INKL. ✨ FUNKELNDE STERNE & WEITERBEARBEITUNGS-CODE) -->
         <section id="tab-schatz" class="m-tab-panel" style="display:none;">
           <div class="m-card" style="border-left-color:#b45309; background:#fffdf7;">
             <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
               <div>
-                <h3 style="margin:0; color:#78350f;">✨ Schatzkiste – Begabungen, Berufe, Ehrenamt &amp; Träume</h3>
+                <h3 style="margin:0; color:#78350f;">✨ Schatzkiste – Begabungen, Träume, Berufe &amp; Hobbys</h3>
                 <p style="margin:4px 0 0 0; font-size:0.92rem;">
-                  Durchsuche alle freiwilligen Rückmeldungen nach Talenten (z. B. <em>Garten, Bienen, Möbel, Kochen, Nähen, Führerschein, LKW, Musik, Kunst, IT, Behörden</em>).
+                  Filtere nach Erfahrungsstufe (z. B. <strong>✨ Traum &amp; Neugier</strong> für den Chor oder <strong>🎓 Meister / Spezialist</strong>) oder suche nach Stichwörtern wie <em>Hotel, Löten, Chor, Garten, Bienen, LKW</em>.
                 </p>
               </div>
               <div style="display:flex; flex-wrap:wrap; gap:8px;">
@@ -346,14 +339,22 @@
                 <button type="button" id="sz-copy-link-btn" class="m-btn">📋 Link zur Schatzsuche kopieren</button>
               </div>
             </div>
-            <div style="margin-top:12px;">
-              <input type="text" id="sz-search" class="m-input" placeholder="Nach Talent, Beruf, Sprache, Hobby oder Land suchen (z. B. Garten, LKW, Klavier, Nähen) …" style="max-width:520px;">
+            <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+              <input type="text" id="sz-search" class="m-input" placeholder="Nach Talent, Beruf, Sprache, Hobby oder Land suchen …" style="max-width:380px;">
+              <select id="sz-level-filter" class="m-select" style="max-width:300px;">
+                <option value="">Alle 5 Stufen anzeigen</option>
+                <option value="dream">✨ Traum &amp; Neugier (möchte einarbeiten)</option>
+                <option value="everyday">🏠 Alltag &amp; Eigenbedarf</option>
+                <option value="helper">🤝 Helfende Hand (unterstützt andere)</option>
+                <option value="experienced">🛠️ Erfahrene Fachkraft</option>
+                <option value="master">🎓 Meister / Lehrer / Spezialist</option>
+              </select>
             </div>
           </div>
           <div id="list-schatz"></div>
         </section>
 
-        <!-- TAB 6: SYSTEM, SEITENSCHUTZ & URL-TARNUNG (NUR SUPERMASTER!) -->
+        <!-- TAB 6: SYSTEM & SEITENSCHUTZ -->
         <section id="tab-system" class="m-tab-panel" style="display:none;">
           <div class="m-card">
             <h3 style="margin-top:0;">Zugangscodes &amp; Flaggenband</h3>
@@ -392,9 +393,6 @@
 
           <div class="m-card">
             <h3 style="margin-top:0;">Seiten-Steuerung: Wartung, Menü-Sichtbarkeit &amp; Adressleisten-Tarnung</h3>
-            <p style="font-size:0.9rem; margin-top:0;">
-              Mit <strong>„Adressleiste tarnen“</strong> ersetzt der Browser beim Öffnen der Seite die URL oben automatisch durch <code>index.html</code>.
-            </p>
             <div class="m-table-wrap">
               <table class="m-table">
                 <thead>
@@ -419,7 +417,7 @@
     </main>
   </div>
 
-  <!-- Vorschau-Modal für vertrauliche Akten-Dateien -->
+  <!-- Vorschau-Modal -->
   <div id="m-file-viewer-modal">
     <div class="m-viewer-box">
       <div style="padding:12px 16px; background:#004080; color:#ffffff; display:flex; justify-content:space-between; align-items:center; gap:10px;">
@@ -441,7 +439,15 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
-      const CACHE_KEY = "fflw_master_overview_cache_v2";
+      const CACHE_KEY = "fflw_master_overview_cache_v3";
+
+      const LEVEL_LABELS = {
+        dream: { icon: "✨", name: "Traum & Neugier", bg: "#fffbeb", fg: "#92400e", border: "#fcd34d" },
+        everyday: { icon: "🏠", name: "Alltag", bg: "#f1f5f9", fg: "#334155", border: "#cbd5e1" },
+        helper: { icon: "🤝", name: "Helfende Hand", bg: "#e0f2fe", fg: "#075985", border: "#7dd3fc" },
+        experienced: { icon: "🛠️", name: "Erfahrene Fachkraft", bg: "#dcfce7", fg: "#166534", border: "#86efac" },
+        master: { icon: "🎓", name: "Meister / Spezialist", bg: "#fae8ff", fg: "#86198f", border: "#f0abfc" }
+      };
 
       const codeInput = document.getElementById("m-code-input");
       if (typeof window.fflwNeutralizeCodeInput === "function") {
@@ -452,7 +458,6 @@
       let currentData = null;
       let selectedCountryFilter = "";
 
-      // Fehlertolerante Transliterations-Normalisierung für Namen (Mohamed/Mohammed/Muhammad, Al-Ahmad/Alahmad etc.)
       function normalizeTranslit(str) {
         return String(str || "")
           .toLowerCase()
@@ -517,15 +522,12 @@
           return { ok: false };
         }
 
-        // Sofort-Anzeige aus Sitzungs-Cache (0 Sekunden Wartezeit!)
         if (!silentBackground) {
           try {
             const cachedRaw = sessionStorage.getItem(CACHE_KEY);
             if (cachedRaw) {
               const cachedObj = JSON.parse(cachedRaw);
-              if (cachedObj && cachedObj.ok) {
-                applyDashboardData(cachedObj, true);
-              }
+              if (cachedObj && cachedObj.ok) applyDashboardData(cachedObj, true);
             }
           } catch (e) {}
         }
@@ -564,9 +566,7 @@
       }
 
       document.getElementById("m-login-btn").addEventListener("click", () => loadMasterData());
-      codeInput.addEventListener("keydown", e => {
-        if (e.key === "Enter") { e.preventDefault(); loadMasterData(); }
-      });
+      codeInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); loadMasterData(); } });
       document.getElementById("m-refresh-btn").addEventListener("click", () => loadMasterData(currentCode, false));
       document.getElementById("m-logout-btn").addEventListener("click", () => {
         sessionStorage.removeItem("fflw_master_session_code");
@@ -578,9 +578,7 @@
         delete codeInput.dataset.userTyped;
       });
 
-      if (currentCode) {
-        loadMasterData(currentCode, false);
-      }
+      if (currentCode) loadMasterData(currentCode, false);
 
       async function postAction(bodyObj) {
         const resp = await fetch(WEB_APP_URL, {
@@ -605,6 +603,14 @@
         document.getElementById("cnt-akten").textContent = akten.length;
         document.getElementById("cnt-schatz").textContent = schatzListe.length;
 
+        // Hauptakten-Auswahl im Anlege-Formular befüllen
+        const parentSel = document.getElementById("ak-new-parent");
+        const mainAkten = akten
+          .filter(a => !a.familyHeadId)
+          .sort((a, b) => String(a.personenName || "").localeCompare(String(b.personenName || ""), "de"));
+        parentSel.innerHTML = `<option value="">– Eigene Hauptakte (alleinstehend / Oberhaupt) –</option>` +
+          mainAkten.map(m => `<option value="${m.id}">${m.personenName} (${m.herkunftsland || "-"}, Code ${m.aktenCode})</option>`).join("");
+
         // 1. Eingang
         const eingangEl = document.getElementById("list-eingang");
         eingangEl.innerHTML = eingang.length === 0
@@ -624,20 +630,6 @@
             </div>
           `).join("");
 
-        eingangEl.querySelectorAll(".btn-pub").forEach(b => {
-          b.addEventListener("click", async () => {
-            await postAction({ action: "publishDonationItem", folderId: b.dataset.id, isWholeProvider: b.dataset.whole === "1" });
-            loadMasterData(currentCode, false);
-          });
-        });
-        eingangEl.querySelectorAll(".btn-arch").forEach(b => {
-          b.addEventListener("click", async () => {
-            if (!confirm("Wirklich ins Archiv verschieben?")) return;
-            await postAction({ action: "archiveDonationItem", folderId: b.dataset.id });
-            loadMasterData(currentCode, false);
-          });
-        });
-
         // 2. Online & Reserviert
         const onlineEl = document.getElementById("list-online");
         onlineEl.innerHTML = online.length === 0
@@ -650,7 +642,6 @@
                     ${it.reserviert ? "RESERVIERT" : "ONLINE"}
                   </span>
                   <strong style="margin-left:6px; color:#003366;">${it.titel}</strong>
-                  <div style="font-size:0.88rem; color:#333;">${it.anbieterLabel} ${it.ort ? "· " + it.ort : ""}</div>
                 </div>
                 <div>
                   ${it.reserviert
@@ -661,19 +652,6 @@
             </div>
           `).join("");
 
-        onlineEl.querySelectorAll(".btn-unres").forEach(b => {
-          b.addEventListener("click", async () => {
-            await postAction({ action: "unreserveItem", itemId: b.dataset.id });
-            loadMasterData(currentCode, false);
-          });
-        });
-        onlineEl.querySelectorAll(".btn-pause").forEach(b => {
-          b.addEventListener("click", async () => {
-            await postAction({ action: "pauseOffer", itemId: b.dataset.id, grund: "Pausiert durch Team" });
-            loadMasterData(currentCode, false);
-          });
-        });
-
         // 3. Bedarfe
         const bedarfeEl = document.getElementById("list-bedarfe");
         bedarfeEl.innerHTML = bedarfe.length === 0
@@ -683,31 +661,17 @@
               <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px;">
                 <div>
                   <strong style="color:#003366;">${b.artikelName}</strong> (${b.prioritaet})
-                  <div style="font-size:0.9rem;">Name: <strong>${b.name}</strong> · Kontakt: ${b.kontakt || "-"} · E-Mail: ${b.email || "-"}</div>
-                  <div style="font-size:0.86rem; color:#444;">Code: <strong>${b.editCode || "-"}</strong> · Ort: ${b.ortDetails || b.ortTyp || "-"}</div>
+                  <div style="font-size:0.9rem;">Name: <strong>${b.name}</strong> · Kontakt: ${b.kontakt || "-"} · Code: ${b.editCode || "-"}</div>
                 </div>
-                <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                  <button type="button" class="m-btn m-btn-orange btn-dem-done" data-id="${b.id}">✓ Erledigt</button>
-                </div>
+                <button type="button" class="m-btn m-btn-orange btn-dem-done" data-id="${b.id}">✓ Erledigt</button>
               </div>
             </div>
           `).join("");
 
-        bedarfeEl.querySelectorAll(".btn-dem-done").forEach(b => {
-          b.addEventListener("click", async () => {
-            if (!confirm("Bedarf als erledigt abschließen?")) return;
-            await postAction({ action: "updateDemand", demandId: b.dataset.id, code: currentCode, alsErledigtMarkieren: true });
-            loadMasterData(currentCode, false);
-          });
-        });
-
-        // 4. Personen-Akten (Supermaster)
         if (data.role === "master") {
           renderAktenListe(akten);
           renderSystemConfig(data);
         }
-
-        // 5. Schatzkiste
         renderSchatzListe(schatzListe);
       }
 
@@ -750,11 +714,148 @@
         });
       }
 
+      function renderSingleAkteCard(a, allAkten, isMember, baseDir) {
+        const uploadLink = `${baseDir}unterlagen.html?c=${encodeURIComponent(a.aktenCode)}`;
+        const schatzLink = `${baseDir}schatzsuche.html?c=${encodeURIComponent(a.aktenCode)}`;
+        const waText = encodeURIComponent(
+          `Hallo ${a.personenName},\nhier ist dein persönlicher Link für vertrauliche Unterlagen beim Freundeskreis:\n${uploadLink}\nDein Zugangs-Code: ${a.aktenCode}`
+        );
+        const dateien = a.dateien || [];
+
+        const roleBadge = a.familyRole === "ehepartner"
+          ? `<span class="m-badge" style="background:#e0f2fe; color:#0369a1; margin-left:4px;">💍 Ehefrau / Ehegatte</span>`
+          : (a.familyRole === "kind"
+            ? `<span class="m-badge" style="background:#fef3c7; color:#92400e; margin-left:4px;">👶 Kind</span>`
+            : `<span class="m-badge" style="background:#f1f5f9; color:#334155; margin-left:4px;">👤 Hauptakte</span>`);
+
+        const potentialHeads = allAkten
+          .filter(x => x.id !== a.id && !x.familyHeadId)
+          .sort((x, y) => String(x.personenName || "").localeCompare(String(y.personenName || ""), "de"));
+
+        return `
+          <article class="m-akte-card ${isMember ? "is-family-member" : ""}">
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:10px;">
+              <div>
+                ${isMember ? `<span style="color:#0284c7; font-weight:bold; margin-right:4px;">↳</span>` : ""}
+                <strong style="font-size:1.08rem; color:#003366;">${a.personenName}</strong>
+                ${roleBadge}
+                <span class="m-badge" style="background:#e3f2fd; color:#0d47a1; margin-left:4px;">Code: ${a.aktenCode}</span>
+                <span class="m-badge" style="background:#f3e5f5; color:#4a148c; margin-left:4px;">${a.hauptThema || "-"}</span>
+                ${a.einwilligungErteilt
+                  ? `<span class="m-badge" style="background:#eaf6ec; color:#1b5e20; margin-left:4px;">✓ DSGVO-Einwilligung</span>`
+                  : `<span class="m-badge" style="background:#fff3e0; color:#e65100; margin-left:4px;">Einwilligung offen</span>`}
+                ${a.aliasNamen ? `<div style="font-size:0.84rem; color:#455a64;">Varianten / Suchwörter: <em>${a.aliasNamen}</em></div>` : ""}
+                <div style="font-size:0.89rem; color:#333; margin-top:4px;">
+                  ${a.telefon ? `Tel: ${a.telefon} · ` : ""}Notiz/Frist: <strong>${a.notiz || "–"}</strong>
+                </div>
+              </div>
+
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <button type="button" class="m-btn btn-copy-link" data-link="${uploadLink}" data-code="${a.aktenCode}">📋 Upload-Link</button>
+                <button type="button" class="m-btn m-btn-orange btn-copy-schatz" data-link="${schatzLink}">✨ Schatzsuche</button>
+                <a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener" class="m-btn m-btn-green">📲 WhatsApp</a>
+                ${a.driveUrl ? `<a href="${a.driveUrl}" target="_blank" rel="noopener" class="m-btn m-btn-grey">📁 Drive</a>` : ""}
+                <button type="button" class="m-btn m-btn-red btn-del-akte" data-id="${a.id}" data-name="${a.personenName}">🗑</button>
+              </div>
+            </div>
+
+            <!-- Familien-Verknüpfung & Rollentausch -->
+            <details style="margin-top:8px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:7px; padding:7px 11px;">
+              <summary style="cursor:pointer; font-weight:bold; color:#0369a1; font-size:0.9rem;">
+                👨‍👩‍👧‍👦 Familie &amp; Rolle verwalten (Ehefrau / Ehegatte / Kinder verknüpfen oder Hauptakte wechseln)
+              </summary>
+              <div style="margin-top:9px; display:flex; flex-wrap:wrap; gap:8px; align-items:flex-end;">
+                <div style="min-width:170px;">
+                  <label style="font-size:0.8rem; font-weight:bold;">Rolle</label>
+                  <select class="m-select fam-role-sel">
+                    <option value="haupt" ${(!a.familyRole || a.familyRole === "haupt") ? "selected" : ""}>👤 Hauptakte / Oberhaupt</option>
+                    <option value="ehepartner" ${a.familyRole === "ehepartner" ? "selected" : ""}>💍 Ehefrau / Ehegatte</option>
+                    <option value="kind" ${a.familyRole === "kind" ? "selected" : ""}>👶 Kind / Jugendlicher</option>
+                  </select>
+                </div>
+                <div style="min-width:220px; flex:1;">
+                  <label style="font-size:0.8rem; font-weight:bold;">Verknüpft mit Hauptakte</label>
+                  <select class="m-select fam-head-sel">
+                    <option value="">– Eigenständige Hauptakte –</option>
+                    ${potentialHeads.map(h => `<option value="${h.id}" ${a.familyHeadId === h.id ? "selected" : ""}>${h.personenName} (${h.herkunftsland || "-"})</option>`).join("")}
+                  </select>
+                </div>
+                <button type="button" class="m-btn btn-save-family" data-akteid="${a.id}">✓ Zuordnung speichern</button>
+                ${a.familyHeadId ? `<button type="button" class="m-btn m-btn-orange btn-promote-head" data-akteid="${a.id}">⇄ Zur Hauptakte der Familie machen</button>` : ""}
+              </div>
+            </details>
+
+            <!-- Eigener Datei- / Foto-Upload durch Supermaster -->
+            <details style="margin-top:8px; background:#f8fbff; border:1px solid #b8d4ec; border-radius:7px; padding:7px 11px;">
+              <summary style="cursor:pointer; font-weight:bold; color:#003366; font-size:0.9rem;">
+                ➕ Selbst Datei, Foto oder Notiz in diese Akte ablegen
+              </summary>
+              <div style="margin-top:9px; display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
+                <div>
+                  <label style="font-size:0.8rem; font-weight:bold;">Bereich / Unterordner</label>
+                  <select class="m-select adm-up-thema">
+                    <option value="Asylantrag & Aufenthalt">1. Asylantrag &amp; Aufenthalt</option>
+                    <option value="Arbeit & Ehrenamt">2. Arbeit &amp; Ehrenamt</option>
+                    <option value="Wohnung & Unterkunft">3. Wohnung &amp; Unterkunft</option>
+                    <option value="Fotos & Einverständnis">4. Fotos &amp; Einverständnis</option>
+                    <option value="Notizen & Sonstiges">5. Notizen &amp; Sonstiges</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.8rem; font-weight:bold;">Foto-Schutzstufe</label>
+                  <select class="m-select adm-up-perm">
+                    <option value="Stufe 0: Nur intern in der Akte">Stufe 0: Nur intern (keine Veröffentlichung)</option>
+                    <option value="Stufe 1: Nur intern im Helferkreis">Stufe 1: Nur intern im Helferkreis</option>
+                    <option value="Stufe 2: Webseite/Presse NUR anonymisiert">Stufe 2: Webseite NUR anonymisiert</option>
+                    <option value="Stufe 3: Webseite/Presse mit Foto erlaubt">Stufe 3: Webseite/Presse freigegeben</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.8rem; font-weight:bold;">Bezeichnung / Notiz</label>
+                  <input type="text" class="m-input adm-up-note" placeholder="z. B. Porträtfoto, Notiz">
+                </div>
+                <div>
+                  <label style="font-size:0.8rem; font-weight:bold;">Datei(en) auswählen</label>
+                  <input type="file" class="m-input adm-up-files" multiple style="padding:5px;">
+                </div>
+              </div>
+              <div style="margin-top:8px;">
+                <button type="button" class="m-btn m-btn-green btn-adm-upload" data-akteid="${a.id}">⬆ In Akte speichern</button>
+              </div>
+            </details>
+
+            <div style="margin-top:9px; padding-top:8px; border-top:1px solid #cbd5e1;">
+              <strong style="font-size:0.9rem; color:#003366;">Abgelegte Unterlagen &amp; Fotos (${dateien.length}):</strong>
+              ${dateien.length === 0
+                ? `<div style="font-size:0.86rem; color:#555; margin-top:3px;">Noch keine Dateien hochgeladen.</div>`
+                : dateien.map(df => {
+                  const permBadge = df.fotoFreigabe
+                    ? `<span class="m-badge" style="background:${df.fotoFreigabe.includes("Stufe 3") ? "#eaf6ec" : (df.fotoFreigabe.includes("Stufe 2") ? "#fff8e1" : "#ffebee")}; color:${df.fotoFreigabe.includes("Stufe 3") ? "#1b5e20" : (df.fotoFreigabe.includes("Stufe 2") ? "#b45309" : "#b71c1c")}; margin-left:4px;">🛡️ ${df.fotoFreigabe}</span>`
+                    : "";
+                  return `
+                    <div class="m-file-row">
+                      <div>
+                        <strong>${df.fileName}</strong>
+                        <span style="font-size:0.82rem; color:#555;"> (${df.bereich} · ${df.sizeKb} KB · ${df.datum})</span>
+                        ${permBadge}
+                        ${df.nachricht ? `<div style="font-size:0.85rem; color:#111; margin-top:2px;">💬 „${df.nachricht}“</div>` : ""}
+                      </div>
+                      <div style="display:flex; gap:6px;">
+                        <button type="button" class="m-btn btn-view-file" data-fid="${df.fileId}" data-fname="${df.fileName}">👁 Ansehen</button>
+                        <button type="button" class="m-btn m-btn-red btn-del-file" data-fid="${df.fileId}" data-fname="${df.fileName}">✕</button>
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+            </div>
+          </article>
+        `;
+      }
+
       function renderAktenListe(akten) {
         const rawQuery = (document.getElementById("ak-search").value || "").trim().toLowerCase();
         const normQuery = normalizeTranslit(rawQuery);
 
-        // Länder-Chips oben aufbauen
         const countryCounts = {};
         akten.forEach(a => {
           const land = (a.herkunftsland || "Ohne Landesangabe").trim();
@@ -777,154 +878,110 @@
           });
         });
 
-        const filtered = akten.filter(a => {
-          const land = (a.herkunftsland || "Ohne Landesangabe").trim();
-          if (selectedCountryFilter && land !== selectedCountryFilter) return false;
+        const matchesSearch = (a) => {
           if (!rawQuery) return true;
-
+          const land = (a.herkunftsland || "Ohne Landesangabe").trim();
           const directHay = `${a.personenName || ""} ${a.aliasNamen || ""} ${land} ${a.aktenCode || ""} ${a.hauptThema || ""} ${a.notiz || ""}`.toLowerCase();
           if (directHay.includes(rawQuery)) return true;
-
           if (normQuery.length >= 2) {
             const normName = normalizeTranslit(`${a.personenName || ""} ${a.aliasNamen || ""}`);
             if (normName.includes(normQuery)) return true;
           }
           return false;
+        };
+
+        // Familienmitglieder einer Hauptakte finden
+        const childrenByHead = {};
+        const akteById = {};
+        akten.forEach(a => { akteById[a.id] = a; });
+        akten.forEach(a => {
+          if (a.familyHeadId && akteById[a.familyHeadId]) {
+            if (!childrenByHead[a.familyHeadId]) childrenByHead[a.familyHeadId] = [];
+            childrenByHead[a.familyHeadId].push(a);
+          }
+        });
+
+        // Hauptakten (inkl. zugehöriger Familienmitglieder) nach Land gruppieren
+        const groups = {};
+        akten.forEach(a => {
+          const isLinkedChild = !!(a.familyHeadId && akteById[a.familyHeadId]);
+          if (isLinkedChild) return; // Wird direkt unter der Hauptakte gerendert!
+
+          const members = childrenByHead[a.id] || [];
+          const land = (a.herkunftsland || "Ohne Landesangabe").trim();
+          if (selectedCountryFilter && land !== selectedCountryFilter && !members.some(m => (m.herkunftsland || "").trim() === selectedCountryFilter)) {
+            return;
+          }
+          if (!matchesSearch(a) && !members.some(m => matchesSearch(m))) {
+            return;
+          }
+          if (!groups[land]) groups[land] = [];
+          groups[land].push({ head: a, members: members });
         });
 
         const container = document.getElementById("list-akten");
-        if (!filtered.length) {
+        const groupKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b, "de"));
+        if (!groupKeys.length) {
           container.innerHTML = `<div class="m-card">Keine passenden Personen-Akten gefunden.</div>`;
           return;
         }
 
-        // Nach Herkunftsland gruppieren
-        const groups = {};
-        filtered.forEach(a => {
-          const land = (a.herkunftsland || "Ohne Landesangabe").trim();
-          if (!groups[land]) groups[land] = [];
-          groups[land].push(a);
-        });
-
         const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
 
-        container.innerHTML = Object.keys(groups).sort((a, b) => a.localeCompare(b, "de")).map(land => {
-          const list = groups[land].sort((a, b) => String(a.personenName || "").localeCompare(String(b.personenName || ""), "de"));
+        container.innerHTML = groupKeys.map(land => {
+          const families = groups[land].sort((x, y) => String(x.head.personenName || "").localeCompare(String(y.head.personenName || ""), "de"));
+          const totalPersons = families.reduce((sum, f) => sum + 1 + f.members.length, 0);
           return `
             <details class="m-country-group" open>
               <summary class="m-country-summary">
-                <span>🌍 ${land} (${list.length} ${list.length === 1 ? "Person" : "Personen"})</span>
+                <span>🌍 ${land} (${totalPersons} ${totalPersons === 1 ? "Person" : "Personen"})</span>
                 <span style="font-size:0.85rem; opacity:0.9;">▾</span>
               </summary>
               <div>
-                ${list.map(a => {
-                  const uploadLink = `${baseDir}unterlagen.html?c=${encodeURIComponent(a.aktenCode)}`;
-                  const schatzLink = `${baseDir}schatzsuche.html?c=${encodeURIComponent(a.aktenCode)}`;
-                  const waText = encodeURIComponent(
-                    `Hallo ${a.personenName},\nhier ist dein persönlicher Link für vertrauliche Unterlagen beim Freundeskreis:\n${uploadLink}\nDein Zugangs-Code: ${a.aktenCode}`
-                  );
-                  const dateien = a.dateien || [];
-
-                  return `
-                    <article class="m-akte-card">
-                      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:10px;">
-                        <div>
-                          <strong style="font-size:1.1rem; color:#003366;">${a.personenName}</strong>
-                          <span class="m-badge" style="background:#e3f2fd; color:#0d47a1; margin-left:6px;">Code: ${a.aktenCode}</span>
-                          <span class="m-badge" style="background:#f3e5f5; color:#4a148c; margin-left:4px;">${a.hauptThema || "-"}</span>
-                          ${a.einwilligungErteilt
-                            ? `<span class="m-badge" style="background:#eaf6ec; color:#1b5e20; margin-left:4px;">✓ DSGVO-Einwilligung liegt vor</span>`
-                            : `<span class="m-badge" style="background:#fff3e0; color:#e65100; margin-left:4px;">Einwilligung offen</span>`}
-                          ${a.aliasNamen ? `<div style="font-size:0.85rem; color:#455a64;">Varianten / Suchwörter: <em>${a.aliasNamen}</em></div>` : ""}
-                          <div style="font-size:0.9rem; color:#333; margin-top:4px;">
-                            ${a.telefon ? `Tel: ${a.telefon} · ` : ""}Notiz/Frist: <strong>${a.notiz || "–"}</strong>
-                          </div>
-                        </div>
-
-                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                          <button type="button" class="m-btn btn-copy-link" data-link="${uploadLink}" data-code="${a.aktenCode}">📋 Upload-Link</button>
-                          <button type="button" class="m-btn m-btn-orange btn-copy-schatz" data-link="${schatzLink}">✨ Schatzsuche-Link</button>
-                          <a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener" class="m-btn m-btn-green">📲 WhatsApp</a>
-                          ${a.driveUrl ? `<a href="${a.driveUrl}" target="_blank" rel="noopener" class="m-btn m-btn-grey">📁 Drive</a>` : ""}
-                          <button type="button" class="m-btn m-btn-red btn-del-akte" data-id="${a.id}" data-name="${a.personenName}">🗑 Löschen</button>
-                        </div>
-                      </div>
-
-                      <!-- Eigener Datei- / Foto-Upload direkt durch dich in diese Akte -->
-                      <details style="margin-top:10px; background:#f8fbff; border:1px solid #b8d4ec; border-radius:7px; padding:8px 12px;">
-                        <summary style="cursor:pointer; font-weight:bold; color:#003366; font-size:0.92rem;">
-                          ➕ Selbst Datei, Foto oder Notiz in diese Akte ablegen
-                        </summary>
-                        <div style="margin-top:10px; display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:8px;">
-                          <div>
-                            <label style="font-size:0.82rem; font-weight:bold;">Bereich / Unterordner</label>
-                            <select class="m-select adm-up-thema">
-                              <option value="Asylantrag & Aufenthalt">1. Asylantrag &amp; Aufenthalt</option>
-                              <option value="Arbeit & Ehrenamt">2. Arbeit &amp; Ehrenamt</option>
-                              <option value="Wohnung & Unterkunft">3. Wohnung &amp; Unterkunft</option>
-                              <option value="Fotos & Einverständnis">4. Fotos &amp; Einverständnis</option>
-                              <option value="Notizen & Sonstiges">5. Notizen &amp; Sonstiges</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label style="font-size:0.82rem; font-weight:bold;">Foto-Schutzstufe (falls Foto)</label>
-                            <select class="m-select adm-up-perm">
-                              <option value="Stufe 0: Nur intern in der Akte">Stufe 0: Nur intern (keine Veröffentlichung)</option>
-                              <option value="Stufe 1: Nur intern im Helferkreis">Stufe 1: Nur intern im Helferkreis</option>
-                              <option value="Stufe 2: Webseite/Presse NUR anonymisiert">Stufe 2: Webseite NUR anonymisiert</option>
-                              <option value="Stufe 3: Webseite/Presse mit Foto erlaubt">Stufe 3: Webseite/Presse freigegeben</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label style="font-size:0.82rem; font-weight:bold;">Bezeichnung / Notiz</label>
-                            <input type="text" class="m-input adm-up-note" placeholder="z. B. Porträtfoto, Notiz vom Gespräch">
-                          </div>
-                          <div>
-                            <label style="font-size:0.82rem; font-weight:bold;">Datei(en) auswählen</label>
-                            <input type="file" class="m-input adm-up-files" multiple style="padding:6px;">
-                          </div>
-                        </div>
-                        <div style="margin-top:8px;">
-                          <button type="button" class="m-btn m-btn-green btn-adm-upload" data-akteid="${a.id}">⬆ In Akte speichern</button>
-                        </div>
-                      </details>
-
-                      <div style="margin-top:10px; padding-top:10px; border-top:1px solid #cbd5e1;">
-                        <strong style="font-size:0.92rem; color:#003366;">Abgelegte Unterlagen &amp; Fotos (${dateien.length}):</strong>
-                        ${dateien.length === 0
-                          ? `<div style="font-size:0.88rem; color:#555; margin-top:4px;">Noch keine Dateien hochgeladen.</div>`
-                          : dateien.map(df => {
-                            const permBadge = df.fotoFreigabe
-                              ? `<span class="m-badge" style="background:${df.fotoFreigabe.includes("Stufe 3") ? "#eaf6ec" : (df.fotoFreigabe.includes("Stufe 2") ? "#fff8e1" : "#ffebee")}; color:${df.fotoFreigabe.includes("Stufe 3") ? "#1b5e20" : (df.fotoFreigabe.includes("Stufe 2") ? "#b45309" : "#b71c1c")}; margin-left:4px;">🛡️ ${df.fotoFreigabe}</span>`
-                              : "";
-                            return `
-                              <div class="m-file-row">
-                                <div>
-                                  <strong>${df.fileName}</strong>
-                                  <span style="font-size:0.82rem; color:#555;"> (${df.bereich} · ${df.sizeKb} KB · ${df.datum})</span>
-                                  ${permBadge}
-                                  ${df.nachricht ? `<div style="font-size:0.86rem; color:#111; margin-top:2px;">💬 „${df.nachricht}“</div>` : ""}
-                                </div>
-                                <div style="display:flex; gap:6px;">
-                                  <button type="button" class="m-btn btn-view-file" data-fid="${df.fileId}" data-fname="${df.fileName}">👁 Ansehen / Kopieren</button>
-                                  <button type="button" class="m-btn m-btn-red btn-del-file" data-fid="${df.fileId}" data-fname="${df.fileName}">✕</button>
-                                </div>
-                              </div>
-                            `;
-                          }).join("")}
-                      </div>
-                    </article>
-                  `;
+                ${families.map(fam => {
+                  const headHtml = renderSingleAkteCard(fam.head, akten, false, baseDir);
+                  const sortedMembers = fam.members.sort((m1, m2) => {
+                    const order = { ehepartner: 1, kind: 2 };
+                    return (order[m1.familyRole] || 9) - (order[m2.familyRole] || 9);
+                  });
+                  const membersHtml = sortedMembers.map(m => renderSingleAkteCard(m, akten, true, baseDir)).join("");
+                  return headHtml + membersHtml;
                 }).join("")}
               </div>
             </details>
           `;
         }).join("");
 
+        // Event-Listener binden
+        container.querySelectorAll(".btn-save-family").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const box = btn.closest("details");
+            const roleVal = box.querySelector(".fam-role-sel").value;
+            const headVal = box.querySelector(".fam-head-sel").value;
+            await postAction({
+              action: "updatePersonFamilyLink",
+              akteId: btn.dataset.akteid,
+              familyRole: headVal ? roleVal : "haupt",
+              familyHeadId: headVal
+            });
+            loadMasterData(currentCode, false);
+          });
+        });
+
+        container.querySelectorAll(".btn-promote-head").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            if (!confirm("Diese Person zur neuen Hauptakte der Familie machen?")) return;
+            await postAction({
+              action: "promoteFamilyHead",
+              newHeadId: btn.dataset.akteid
+            });
+            loadMasterData(currentCode, false);
+          });
+        });
+
         container.querySelectorAll(".btn-copy-link").forEach(btn => {
           btn.addEventListener("click", async () => {
-            const txt = `Vertraulicher Upload-Link (Freundeskreis): ${btn.dataset.link}\nZugangs-Code: ${btn.dataset.code}`;
-            await navigator.clipboard.writeText(txt);
+            await navigator.clipboard.writeText(`Vertraulicher Upload-Link (Freundeskreis): ${btn.dataset.link}\nZugangs-Code: ${btn.dataset.code}`);
             btn.textContent = "✓ Kopiert!";
             setTimeout(() => { btn.textContent = "📋 Upload-Link"; }, 2000);
           });
@@ -932,9 +989,9 @@
 
         container.querySelectorAll(".btn-copy-schatz").forEach(btn => {
           btn.addEventListener("click", async () => {
-            await navigator.clipboard.writeText(`Schatzsuche – Deine Begabungen & Talente (Freundeskreis): ${btn.dataset.link}`);
+            await navigator.clipboard.writeText(`Schatzsuche – Deine Begabungen & Träume (Freundeskreis): ${btn.dataset.link}`);
             btn.textContent = "✓ Kopiert!";
-            setTimeout(() => { btn.textContent = "✨ Schatzsuche-Link"; }, 2000);
+            setTimeout(() => { btn.textContent = "✨ Schatzsuche"; }, 2000);
           });
         });
 
@@ -943,15 +1000,10 @@
             const wrap = btn.closest("details");
             const fileInput = wrap.querySelector(".adm-up-files");
             const rawFiles = Array.from(fileInput.files || []);
-            if (!rawFiles.length) {
-              alert("Bitte zuerst eine oder mehrere Dateien auswählen.");
-              return;
-            }
+            if (!rawFiles.length) { alert("Bitte zuerst eine Datei auswählen."); return; }
             const task = async () => {
               const prepared = [];
-              for (let i = 0; i < rawFiles.length; i++) {
-                prepared.push(await readAdminFile(rawFiles[i]));
-              }
+              for (let i = 0; i < rawFiles.length; i++) prepared.push(await readAdminFile(rawFiles[i]));
               const res = await postAction({
                 action: "adminUploadToCase",
                 akteId: btn.dataset.akteid,
@@ -960,23 +1012,18 @@
                 nachricht: wrap.querySelector(".adm-up-note").value.trim(),
                 files: prepared
               });
-              if (res && res.ok) {
-                loadMasterData(currentCode, false);
-                return { ok: true };
-              }
+              if (res && res.ok) { loadMasterData(currentCode, false); return { ok: true }; }
               return { ok: false };
             };
             if (typeof window.fflwRunButtonAction === "function") {
               await window.fflwRunButtonAction(btn, task, { loadingText: "Speichere …", successText: "✓ Gespeichert!" });
-            } else {
-              await task();
-            }
+            } else { await task(); }
           });
         });
 
         container.querySelectorAll(".btn-del-akte").forEach(btn => {
           btn.addEventListener("click", async () => {
-            if (!confirm(`Personen-Akte „${btn.dataset.name}“ inklusive ALLER Dokumente unwiderruflich in den Papierkorb verschieben?`)) return;
+            if (!confirm(`Personen-Akte „${btn.dataset.name}“ inklusive ALLER Dokumente in den Papierkorb verschieben?`)) return;
             await postAction({ action: "deletePersonCaseOrFile", akteId: btn.dataset.id });
             loadMasterData(currentCode, false);
           });
@@ -1029,11 +1076,20 @@
 
       function renderSchatzListe(liste) {
         const q = (document.getElementById("sz-search").value || "").trim().toLowerCase();
+        const lvlFilter = document.getElementById("sz-level-filter").value;
         const normQ = normalizeTranslit(q);
+
         const filtered = liste.filter(s => {
+          const detMap = s.domainDetails || {};
+          if (lvlFilter) {
+            const hasLevel = Object.values(detMap).some(d => Array.isArray(d.levels) && d.levels.includes(lvlFilter));
+            if (!hasLevel) return false;
+          }
           if (!q) return true;
-          const allTags = Object.values(s.bereiche || {}).flat().join(" ");
-          const hay = `${s.name || ""} ${s.herkunftsland || ""} ${s.beruf || ""} ${s.muttersprache || ""} ${s.sprachen || ""} ${allTags} ${s.mobilNotiz || ""} ${s.ehrenamtNotiz || ""} ${s.handwerkNotiz || ""} ${s.gartenNotiz || ""} ${s.kunstNotiz || ""}`.toLowerCase();
+          const domainTexts = Object.values(detMap).map(d =>
+            `${d.title || ""} ${(d.options || []).join(" ")} ${d.detail || ""}`
+          ).join(" ");
+          const hay = `${s.name || ""} ${s.herkunftsland || ""} ${s.beruf || ""} ${s.muttersprache || ""} ${s.sprachen || ""} ${s.schatzCode || ""} ${domainTexts}`.toLowerCase();
           if (hay.includes(q)) return true;
           if (normQ.length >= 2 && normalizeTranslit(s.name || "").includes(normQ)) return true;
           return false;
@@ -1041,43 +1097,65 @@
 
         const container = document.getElementById("list-schatz");
         if (!filtered.length) {
-          container.innerHTML = `<div class="m-card">Noch keine passenden Einträge in der Schatzkiste gefunden.</div>`;
+          container.innerHTML = `<div class="m-card">Keine passenden Einträge in der Schatzkiste gefunden.</div>`;
           return;
         }
 
+        const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
+
         container.innerHTML = filtered.map(s => {
-          const allTags = Object.values(s.bereiche || {}).flat();
+          const detMap = s.domainDetails || {};
+          const domainKeys = Object.keys(detMap);
+          const editLink = s.schatzCode ? `${baseDir}schatzsuche.html?sc=${encodeURIComponent(s.schatzCode)}` : "";
+
           return `
             <div class="m-card" style="border-left-color:#b45309;">
-              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px;">
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:8px;">
                 <div>
-                  <strong style="font-size:1.06rem; color:#003366;">${s.name}</strong>
+                  <strong style="font-size:1.08rem; color:#003366;">${s.name}</strong>
                   <span class="m-badge" style="background:#e3f2fd; color:#0d47a1; margin-left:6px;">🌍 ${s.herkunftsland || "-"}</span>
+                  ${s.schatzCode ? `<span class="m-badge" style="background:#fef3c7; color:#92400e; margin-left:4px;">Schatz-Code: ${s.schatzCode}</span>` : ""}
                   ${s.aktenCode ? `<span class="m-badge" style="background:#f3e5f5; color:#4a148c; margin-left:4px;">Akte: ${s.aktenCode}</span>` : ""}
                 </div>
-                <div style="font-size:0.88rem; color:#333;">
-                  Kontakt: <strong>${s.kontakt || "-"}</strong> ${s.email ? `(${s.email})` : ""}
+                <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+                  <span style="font-size:0.88rem; color:#333;">Kontakt: <strong>${s.kontakt || "-"}</strong></span>
+                  ${editLink ? `<button type="button" class="m-btn btn-copy-sz-edit" data-link="${editLink}" data-code="${s.schatzCode}">📋 Ergänzungs-Link</button>` : ""}
                 </div>
               </div>
               <div style="font-size:0.92rem; margin-top:6px;">
                 <strong>Beruf / Wunsch:</strong> ${s.beruf || "–"} · <strong>Sprachen:</strong> ${[s.muttersprache, s.sprachen].filter(Boolean).join(", ") || "–"}
               </div>
-              ${allTags.length ? `
-                <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:5px;">
-                  ${allTags.map(t => `<span class="m-badge" style="background:#fff8e1; color:#78350f; border:1px solid #fcd34d;">✨ ${t}</span>`).join("")}
-                </div>
-              ` : ""}
-              ${[s.mobilNotiz, s.ehrenamtNotiz, s.handwerkNotiz, s.gartenNotiz, s.kunstNotiz].filter(Boolean).length ? `
-                <div style="font-size:0.88rem; color:#333; margin-top:6px; background:#f8fafc; padding:6px 10px; border-radius:6px;">
-                  ${[s.mobilNotiz, s.ehrenamtNotiz, s.handwerkNotiz, s.gartenNotiz, s.kunstNotiz].filter(Boolean).join(" | ")}
-                </div>
-              ` : ""}
+              ${domainKeys.map(k => {
+                const d = detMap[k];
+                const badges = (d.levels || []).map(lv => {
+                  const info = LEVEL_LABELS[lv] || { icon: "•", name: lv, bg: "#eee", fg: "#111", border: "#ccc" };
+                  return `<span class="m-badge" style="background:${info.bg}; color:${info.fg}; border:1px solid ${info.border}; margin-right:4px;">${info.icon} ${info.name}</span>`;
+                }).join("");
+                return `
+                  <div style="margin-top:8px; padding:8px 11px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:7px;">
+                    <div><strong>${d.title || k}:</strong> ${badges}</div>
+                    ${(d.options && d.options.length) ? `<div style="font-size:0.88rem; color:#1e293b; margin-top:4px;">• ${d.options.join(" · ")}</div>` : ""}
+                    ${d.detail ? `<div style="font-size:0.88rem; color:#003366; margin-top:4px;">💬 <em>„${d.detail}“</em></div>` : ""}
+                  </div>
+                `;
+              }).join("")}
             </div>
           `;
         }).join("");
+
+        container.querySelectorAll(".btn-copy-sz-edit").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            await navigator.clipboard.writeText(`Schatzsuche weiterbearbeiten & ergänzen (Freundeskreis):\n${btn.dataset.link}\nDein Schatzsuche-Code: ${btn.dataset.code}`);
+            btn.textContent = "✓ Kopiert!";
+            setTimeout(() => { btn.textContent = "📋 Ergänzungs-Link"; }, 2000);
+          });
+        });
       }
 
       document.getElementById("sz-search").addEventListener("input", () => {
+        if (currentData && currentData.schatzkiste) renderSchatzListe(currentData.schatzkiste);
+      });
+      document.getElementById("sz-level-filter").addEventListener("change", () => {
         if (currentData && currentData.schatzkiste) renderSchatzListe(currentData.schatzkiste);
       });
 
@@ -1094,25 +1172,26 @@
       });
 
       document.getElementById("ak-search").addEventListener("input", () => {
-        if (currentData && currentData.personenAkten) {
-          renderAktenListe(currentData.personenAkten);
-        }
+        if (currentData && currentData.personenAkten) renderAktenListe(currentData.personenAkten);
       });
 
       document.getElementById("ak-create-btn").addEventListener("click", async function () {
         const name = document.getElementById("ak-new-name").value.trim();
         const land = document.getElementById("ak-new-land").value.trim() || "Ohne Landesangabe";
         const msgEl = document.getElementById("ak-create-msg");
-        if (!name) {
-          msgEl.style.color = "#c62828";
-          msgEl.textContent = "Bitte Name oder Kürzel angeben.";
-          return;
-        }
+        if (!name) { msgEl.style.color = "#c62828"; msgEl.textContent = "Bitte Name oder Kürzel angeben."; return; }
+
+        const parentId = document.getElementById("ak-new-parent").value;
+        let roleVal = document.getElementById("ak-new-role").value;
+        if (!parentId) roleVal = "haupt";
+
         const task = async () => {
           const res = await postAction({
             action: "createPersonCase",
             herkunftsland: land,
             personenName: name,
+            familyRole: roleVal,
+            familyHeadId: parentId,
             aliasNamen: document.getElementById("ak-new-alias").value.trim(),
             hauptThema: document.getElementById("ak-new-thema").value,
             telefon: document.getElementById("ak-new-tel").value.trim(),
@@ -1134,9 +1213,7 @@
         };
         if (typeof window.fflwRunButtonAction === "function") {
           await window.fflwRunButtonAction(this, task, { loadingText: "Erstelle Akte …", successText: "✓ Angelegt!" });
-        } else {
-          await task();
-        }
+        } else { await task(); }
       });
 
       async function renderSystemConfig(data) {
@@ -1202,9 +1279,7 @@
 
         if (typeof window.fflwRunButtonAction === "function") {
           await window.fflwRunButtonAction(this, task, { loadingText: "Speichere …", successText: "✓ Gespeichert!" });
-        } else {
-          await task();
-        }
+        } else { await task(); }
       });
 
       document.getElementById("m-release-all-btn").addEventListener("click", async function () {
