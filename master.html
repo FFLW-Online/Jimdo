@@ -1,10 +1,12 @@
 <!-- ==========================================================================
   DATEI: master.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-20 19:02 CET
+  ERSTELLT VON GEMINI AM: 2026-11-21 07:33 CET
   BESCHREIBUNG: Aufgeräumtes Steuerungs-Cockpit für Supermaster & Untermaster
-    - Kontrastreiches, helles Design mit animierter Lade-Sanduhr
-    - Rollen-Trennung: FFLW-99 (Supermaster), FFLW-TEAM, FFLW-KOORD, FFLW-COPILOT
-    - Exklusiver Supermaster-Bereich: Versteckte Unterseiten & Seitenschutz/Sperren
+    - Dynamische GitHub-Erkennung (FFLW-Online/Jimdo) aller versteckten & Menü-Seiten
+    - Filter-Optionen: Nur versteckte Seiten / Nur Menü-Seiten / Alle zusammen
+    - 1-Klick-Link-Kopierfunktion für schnelle Weitergabe geheimer Seiten
+    - Einheitlicher Seitenschutz (Wartungsmodus) direkt in der dynamischen Liste
+    - Geräte-Erkennung & Fingerabdruck-Login (Passkey / WebAuthn) für Supermaster
 ========================================================================== -->
 <!doctype html>
 <html lang="de">
@@ -74,6 +76,10 @@
       align-items: center;
       gap: 6px;
     }
+    .m-btn-sm {
+      padding: 6px 11px;
+      font-size: 0.85rem;
+    }
     .m-btn-green { background: #2e7d32; }
     .m-btn-blue { background: #1565c0; }
     .m-btn-orange { background: #d97706; }
@@ -120,41 +126,84 @@
       color: #111111;
       background: #ffffff;
     }
-    .m-hidden-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 10px;
-      margin: 12px 0 20px 0;
-    }
-    .m-hidden-link {
-      display: block;
-      padding: 11px 14px;
-      background: #eef6fc;
-      border: 1px solid #90caf9;
-      border-radius: 8px;
-      color: #003366 !important;
-      font-weight: bold;
-      text-decoration: none;
-    }
-    .m-hidden-link:hover {
-      background: #d8ebfa;
-    }
-    .m-lock-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 8px;
-      margin: 10px 0 16px 0;
-    }
-    .m-lock-item {
+
+    /* Filter-Buttons & Dynamische Seiten-Karten */
+    .m-filter-bar {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
-      padding: 9px 12px;
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      background: #f2f7fc;
+      border: 1px solid #c5d7eb;
+      border-radius: 9px;
+    }
+    .m-filter-btn {
+      padding: 8px 14px;
+      border-radius: 7px;
+      border: 2px solid #90caf9;
+      background: #ffffff;
+      color: #003366;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .m-filter-btn.active {
+      background: #004080;
+      border-color: #004080;
+      color: #ffffff;
+    }
+    .m-page-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      margin-bottom: 8px;
       background: #ffffff;
       border: 1px solid #c5d7eb;
-      border-radius: 7px;
+      border-left: 5px solid #1565c0;
+      border-radius: 8px;
+    }
+    .m-page-row.is-hidden-page {
+      border-left-color: #5e35b1;
+      background: #faf8ff;
+    }
+    .m-page-row.is-locked-page {
+      border-left-color: #c62828;
+      background: #fff8f8;
+    }
+    .m-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 0.78rem;
+      font-weight: bold;
+    }
+    .m-badge-hidden {
+      background: #ede7f6;
+      color: #4527a0;
+      border: 1px solid #b39ddb;
+    }
+    .m-badge-menu {
+      background: #e3f2fd;
+      color: #0d47a1;
+      border: 1px solid #90caf9;
+    }
+    .m-lock-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid #c5d7eb;
+      background: #f8fafc;
       cursor: pointer;
-      font-size: 0.94rem;
+      font-weight: bold;
+      font-size: 0.85rem;
+      color: #111111;
     }
   </style>
 </head>
@@ -179,6 +228,9 @@
         <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
           <input type="password" id="m-code-input" class="m-input" placeholder="Zugangscode …" style="max-width:230px;">
           <button type="button" id="m-login-btn" class="m-btn m-btn-green">Anmelden</button>
+          <button type="button" id="m-bio-login-btn" class="m-btn m-btn-purple" style="display:none;">
+            Mit Fingerabdruck / FaceID anmelden
+          </button>
         </div>
         <div id="m-login-msg" style="margin-top:10px; font-weight:bold; color:#c62828;"></div>
       </section>
@@ -243,37 +295,38 @@
         </div>
 
         <div id="tab-supermaster" class="m-tab-panel m-card" style="display:none;">
-          <h3 style="margin-top:0; color:#003366;">Versteckte &amp; interne Unterseiten</h3>
+          <h3 style="margin-top:0; color:#003366;">Seiten-Übersicht, Geheime Links &amp; Seitenschutz (Live aus GitHub)</h3>
           <p style="font-size:0.94rem; color:#222222;">
-            Direktzugriff auf Seiten, die nicht im normalen Hauptmenü angezeigt werden:
+            Alle HTML-Seiten aus <strong>FFLW-Online/Jimdo</strong> werden automatisch erkannt und mit dem Hauptmenü abgeglichen:
           </p>
-          <div class="m-hidden-grid">
-            <a href="zusammenfinden.html" class="m-hidden-link">Zusammenfinden (Wohnungs-Vermittlung)</a>
-            <a href="der-versteckte-obstgarten.html" class="m-hidden-link">Der unsichtbare Obstgarten</a>
-            <a href="intern-statistik.html" class="m-hidden-link">Interne Statistik (SA)</a>
-            <a href="beispielbilder.html" class="m-hidden-link">Beispielbilder</a>
-            <a href="bilder-selbst-hochladen.html" class="m-hidden-link">Bilder selbst hochladen</a>
-            <a href="wie-man-den-tragegurt-einsetzt.html" class="m-hidden-link">Tragegurt-Anleitung (Videos)</a>
-            <a href="tipps-und-tricks.html" class="m-hidden-link">Tipps und Tricks (Umzug/Anschluss)</a>
-            <a href="transport-alternativen.html" class="m-hidden-link">Transport-Alternativen</a>
-            <a href="sitemap.html" class="m-hidden-link">Komplette Sitemap öffnen</a>
+
+          <div class="m-filter-bar">
+            <button type="button" class="m-filter-btn active" data-page-filter="hidden" id="btn-filter-hidden">
+              Nur versteckte Seiten (<span id="count-hidden">0</span>)
+            </button>
+            <button type="button" class="m-filter-btn" data-page-filter="menu" id="btn-filter-menu">
+              Nur Menü-Seiten (<span id="count-menu">0</span>)
+            </button>
+            <button type="button" class="m-filter-btn" data-page-filter="all" id="btn-filter-all">
+              Alle Seiten (<span id="count-all">0</span>)
+            </button>
+            <input type="search" id="m-page-search" class="m-input" placeholder="Seite suchen …" style="padding:7px 10px; font-size:14px; flex:1; min-width:160px;">
+          </div>
+
+          <div style="margin-bottom:12px;">
+            <label class="m-lock-item" style="background:#fff3e0; border-color:#ffb74d; font-weight:bold; display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:7px; cursor:pointer;">
+              <input type="checkbox" id="m-lock-all-pages" value="*">
+              <span>Notfall-Sperre: Komplette Webseite für Besucher sperren</span>
+            </label>
+          </div>
+
+          <div id="m-dynamic-pages-list">
+            <div style="display:flex; align-items:center; gap:8px; color:#004080; font-weight:bold;">
+              <span class="fflw-spinner"></span> <span>Lese Verzeichnis von GitHub …</span>
+            </div>
           </div>
 
           <hr style="margin:22px 0; border:none; border-top:1px solid #c5d7eb;">
-
-          <h3 style="color:#003366;">Webseiten schützen &amp; sperren (Wartungsmodus)</h3>
-          <p style="font-size:0.94rem; color:#222222;">
-            Angehakte Seiten werden für normale Besucher sofort mit der Wartungs-Info gesperrt:
-          </p>
-          <div class="m-lock-list" id="m-lock-pages-list">
-            <label class="m-lock-item"><input type="checkbox" value="virtuelles-warenhaus.html"> Virtuelles Warenhaus (Start)</label>
-            <label class="m-lock-item"><input type="checkbox" value="moebel-abgeben.html"> Möbel &amp; Sachen spenden</label>
-            <label class="m-lock-item"><input type="checkbox" value="aktuelle-angebote.html"> Aktuelle Angebote ansehen</label>
-            <label class="m-lock-item"><input type="checkbox" value="suche-sachen.html"> Bedarf anmelden (Suchen)</label>
-            <label class="m-lock-item"><input type="checkbox" value="dinge-die-wir-fast-immer-brauchen-koennen.html"> Was wir oft brauchen</label>
-            <label class="m-lock-item"><input type="checkbox" value="transport.html"> Transport &amp; Lieferung</label>
-            <label class="m-lock-item"><input type="checkbox" value="zusammenfinden.html"> Zusammenfinden</label>
-          </div>
 
           <div style="display:flex; flex-wrap:wrap; gap:18px; margin-bottom:16px;">
             <div>
@@ -291,8 +344,11 @@
             </div>
           </div>
 
-          <button type="button" id="m-save-settings-btn" class="m-btn m-btn-green">Seitenschutz &amp; Einstellungen speichern</button>
-          <span id="m-settings-msg" style="margin-left:10px; font-weight:bold; color:#1b5e20;"></span>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+            <button type="button" id="m-save-settings-btn" class="m-btn m-btn-green">Seitenschutz &amp; Einstellungen speichern</button>
+            <button type="button" id="m-register-bio-btn" class="m-btn m-btn-purple">Dieses Gerät für Fingerabdruck-Login merken</button>
+            <span id="m-settings-msg" style="font-weight:bold; color:#1b5e20;"></span>
+          </div>
 
           <hr style="margin:22px 0; border:none; border-top:1px solid #c5d7eb;">
 
@@ -311,6 +367,7 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      const BIO_STORAGE_KEY = "fflw_supermaster_passkey_v1";
 
       const ROLLEN = {
         "FFLW-99": { role: "master", label: "Supermaster (Vollzugriff)", desc: "Zugriff auf alle Bereiche, versteckte Unterseiten & Seitenschutz", defaultMode: "full" },
@@ -323,11 +380,101 @@
       let activeRole = null;
       let copilotMode = "full";
 
+      let allDynamicPages = [];
+      let lockedPagesSet = new Set();
+      let currentPageFilter = "hidden";
+
       const loginBtn = document.getElementById("m-login-btn");
+      const bioLoginBtn = document.getElementById("m-bio-login-btn");
       const codeInput = document.getElementById("m-code-input");
       const loginMsg = document.getElementById("m-login-msg");
       const cockpit = document.getElementById("m-cockpit");
       const copilotSel = document.getElementById("m-copilot-mode");
+
+      // Fingerabdruck / Geräte-Erkennung prüfen
+      function hasStoredPasskey() {
+        try {
+          return Boolean(localStorage.getItem(BIO_STORAGE_KEY) && window.PublicKeyCredential);
+        } catch (e) {
+          return false;
+        }
+      }
+
+      if (hasStoredPasskey()) {
+        bioLoginBtn.style.display = "inline-flex";
+      }
+
+      async function verifyDeviceBiometrics() {
+        const storedRaw = localStorage.getItem(BIO_STORAGE_KEY);
+        if (!storedRaw || !window.PublicKeyCredential) return false;
+        const stored = JSON.parse(storedRaw);
+        const credIdBytes = Uint8Array.from(atob(stored.credId), c => c.charCodeAt(0));
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+
+        const assertion = await navigator.credentials.get({
+          publicKey: {
+            challenge: challenge,
+            allowCredentials: [{ id: credIdBytes, type: "public-key" }],
+            userVerification: "required",
+            timeout: 45000
+          }
+        });
+        return Boolean(assertion);
+      }
+
+      bioLoginBtn.addEventListener("click", async () => {
+        loginMsg.textContent = "";
+        try {
+          const ok = await verifyDeviceBiometrics();
+          if (ok) {
+            codeInput.value = "FFLW-99";
+            performLogin();
+          }
+        } catch (err) {
+          loginMsg.textContent = "Fingerabdruck-Prüfung abgebrochen. Bitte Zugangscode eingeben.";
+        }
+      });
+
+      document.getElementById("m-register-bio-btn").addEventListener("click", async () => {
+        if (!window.PublicKeyCredential) {
+          alert("Dieser Browser unterstützt keinen Fingerabdruck-/Passkey-Login.");
+          return;
+        }
+        try {
+          const challenge = new Uint8Array(32);
+          const userId = new Uint8Array(16);
+          window.crypto.getRandomValues(challenge);
+          window.crypto.getRandomValues(userId);
+
+          const cred = await navigator.credentials.create({
+            publicKey: {
+              challenge: challenge,
+              rp: { name: "FFLW Steuerung" },
+              user: { id: userId, name: "supermaster@freundeleuwi.org", displayName: "FFLW Supermaster" },
+              pubKeyCredParams: [
+                { type: "public-key", alg: -7 },
+                { type: "public-key", alg: -257 }
+              ],
+              authenticatorSelection: {
+                authenticatorAttachment: "platform",
+                userVerification: "required"
+              },
+              timeout: 45000
+            }
+          });
+
+          const rawIdArr = new Uint8Array(cred.rawId);
+          const credIdB64 = btoa(String.fromCharCode.apply(null, rawIdArr));
+          localStorage.setItem(BIO_STORAGE_KEY, JSON.stringify({
+            credId: credIdB64,
+            createdAt: new Date().toISOString()
+          }));
+          alert("Dieses Gerät wurde erfolgreich für den Fingerabdruck-Login gespeichert!");
+        } catch (err) {
+          alert("Geräte-Registrierung nicht abgeschlossen: " + err.message);
+        }
+      });
 
       document.getElementById("m-toggle-accessible").addEventListener("click", () => {
         document.body.classList.toggle("accessible-mode");
@@ -355,6 +502,139 @@
         btn.addEventListener("click", () => activateTab(btn.getAttribute("data-tab")));
       });
 
+      // Filter-Buttons für versteckte / Menü / alle Seiten
+      document.querySelectorAll(".m-filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".m-filter-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentPageFilter = btn.getAttribute("data-page-filter");
+          renderDynamicPagesList();
+        });
+      });
+
+      document.getElementById("m-page-search").addEventListener("input", () => {
+        renderDynamicPagesList();
+      });
+
+      document.getElementById("m-lock-all-pages").addEventListener("change", function () {
+        if (this.checked) lockedPagesSet.add("*");
+        else lockedPagesSet.delete("*");
+      });
+
+      function buildAbsolutePageUrl(file) {
+        try {
+          return new URL(file, window.location.href).href;
+        } catch (e) {
+          return file;
+        }
+      }
+
+      async function copyTextToClipboard(text, btnEl) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (e) {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+        }
+        const origText = btnEl.textContent;
+        const origBg = btnEl.style.background;
+        btnEl.textContent = "Kopiert!";
+        btnEl.style.background = "#2e7d32";
+        setTimeout(() => {
+          btnEl.textContent = origText;
+          btnEl.style.background = origBg;
+        }, 1800);
+      }
+
+      async function initDynamicGitHubPages() {
+        if (typeof window.fetchFflwDynamicPages !== "function") return;
+        const res = await window.fetchFflwDynamicPages();
+        allDynamicPages = res.pages || [];
+
+        const hiddenCount = allDynamicPages.filter(p => p.isHidden).length;
+        const menuCount = allDynamicPages.filter(p => p.inMenu).length;
+        document.getElementById("count-hidden").textContent = hiddenCount;
+        document.getElementById("count-menu").textContent = menuCount;
+        document.getElementById("count-all").textContent = allDynamicPages.length;
+
+        renderDynamicPagesList();
+      }
+
+      function renderDynamicPagesList() {
+        const container = document.getElementById("m-dynamic-pages-list");
+        const query = (document.getElementById("m-page-search").value || "").trim().toLowerCase();
+
+        const filtered = allDynamicPages.filter(p => {
+          if (currentPageFilter === "hidden" && !p.isHidden) return false;
+          if (currentPageFilter === "menu" && !p.inMenu) return false;
+          if (query && !p.file.toLowerCase().includes(query) && !p.title.toLowerCase().includes(query)) return false;
+          return true;
+        });
+
+        if (!filtered.length) {
+          container.innerHTML = "<p>Keine Seiten für diesen Filter gefunden.</p>";
+          return;
+        }
+
+        container.innerHTML = "";
+        filtered.forEach(p => {
+          const isLocked = lockedPagesSet.has(p.file);
+          const canBeLocked = !p.isLegal && p.file !== "master.html";
+          const fullUrl = buildAbsolutePageUrl(p.file);
+
+          const row = document.createElement("div");
+          row.className = "m-page-row" + (p.isHidden ? " is-hidden-page" : "") + (isLocked ? " is-locked-page" : "");
+
+          const badgeHtml = p.isHidden
+            ? `<span class="m-badge m-badge-hidden">Versteckt</span>`
+            : `<span class="m-badge m-badge-menu">Im Menü</span>`;
+
+          row.innerHTML = `
+            <div style="flex:1; min-width:210px;">
+              <div style="display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-bottom:2px;">
+                <a href="${p.file}" target="_blank" rel="noopener" style="font-weight:bold; color:#003366; text-decoration:underline; font-size:0.98rem;">
+                  ${p.title}
+                </a>
+                ${badgeHtml}
+              </div>
+              <div style="font-size:0.82rem; color:#555555;">${p.file}</div>
+            </div>
+
+            <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+              <button type="button" class="m-btn m-btn-sm m-btn-blue btn-copy-link">Link kopieren</button>
+              ${canBeLocked ? `
+                <label class="m-lock-toggle">
+                  <input type="checkbox" class="cb-lock-page" value="${p.file}" ${isLocked ? "checked" : ""}>
+                  <span>${isLocked ? "Gesperrt" : "Sperren"}</span>
+                </label>
+              ` : ""}
+            </div>
+          `;
+
+          row.querySelector(".btn-copy-link").addEventListener("click", function () {
+            copyTextToClipboard(fullUrl, this);
+          });
+
+          const cb = row.querySelector(".cb-lock-page");
+          if (cb) {
+            cb.addEventListener("change", function () {
+              if (this.checked) {
+                lockedPagesSet.add(p.file);
+              } else {
+                lockedPagesSet.delete(p.file);
+              }
+              renderDynamicPagesList();
+            });
+          }
+
+          container.appendChild(row);
+        });
+      }
+
       function performLogin() {
         const val = codeInput.value.trim().toUpperCase();
         if (!ROLLEN[val]) {
@@ -377,6 +657,7 @@
         if (activeRole.role === "master") {
           btnSuper.style.display = "inline-block";
           activateTab("eingang");
+          initDynamicGitHubPages();
         } else if (activeRole.role === "freischalter") {
           btnBedarfe.style.display = "none";
           btnSuper.style.display = "none";
@@ -440,10 +721,9 @@
           if (data.siteConfig) {
             document.getElementById("m-set-code").value = data.siteConfig.zugangscode || "";
             document.getElementById("m-set-flag").value = data.siteConfig.flaggenStil || "A";
-            const locked = data.siteConfig.wartungSeiten || [];
-            document.querySelectorAll("#m-lock-pages-list input[type='checkbox']").forEach(cb => {
-              cb.checked = locked.includes(cb.value);
-            });
+            lockedPagesSet = new Set(Array.isArray(data.siteConfig.wartungSeiten) ? data.siteConfig.wartungSeiten : []);
+            document.getElementById("m-lock-all-pages").checked = lockedPagesSet.has("*");
+            renderDynamicPagesList();
           }
         } catch (err) {
           banner.innerHTML = `<span style="color:#c62828;">Verbindungsfehler: ${err.message}</span>`;
@@ -453,15 +733,11 @@
       document.getElementById("m-save-settings-btn").addEventListener("click", async () => {
         const msgEl = document.getElementById("m-settings-msg");
         msgEl.textContent = "Speichere …";
-        const wartungSeiten = [];
-        document.querySelectorAll("#m-lock-pages-list input[type='checkbox']:checked").forEach(cb => {
-          wartungSeiten.push(cb.value);
-        });
         const res = await callMasterApi({
           action: "save_site_status",
           zugangscode: document.getElementById("m-set-code").value,
           flaggenStil: document.getElementById("m-set-flag").value,
-          wartungSeiten: wartungSeiten
+          wartungSeiten: Array.from(lockedPagesSet)
         });
         if (res && res.ok) {
           msgEl.textContent = "Gespeichert!";
