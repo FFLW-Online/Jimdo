@@ -6,6 +6,72 @@ const FFLW_GITHUB_REPO = "Jimdo";
 const FFLW_GITHUB_BRANCH = "main";
 
 // ============================================================================
+// GLOBALE BUTTON-RÜCKMELDUNG (ROTIERENDES ZEICHEN + FARBWECHSEL BEI ERFOLG)
+// ============================================================================
+window.fflwRunButtonAction = async function (btn, asyncTask, options) {
+  const opts = Object.assign({
+    loadingText: "Bitte warten …",
+    successText: "✓ Erledigt!",
+    errorText: "✕ Fehler",
+    resetAfterMs: 2400,
+    keepConfirmedColor: false
+  }, options || {});
+
+  if (!btn) {
+    return await asyncTask();
+  }
+
+  if (!btn.dataset.fflwOrigHtml) {
+    btn.dataset.fflwOrigHtml = btn.innerHTML;
+  }
+
+  btn.disabled = true;
+  btn.classList.remove("fflw-btn-confirmed", "fflw-btn-error");
+  btn.classList.add("fflw-btn-loading");
+  btn.innerHTML = `<span class="fflw-spinner fflw-spinner-light"></span> <span>${opts.loadingText}</span>`;
+
+  try {
+    const result = await asyncTask();
+    const isOk = !(result && typeof result === "object" && result.ok === false);
+
+    btn.classList.remove("fflw-btn-loading");
+    if (isOk) {
+      btn.classList.add("fflw-btn-confirmed");
+      btn.innerHTML = `<span>${opts.successText}</span>`;
+    } else {
+      btn.classList.add("fflw-btn-error");
+      btn.innerHTML = `<span>${opts.errorText}</span>`;
+    }
+
+    if (opts.resetAfterMs > 0 && !opts.keepConfirmedColor) {
+      setTimeout(() => {
+        if (document.body.contains(btn)) {
+          btn.disabled = false;
+          btn.classList.remove("fflw-btn-confirmed", "fflw-btn-error");
+          btn.innerHTML = btn.dataset.fflwOrigHtml;
+        }
+      }, opts.resetAfterMs);
+    } else {
+      btn.disabled = false;
+    }
+
+    return result;
+  } catch (err) {
+    btn.classList.remove("fflw-btn-loading");
+    btn.classList.add("fflw-btn-error");
+    btn.innerHTML = `<span>${opts.errorText}</span>`;
+    setTimeout(() => {
+      if (document.body.contains(btn)) {
+        btn.disabled = false;
+        btn.classList.remove("fflw-btn-error");
+        btn.innerHTML = btn.dataset.fflwOrigHtml;
+      }
+    }, 2800);
+    throw err;
+  }
+};
+
+// ============================================================================
 // 0. DYNAMISCHE GITHUB-ERKENNUNG (ALLE HTML-DATEIEN VS. MENÜ-NAVIGATION)
 // ============================================================================
 window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
@@ -203,7 +269,6 @@ function applyHiddenNavItems(versteckteSeiten) {
     const rawHref = (link.getAttribute("href") || "").split("?")[0].split("#")[0].trim();
     if (!rawHref.endsWith(".html")) return;
 
-    // Nur blatt-Einträge (ohne eigenes Untermenü) ausblenden
     const hasSubMenu = li.querySelector("details") !== null;
     if (!hasSubMenu) {
       li.style.display = hiddenSet.has(rawHref) ? "none" : "";

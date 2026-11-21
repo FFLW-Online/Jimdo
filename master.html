@@ -1,12 +1,11 @@
 <!-- ==========================================================================
   DATEI: master.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-21 08:00 CET
-  BESCHREIBUNG: Aufgeräumtes Steuerungs-Cockpit für Supermaster & Untermaster
-    - Dynamische GitHub-Erkennung (FFLW-Online/Jimdo) aller versteckten & Menü-Seiten
-    - Seiten wahlweise "Sperren" (Wartung) ODER "Im Menü verstecken" (aus Menü entfernen)
-    - Alle Team- & Master-Codes (Standard: FFLW99 ohne Bindestrich) direkt im
-      Supermaster-Cockpit einsehbar und selbst änderbar
-    - Fingerabdruck- / Passkey-Login mit Geräte-Check & klarer Rückmeldung
+  ERSTELLT VON GEMINI AM: 2026-11-21 08:40 CET
+  BESCHREIBUNG: Steuerungs-Cockpit mit klarer visueller Rückmeldung auf jedem Knopf:
+    - Jeder geklickte Button zeigt sofort ein rotierendes Ladezeichen und wechselt
+      nach Ausführung sichtbar die Farbe + Häkchen ("✓ Gespeichert / ✓ Erledigt")
+    - Eindeutiger Hinweisbalken bei ungespeicherten Änderungen (Häkchen/Codes),
+      damit sofort klar ist, was sofort wirkt und was erst gespeichert werden muss
 ========================================================================== -->
 <!doctype html>
 <html lang="de">
@@ -74,7 +73,7 @@
       font-size: 0.92rem;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
     }
     .m-btn-sm {
       padding: 6px 11px;
@@ -85,7 +84,7 @@
     .m-btn-orange { background: #d97706; }
     .m-btn-red { background: #c62828; }
     .m-btn-purple { background: #5e35b1; }
-    .m-btn:disabled { opacity: 0.6; cursor: wait; }
+    .m-btn:disabled { opacity: 0.85; cursor: wait; }
 
     .m-box {
       background: #f9fbfd;
@@ -220,6 +219,26 @@
       background: #eef6fc;
       color: #003366;
     }
+
+    /* Warnbalken für ungespeicherte Einstellungen */
+    .m-unsaved-bar {
+      position: sticky;
+      bottom: 12px;
+      z-index: 950;
+      background: #fff3e0;
+      border: 2px solid #e65100;
+      border-left: 8px solid #e65100;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-top: 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: #111111;
+    }
   </style>
 </head>
 <body>
@@ -288,7 +307,7 @@
         <div id="tab-eingang" class="m-tab-panel m-card m-card-green">
           <h3 style="margin-top:0; color:#1b5e20;">Eingereichte Spenden &amp; Wartepositionen</h3>
           <p style="font-size:0.94rem; color:#222222;">
-            Hier stehen neue Spenden sowie pausierte Angebote. Sie können sofort freigeschaltet oder für ein festes Startdatum eingeplant werden.
+            Hier stehen neue Spenden sowie pausierte Angebote. <strong>Ein Klick auf einen Knopf wird sofort ausgeführt</strong> (mit Drehzeichen und Farbwechsel zur Bestätigung).
           </p>
           <div id="m-eingang-list"></div>
         </div>
@@ -296,7 +315,7 @@
         <div id="tab-online" class="m-tab-panel m-card" style="display:none;">
           <h3 style="margin-top:0; color:#003366;">Aktuelle Online-Angebote &amp; Reservierungen</h3>
           <p style="font-size:0.94rem; color:#222222;">
-            Hier können Reservierungen wieder aufgehoben oder einzelne Stücke bzw. komplette Wohnungen in die Warteposition gesetzt werden.
+            Hier können Reservierungen wieder aufgehoben oder einzelne Stücke bzw. komplette Wohnungen in die Warteposition gesetzt werden (wird beim Klick sofort aktiv).
           </p>
           <div id="m-online-list"></div>
         </div>
@@ -310,6 +329,10 @@
         </div>
 
         <div id="tab-supermaster" class="m-tab-panel m-card" style="display:none;">
+          <div style="background:#eef6fc; border:1px solid #90caf9; border-left:5px solid #1565c0; border-radius:8px; padding:11px 14px; margin-bottom:16px; font-size:0.93rem; color:#0d47a1;">
+            <strong>So funktioniert dieser Bereich:</strong> Wenn du hier Häkchen bei Seiten setzt oder Codes änderst, sind sie erst aktiv, nachdem du auf <strong>„Alle Einstellungen &amp; Codes speichern“</strong> gedrückt hast (der Knopf wechselt dann auf Dunkelgrün).
+          </div>
+
           <h3 style="margin-top:0; color:#003366;">1. Seiten-Übersicht: Im Menü verstecken &amp; Seitenschutz (Live aus GitHub)</h3>
           <p style="font-size:0.94rem; color:#222222;">
             <strong>Unterschied:</strong> <em>„Im Menü verstecken“</em> blendet die Seite komplett aus der Navigation aus (sie bleibt aber per Direktlink erreichbar). <em>„Sperren“</em> zeigt Besuchern die Wartungsmeldung.
@@ -360,27 +383,27 @@
               <tr style="background:#f4f8fc;">
                 <td><strong>Supermaster (Du selbst)</strong></td>
                 <td>Vollzugriff, versteckte Seiten, Codes &amp; Seitenschutz</td>
-                <td><input type="text" id="m-code-master" class="m-input" style="max-width:170px; font-weight:bold;" value="FFLW99"></td>
+                <td><input type="text" id="m-code-master" class="m-input m-dirty-watch" style="max-width:170px; font-weight:bold;" value="FFLW99"></td>
               </tr>
               <tr>
                 <td><strong>Untermaster: Spenden-Team</strong></td>
                 <td>Spenden prüfen, freischalten &amp; Reservierungen verwalten</td>
-                <td><input type="text" id="m-code-freischalter" class="m-input" style="max-width:170px;" value="FFLWTEAM"></td>
+                <td><input type="text" id="m-code-freischalter" class="m-input m-dirty-watch" style="max-width:170px;" value="FFLWTEAM"></td>
               </tr>
               <tr>
                 <td><strong>Untermaster: Bedarfs-Koordination</strong></td>
                 <td>Bedarfsanmeldungen prüfen &amp; koordinieren</td>
-                <td><input type="text" id="m-code-koordinator" class="m-input" style="max-width:170px;" value="FFLWKOORD"></td>
+                <td><input type="text" id="m-code-koordinator" class="m-input m-dirty-watch" style="max-width:170px;" value="FFLWKOORD"></td>
               </tr>
               <tr>
                 <td><strong>Untermaster: Mitflug / Copilot</strong></td>
                 <td>Nur-Lesen / Einarbeitung</td>
-                <td><input type="text" id="m-code-copilot" class="m-input" style="max-width:170px;" value="FFLWCOPILOT"></td>
+                <td><input type="text" id="m-code-copilot" class="m-input m-dirty-watch" style="max-width:170px;" value="FFLWCOPILOT"></td>
               </tr>
               <tr style="background:#eaf6ec;">
                 <td><strong>Besucher-Zugangscode (Warenhaus)</strong></td>
                 <td>Code für <em>aktuelle-angebote.html</em> (leer = offen für alle)</td>
-                <td><input type="text" id="m-set-code" class="m-input" style="max-width:170px;" placeholder="z. B. 11"></td>
+                <td><input type="text" id="m-set-code" class="m-input m-dirty-watch" style="max-width:170px;" placeholder="z. B. 11"></td>
               </tr>
             </tbody>
           </table>
@@ -388,7 +411,7 @@
           <div style="display:flex; flex-wrap:wrap; gap:18px; margin-bottom:16px; align-items:flex-end;">
             <div>
               <label for="m-set-flag" style="display:block; font-weight:bold; margin-bottom:5px; color:#003366;">Flaggen-Laufband unter Logo:</label>
-              <select id="m-set-flag" class="m-input">
+              <select id="m-set-flag" class="m-input m-dirty-watch">
                 <option value="A">Stil A (Radar-Wellen)</option>
                 <option value="B">Stil B (3D-Chip)</option>
                 <option value="C">Stil C (Minimalistisch)</option>
@@ -403,6 +426,14 @@
             <span id="m-settings-msg" style="font-weight:bold; color:#1b5e20;"></span>
           </div>
           <div id="m-bio-status" style="margin-top:8px; font-size:0.88rem; color:#333333;"></div>
+
+          <div id="m-unsaved-bar" class="m-unsaved-bar" style="display:none;">
+            <div>
+              <strong style="color:#e65100;">⚠️ Du hast Änderungen vorgenommen, die noch nicht gespeichert sind.</strong><br>
+              <span style="font-size:0.88rem;">Erst nach dem Speichern werden sie für alle Besucher wirksam.</span>
+            </div>
+            <button type="button" id="m-save-settings-btn-floating" class="m-btn m-btn-orange">Jetzt speichern</button>
+          </div>
 
           <hr style="margin:24px 0; border:none; border-top:1px solid #c5d7eb;">
 
@@ -431,6 +462,7 @@
       let lockedPagesSet = new Set();
       let hiddenNavPagesSet = new Set();
       let currentPageFilter = "hidden";
+      let hasUnsavedSettings = false;
 
       const loginBtn = document.getElementById("m-login-btn");
       const bioLoginBtn = document.getElementById("m-bio-login-btn");
@@ -439,6 +471,26 @@
       const cockpit = document.getElementById("m-cockpit");
       const copilotSel = document.getElementById("m-copilot-mode");
       const bioStatusEl = document.getElementById("m-bio-status");
+      const unsavedBar = document.getElementById("m-unsaved-bar");
+
+      function markSettingsDirty(isDirty) {
+        hasUnsavedSettings = Boolean(isDirty);
+        if (unsavedBar) {
+          unsavedBar.style.display = hasUnsavedSettings ? "flex" : "none";
+        }
+      }
+
+      document.querySelectorAll(".m-dirty-watch").forEach(el => {
+        el.addEventListener("input", () => markSettingsDirty(true));
+        el.addEventListener("change", () => markSettingsDirty(true));
+      });
+
+      function runWithFeedback(btn, asyncFn, opts) {
+        if (typeof window.fflwRunButtonAction === "function") {
+          return window.fflwRunButtonAction(btn, asyncFn, opts);
+        }
+        return asyncFn();
+      }
 
       // Fingerabdruck / Passkey Verfügbarkeit prüfen
       function getStoredPasskey() {
@@ -487,18 +539,20 @@
 
       bioLoginBtn.addEventListener("click", async () => {
         loginMsg.textContent = "";
-        try {
+        await runWithFeedback(bioLoginBtn, async () => {
           const savedMasterCode = await verifyDeviceBiometrics();
           if (savedMasterCode) {
             codeInput.value = savedMasterCode;
-            performLogin();
+            await performLogin();
+            return { ok: true };
           }
-        } catch (err) {
-          loginMsg.textContent = "Fingerabdruck-Prüfung nicht bestätigt (" + err.name + "). Bitte Zugangscode eingeben.";
-        }
+          loginMsg.textContent = "Fingerabdruck-Prüfung nicht bestätigt. Bitte Zugangscode eingeben.";
+          return { ok: false };
+        }, { loadingText: "Prüfe Fingerabdruck …", successText: "✓ Erkannt!" });
       });
 
-      document.getElementById("m-register-bio-btn").addEventListener("click", async () => {
+      document.getElementById("m-register-bio-btn").addEventListener("click", async function () {
+        const btn = this;
         if (!window.PublicKeyCredential) {
           alert("Dieser Browser unterstützt keinen Fingerabdruck-/Passkey-Login.");
           return;
@@ -507,7 +561,7 @@
           alert("Fingerabdruck-Login funktioniert nur über die echte HTTPS-Webseite (nicht als lokale Datei).");
           return;
         }
-        try {
+        await runWithFeedback(btn, async () => {
           const challenge = new Uint8Array(32);
           const userId = new Uint8Array(16);
           window.crypto.getRandomValues(challenge);
@@ -540,18 +594,22 @@
             createdAt: new Date().toISOString()
           }));
           bioStatusEl.textContent = "Fingerabdruck / Biometrie ist auf diesem Gerät aktiv eingerichtet.";
-          alert("Dieses Gerät wurde erfolgreich für den Fingerabdruck-Login gespeichert!");
-        } catch (err) {
-          alert("Geräte-Registrierung abgebrochen oder nicht möglich: " + err.message);
-        }
+          return { ok: true };
+        }, { loadingText: "Bitte Sensor berühren …", successText: "✓ Gerät gespeichert!" });
       });
 
-      document.getElementById("m-toggle-accessible").addEventListener("click", () => {
+      document.getElementById("m-toggle-accessible").addEventListener("click", function () {
         document.body.classList.toggle("accessible-mode");
+        const active = document.body.classList.contains("accessible-mode");
+        this.classList.toggle("fflw-btn-confirmed", active);
+        this.textContent = active ? "✓ Großtasten aktiv" : "Großtasten-Modus";
       });
 
-      document.getElementById("m-refresh-btn").addEventListener("click", () => {
-        loadMasterDashboard();
+      document.getElementById("m-refresh-btn").addEventListener("click", async function () {
+        await runWithFeedback(this, async () => {
+          await loadMasterDashboard();
+          return { ok: true };
+        }, { loadingText: "Aktualisiere …", successText: "✓ Aktuell!" });
       });
 
       copilotSel.addEventListener("change", () => {
@@ -588,6 +646,7 @@
       document.getElementById("m-lock-all-pages").addEventListener("change", function () {
         if (this.checked) lockedPagesSet.add("*");
         else lockedPagesSet.delete("*");
+        markSettingsDirty(true);
       });
 
       function buildAbsolutePageUrl(file) {
@@ -599,24 +658,19 @@
       }
 
       async function copyTextToClipboard(text, btnEl) {
-        try {
-          await navigator.clipboard.writeText(text);
-        } catch (e) {
-          const ta = document.createElement("textarea");
-          ta.value = text;
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand("copy");
-          ta.remove();
-        }
-        const origText = btnEl.textContent;
-        const origBg = btnEl.style.background;
-        btnEl.textContent = "Kopiert!";
-        btnEl.style.background = "#2e7d32";
-        setTimeout(() => {
-          btnEl.textContent = origText;
-          btnEl.style.background = origBg;
-        }, 1800);
+        await runWithFeedback(btnEl, async () => {
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch (e) {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            ta.remove();
+          }
+          return { ok: true };
+        }, { loadingText: "Kopiere …", successText: "✓ Link kopiert!", resetAfterMs: 2200 });
       }
 
       async function initDynamicGitHubPages() {
@@ -707,6 +761,7 @@
               } else {
                 hiddenNavPagesSet.delete(p.file);
               }
+              markSettingsDirty(true);
               const hiddenCount = allDynamicPages.filter(x => !x.isLegal && (!x.inNavHtml || hiddenNavPagesSet.has(x.file))).length;
               const menuCount = allDynamicPages.filter(x => x.inNavHtml && !hiddenNavPagesSet.has(x.file)).length;
               document.getElementById("count-hidden").textContent = hiddenCount;
@@ -723,6 +778,7 @@
               } else {
                 lockedPagesSet.delete(p.file);
               }
+              markSettingsDirty(true);
               renderDynamicPagesList();
             });
           }
@@ -742,9 +798,8 @@
         const val = codeInput.value.trim().toUpperCase();
         if (!val) {
           loginMsg.textContent = "Bitte Zugangscode eingeben.";
-          return;
+          return { ok: false };
         }
-        loginBtn.disabled = true;
         loginMsg.style.color = "#004080";
         loginMsg.textContent = "Prüfe Zugangscode …";
 
@@ -754,12 +809,11 @@
             redirect: "follow"
           });
           const data = await resp.json();
-          loginBtn.disabled = false;
 
           if (!data || !data.ok || !ROLE_META[data.role]) {
             loginMsg.style.color = "#c62828";
             loginMsg.textContent = "Unbekannter Zugangscode. Bitte Eingabe prüfen.";
-            return;
+            return { ok: false };
           }
 
           loginMsg.textContent = "";
@@ -797,35 +851,48 @@
           document.getElementById("m-login-box").style.display = "none";
           cockpit.style.display = "block";
           applyOverviewDataToUI(data);
+          return { ok: true };
         } catch (err) {
-          loginBtn.disabled = false;
           loginMsg.style.color = "#c62828";
           loginMsg.textContent = "Verbindungsfehler: " + err.message;
+          return { ok: false };
         }
       }
 
-      loginBtn.addEventListener("click", performLogin);
+      loginBtn.addEventListener("click", () => {
+        runWithFeedback(loginBtn, performLogin, {
+          loadingText: "Anmelden …",
+          successText: "✓ Angemeldet!"
+        });
+      });
       codeInput.addEventListener("keydown", e => {
-        if (e.key === "Enter") performLogin();
+        if (e.key === "Enter") {
+          runWithFeedback(loginBtn, performLogin, {
+            loadingText: "Anmelden …",
+            successText: "✓ Angemeldet!"
+          });
+        }
       });
 
-      async function callMasterApi(payload) {
+      async function callMasterApi(payload, triggerBtn, feedbackOpts) {
         if (copilotMode === "observer") {
           alert("Sie befinden sich aktuell im Mitflug-Modus (Nur-Lesen). Bitte oben auf 'Voller Disponent' umstellen.");
           return null;
         }
-        const resp = await fetch(WEB_APP_URL, {
-          method: "POST",
-          redirect: "follow",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify(Object.assign({ masterCode: activeCode }, payload))
-        });
-        return await resp.json();
+        return await runWithFeedback(triggerBtn, async () => {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(Object.assign({ masterCode: activeCode }, payload))
+          });
+          return await resp.json();
+        }, feedbackOpts);
       }
 
       function applyOverviewDataToUI(data) {
         const banner = document.getElementById("m-status-banner");
-        banner.innerHTML = `<span style="color:#1b5e20;">Verbunden (Stand: ${new Date().toLocaleTimeString("de-DE")})</span>`;
+        banner.innerHTML = `<span style="color:#1b5e20;">✓ Verbunden (Stand: ${new Date().toLocaleTimeString("de-DE")})</span>`;
         renderEingang(data.eingang || []);
         renderOnline(data.online || []);
         renderBedarfe(data.bedarfe || []);
@@ -844,6 +911,7 @@
           lockedPagesSet = new Set(Array.isArray(data.siteConfig.wartungSeiten) ? data.siteConfig.wartungSeiten : []);
           hiddenNavPagesSet = new Set(Array.isArray(data.siteConfig.versteckteSeiten) ? data.siteConfig.versteckteSeiten : []);
           document.getElementById("m-lock-all-pages").checked = lockedPagesSet.has("*");
+          markSettingsDirty(false);
           if (activeRole && activeRole.role === "master") {
             initDynamicGitHubPages();
           }
@@ -870,14 +938,14 @@
         }
       }
 
-      document.getElementById("m-save-settings-btn").addEventListener("click", async () => {
+      async function handleSaveAllSettings(triggerBtn) {
         const msgEl = document.getElementById("m-settings-msg");
         const newMasterCode = document.getElementById("m-code-master").value.trim().toUpperCase();
         if (!newMasterCode) {
           alert("Das Supermaster-Passwort darf nicht leer sein.");
           return;
         }
-        msgEl.textContent = "Speichere …";
+        msgEl.textContent = "";
 
         const res = await callMasterApi({
           action: "save_site_status",
@@ -891,7 +959,12 @@
             koordinator: document.getElementById("m-code-koordinator").value.trim().toUpperCase(),
             copilot: document.getElementById("m-code-copilot").value.trim().toUpperCase()
           }
+        }, triggerBtn, {
+          loadingText: "Speichere Einstellungen …",
+          successText: "✓ Gespeichert!",
+          resetAfterMs: 3200
         });
+
         if (res && res.ok) {
           activeCode = newMasterCode;
           const storedBio = getStoredPasskey();
@@ -899,11 +972,20 @@
             storedBio.masterCode = newMasterCode;
             localStorage.setItem(BIO_STORAGE_KEY, JSON.stringify(storedBio));
           }
-          msgEl.textContent = "Alle Einstellungen & Codes gespeichert!";
-          setTimeout(() => { msgEl.textContent = ""; }, 3500);
+          markSettingsDirty(false);
+          msgEl.textContent = "✓ Alle Einstellungen & Codes wurden dauerhaft gespeichert!";
+          setTimeout(() => { msgEl.textContent = ""; }, 4500);
         } else {
+          msgEl.style.color = "#c62828";
           msgEl.textContent = "Fehler beim Speichern.";
         }
+      }
+
+      document.getElementById("m-save-settings-btn").addEventListener("click", function () {
+        handleSaveAllSettings(this);
+      });
+      document.getElementById("m-save-settings-btn-floating").addEventListener("click", function () {
+        handleSaveAllSettings(this);
       });
 
       function renderCopilotChecklist(hintText) {
@@ -947,25 +1029,33 @@
             </div>
           `;
 
-          box.querySelector(".btn-release-now").addEventListener("click", async () => {
-            const res = await callMasterApi({ action: "approveDonation", folderId: sp.folderId, isWholeProvider: Boolean(sp.isWholeProvider) });
-            if (res && res.ok) loadMasterDashboard();
+          box.querySelector(".btn-release-now").addEventListener("click", async function () {
+            const res = await callMasterApi({
+              action: "approveDonation",
+              folderId: sp.folderId,
+              isWholeProvider: Boolean(sp.isWholeProvider)
+            }, this, { loadingText: "Schalte frei …", successText: "✓ Freigeschaltet!", keepConfirmedColor: true });
+            if (res && res.ok) setTimeout(loadMasterDashboard, 650);
           });
 
-          box.querySelector(".btn-release-date").addEventListener("click", async () => {
+          box.querySelector(".btn-release-date").addEventListener("click", async function () {
             const dt = box.querySelector(".inp-release-date").value;
             if (!dt) { alert("Bitte zuerst ein Startdatum auswählen."); return; }
-            const res = await callMasterApi({ action: "scheduleDonation", folderId: sp.folderId, freischaltenAb: dt });
-            if (res && res.ok) {
-              alert("Gespeichert! Das Angebot wird am " + dt + " automatisch freigeschaltet.");
-              loadMasterDashboard();
-            }
+            const res = await callMasterApi({
+              action: "scheduleDonation",
+              folderId: sp.folderId,
+              freischaltenAb: dt
+            }, this, { loadingText: "Plane Termin …", successText: "✓ Geplant ab " + dt, keepConfirmedColor: true });
+            if (res && res.ok) setTimeout(loadMasterDashboard, 750);
           });
 
-          box.querySelector(".btn-archive-item").addEventListener("click", async () => {
+          box.querySelector(".btn-archive-item").addEventListener("click", async function () {
             if (!confirm("Diesen Eintrag ins Archiv verschieben?")) return;
-            const res = await callMasterApi({ action: "archiveDonationItem", folderId: sp.folderId });
-            if (res && res.ok) loadMasterDashboard();
+            const res = await callMasterApi({
+              action: "archiveDonationItem",
+              folderId: sp.folderId
+            }, this, { loadingText: "Archiviere …", successText: "✓ Archiviert!", keepConfirmedColor: true });
+            if (res && res.ok) setTimeout(loadMasterDashboard, 650);
           });
 
           el.appendChild(box);
@@ -996,29 +1086,42 @@
 
           const unresBtn = box.querySelector(".btn-unreserve");
           if (unresBtn) {
-            unresBtn.addEventListener("click", async () => {
-              const res = await callMasterApi({ action: "unreserveItem", itemId: item.id });
-              if (res && res.ok) loadMasterDashboard();
+            unresBtn.addEventListener("click", async function () {
+              const res = await callMasterApi({
+                action: "unreserveItem",
+                itemId: item.id
+              }, this, { loadingText: "Hebe auf …", successText: "✓ Aufgehoben!", keepConfirmedColor: true });
+              if (res && res.ok) setTimeout(loadMasterDashboard, 650);
             });
           }
 
           const pauseItemBtn = box.querySelector(".btn-pause-item");
           if (pauseItemBtn) {
-            pauseItemBtn.addEventListener("click", async () => {
+            pauseItemBtn.addEventListener("click", async function () {
               const grund = prompt("Optionaler Hinweis für die Warteposition (z. B. Umzug verschoben):", "Umzug verschoben");
               if (grund === null) return;
-              const res = await callMasterApi({ action: "pauseOffer", itemId: item.id, scope: "single", grund });
-              if (res && res.ok) loadMasterDashboard();
+              const res = await callMasterApi({
+                action: "pauseOffer",
+                itemId: item.id,
+                scope: "single",
+                grund
+              }, this, { loadingText: "Pausiere …", successText: "✓ In Warteposition!", keepConfirmedColor: true });
+              if (res && res.ok) setTimeout(loadMasterDashboard, 650);
             });
           }
 
           const pauseAllBtn = box.querySelector(".btn-pause-all");
           if (pauseAllBtn) {
-            pauseAllBtn.addEventListener("click", async () => {
+            pauseAllBtn.addEventListener("click", async function () {
               const grund = prompt("Komplettes Angebot dieser Familie/Wohnung pausieren? Hinweis:", "Umzug verschoben");
               if (grund === null) return;
-              const res = await callMasterApi({ action: "pauseOffer", spenderFolderId: item.spenderFolderId, scope: "family", grund });
-              if (res && res.ok) loadMasterDashboard();
+              const res = await callMasterApi({
+                action: "pauseOffer",
+                spenderFolderId: item.spenderFolderId,
+                scope: "family",
+                grund
+              }, this, { loadingText: "Pausiere alles …", successText: "✓ Pausiert!", keepConfirmedColor: true });
+              if (res && res.ok) setTimeout(loadMasterDashboard, 650);
             });
           }
 
@@ -1054,21 +1157,35 @@
             ${b.begruendung ? `<div style="font-size:0.9rem; color:#444444; margin-bottom:10px;">${b.begruendung}</div>` : ""}
             ${renderCopilotChecklist("Kurz klären, ob der Bedarf noch aktuell ist und die Maße passen.")}
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">
-              <a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener" class="m-btn m-btn-green" style="text-decoration:none;">WhatsApp-Nachfrage</a>
+              <a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener" class="m-btn m-btn-green btn-wa-demand" style="text-decoration:none;">WhatsApp-Nachfrage</a>
               <button type="button" class="m-btn m-btn-blue btn-mail-demand">Per E-Mail nachfragen</button>
               <button type="button" class="m-btn m-btn-purple btn-verify-demand">Als geklärt markieren</button>
             </div>
           `;
 
-          box.querySelector(".btn-mail-demand").addEventListener("click", async () => {
-            const res = await callMasterApi({ action: "sendDemandPing", demandId: b.id, kontakt: b.kontakt, artikelName: b.artikelName, name: b.name });
-            if (res && res.ok) alert("Rückfrage-E-Mail wurde versendet!");
-            else if (res && res.error) alert(res.error);
+          box.querySelector(".btn-wa-demand").addEventListener("click", function () {
+            this.classList.add("fflw-btn-confirmed");
+            this.textContent = "✓ WhatsApp geöffnet";
           });
 
-          box.querySelector(".btn-verify-demand").addEventListener("click", async () => {
-            const res = await callMasterApi({ action: "markDemandVerified", demandId: b.id, bearbeiter: activeRole.label });
-            if (res && res.ok) loadMasterDashboard();
+          box.querySelector(".btn-mail-demand").addEventListener("click", async function () {
+            const res = await callMasterApi({
+              action: "sendDemandPing",
+              demandId: b.id,
+              kontakt: b.kontakt,
+              artikelName: b.artikelName,
+              name: b.name
+            }, this, { loadingText: "Sende E-Mail …", successText: "✓ E-Mail gesendet!", keepConfirmedColor: true });
+            if (res && !res.ok && res.error) alert(res.error);
+          });
+
+          box.querySelector(".btn-verify-demand").addEventListener("click", async function () {
+            const res = await callMasterApi({
+              action: "markDemandVerified",
+              demandId: b.id,
+              bearbeiter: activeRole.label
+            }, this, { loadingText: "Markiere …", successText: "✓ Geklärt!", keepConfirmedColor: true });
+            if (res && res.ok) setTimeout(loadMasterDashboard, 650);
           });
 
           el.appendChild(box);
@@ -1092,13 +1209,21 @@
               <button type="button" class="m-btn m-btn-red btn-kat-del">Verwerfen</button>
             </div>
           `;
-          box.querySelector(".btn-kat-ok").addEventListener("click", async () => {
-            const res = await callMasterApi({ action: "manageCatalogSuggestion", titel: v.titel, decision: "accept" });
-            if (res && res.ok) loadMasterDashboard();
+          box.querySelector(".btn-kat-ok").addEventListener("click", async function () {
+            const res = await callMasterApi({
+              action: "manageCatalogSuggestion",
+              titel: v.titel,
+              decision: "accept"
+            }, this, { loadingText: "Übernehme …", successText: "✓ Übernommen!", keepConfirmedColor: true });
+            if (res && res.ok) setTimeout(loadMasterDashboard, 650);
           });
-          box.querySelector(".btn-kat-del").addEventListener("click", async () => {
-            const res = await callMasterApi({ action: "manageCatalogSuggestion", titel: v.titel, decision: "reject" });
-            if (res && res.ok) loadMasterDashboard();
+          box.querySelector(".btn-kat-del").addEventListener("click", async function () {
+            const res = await callMasterApi({
+              action: "manageCatalogSuggestion",
+              titel: v.titel,
+              decision: "reject"
+            }, this, { loadingText: "Verwerfe …", successText: "✓ Verworfen!", keepConfirmedColor: true });
+            if (res && res.ok) setTimeout(loadMasterDashboard, 650);
           });
           el.appendChild(box);
         });
