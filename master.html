@@ -1,11 +1,13 @@
 <!-- ==========================================================================
   DATEI: master.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-21 15:15 CET
+  ERSTELLT VON GEMINI AM: 2026-11-21 15:55 CET
   BESCHREIBUNG: Zentrale Steuerungs- & Koordinations-Konsole (Master & Untermaster)
-    - Klare Kontraste & leeres Code-Feld (keine vorbelegten Passwörter)
-    - Selektive Adressleisten-Tarnung (maskierteSeiten) & Menü-Steuerung
-    - Supermaster-Tresor: Vertrauliche Personen-Akten (Asyl / Arbeit / Wohnung)
-      mit Ein-Klick-WhatsApp-Link, Vorschau, Download, Kopie & Akten-Löschung
+    - Kein Browser-Autofill (nie wieder heimliche Punkte im Code-Feld)
+    - Blitzschneller Start durch Sitzungs-Cache + gezieltes Nachladen
+    - Personen-Akten-Tresor gruppiert nach Herkunftsland + fehlertolerante
+      Transliterations-Suche (Mohamed / Mohammed / Al-Ahmad etc.)
+    - Eigener Datei-/Foto-Upload durch Supermaster + mehrstufige Foto-Einwilligung
+    - Integrierte „Schatzkiste“-Datenbank (Talente, Berufe, Ehrenamt, Hobbys)
 ========================================================================== -->
 <!doctype html>
 <html lang="de">
@@ -56,6 +58,16 @@
       background: #8e1c24;
       color: #ffffff;
       border-color: #5c0f15;
+    }
+    .m-tab-btn.treasure-tab {
+      background: #fff8e1;
+      color: #7c2d12;
+      border-color: #fcd34d;
+    }
+    .m-tab-btn.treasure-tab.active {
+      background: #b45309;
+      color: #ffffff;
+      border-color: #78350f;
     }
     .m-btn {
       background: #004080;
@@ -114,13 +126,33 @@
       font-size: 0.8rem;
       font-weight: bold;
     }
-    .m-akte-card {
-      background: #f8fafc;
+    .m-country-group {
       border: 2px solid #90caf9;
+      border-radius: 10px;
+      margin: 14px 0;
+      background: #f4f8fc;
+      overflow: hidden;
+    }
+    .m-country-summary {
+      padding: 12px 16px;
+      background: #004080;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 1.04rem;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .m-country-summary::-webkit-details-marker { display: none; }
+    .m-akte-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
       border-left: 6px solid #8e1c24;
-      border-radius: 9px;
+      border-radius: 8px;
       padding: 14px 16px;
-      margin: 12px 0;
+      margin: 12px;
     }
     .m-file-row {
       display: flex;
@@ -128,11 +160,26 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      background: #ffffff;
+      background: #f8fafc;
       border: 1px solid #cbd5e1;
       border-radius: 6px;
       padding: 8px 10px;
       margin-top: 6px;
+    }
+    .m-chip {
+      background: #ffffff;
+      color: #003366;
+      border: 1px solid #90caf9;
+      border-radius: 16px;
+      padding: 5px 12px;
+      font-size: 0.86rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .m-chip.active {
+      background: #004080;
+      color: #ffffff;
+      border-color: #004080;
     }
     #m-file-viewer-modal {
       position: fixed;
@@ -171,13 +218,13 @@
     <main class="content">
       <h2>Zentrale Steuerung &amp; Koordination</h2>
 
-      <!-- Login-Box (Code-Feld bewusst leer!) -->
+      <!-- Login-Box (Garantiert ohne Browser-Autofill-Punkte) -->
       <section id="m-login-box" class="m-card">
         <p style="margin-top:0;">
           Bitte gib deinen persönlichen Team- oder Master-Code ein, um die freigegebenen Bereiche zu laden.
         </p>
         <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-          <input type="password" id="m-code-input" class="m-input" autocomplete="off" placeholder="Zugangscode eingeben …" style="max-width:240px; font-weight:bold;">
+          <input type="text" id="m-code-input" class="m-input fflw-masked-code-input" placeholder="Zugangscode eingeben …" style="max-width:240px; font-weight:bold;">
           <button type="button" id="m-login-btn" class="m-btn">Anmelden</button>
           <span id="m-login-msg" style="font-weight:bold;"></span>
         </div>
@@ -189,6 +236,7 @@
           <div>
             <strong id="m-role-label" style="color:#003366; font-size:1.05rem;">Angemeldet</strong>
             <span id="m-live-badge" style="margin-left:10px; background:#eaf6ec; color:#1b5e20; border:1px solid #a5d6a7; padding:3px 9px; border-radius:6px; font-size:0.85rem; font-weight:bold;"></span>
+            <span id="m-sync-hint" style="margin-left:8px; font-size:0.84rem; color:#455a64;"></span>
           </div>
           <div style="display:flex; gap:8px;">
             <button type="button" id="m-refresh-btn" class="m-btn">↻ Aktualisieren</button>
@@ -201,6 +249,7 @@
           <button type="button" class="m-tab-btn" data-tab="online">🌐 Online &amp; Reserviert (<span id="cnt-online">0</span>)</button>
           <button type="button" class="m-tab-btn" data-tab="bedarfe">📋 Offene Bedarfe (<span id="cnt-bedarfe">0</span>)</button>
           <button type="button" class="m-tab-btn secret-tab" id="tab-btn-akten" data-tab="akten" style="display:none;">🗂️ Personen-Akten (<span id="cnt-akten">0</span>)</button>
+          <button type="button" class="m-tab-btn treasure-tab" id="tab-btn-schatz" data-tab="schatz" style="display:none;">✨ Schatzkiste (<span id="cnt-schatz">0</span>)</button>
           <button type="button" class="m-tab-btn" id="tab-btn-system" data-tab="system" style="display:none;">⚙ Seitenschutz, URL-Tarnung &amp; Codes</button>
         </div>
 
@@ -222,18 +271,33 @@
           <div id="list-bedarfe"></div>
         </section>
 
-        <!-- TAB 4: PERSONEN-AKTEN (NUR SUPERMASTER!) -->
+        <!-- TAB 4: PERSONEN-AKTEN NACH HERKUNFTSLAND (NUR SUPERMASTER!) -->
         <section id="tab-akten" class="m-tab-panel" style="display:none;">
           <div class="m-card" style="border-left-color:#8e1c24; background:#fffafa;">
-            <h3 style="margin-top:0; color:#8e1c24;">🔒 Vertraulicher Personen-Akten-Tresor (Asyl / Arbeit / Wohnung)</h3>
+            <h3 style="margin-top:0; color:#8e1c24;">🔒 Vertraulicher Personen-Akten-Tresor (gruppiert nach Herkunftsland)</h3>
             <p style="margin:0 0 12px 0; font-size:0.93rem;">
-              Hier legst du für Ratsuchende einen <strong>6-stelligen Einwurf-Code</strong> an. Die Person kann über die unsichtbare Seite (deren Adressleiste automatisch auf <code>index.html</code> getarnt wird) Fotos &amp; PDFs einwerfen, sieht danach aber <strong>nichts mehr</strong>. Nur du als Supermaster kannst hier alle Unterlagen ansehen, herunterladen, kopieren oder die Akte DSGVO-konform löschen.
+              Akten werden automatisch nach <strong>Herkunftsland</strong> gruppiert und über eine fehlertolerante Namenssuche gefunden (gleicht z. B. <em>Mohamed / Mohammed / Muhammad</em> oder <em>Al-Ahmad / Alahmad</em> aus). Du kannst hier auch selbst Dateien oder Fotos zuordnen und direkt den <strong>Schatzsuche-Fragebogen</strong> mitgeben.
             </p>
 
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
               <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Herkunftsland *</label>
+                <input type="text" id="ak-new-land" class="m-input" list="m-laender-datalist" placeholder="z. B. Syrien, Ukraine, Afghanistan">
+                <datalist id="m-laender-datalist">
+                  <option value="Syrien"><option value="Ukraine"><option value="Afghanistan">
+                  <option value="Irak"><option value="Iran"><option value="Türkei">
+                  <option value="Eritrea"><option value="Somalia"><option value="Nigeria">
+                  <option value="Gambia"><option value="Albanien"><option value="Kosovo">
+                  <option value="Serbien"><option value="Russland"><option value="Georgien">
+                </datalist>
+              </div>
+              <div>
                 <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Name / Kürzel der Person *</label>
-                <input type="text" id="ak-new-name" class="m-input" placeholder="z. B. Mustermann, Ahmad">
+                <input type="text" id="ak-new-name" class="m-input" placeholder="z. B. Al-Ahmad, Mohammed">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Alternative Schreibweisen / Suchbegriffe</label>
+                <input type="text" id="ak-new-alias" class="m-input" placeholder="z. B. Mohamed, Abu Ali, Familie Schwaikheim">
               </div>
               <div>
                 <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Hauptthema</label>
@@ -241,6 +305,7 @@
                   <option value="Asylantrag & Aufenthalt">⚖️ Asylantrag &amp; Aufenthalt</option>
                   <option value="Arbeit & Ehrenamt">💼 Arbeit &amp; Ehrenamt</option>
                   <option value="Wohnung & Unterkunft">🏠 Wohnung &amp; Unterkunft</option>
+                  <option value="Fotos & Einverständnis">📷 Fotos &amp; Einverständnis</option>
                 </select>
               </div>
               <div>
@@ -258,14 +323,37 @@
             </div>
           </div>
 
-          <div style="margin:12px 0;">
-            <input type="text" id="ak-search" class="m-input" placeholder="Akten durchsuchen (Name, Code, Thema, Notiz) …" style="max-width:420px;">
+          <div style="margin:12px 0; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+            <input type="text" id="ak-search" class="m-input" placeholder="Fehlertolerante Suche (Name, Variante, Land, Code, Notiz) …" style="max-width:440px;">
           </div>
+          <div id="ak-country-chips" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;"></div>
 
           <div id="list-akten"></div>
         </section>
 
-        <!-- TAB 5: SYSTEM, SEITENSCHUTZ & URL-TARNUNG (NUR SUPERMASTER!) -->
+        <!-- TAB 5: SCHATZKISTE (TALENTE, BERUFE, EHRENAMT & HOBBYS) -->
+        <section id="tab-schatz" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#b45309; background:#fffdf7;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+              <div>
+                <h3 style="margin:0; color:#78350f;">✨ Schatzkiste – Begabungen, Berufe, Ehrenamt &amp; Träume</h3>
+                <p style="margin:4px 0 0 0; font-size:0.92rem;">
+                  Durchsuche alle freiwilligen Rückmeldungen nach Talenten (z. B. <em>Garten, Bienen, Möbel, Kochen, Nähen, Führerschein, LKW, Musik, Kunst, IT, Behörden</em>).
+                </p>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <a href="schatzsuche.html" target="_blank" class="m-btn m-btn-orange">📝 Fragebogen öffnen</a>
+                <button type="button" id="sz-copy-link-btn" class="m-btn">📋 Link zur Schatzsuche kopieren</button>
+              </div>
+            </div>
+            <div style="margin-top:12px;">
+              <input type="text" id="sz-search" class="m-input" placeholder="Nach Talent, Beruf, Sprache, Hobby oder Land suchen (z. B. Garten, LKW, Klavier, Nähen) …" style="max-width:520px;">
+            </div>
+          </div>
+          <div id="list-schatz"></div>
+        </section>
+
+        <!-- TAB 6: SYSTEM, SEITENSCHUTZ & URL-TARNUNG (NUR SUPERMASTER!) -->
         <section id="tab-system" class="m-tab-panel" style="display:none;">
           <div class="m-card">
             <h3 style="margin-top:0;">Zugangscodes &amp; Flaggenband</h3>
@@ -305,7 +393,7 @@
           <div class="m-card">
             <h3 style="margin-top:0;">Seiten-Steuerung: Wartung, Menü-Sichtbarkeit &amp; Adressleisten-Tarnung</h3>
             <p style="font-size:0.9rem; margin-top:0;">
-              Mit <strong>„Adressleiste tarnen“</strong> ersetzt der Browser beim Öffnen der Seite die URL oben automatisch durch <code>index.html</code> (ideal für vertrauliche Seiten wie <code>unterlagen.html</code> oder <code>master.html</code>).
+              Mit <strong>„Adressleiste tarnen“</strong> ersetzt der Browser beim Öffnen der Seite die URL oben automatisch durch <code>index.html</code>.
             </p>
             <div class="m-table-wrap">
               <table class="m-table">
@@ -353,9 +441,34 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      const CACHE_KEY = "fflw_master_overview_cache_v2";
+
+      const codeInput = document.getElementById("m-code-input");
+      if (typeof window.fflwNeutralizeCodeInput === "function") {
+        window.fflwNeutralizeCodeInput(codeInput);
+      }
 
       let currentCode = sessionStorage.getItem("fflw_master_session_code") || "";
       let currentData = null;
+      let selectedCountryFilter = "";
+
+      // Fehlertolerante Transliterations-Normalisierung für Namen (Mohamed/Mohammed/Muhammad, Al-Ahmad/Alahmad etc.)
+      function normalizeTranslit(str) {
+        return String(str || "")
+          .toLowerCase()
+          .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
+          .replace(/[\s\-_'’`.,;:()\/]+/g, "")
+          .replace(/^al/, "")
+          .replace(/ou|oo|u/g, "o")
+          .replace(/ee|ei|ie|y|i/g, "i")
+          .replace(/ph/g, "f")
+          .replace(/kh|ch/g, "h")
+          .replace(/sh|sch/g, "s")
+          .replace(/th|dh|z/g, "s")
+          .replace(/q|ck|c/g, "k")
+          .replace(/w/g, "v")
+          .replace(/(.)\1+/g, "$1");
+      }
 
       function switchTab(tabName) {
         document.querySelectorAll(".m-tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
@@ -366,14 +479,55 @@
         btn.addEventListener("click", () => switchTab(btn.dataset.tab));
       });
 
-      async function loadMasterData(codeToUse) {
+      function applyDashboardData(data, fromCache) {
+        currentData = data;
+        document.getElementById("m-login-box").style.display = "none";
+        document.getElementById("m-dashboard").style.display = "block";
+
+        const roleNames = {
+          master: "Supermaster (Vollzugriff)",
+          freischalter: "Team-Freischalter",
+          koordinator: "Koordinator (Bedarfe)",
+          copilot: "Copilot (Lesemodus)"
+        };
+        document.getElementById("m-role-label").textContent = "Rolle: " + (roleNames[data.role] || data.role);
+        document.getElementById("m-sync-hint").textContent = fromCache ? "⏳ Aktualisiere im Hintergrund …" : "✓ Aktuell";
+
+        if (data.visitStats) {
+          document.getElementById("m-live-badge").textContent =
+            `Live: ${data.visitStats.onlineNow || 0} online · Heute: ${data.visitStats.counts.today || 0} Aufrufe`;
+        }
+
+        const isSuper = data.role === "master";
+        const canSeeTreasure = isSuper || data.role === "koordinator" || data.role === "freischalter";
+        document.getElementById("tab-btn-akten").style.display = isSuper ? "inline-block" : "none";
+        document.getElementById("tab-btn-schatz").style.display = canSeeTreasure ? "inline-block" : "none";
+        document.getElementById("tab-btn-system").style.display = isSuper ? "inline-block" : "none";
+
+        renderAllSections(data);
+      }
+
+      async function loadMasterData(codeToUse, silentBackground) {
         const msgEl = document.getElementById("m-login-msg");
         const loginBtn = document.getElementById("m-login-btn");
-        const code = String(codeToUse || document.getElementById("m-code-input").value || "").trim();
+        const code = String(codeToUse || codeInput.value || "").trim();
         if (!code) {
           msgEl.style.color = "#c62828";
           msgEl.textContent = "Bitte Zugangscode eingeben.";
           return { ok: false };
+        }
+
+        // Sofort-Anzeige aus Sitzungs-Cache (0 Sekunden Wartezeit!)
+        if (!silentBackground) {
+          try {
+            const cachedRaw = sessionStorage.getItem(CACHE_KEY);
+            if (cachedRaw) {
+              const cachedObj = JSON.parse(cachedRaw);
+              if (cachedObj && cachedObj.ok) {
+                applyDashboardData(cachedObj, true);
+              }
+            }
+          } catch (e) {}
         }
 
         const task = async () => {
@@ -386,38 +540,20 @@
             msgEl.style.color = "#c62828";
             msgEl.textContent = (data && data.error) ? data.error : "Ungültiger Code.";
             sessionStorage.removeItem("fflw_master_session_code");
+            sessionStorage.removeItem(CACHE_KEY);
+            document.getElementById("m-dashboard").style.display = "none";
+            document.getElementById("m-login-box").style.display = "block";
             return { ok: false };
           }
 
           currentCode = code;
           sessionStorage.setItem("fflw_master_session_code", code);
-          currentData = data;
-
-          document.getElementById("m-login-box").style.display = "none";
-          document.getElementById("m-dashboard").style.display = "block";
-
-          const roleNames = {
-            master: "Supermaster (Vollzugriff)",
-            freischalter: "Team-Freischalter",
-            koordinator: "Koordinator (Bedarfe)",
-            copilot: "Copilot (Lesemodus)"
-          };
-          document.getElementById("m-role-label").textContent = "Rolle: " + (roleNames[data.role] || data.role);
-
-          if (data.visitStats) {
-            document.getElementById("m-live-badge").textContent =
-              `Live: ${data.visitStats.onlineNow || 0} online · Heute: ${data.visitStats.counts.today || 0} Aufrufe`;
-          }
-
-          const isSuper = data.role === "master";
-          document.getElementById("tab-btn-akten").style.display = isSuper ? "inline-block" : "none";
-          document.getElementById("tab-btn-system").style.display = isSuper ? "inline-block" : "none";
-
-          renderAllSections(data);
+          try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {}
+          applyDashboardData(data, false);
           return { ok: true };
         };
 
-        if (typeof window.fflwRunButtonAction === "function") {
+        if (!silentBackground && document.getElementById("m-login-box").style.display !== "none" && typeof window.fflwRunButtonAction === "function") {
           return await window.fflwRunButtonAction(loginBtn, task, {
             loadingText: "Lade Cockpit …",
             successText: "✓ Angemeldet!",
@@ -428,20 +564,22 @@
       }
 
       document.getElementById("m-login-btn").addEventListener("click", () => loadMasterData());
-      document.getElementById("m-code-input").addEventListener("keydown", e => {
+      codeInput.addEventListener("keydown", e => {
         if (e.key === "Enter") { e.preventDefault(); loadMasterData(); }
       });
-      document.getElementById("m-refresh-btn").addEventListener("click", () => loadMasterData(currentCode));
+      document.getElementById("m-refresh-btn").addEventListener("click", () => loadMasterData(currentCode, false));
       document.getElementById("m-logout-btn").addEventListener("click", () => {
         sessionStorage.removeItem("fflw_master_session_code");
+        sessionStorage.removeItem(CACHE_KEY);
         currentCode = "";
         document.getElementById("m-dashboard").style.display = "none";
         document.getElementById("m-login-box").style.display = "block";
-        document.getElementById("m-code-input").value = "";
+        codeInput.value = "";
+        delete codeInput.dataset.userTyped;
       });
 
       if (currentCode) {
-        loadMasterData(currentCode);
+        loadMasterData(currentCode, false);
       }
 
       async function postAction(bodyObj) {
@@ -459,11 +597,13 @@
         const online = data.online || [];
         const bedarfe = data.bedarfe || [];
         const akten = data.personenAkten || [];
+        const schatzListe = data.schatzkiste || [];
 
         document.getElementById("cnt-eingang").textContent = eingang.length;
         document.getElementById("cnt-online").textContent = online.length;
         document.getElementById("cnt-bedarfe").textContent = bedarfe.length;
         document.getElementById("cnt-akten").textContent = akten.length;
+        document.getElementById("cnt-schatz").textContent = schatzListe.length;
 
         // 1. Eingang
         const eingangEl = document.getElementById("list-eingang");
@@ -487,14 +627,14 @@
         eingangEl.querySelectorAll(".btn-pub").forEach(b => {
           b.addEventListener("click", async () => {
             await postAction({ action: "publishDonationItem", folderId: b.dataset.id, isWholeProvider: b.dataset.whole === "1" });
-            loadMasterData(currentCode);
+            loadMasterData(currentCode, false);
           });
         });
         eingangEl.querySelectorAll(".btn-arch").forEach(b => {
           b.addEventListener("click", async () => {
             if (!confirm("Wirklich ins Archiv verschieben?")) return;
             await postAction({ action: "archiveDonationItem", folderId: b.dataset.id });
-            loadMasterData(currentCode);
+            loadMasterData(currentCode, false);
           });
         });
 
@@ -524,13 +664,13 @@
         onlineEl.querySelectorAll(".btn-unres").forEach(b => {
           b.addEventListener("click", async () => {
             await postAction({ action: "unreserveItem", itemId: b.dataset.id });
-            loadMasterData(currentCode);
+            loadMasterData(currentCode, false);
           });
         });
         onlineEl.querySelectorAll(".btn-pause").forEach(b => {
           b.addEventListener("click", async () => {
             await postAction({ action: "pauseOffer", itemId: b.dataset.id, grund: "Pausiert durch Team" });
-            loadMasterData(currentCode);
+            loadMasterData(currentCode, false);
           });
         });
 
@@ -557,7 +697,7 @@
           b.addEventListener("click", async () => {
             if (!confirm("Bedarf als erledigt abschließen?")) return;
             await postAction({ action: "updateDemand", demandId: b.dataset.id, code: currentCode, alsErledigtMarkieren: true });
-            loadMasterData(currentCode);
+            loadMasterData(currentCode, false);
           });
         });
 
@@ -566,72 +706,218 @@
           renderAktenListe(akten);
           renderSystemConfig(data);
         }
+
+        // 5. Schatzkiste
+        renderSchatzListe(schatzListe);
+      }
+
+      function readAdminFile(file) {
+        return new Promise((resolve, reject) => {
+          if (file.type && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              const img = new Image();
+              img.onload = () => {
+                const maxDim = 1800;
+                let w = img.width, h = img.height;
+                if (w > maxDim || h > maxDim) {
+                  if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                  else { w = Math.round(w * maxDim / h); h = maxDim; }
+                }
+                const c = document.createElement("canvas");
+                c.width = w; c.height = h;
+                c.getContext("2d").drawImage(img, 0, 0, w, h);
+                const d = c.toDataURL("image/jpeg", 0.86);
+                resolve({ fileName: file.name, mimeType: "image/jpeg", base64: d.split(",")[1] });
+              };
+              img.onerror = reject;
+              img.src = ev.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          } else {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              resolve({
+                fileName: file.name,
+                mimeType: file.type || "application/octet-stream",
+                base64: String(ev.target.result || "").split(",")[1]
+              });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          }
+        });
       }
 
       function renderAktenListe(akten) {
-        const q = (document.getElementById("ak-search").value || "").trim().toLowerCase();
+        const rawQuery = (document.getElementById("ak-search").value || "").trim().toLowerCase();
+        const normQuery = normalizeTranslit(rawQuery);
+
+        // Länder-Chips oben aufbauen
+        const countryCounts = {};
+        akten.forEach(a => {
+          const land = (a.herkunftsland || "Ohne Landesangabe").trim();
+          countryCounts[land] = (countryCounts[land] || 0) + 1;
+        });
+
+        const chipsEl = document.getElementById("ak-country-chips");
+        const laenderSorted = Object.keys(countryCounts).sort((a, b) => a.localeCompare(b, "de"));
+        chipsEl.innerHTML = [
+          `<button type="button" class="m-chip ${selectedCountryFilter === "" ? "active" : ""}" data-land="">Alle Länder (${akten.length})</button>`,
+          ...laenderSorted.map(l =>
+            `<button type="button" class="m-chip ${selectedCountryFilter === l ? "active" : ""}" data-land="${l}">${l} (${countryCounts[l]})</button>`
+          )
+        ].join("");
+
+        chipsEl.querySelectorAll(".m-chip").forEach(ch => {
+          ch.addEventListener("click", () => {
+            selectedCountryFilter = ch.dataset.land;
+            renderAktenListe(akten);
+          });
+        });
+
         const filtered = akten.filter(a => {
-          if (!q) return true;
-          const hay = `${a.personenName || ""} ${a.aktenCode || ""} ${a.hauptThema || ""} ${a.notiz || ""}`.toLowerCase();
-          return hay.includes(q);
+          const land = (a.herkunftsland || "Ohne Landesangabe").trim();
+          if (selectedCountryFilter && land !== selectedCountryFilter) return false;
+          if (!rawQuery) return true;
+
+          const directHay = `${a.personenName || ""} ${a.aliasNamen || ""} ${land} ${a.aktenCode || ""} ${a.hauptThema || ""} ${a.notiz || ""}`.toLowerCase();
+          if (directHay.includes(rawQuery)) return true;
+
+          if (normQuery.length >= 2) {
+            const normName = normalizeTranslit(`${a.personenName || ""} ${a.aliasNamen || ""}`);
+            if (normName.includes(normQuery)) return true;
+          }
+          return false;
         });
 
         const container = document.getElementById("list-akten");
         if (!filtered.length) {
-          container.innerHTML = `<div class="m-card">Keine Personen-Akten gefunden. Lege oben eine neue Akte an.</div>`;
+          container.innerHTML = `<div class="m-card">Keine passenden Personen-Akten gefunden.</div>`;
           return;
         }
 
+        // Nach Herkunftsland gruppieren
+        const groups = {};
+        filtered.forEach(a => {
+          const land = (a.herkunftsland || "Ohne Landesangabe").trim();
+          if (!groups[land]) groups[land] = [];
+          groups[land].push(a);
+        });
+
         const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
-        container.innerHTML = filtered.map(a => {
-          const uploadLink = `${baseDir}unterlagen.html?c=${encodeURIComponent(a.aktenCode)}`;
-          const waText = encodeURIComponent(
-            `Hallo ${a.personenName},\nhier ist dein persönlicher Link für vertrauliche Unterlagen beim Freundeskreis:\n${uploadLink}\nDein Zugangs-Code: ${a.aktenCode}`
-          );
-          const dateien = a.dateien || [];
 
+        container.innerHTML = Object.keys(groups).sort((a, b) => a.localeCompare(b, "de")).map(land => {
+          const list = groups[land].sort((a, b) => String(a.personenName || "").localeCompare(String(b.personenName || ""), "de"));
           return `
-            <article class="m-akte-card">
-              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:10px;">
-                <div>
-                  <strong style="font-size:1.1rem; color:#003366;">${a.personenName}</strong>
-                  <span class="m-badge" style="background:#e3f2fd; color:#0d47a1; margin-left:6px;">Code: ${a.aktenCode}</span>
-                  <span class="m-badge" style="background:#f3e5f5; color:#4a148c; margin-left:4px;">${a.hauptThema || "-"}</span>
-                  ${a.einwilligungErteilt
-                    ? `<span class="m-badge" style="background:#eaf6ec; color:#1b5e20; margin-left:4px;">✓ DSGVO-Einwilligung liegt vor</span>`
-                    : `<span class="m-badge" style="background:#fff3e0; color:#e65100; margin-left:4px;">Einwilligung erfolgt beim 1. Upload</span>`}
-                  <div style="font-size:0.9rem; color:#333; margin-top:4px;">
-                    ${a.telefon ? `Tel: ${a.telefon} · ` : ""}Notiz/Frist: <strong>${a.notiz || "–"}</strong>
-                  </div>
-                </div>
+            <details class="m-country-group" open>
+              <summary class="m-country-summary">
+                <span>🌍 ${land} (${list.length} ${list.length === 1 ? "Person" : "Personen"})</span>
+                <span style="font-size:0.85rem; opacity:0.9;">▾</span>
+              </summary>
+              <div>
+                ${list.map(a => {
+                  const uploadLink = `${baseDir}unterlagen.html?c=${encodeURIComponent(a.aktenCode)}`;
+                  const schatzLink = `${baseDir}schatzsuche.html?c=${encodeURIComponent(a.aktenCode)}`;
+                  const waText = encodeURIComponent(
+                    `Hallo ${a.personenName},\nhier ist dein persönlicher Link für vertrauliche Unterlagen beim Freundeskreis:\n${uploadLink}\nDein Zugangs-Code: ${a.aktenCode}`
+                  );
+                  const dateien = a.dateien || [];
 
-                <div style="display:flex; flex-wrap:wrap; gap:6px;">
-                  <button type="button" class="m-btn btn-copy-link" data-link="${uploadLink}" data-code="${a.aktenCode}">📋 Link &amp; Code kopieren</button>
-                  <a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener" class="m-btn m-btn-green">📲 WhatsApp</a>
-                  ${a.driveUrl ? `<a href="${a.driveUrl}" target="_blank" rel="noopener" class="m-btn m-btn-grey">📁 Drive-Ordner</a>` : ""}
-                  <button type="button" class="m-btn m-btn-red btn-del-akte" data-id="${a.id}" data-name="${a.personenName}">🗑 Akte löschen</button>
-                </div>
-              </div>
+                  return `
+                    <article class="m-akte-card">
+                      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:10px;">
+                        <div>
+                          <strong style="font-size:1.1rem; color:#003366;">${a.personenName}</strong>
+                          <span class="m-badge" style="background:#e3f2fd; color:#0d47a1; margin-left:6px;">Code: ${a.aktenCode}</span>
+                          <span class="m-badge" style="background:#f3e5f5; color:#4a148c; margin-left:4px;">${a.hauptThema || "-"}</span>
+                          ${a.einwilligungErteilt
+                            ? `<span class="m-badge" style="background:#eaf6ec; color:#1b5e20; margin-left:4px;">✓ DSGVO-Einwilligung liegt vor</span>`
+                            : `<span class="m-badge" style="background:#fff3e0; color:#e65100; margin-left:4px;">Einwilligung offen</span>`}
+                          ${a.aliasNamen ? `<div style="font-size:0.85rem; color:#455a64;">Varianten / Suchwörter: <em>${a.aliasNamen}</em></div>` : ""}
+                          <div style="font-size:0.9rem; color:#333; margin-top:4px;">
+                            ${a.telefon ? `Tel: ${a.telefon} · ` : ""}Notiz/Frist: <strong>${a.notiz || "–"}</strong>
+                          </div>
+                        </div>
 
-              <div style="margin-top:10px; padding-top:10px; border-top:1px solid #cbd5e1;">
-                <strong style="font-size:0.92rem; color:#003366;">Eingeworfene Unterlagen (${dateien.length}):</strong>
-                ${dateien.length === 0
-                  ? `<div style="font-size:0.88rem; color:#555; margin-top:4px;">Noch keine Dateien hochgeladen.</div>`
-                  : dateien.map(df => `
-                    <div class="m-file-row">
-                      <div>
-                        <strong>${df.fileName}</strong>
-                        <span style="font-size:0.82rem; color:#555;"> (${df.bereich} · ${df.sizeKb} KB · ${df.datum})</span>
-                        ${df.nachricht ? `<div style="font-size:0.86rem; color:#111; margin-top:2px;">💬 „${df.nachricht}“</div>` : ""}
+                        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                          <button type="button" class="m-btn btn-copy-link" data-link="${uploadLink}" data-code="${a.aktenCode}">📋 Upload-Link</button>
+                          <button type="button" class="m-btn m-btn-orange btn-copy-schatz" data-link="${schatzLink}">✨ Schatzsuche-Link</button>
+                          <a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener" class="m-btn m-btn-green">📲 WhatsApp</a>
+                          ${a.driveUrl ? `<a href="${a.driveUrl}" target="_blank" rel="noopener" class="m-btn m-btn-grey">📁 Drive</a>` : ""}
+                          <button type="button" class="m-btn m-btn-red btn-del-akte" data-id="${a.id}" data-name="${a.personenName}">🗑 Löschen</button>
+                        </div>
                       </div>
-                      <div style="display:flex; gap:6px;">
-                        <button type="button" class="m-btn btn-view-file" data-fid="${df.fileId}" data-fname="${df.fileName}">👁 Ansehen / Kopieren</button>
-                        <button type="button" class="m-btn m-btn-red btn-del-file" data-fid="${df.fileId}" data-fname="${df.fileName}">✕</button>
+
+                      <!-- Eigener Datei- / Foto-Upload direkt durch dich in diese Akte -->
+                      <details style="margin-top:10px; background:#f8fbff; border:1px solid #b8d4ec; border-radius:7px; padding:8px 12px;">
+                        <summary style="cursor:pointer; font-weight:bold; color:#003366; font-size:0.92rem;">
+                          ➕ Selbst Datei, Foto oder Notiz in diese Akte ablegen
+                        </summary>
+                        <div style="margin-top:10px; display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:8px;">
+                          <div>
+                            <label style="font-size:0.82rem; font-weight:bold;">Bereich / Unterordner</label>
+                            <select class="m-select adm-up-thema">
+                              <option value="Asylantrag & Aufenthalt">1. Asylantrag &amp; Aufenthalt</option>
+                              <option value="Arbeit & Ehrenamt">2. Arbeit &amp; Ehrenamt</option>
+                              <option value="Wohnung & Unterkunft">3. Wohnung &amp; Unterkunft</option>
+                              <option value="Fotos & Einverständnis">4. Fotos &amp; Einverständnis</option>
+                              <option value="Notizen & Sonstiges">5. Notizen &amp; Sonstiges</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style="font-size:0.82rem; font-weight:bold;">Foto-Schutzstufe (falls Foto)</label>
+                            <select class="m-select adm-up-perm">
+                              <option value="Stufe 0: Nur intern in der Akte">Stufe 0: Nur intern (keine Veröffentlichung)</option>
+                              <option value="Stufe 1: Nur intern im Helferkreis">Stufe 1: Nur intern im Helferkreis</option>
+                              <option value="Stufe 2: Webseite/Presse NUR anonymisiert">Stufe 2: Webseite NUR anonymisiert</option>
+                              <option value="Stufe 3: Webseite/Presse mit Foto erlaubt">Stufe 3: Webseite/Presse freigegeben</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style="font-size:0.82rem; font-weight:bold;">Bezeichnung / Notiz</label>
+                            <input type="text" class="m-input adm-up-note" placeholder="z. B. Porträtfoto, Notiz vom Gespräch">
+                          </div>
+                          <div>
+                            <label style="font-size:0.82rem; font-weight:bold;">Datei(en) auswählen</label>
+                            <input type="file" class="m-input adm-up-files" multiple style="padding:6px;">
+                          </div>
+                        </div>
+                        <div style="margin-top:8px;">
+                          <button type="button" class="m-btn m-btn-green btn-adm-upload" data-akteid="${a.id}">⬆ In Akte speichern</button>
+                        </div>
+                      </details>
+
+                      <div style="margin-top:10px; padding-top:10px; border-top:1px solid #cbd5e1;">
+                        <strong style="font-size:0.92rem; color:#003366;">Abgelegte Unterlagen &amp; Fotos (${dateien.length}):</strong>
+                        ${dateien.length === 0
+                          ? `<div style="font-size:0.88rem; color:#555; margin-top:4px;">Noch keine Dateien hochgeladen.</div>`
+                          : dateien.map(df => {
+                            const permBadge = df.fotoFreigabe
+                              ? `<span class="m-badge" style="background:${df.fotoFreigabe.includes("Stufe 3") ? "#eaf6ec" : (df.fotoFreigabe.includes("Stufe 2") ? "#fff8e1" : "#ffebee")}; color:${df.fotoFreigabe.includes("Stufe 3") ? "#1b5e20" : (df.fotoFreigabe.includes("Stufe 2") ? "#b45309" : "#b71c1c")}; margin-left:4px;">🛡️ ${df.fotoFreigabe}</span>`
+                              : "";
+                            return `
+                              <div class="m-file-row">
+                                <div>
+                                  <strong>${df.fileName}</strong>
+                                  <span style="font-size:0.82rem; color:#555;"> (${df.bereich} · ${df.sizeKb} KB · ${df.datum})</span>
+                                  ${permBadge}
+                                  ${df.nachricht ? `<div style="font-size:0.86rem; color:#111; margin-top:2px;">💬 „${df.nachricht}“</div>` : ""}
+                                </div>
+                                <div style="display:flex; gap:6px;">
+                                  <button type="button" class="m-btn btn-view-file" data-fid="${df.fileId}" data-fname="${df.fileName}">👁 Ansehen / Kopieren</button>
+                                  <button type="button" class="m-btn m-btn-red btn-del-file" data-fid="${df.fileId}" data-fname="${df.fileName}">✕</button>
+                                </div>
+                              </div>
+                            `;
+                          }).join("")}
                       </div>
-                    </div>
-                  `).join("")}
+                    </article>
+                  `;
+                }).join("")}
               </div>
-            </article>
+            </details>
           `;
         }).join("");
 
@@ -640,7 +926,51 @@
             const txt = `Vertraulicher Upload-Link (Freundeskreis): ${btn.dataset.link}\nZugangs-Code: ${btn.dataset.code}`;
             await navigator.clipboard.writeText(txt);
             btn.textContent = "✓ Kopiert!";
-            setTimeout(() => { btn.textContent = "📋 Link & Code kopieren"; }, 2000);
+            setTimeout(() => { btn.textContent = "📋 Upload-Link"; }, 2000);
+          });
+        });
+
+        container.querySelectorAll(".btn-copy-schatz").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            await navigator.clipboard.writeText(`Schatzsuche – Deine Begabungen & Talente (Freundeskreis): ${btn.dataset.link}`);
+            btn.textContent = "✓ Kopiert!";
+            setTimeout(() => { btn.textContent = "✨ Schatzsuche-Link"; }, 2000);
+          });
+        });
+
+        container.querySelectorAll(".btn-adm-upload").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const wrap = btn.closest("details");
+            const fileInput = wrap.querySelector(".adm-up-files");
+            const rawFiles = Array.from(fileInput.files || []);
+            if (!rawFiles.length) {
+              alert("Bitte zuerst eine oder mehrere Dateien auswählen.");
+              return;
+            }
+            const task = async () => {
+              const prepared = [];
+              for (let i = 0; i < rawFiles.length; i++) {
+                prepared.push(await readAdminFile(rawFiles[i]));
+              }
+              const res = await postAction({
+                action: "adminUploadToCase",
+                akteId: btn.dataset.akteid,
+                thema: wrap.querySelector(".adm-up-thema").value,
+                fotoFreigabe: wrap.querySelector(".adm-up-perm").value,
+                nachricht: wrap.querySelector(".adm-up-note").value.trim(),
+                files: prepared
+              });
+              if (res && res.ok) {
+                loadMasterData(currentCode, false);
+                return { ok: true };
+              }
+              return { ok: false };
+            };
+            if (typeof window.fflwRunButtonAction === "function") {
+              await window.fflwRunButtonAction(btn, task, { loadingText: "Speichere …", successText: "✓ Gespeichert!" });
+            } else {
+              await task();
+            }
           });
         });
 
@@ -648,7 +978,7 @@
           btn.addEventListener("click", async () => {
             if (!confirm(`Personen-Akte „${btn.dataset.name}“ inklusive ALLER Dokumente unwiderruflich in den Papierkorb verschieben?`)) return;
             await postAction({ action: "deletePersonCaseOrFile", akteId: btn.dataset.id });
-            loadMasterData(currentCode);
+            loadMasterData(currentCode, false);
           });
         });
 
@@ -656,7 +986,7 @@
           btn.addEventListener("click", async () => {
             if (!confirm(`Datei „${btn.dataset.fname}“ wirklich löschen?`)) return;
             await postAction({ action: "deletePersonCaseOrFile", fileId: btn.dataset.fid });
-            loadMasterData(currentCode);
+            loadMasterData(currentCode, false);
           });
         });
 
@@ -697,6 +1027,67 @@
         });
       }
 
+      function renderSchatzListe(liste) {
+        const q = (document.getElementById("sz-search").value || "").trim().toLowerCase();
+        const normQ = normalizeTranslit(q);
+        const filtered = liste.filter(s => {
+          if (!q) return true;
+          const allTags = Object.values(s.bereiche || {}).flat().join(" ");
+          const hay = `${s.name || ""} ${s.herkunftsland || ""} ${s.beruf || ""} ${s.muttersprache || ""} ${s.sprachen || ""} ${allTags} ${s.mobilNotiz || ""} ${s.ehrenamtNotiz || ""} ${s.handwerkNotiz || ""} ${s.gartenNotiz || ""} ${s.kunstNotiz || ""}`.toLowerCase();
+          if (hay.includes(q)) return true;
+          if (normQ.length >= 2 && normalizeTranslit(s.name || "").includes(normQ)) return true;
+          return false;
+        });
+
+        const container = document.getElementById("list-schatz");
+        if (!filtered.length) {
+          container.innerHTML = `<div class="m-card">Noch keine passenden Einträge in der Schatzkiste gefunden.</div>`;
+          return;
+        }
+
+        container.innerHTML = filtered.map(s => {
+          const allTags = Object.values(s.bereiche || {}).flat();
+          return `
+            <div class="m-card" style="border-left-color:#b45309;">
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px;">
+                <div>
+                  <strong style="font-size:1.06rem; color:#003366;">${s.name}</strong>
+                  <span class="m-badge" style="background:#e3f2fd; color:#0d47a1; margin-left:6px;">🌍 ${s.herkunftsland || "-"}</span>
+                  ${s.aktenCode ? `<span class="m-badge" style="background:#f3e5f5; color:#4a148c; margin-left:4px;">Akte: ${s.aktenCode}</span>` : ""}
+                </div>
+                <div style="font-size:0.88rem; color:#333;">
+                  Kontakt: <strong>${s.kontakt || "-"}</strong> ${s.email ? `(${s.email})` : ""}
+                </div>
+              </div>
+              <div style="font-size:0.92rem; margin-top:6px;">
+                <strong>Beruf / Wunsch:</strong> ${s.beruf || "–"} · <strong>Sprachen:</strong> ${[s.muttersprache, s.sprachen].filter(Boolean).join(", ") || "–"}
+              </div>
+              ${allTags.length ? `
+                <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:5px;">
+                  ${allTags.map(t => `<span class="m-badge" style="background:#fff8e1; color:#78350f; border:1px solid #fcd34d;">✨ ${t}</span>`).join("")}
+                </div>
+              ` : ""}
+              ${[s.mobilNotiz, s.ehrenamtNotiz, s.handwerkNotiz, s.gartenNotiz, s.kunstNotiz].filter(Boolean).length ? `
+                <div style="font-size:0.88rem; color:#333; margin-top:6px; background:#f8fafc; padding:6px 10px; border-radius:6px;">
+                  ${[s.mobilNotiz, s.ehrenamtNotiz, s.handwerkNotiz, s.gartenNotiz, s.kunstNotiz].filter(Boolean).join(" | ")}
+                </div>
+              ` : ""}
+            </div>
+          `;
+        }).join("");
+      }
+
+      document.getElementById("sz-search").addEventListener("input", () => {
+        if (currentData && currentData.schatzkiste) renderSchatzListe(currentData.schatzkiste);
+      });
+
+      document.getElementById("sz-copy-link-btn").addEventListener("click", async function () {
+        const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
+        await navigator.clipboard.writeText(`${baseDir}schatzsuche.html`);
+        this.textContent = "✓ Link kopiert!";
+        setTimeout(() => { this.textContent = "📋 Link zur Schatzsuche kopieren"; }, 2000);
+      });
+
       document.getElementById("m-viewer-close").addEventListener("click", () => {
         document.getElementById("m-file-viewer-modal").style.display = "none";
         document.getElementById("m-viewer-body").innerHTML = "";
@@ -710,6 +1101,7 @@
 
       document.getElementById("ak-create-btn").addEventListener("click", async function () {
         const name = document.getElementById("ak-new-name").value.trim();
+        const land = document.getElementById("ak-new-land").value.trim() || "Ohne Landesangabe";
         const msgEl = document.getElementById("ak-create-msg");
         if (!name) {
           msgEl.style.color = "#c62828";
@@ -719,18 +1111,21 @@
         const task = async () => {
           const res = await postAction({
             action: "createPersonCase",
+            herkunftsland: land,
             personenName: name,
+            aliasNamen: document.getElementById("ak-new-alias").value.trim(),
             hauptThema: document.getElementById("ak-new-thema").value,
             telefon: document.getElementById("ak-new-tel").value.trim(),
             notiz: document.getElementById("ak-new-notiz").value.trim()
           });
           if (res && res.ok) {
             document.getElementById("ak-new-name").value = "";
+            document.getElementById("ak-new-alias").value = "";
             document.getElementById("ak-new-tel").value = "";
             document.getElementById("ak-new-notiz").value = "";
             msgEl.style.color = "#1b5e20";
-            msgEl.textContent = `✓ Akte angelegt! Einwurf-Code: ${res.akte.aktenCode}`;
-            loadMasterData(currentCode);
+            msgEl.textContent = `✓ Akte angelegt (${land})! Einwurf-Code: ${res.akte.aktenCode}`;
+            loadMasterData(currentCode, false);
             return { ok: true };
           }
           msgEl.style.color = "#c62828";
@@ -755,7 +1150,7 @@
         document.getElementById("sys-flaggen").value = cfg.flaggenStil || "A";
 
         const wartungSet = new Set(cfg.wartungSeiten || []);
-        const hiddenSet = new Set(cfg.versteckteSeiten || ["unterlagen.html"]);
+        const hiddenSet = new Set(cfg.versteckteSeiten || ["unterlagen.html", "schatzsuche.html"]);
         const maskSet = new Set(cfg.maskierteSeiten || ["unterlagen.html", "master.html"]);
 
         const dyn = (typeof window.fetchFflwDynamicPages === "function")
@@ -815,7 +1210,7 @@
       document.getElementById("m-release-all-btn").addEventListener("click", async function () {
         if (!confirm("Wirklich ALLE reservierten Artikel wieder öffentlich freigeben?")) return;
         await postAction({ action: "admin_release_all" });
-        loadMasterData(currentCode);
+        loadMasterData(currentCode, false);
       });
     });
   </script>

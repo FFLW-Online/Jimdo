@@ -1,0 +1,481 @@
+<!-- ==========================================================================
+  DATEI: schatzsuche.html – von Gemini
+  ERSTELLT VON GEMINI AM: 2026-11-21 15:55 CET
+  BESCHREIBUNG: Schatzsuche – Wo liegen deine Begabungen und Talente?
+    - Stärkenorientierter Fragebogen (Mobilität, Beruf, Ehrenamt, Haushalt & Reparatur,
+      IT & Papierkram, Garten & Landwirtschaft, Bildende Kunst, Bildhauerei/Ton, Musik)
+    - Automatisch übersetzbar über das Flaggenband oben
+    - Optional verknüpfbar mit persönlichem 6-stelligen Akten-Code
+========================================================================== -->
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Schatzsuche – Wo liegen deine Begabungen und Talente? | FFLW</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .sz-intro {
+      background: linear-gradient(180deg, #eef6fc 0%, #ffffff 100%);
+      border: 2px solid #b8d4ec;
+      border-left: 6px solid #004080;
+      border-radius: 10px;
+      padding: 20px 22px;
+      margin: 14px 0 20px 0;
+      color: #111111;
+    }
+    .sz-section {
+      background: #ffffff;
+      border: 2px solid #c5d7eb;
+      border-left: 6px solid #2e7d32;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 18px 0;
+      box-shadow: 0 2px 8px rgba(0, 64, 128, 0.06);
+    }
+    .sz-section h3 {
+      margin-top: 0;
+      color: #003366;
+      border-bottom: 1px solid #dce6f2;
+      padding-bottom: 8px;
+    }
+    .sz-q-title {
+      display: block;
+      font-weight: bold;
+      color: #003366;
+      margin: 14px 0 6px 0;
+      font-size: 1rem;
+    }
+    .sz-input, .sz-select, .sz-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #8faadc;
+      border-radius: 7px;
+      font-size: 16px;
+      color: #111111;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+    .sz-check-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 7px;
+      margin: 6px 0 10px 0;
+    }
+    .sz-check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #f8fbff;
+      border: 1px solid #d8e3f0;
+      border-radius: 7px;
+      padding: 8px 11px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .sz-check-item:hover {
+      background: #eef6fc;
+      border-color: #90caf9;
+    }
+    .sz-check-item input[type="checkbox"] {
+      width: 19px;
+      height: 19px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .sz-btn-submit {
+      background: #2e7d32;
+      color: #ffffff;
+      border: none;
+      padding: 14px 26px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.06rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>Schatzsuche – Wo liegen deine Begabungen und Talente?</h2>
+
+      <section class="sz-intro">
+        <p style="margin-top:0;">
+          Wir sind der Überzeugung, dass jeder und jede bestimmte Begabungen hat und dass es schön ist, wenn man diese Begabungen für sich und für andere einbringen kann. Wie kannst du – wenn du möchtest – dich in das Netz des Ehrenamts in Winnenden und Leutenbach oder auch bei uns im Verein persönlich einbringen?
+        </p>
+        <p>
+          <strong>Niemand ist verpflichtet dazu, sich ehrenamtlich zu engagieren.</strong> Ehrenamtlich bedeutet: Man tut etwas – ohne dafür konkret bezahlt zu werden. Man macht es, weil man denkt: <em>Ich habe freie Zeit – und die Welt kann durch meine Hilfe etwas besser werden.</em>
+        </p>
+        <p>
+          Natürlich kann man denken: <em>Was bringt das mir? Ich muss arbeiten, ich muss Geld verdienen, ich muss Deutsch lernen, ich muss meine Familie ernähren und vielleicht meine Familie in meinem Heimatland unterstützen.</em> Das ist richtig, und das Ehrenamt soll nicht als Konkurrenz zur Arbeit oder zu Sprachkursen verstanden werden. Aber wenn man aktuell noch auf Arbeit oder einen Sprachkurs wartet, kann ein Ehrenamt guttun:
+        </p>
+        <ol style="margin: 8px 0 12px 20px; padding: 0;">
+          <li>Es tut gut, wenn man anderen hilft – man hat nicht das Gefühl „nutzlos“ zu sein.</li>
+          <li>Man lernt dabei neue Leute kennen.</li>
+          <li>Es ist hilfreich, um das Leben und die Kultur hier kennenzulernen.</li>
+          <li>Andere Menschen merken: Auf dich ist Verlass, du hast viele Begabungen – und oft entstehen daraus wertvolle Kontakte für Arbeit und Alltag.</li>
+          <li>Es hilft, die deutsche Sprache schneller im Alltag zu sprechen.</li>
+          <li>Für eine spätere Einbürgerung ist ehrenamtliches Engagement ein schönes Plus.</li>
+          <li>Viele Vereine und Gruppen freuen sich über neue Mitglieder.</li>
+        </ol>
+        <p style="margin-bottom:0; background:#eaf6ec; border:1px solid #a5d6a7; padding:10px 12px; border-radius:7px;">
+          <strong>Alle Angaben sind komplett freiwillig.</strong> Du musst nicht alle Fragen beantworten – fülle einfach das aus, was dir Freude macht.
+        </p>
+      </section>
+
+      <form id="sz-form">
+        <!-- ABSCHNITT 1: PERSÖNLICHE ANGABEN -->
+        <section class="sz-section" style="border-left-color:#004080;">
+          <h3>1. Über dich &amp; deine Sprachen</h3>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
+            <div>
+              <label class="sz-q-title" for="sz-name">Dein Name (Vorname, Nachname) *</label>
+              <input type="text" id="sz-name" class="sz-input" required placeholder="Vorname Nachname">
+            </div>
+            <div>
+              <label class="sz-q-title" for="sz-herkunft">Wie heißt dein Heimatland? *</label>
+              <input type="text" id="sz-herkunft" class="sz-input" list="sz-laender-list" required placeholder="z. B. Syrien, Ukraine, Afghanistan …">
+              <datalist id="sz-laender-list">
+                <option value="Syrien"><option value="Ukraine"><option value="Afghanistan">
+                <option value="Irak"><option value="Iran"><option value="Türkei">
+                <option value="Eritrea"><option value="Somalia"><option value="Nigeria">
+                <option value="Gambia"><option value="Albanien"><option value="Kosovo">
+                <option value="Serbien"><option value="Russland"><option value="Georgien">
+              </datalist>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
+            <div>
+              <label class="sz-q-title" for="sz-kontakt">Telefon / WhatsApp (oder E-Mail) *</label>
+              <input type="text" id="sz-kontakt" class="sz-input" required placeholder="z. B. 0171 1234567">
+            </div>
+            <div>
+              <label class="sz-q-title" for="sz-email">E-Mail-Adresse (optional)</label>
+              <input type="email" id="sz-email" class="sz-input" placeholder="name@example.com">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+            <div>
+              <label class="sz-q-title" for="sz-geburt">Geburtsjahr oder Geburtsdatum (optional)</label>
+              <input type="text" id="sz-geburt" class="sz-input" placeholder="z. B. 1992">
+            </div>
+            <div>
+              <label class="sz-q-title" for="sz-muttersprache">Deine Muttersprache(n)</label>
+              <input type="text" id="sz-muttersprache" class="sz-input" placeholder="z. B. Arabisch, Kurdisch, Ukrainisch">
+            </div>
+            <div>
+              <label class="sz-q-title" for="sz-sprachen">Welche anderen Sprachen sprichst du?</label>
+              <input type="text" id="sz-sprachen" class="sz-input" placeholder="z. B. Deutsch, Englisch, Französisch">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
+            <div>
+              <label class="sz-q-title" for="sz-familie">Familie / Kinder (optional)</label>
+              <input type="text" id="sz-familie" class="sz-input" placeholder="z. B. verheiratet, 2 Kinder">
+            </div>
+            <div>
+              <label class="sz-q-title" for="sz-aktencode">Falls vorhanden: Dein 6-stelliger Akten-Code</label>
+              <input type="text" id="sz-aktencode" class="sz-input" inputmode="numeric" maxlength="10" placeholder="Optional (ordnet direkt deiner Akte zu)">
+            </div>
+          </div>
+        </section>
+
+        <!-- ABSCHNITT 2: MOBILITÄT -->
+        <section class="sz-section">
+          <h3>2. Mobilität (Fahrrad &amp; Auto)</h3>
+          <span class="sz-q-title">Welche Möglichkeiten und Wünsche hast du im Bereich Mobilität? (Mehrfachauswahl möglich)</span>
+          <div class="sz-check-list" data-group="mobilitaet">
+            <label class="sz-check-item"><input type="checkbox" value="Kann noch nicht Fahrrad fahren, möchte es gerne lernen"> Ich kann (noch) nicht FAHRRAD fahren – aber ich würde es sehr gerne lernen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Kann Fahrrad fahren, habe aber kein Fahrrad"> Ich kann FAHRRAD fahren, habe hier aber kein FAHRRAD</label>
+            <label class="sz-check-item"><input type="checkbox" value="Hätte gerne ein Fahrrad"> Ich hätte gerne ein FAHRRAD</label>
+            <label class="sz-check-item"><input type="checkbox" value="Kann Fahrrad fahren und es anderen beibringen"> Ich kann Fahrrad fahren und freue mich, wenn ich es anderen beibringen kann!</label>
+            <label class="sz-check-item"><input type="checkbox" value="Kann noch nicht Auto fahren, möchte es lernen"> Ich kann (noch) nicht AUTO fahren, aber ich würde es gerne lernen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Führerschein aus Heimatland vorhanden"> Ich bin in meinem Heimatland schon AUTO gefahren und habe dort auch einen gültigen Führerschein</label>
+            <label class="sz-check-item"><input type="checkbox" value="Gültiger Führerschein für Deutschland, aber kein Auto"> Ich habe einen gültigen FÜHRERSCHEIN für Deutschland – aber ich habe KEIN AUTO</label>
+            <label class="sz-check-item"><input type="checkbox" value="Eigenes Auto in Deutschland vorhanden"> Ich habe sogar schon ein AUTO und kann hier in Deutschland damit fahren</label>
+            <label class="sz-check-item"><input type="checkbox" value="Beruflich mit Auto unterwegs gewesen"> Ich war in meinem Heimatland beruflich mit dem Auto unterwegs</label>
+            <label class="sz-check-item"><input type="checkbox" value="Erfahrung mit Anhänger"> Ich habe auch schon Erfahrung mit einem Auto mit ANHÄNGER</label>
+            <label class="sz-check-item"><input type="checkbox" value="Taxi-Fahrer"> Ich war TAXI-Fahrer</label>
+            <label class="sz-check-item"><input type="checkbox" value="Bus-Fahrer"> Ich war BUS-Fahrer</label>
+            <label class="sz-check-item"><input type="checkbox" value="LKW-Fahrer"> Ich war LKW-Fahrer</label>
+          </div>
+          <label class="sz-q-title" for="sz-mobil-notiz">Persönliche Ergänzung zum Thema Mobilität:</label>
+          <input type="text" id="sz-mobil-notiz" class="sz-input" placeholder="Optional …">
+        </section>
+
+        <!-- ABSCHNITT 3: BERUF & EHRENAMT -->
+        <section class="sz-section">
+          <h3>3. Beruf, Träume &amp; bisheriges Ehrenamt</h3>
+
+          <label class="sz-q-title" for="sz-beruf">Welchen Beruf oder welche Berufe hast du ausgeübt – und was sind deine Berufswünsche?</label>
+          <textarea id="sz-beruf" class="sz-textarea" rows="3" placeholder="Schreibe gerne auch, wie lange du das gemacht hast oder wovon du beruflich träumst …"></textarea>
+
+          <label class="sz-q-title">In welchem Bereich hast du im Heimatland oder hier schon ehrenamtlich mitgeholfen?</label>
+          <div class="sz-check-list" data-group="ehrenamt">
+            <label class="sz-check-item"><input type="checkbox" value="Feuerwehr"> Bei der Feuerwehr</label>
+            <label class="sz-check-item"><input type="checkbox" value="Naturschutz"> Im Naturschutz</label>
+            <label class="sz-check-item"><input type="checkbox" value="Sportverein"> In einem Sportverein</label>
+            <label class="sz-check-item"><input type="checkbox" value="Musikverein"> In einem Musikverein</label>
+            <label class="sz-check-item"><input type="checkbox" value="Rettungswesen / Rotes Kreuz"> Im Rettungswesen (z. B. Rotes Kreuz / Roter Halbmond)</label>
+            <label class="sz-check-item"><input type="checkbox" value="Kirche oder Moschee"> In der Kirche oder in der Moschee</label>
+            <label class="sz-check-item"><input type="checkbox" value="Altenhilfe"> In der Altenhilfe</label>
+            <label class="sz-check-item"><input type="checkbox" value="Krankenhaus"> Im Krankenhaus</label>
+            <label class="sz-check-item"><input type="checkbox" value="Tierschutz"> Im Tierschutz</label>
+          </div>
+          <label class="sz-q-title" for="sz-ehrenamt-notiz">Eigene Worte zu deinen Erfahrungen im Ehrenamt:</label>
+          <input type="text" id="sz-ehrenamt-notiz" class="sz-input" placeholder="Optional …">
+        </section>
+
+        <!-- ABSCHNITT 4: HAUSHALT, HANDWERK, TECHNIK & PAPIER -->
+        <section class="sz-section">
+          <h3>4. Praktische Talente (Kochen, Nähen, Reparatur, Computer &amp; Papierkram)</h3>
+
+          <span class="sz-q-title">Kochen &amp; Backen</span>
+          <div class="sz-check-list" data-group="kochen">
+            <label class="sz-check-item"><input type="checkbox" value="Koche sehr gerne"> Ich KOCHE sehr gerne für mich und andere</label>
+            <label class="sz-check-item"><input type="checkbox" value="Zusammen kochen & Rezepte tauschen"> Ich würde auch gerne zusammen mit anderen KOCHEN und Rezepte austauschen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Kochkurse geben"> Ich würde gerne auch anderen zeigen und Kurse geben zum Thema „KOCHEN“</label>
+          </div>
+
+          <span class="sz-q-title">Nähen &amp; Handarbeit</span>
+          <div class="sz-check-list" data-group="naehen">
+            <label class="sz-check-item"><input type="checkbox" value="Nähe sehr gerne"> Ich NÄHE sehr gerne für mich und andere</label>
+            <label class="sz-check-item"><input type="checkbox" value="Zusammen nähen"> Ich würde auch gerne zusammen mit anderen NÄHEN</label>
+            <label class="sz-check-item"><input type="checkbox" value="Nähkurse geben"> Ich würde gerne auch anderen zeigen und Kurse geben zum Thema „NÄHEN“</label>
+          </div>
+
+          <span class="sz-q-title">Reparatur, Handwerk &amp; Technik</span>
+          <div class="sz-check-list" data-group="reparatur">
+            <label class="sz-check-item"><input type="checkbox" value="Technische Dinge im Haushalt"> Ich habe schon immer gerne TECHNISCHE DINGE im Haushalt erledigt</label>
+            <label class="sz-check-item"><input type="checkbox" value="Fahrrad-Reparatur"> Ich kenne mich gut mit der REPARATUR von FAHRRÄDERN aus</label>
+            <label class="sz-check-item"><input type="checkbox" value="Waschmaschine / Spülmaschine anschließen"> Ich kann z. B. eine WASCHMASCHINE oder GESCHIRRSPÜLMASCHINE anschließen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Möbel Auf-/Abbau & Transport"> Ich kann beim Aufbau, Abbau und Transport von MÖBELN helfen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Küche einbauen"> Ich kann beim Einbau einer KÜCHE helfen und habe das schon oft selbst gemacht</label>
+            <label class="sz-check-item"><input type="checkbox" value="Unterstützend mithelfen"> Ich kann helfen – aber nur unterstützend</label>
+            <label class="sz-check-item"><input type="checkbox" value="Anschluss elektrischer Geräte"> Ich habe Erfahrung beim Anschluss von ELEKTRISCHEN GERÄTEN</label>
+            <label class="sz-check-item"><input type="checkbox" value="Heizung, Wasser & Abwasser"> Im Bereich HEIZUNG, WASSER und ABWASSER kenne ich mich gut aus</label>
+          </div>
+
+          <span class="sz-q-title">Computer, Smartphone &amp; Programmieren</span>
+          <div class="sz-check-list" data-group="it">
+            <label class="sz-check-item"><input type="checkbox" value="Computer, Notebook & Drucker"> Ich kenne mich gut mit COMPUTERN (Notebook) und DRUCKER aus und kann helfen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Handys & Smartphones einrichten"> Ich kenne mich gut mit HANDYS und SMARTPHONES aus (Kauf &amp; Einrichten)</label>
+            <label class="sz-check-item"><input type="checkbox" value="Webseiten erstellen"> Ich kann Webseiten erstellen und programmieren (und anderen zeigen)</label>
+            <label class="sz-check-item"><input type="checkbox" value="Programme oder Apps programmieren"> Ich kann COMPUTER-Programme schreiben oder APPS programmieren</label>
+          </div>
+
+          <span class="sz-q-title">Papierkram &amp; Behörden</span>
+          <div class="sz-check-list" data-group="papier">
+            <label class="sz-check-item"><input type="checkbox" value="Kontakt mit Behörden"> Ich kenne mich gut mit dem Kontakt mit Behörden aus</label>
+            <label class="sz-check-item"><input type="checkbox" value="Papiersachen im Haushalt ordnen"> Ich kann unterstützen, wenn es um die Organisation mit Papiersachen im Haushalt geht</label>
+          </div>
+
+          <label class="sz-q-title" for="sz-handwerk-notiz">Eigene Ideen und Gedanken zu Haushalt, Technik oder IT:</label>
+          <input type="text" id="sz-handwerk-notiz" class="sz-input" placeholder="Optional …">
+        </section>
+
+        <!-- ABSCHNITT 5: GARTEN & LANDWIRTSCHAFT -->
+        <section class="sz-section">
+          <h3>5. Garten, Natur &amp; Landwirtschaft</h3>
+          <div class="sz-check-list" data-group="garten">
+            <label class="sz-check-item"><input type="checkbox" value="Gartenarbeit & Austausch"> Ich kenne mich gut mit Gartenarbeit aus und hätte Interesse an einem Austausch darüber</label>
+            <label class="sz-check-item"><input type="checkbox" value="Gartenbau-Verein"> Ein Kontakt zu einem Gartenbau-Verein würde mich freuen – ich könnte mir vorstellen dort mitzuarbeiten</label>
+            <label class="sz-check-item"><input type="checkbox" value="Eigener Garten zum Pachten"> Über einen eigenen Garten zum Pachten würde ich mich sehr freuen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Erfahrung in der Landwirtschaft"> Ich habe Erfahrung in der Landwirtschaft</label>
+            <label class="sz-check-item"><input type="checkbox" value="Haltung von Bienen"> Ich habe Erfahrung in der Haltung von Bienen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Erfahrung mit Pferden"> Ich habe Erfahrung mit Pferden und würde mich freuen, mit Pferden zu arbeiten</label>
+            <label class="sz-check-item"><input type="checkbox" value="Kühe, Ziegen, Schafe & Tiere"> Ich habe Erfahrung mit Kühen, Ziegen, Schafen oder anderen Tieren in der Landwirtschaft</label>
+            <label class="sz-check-item"><input type="checkbox" value="Obstbäume & Obstbaumschnitt"> Ich kenne mich gut mit Obstbäumen und Obstbaumschnitt aus</label>
+          </div>
+          <label class="sz-q-title" for="sz-garten-notiz">Sonstiges zum Thema Garten, Tiere &amp; Landwirtschaft:</label>
+          <input type="text" id="sz-garten-notiz" class="sz-input" placeholder="Optional …">
+        </section>
+
+        <!-- ABSCHNITT 6: KULTUR, KUNST & MUSIK -->
+        <section class="sz-section">
+          <h3>6. Kultur, Kunst, Handwerk &amp; Musik</h3>
+          <p style="margin-top:0; font-size:0.95rem;">
+            Das Leben besteht nicht nur aus Arbeit. Zum Menschsein gehört auch die Kunst und Musik.
+          </p>
+
+          <span class="sz-q-title">Bildende Kunst &amp; Malerei</span>
+          <div class="sz-check-list" data-group="malerei">
+            <label class="sz-check-item"><input type="checkbox" value="Interesse an Malerei"> Ich interessiere mich für Malerei</label>
+            <label class="sz-check-item"><input type="checkbox" value="Viel Erfahrung in Malerei – weitergeben"> Ich habe selbst schon viel Erfahrung in Malerei und würde diese gerne weitergeben</label>
+            <label class="sz-check-item"><input type="checkbox" value="Andere Künstler kennenlernen"> Ich habe Interesse, andere Künstler im Bereich der Malerei kennenzulernen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Künstler / Unterricht an Schule oder Hochschule"> Ich bin selbst Künstler und unterrichte dieses Fach sogar an Schule oder Hochschule</label>
+          </div>
+
+          <span class="sz-q-title">Bildhauerei, Arbeiten mit Ton und Lehm</span>
+          <div class="sz-check-list" data-group="bildhauerei">
+            <label class="sz-check-item"><input type="checkbox" value="Interesse an Bildhauerei / Ton / Lehm"> Ich interessiere mich für Bildhauerei und für Arbeiten mit Ton und Lehm</label>
+            <label class="sz-check-item"><input type="checkbox" value="Erfahrung mit Bildhauerei / Ton / Lehm"> Ich habe schon Erfahrung mit Bildhauerei und mit Arbeiten mit Ton und Lehm</label>
+            <label class="sz-check-item"><input type="checkbox" value="Erfahrung in Bildhauerei weitergeben"> Ich möchte meine Erfahrung mit der Bildhauerei gerne weitergeben</label>
+            <label class="sz-check-item"><input type="checkbox" value="Bildhauerei an Schule/Hochschule unterrichtet"> Ich habe schon an einer Schule oder Hochschule im Bereich Bildhauerei unterrichtet</label>
+          </div>
+
+          <span class="sz-q-title">Musik &amp; Gesang</span>
+          <div class="sz-check-list" data-group="musik">
+            <label class="sz-check-item"><input type="checkbox" value="Möchte gerne im Chor mitsingen"> Ich interessiere mich für Musik und würde gerne in einem Chor mitsingen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Schon im Chor mitgesungen"> Ich habe schon in einem Chor mitgesungen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Singe halbprofessionell / professionell"> Ich singe halbprofessionell oder sogar professionell</label>
+            <label class="sz-check-item"><input type="checkbox" value="Erfahrung in Chorleitung"> Ich habe Erfahrung in „Chorleitung“ und würde das gerne einbringen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Möchte Musikinstrument lernen"> Ich würde sehr gerne ein Musikinstrument lernen</label>
+            <label class="sz-check-item"><input type="checkbox" value="Spiele bereits ein Musikinstrument"> Ich spiele bereits ein Musikinstrument und habe Freude daran</label>
+            <label class="sz-check-item"><input type="checkbox" value="Kann Musikinstrument unterrichten"> Ich spiele das Instrument so gut, dass ich auch andere unterrichten kann</label>
+          </div>
+
+          <label class="sz-q-title" for="sz-kunst-notiz">Welches Instrument spielst du / möchtest du lernen – oder Link zu deinen Werken / weitere Gedanken:</label>
+          <textarea id="sz-kunst-notiz" class="sz-textarea" rows="3" placeholder="z. B. Oud, Gitarre, Klavier, Geige, Webseiten-Link zu deinen Bildern …"></textarea>
+        </section>
+
+        <!-- DATENSCHUTZ & FREIGABE -->
+        <section class="sz-section" style="border-left-color:#004080; background:#f8fbff;">
+          <h3>7. Datenschutz &amp; Vertraulichkeit</h3>
+          <label class="sz-q-title" for="sz-sichtbarkeit">Wer im Freundeskreis darf deine Talente sehen, um passende Kontakte oder Arbeit zu vermitteln?</label>
+          <select id="sz-sichtbarkeit" class="sz-select">
+            <option value="team">Das Vermittlungs-Team (für Job- &amp; Ehrenamts-Kontakte im Freundeskreis)</option>
+            <option value="nur_koordinator">Nur die Haupt-Koordination (streng vertraulich)</option>
+          </select>
+
+          <label class="sz-check-item" style="margin-top:12px; background:#ffffff; border-color:#1565c0;">
+            <input type="checkbox" id="sz-dsgvo" required>
+            <span>
+              <strong>Einwilligung (DSGVO):</strong> Ich bin damit einverstanden, dass meine freiwilligen Angaben im <em>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</em> gespeichert und für die ehrenamtliche Unterstützung, Kontaktvermittlung und Jobsuche genutzt werden. Ich kann dies jederzeit widerrufen.
+            </span>
+          </label>
+
+          <div style="margin-top:16px; display:flex; flex-wrap:wrap; align-items:center; gap:14px;">
+            <button type="submit" id="sz-submit-btn" class="sz-btn-submit">✨ Schatzsuche absenden</button>
+            <span id="sz-msg" style="font-weight:bold;"></span>
+          </div>
+        </section>
+      </form>
+
+      <section id="sz-done" class="sz-intro" style="display:none; background:#eaf6ec; border-color:#2e7d32; border-left-color:#2e7d32;">
+        <h3 style="margin-top:0; color:#1b5e20;">✓ Vielen herzlichen Dank für deine Schatzsuche!</h3>
+        <p style="margin-bottom:12px;">
+          Deine Begabungen, Interessen und Wünsche wurden sicher gespeichert. Wir freuen uns sehr darauf, dich und deine Talente noch besser kennenzulernen!
+        </p>
+        <a href="index.html" style="display:inline-block; background:#004080; color:#ffffff; padding:10px 18px; border-radius:7px; font-weight:bold; text-decoration:none;">Zur Startseite</a>
+      </section>
+    </main>
+  </div>
+
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+
+      const codeInput = document.getElementById("sz-aktencode");
+      if (typeof window.fflwNeutralizeCodeInput === "function") {
+        window.fflwNeutralizeCodeInput(codeInput);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const urlCode = params.get("c") || params.get("code") || "";
+      if (urlCode) {
+        codeInput.value = urlCode.trim();
+        codeInput.dataset.userTyped = "1";
+      }
+
+      function getCheckedValues(groupName) {
+        return Array.from(document.querySelectorAll(`.sz-check-list[data-group="${groupName}"] input[type="checkbox"]:checked`))
+          .map(cb => cb.value);
+      }
+
+      document.getElementById("sz-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const btn = document.getElementById("sz-submit-btn");
+        const msgEl = document.getElementById("sz-msg");
+
+        const bereiche = {
+          mobilitaet: getCheckedValues("mobilitaet"),
+          ehrenamt: getCheckedValues("ehrenamt"),
+          kochen: getCheckedValues("kochen"),
+          naehen: getCheckedValues("naehen"),
+          reparatur: getCheckedValues("reparatur"),
+          it: getCheckedValues("it"),
+          papier: getCheckedValues("papier"),
+          garten: getCheckedValues("garten"),
+          malerei: getCheckedValues("malerei"),
+          bildhauerei: getCheckedValues("bildhauerei"),
+          musik: getCheckedValues("musik")
+        };
+
+        const payload = {
+          action: "submitTreasureSurvey",
+          name: document.getElementById("sz-name").value.trim(),
+          herkunftsland: document.getElementById("sz-herkunft").value.trim(),
+          kontakt: document.getElementById("sz-kontakt").value.trim(),
+          email: document.getElementById("sz-email").value.trim(),
+          geburt: document.getElementById("sz-geburt").value.trim(),
+          muttersprache: document.getElementById("sz-muttersprache").value.trim(),
+          sprachen: document.getElementById("sz-sprachen").value.trim(),
+          familie: document.getElementById("sz-familie").value.trim(),
+          aktenCode: document.getElementById("sz-aktencode").value.trim(),
+          beruf: document.getElementById("sz-beruf").value.trim(),
+          mobilNotiz: document.getElementById("sz-mobil-notiz").value.trim(),
+          ehrenamtNotiz: document.getElementById("sz-ehrenamt-notiz").value.trim(),
+          handwerkNotiz: document.getElementById("sz-handwerk-notiz").value.trim(),
+          gartenNotiz: document.getElementById("sz-garten-notiz").value.trim(),
+          kunstNotiz: document.getElementById("sz-kunst-notiz").value.trim(),
+          sichtbarkeit: document.getElementById("sz-sichtbarkeit").value,
+          bereiche: bereiche
+        };
+
+        const task = async () => {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+          const res = await resp.json();
+          if (res && res.ok) {
+            document.getElementById("sz-form").style.display = "none";
+            document.getElementById("sz-done").style.display = "block";
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            return { ok: true };
+          }
+          msgEl.style.color = "#c62828";
+          msgEl.textContent = "Fehler beim Speichern: " + (res && res.error ? res.error : "Bitte erneut versuchen.");
+          return { ok: false };
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(btn, task, {
+            loadingText: "Speichere Schatzsuche …",
+            successText: "✓ Gespeichert!"
+          });
+        } else {
+          await task();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

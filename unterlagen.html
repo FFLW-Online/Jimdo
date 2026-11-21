@@ -1,11 +1,11 @@
 <!-- ==========================================================================
   DATEI: unterlagen.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-21 15:15 CET
-  BESCHREIBUNG: Versteckter DSGVO-Einweg-Briefkasten für persönliche Unterlagen
-    - Themen: Asylantrag & Aufenthalt, Arbeit & Ehrenamt, Wohnung & Unterkunft
-    - Reines Einwurf-Prinzip: Nach Upload kein Einsehen, Ändern oder Herunterladen
-    - Adressleiste wird automatisch auf index.html neutralisiert
-    - Ausdrückliche DSGVO-Einwilligung (Art. 6 & Art. 9 DSGVO) erforderlich
+  ERSTELLT VON GEMINI AM: 2026-11-21 15:55 CET
+  BESCHREIBUNG: Versteckter DSGVO-Einweg-Briefkasten für persönliche Unterlagen & Fotos
+    - Themen: Asylantrag & Aufenthalt, Arbeit & Ehrenamt, Wohnung & Unterkunft,
+      Fotos & Einverständnis (mit Schutzstufen für Geflüchtete!), Sonstiges
+    - Kein Browser-Autofill im Code-Feld
+    - Reines Einwurf-Prinzip (kein Lesen/Herunterladen nach Upload)
 ========================================================================== -->
 <!doctype html>
 <html lang="de">
@@ -32,6 +32,14 @@
       border-radius: 9px;
       padding: 14px 16px;
       margin: 16px 0;
+      color: #111111;
+    }
+    .uk-photo-consent-box {
+      background: #fff8e1;
+      border: 2px solid #f59e0b;
+      border-radius: 9px;
+      padding: 14px 16px;
+      margin: 14px 0;
       color: #111111;
     }
     .uk-label {
@@ -79,7 +87,7 @@
     .uk-topic-btn small {
       font-weight: normal;
       font-size: 0.82rem;
-      opacity: 0.9;
+      opacity: 0.92;
     }
     .uk-btn-primary {
       background: #004080;
@@ -122,12 +130,12 @@
     <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
 
     <main class="content">
-      <h2>Vertrauliche Unterlagen übermitteln</h2>
+      <h2>Vertrauliche Unterlagen &amp; Fotos übermitteln</h2>
 
       <!-- Schritt 1: Code-Prüfung -->
       <section id="uk-step-code" class="uk-card">
         <p style="margin-top:0; font-size:0.98rem;">
-          Hier können Sie vertrauliche Dokumente (z. B. Schreiben vom Anwalt, BAMF-Bescheide, Arbeitsunterlagen oder Wohnungsunterlagen) sicher direkt in Ihre digitale Akte beim Freundeskreis einwerfen.
+          Hier können Sie vertrauliche Dokumente (z. B. Schreiben vom Anwalt, BAMF-Bescheide, Arbeitsunterlagen, Wohnungsunterlagen oder Fotos) sicher direkt in Ihre digitale Akte beim Freundeskreis einwerfen.
         </p>
         <div style="background:#f4f8fc; border:1px solid #90caf9; border-radius:8px; padding:12px 14px; margin-bottom:14px; font-size:0.92rem;">
           🔒 <strong>Sicherheit &amp; Einwurf-Prinzip:</strong> Nach dem Absenden werden Ihre Unterlagen ausschließlich im geschützten Bereich abgelegt. Über diese Seite können keine bereits gespeicherten Dokumente eingesehen, verändert oder heruntergeladen werden.
@@ -141,7 +149,7 @@
         <div id="uk-code-msg" style="margin-top:10px; font-weight:bold;"></div>
       </section>
 
-      <!-- Schritt 2: Upload-Briefkasten (erst nach gültigem Code sichtbar) -->
+      <!-- Schritt 2: Upload-Briefkasten -->
       <form id="uk-upload-form" class="uk-card" style="display:none; border-left-color:#2e7d32;">
         <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; padding-bottom:10px; border-bottom:1px solid #d8e3f0;">
           <strong id="uk-welcome-title" style="color:#003366; font-size:1.08rem;">Willkommen!</strong>
@@ -162,6 +170,10 @@
             <span>🏠 Wohnung &amp; Unterkunft</span>
             <small>WBS, Jobcenter-Schreiben, Mietvertrag, Bewerbung</small>
           </button>
+          <button type="button" class="uk-topic-btn" data-topic="Fotos & Einverständnis">
+            <span>📷 Fotos &amp; Einverständnis</span>
+            <small>Persönliche Fotos, Veranstaltungen, Freigabe</small>
+          </button>
         </div>
 
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap:12px; margin-top:8px;">
@@ -170,14 +182,30 @@
             <input type="text" id="uk-sender-name" class="uk-input" required placeholder="Vorname Nachname">
           </div>
           <div>
-            <label class="uk-label" for="uk-doc-type">3. Art des Dokuments *</label>
-            <input type="text" id="uk-doc-type" class="uk-input" required placeholder="z. B. Brief vom Anwalt, Bescheid, Ausweis">
+            <label class="uk-label" for="uk-doc-type">3. Art des Dokuments / Fotos *</label>
+            <input type="text" id="uk-doc-type" class="uk-input" required placeholder="z. B. Brief vom Anwalt, Bescheid, Foto">
           </div>
         </div>
 
         <label class="uk-label" for="uk-files">4. Fotos abfotografieren oder PDF-Dateien auswählen *</label>
         <input type="file" id="uk-files" class="uk-input" accept="image/*,application/pdf" multiple required style="padding:8px;">
         <div id="uk-file-preview" class="uk-file-list" style="display:none;"></div>
+
+        <!-- Abgestufte Foto-Schutz-Abfrage (wird bei Fotos oder Thema "Fotos" besonders hervorgehoben) -->
+        <div id="uk-photo-consent-box" class="uk-photo-consent-box">
+          <strong style="color:#7c2d12; display:block; margin-bottom:6px;">
+            🛡️ Schutz-Abfrage bei Fotos (Wichtig zu Ihrer Sicherheit):
+          </strong>
+          <p style="margin:0 0 8px 0; font-size:0.9rem;">
+            Falls Sie hier Fotos von sich oder Ihrer Familie hochladen: Wie darf der Freundeskreis diese Fotos verwenden? (Standard ist <strong>keine Veröffentlichung im Internet</strong>.)
+          </p>
+          <select id="uk-photo-permission" class="uk-select">
+            <option value="Stufe 0: Nur intern in der Akte (KEINE Veröffentlichung)">Stufe 0: Nur intern in meiner Akte (KEINE Veröffentlichung – maximaler Schutz)</option>
+            <option value="Stufe 1: Nur intern im Helferkreis">Stufe 1: Nur intern für Helferinnen und Helfer im Verein (nicht öffentlich)</option>
+            <option value="Stufe 2: Webseite / Presse NUR anonymisiert (ohne Namen / Gesicht nicht erkennbar)">Stufe 2: Webseite / Zeitung NUR anonymisiert (ohne Namen, Gesicht nicht erkennbar)</option>
+            <option value="Stufe 3: Vereins-Webseite / Presse mit Foto erlaubt">Stufe 3: Veröffentlichung auf der Vereins-Webseite / in der Presse ist für mich sicher und erlaubt</option>
+          </select>
+        </div>
 
         <label class="uk-label" for="uk-note">5. Kurze Nachricht / Frage dazu (optional)</label>
         <textarea id="uk-note" class="uk-textarea" rows="3" placeholder="z. B. Termin beim Anwalt ist nächste Woche, was müssen wir mitbringen?"></textarea>
@@ -186,7 +214,7 @@
           <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer; font-size:0.93rem; line-height:1.45;">
             <input type="checkbox" id="uk-dsgvo-check" required style="width:20px; height:20px; margin-top:2px; flex-shrink:0;">
             <span>
-              <strong>Datenschutz-Einwilligung (DSGVO):</strong> Ich bin damit einverstanden, dass meine übermittelten Daten und Dokumente (einschließlich eventueller besonderer personenbezogener Daten nach Art. 9 DSGVO) ausschließlich für die ehrenamtliche Beratung und Unterstützung durch die zuständige Ansprechperson im <em>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</em> gespeichert und verarbeitet werden. Ich kann diese Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen und die vollständige Löschung meiner Akte verlangen.
+              <strong>Datenschutz-Einwilligung (DSGVO):</strong> Ich bin damit einverstanden, dass meine übermittelten Daten, Dokumente und Fotos (einschließlich eventueller besonderer personenbezogener Daten nach Art. 9 DSGVO) ausschließlich für die ehrenamtliche Beratung und Unterstützung durch die zuständige Ansprechperson im <em>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</em> gespeichert und gemäß meiner gewählten Schutzstufe verarbeitet werden. Ich kann diese Einwilligung jederzeit widerrufen und die vollständige Löschung meiner Akte verlangen.
             </span>
           </label>
         </div>
@@ -197,7 +225,7 @@
         </div>
       </form>
 
-      <!-- Schritt 3: Bestätigung nach Einwurf (ohne Anzeige der Dateien!) -->
+      <!-- Schritt 3: Bestätigung -->
       <section id="uk-done-box" class="uk-card" style="display:none; background:#eaf6ec; border-color:#2e7d32; border-left-color:#2e7d32;">
         <h3 style="margin-top:0; color:#1b5e20;">✓ Vielen Dank! Ihre Unterlagen wurden sicher eingeworfen.</h3>
         <p style="margin-bottom:12px;">
@@ -225,10 +253,14 @@
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
 
+      const codeInput = document.getElementById("uk-code-input");
+      if (typeof window.fflwNeutralizeCodeInput === "function") {
+        window.fflwNeutralizeCodeInput(codeInput);
+      }
+
       let verifiedCode = "";
       let selectedTopic = "Asylantrag & Aufenthalt";
 
-      // Themen-Auswahl
       document.querySelectorAll("#uk-topic-grid .uk-topic-btn").forEach(btn => {
         btn.addEventListener("click", function () {
           document.querySelectorAll("#uk-topic-grid .uk-topic-btn").forEach(b => b.classList.remove("active"));
@@ -237,7 +269,6 @@
         });
       });
 
-      // Datei-Auswahl Vorschau (nur Dateinamen & Größe, kein Download)
       const fileInput = document.getElementById("uk-files");
       const previewEl = document.getElementById("uk-file-preview");
       fileInput.addEventListener("change", function () {
@@ -253,7 +284,7 @@
       });
 
       async function verifyCode(codeRaw) {
-        const code = String(codeRaw || document.getElementById("uk-code-input").value || "").trim();
+        const code = String(codeRaw || codeInput.value || "").trim();
         const msgEl = document.getElementById("uk-code-msg");
         const btn = document.getElementById("uk-verify-btn");
         if (!code) {
@@ -261,7 +292,8 @@
           msgEl.textContent = "Bitte geben Sie Ihren persönlichen Zugangs-Code ein.";
           return { ok: false };
         }
-        document.getElementById("uk-code-input").value = code;
+        codeInput.value = code;
+        codeInput.dataset.userTyped = "1";
         msgEl.style.color = "#004080";
         msgEl.textContent = "Prüfe Zugang …";
 
@@ -303,14 +335,13 @@
       }
 
       document.getElementById("uk-verify-btn").addEventListener("click", () => verifyCode());
-      document.getElementById("uk-code-input").addEventListener("keydown", e => {
+      codeInput.addEventListener("keydown", e => {
         if (e.key === "Enter") {
           e.preventDefault();
           verifyCode();
         }
       });
 
-      // Falls Code per Link mitgegeben wurde (wurde von nav-loader.js vor URL-Tarnung gesichert)
       const preCode = sessionStorage.getItem("fflw_masked_case_code")
         || new URLSearchParams(window.location.search).get("c")
         || new URLSearchParams(window.location.search).get("code");
@@ -325,7 +356,6 @@
             reader.onload = ev => {
               const img = new Image();
               img.onload = () => {
-                // Dokumente gut lesbar halten (bis 1800px für scharfe Schrift)
                 const maxDim = 1800;
                 let w = img.width, h = img.height;
                 if (w > maxDim || h > maxDim) {
@@ -407,6 +437,7 @@
               thema: selectedTopic,
               absenderName: document.getElementById("uk-sender-name").value.trim(),
               dokumentTyp: document.getElementById("uk-doc-type").value.trim(),
+              fotoFreigabe: document.getElementById("uk-photo-permission").value,
               nachricht: document.getElementById("uk-note").value.trim(),
               dsgvoEinwilligung: true,
               files: preparedFiles

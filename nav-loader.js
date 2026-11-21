@@ -6,6 +6,27 @@ const FFLW_GITHUB_REPO = "Jimdo";
 const FFLW_GITHUB_BRANCH = "main";
 
 // ============================================================================
+// SCHUTZ GEGEN BROWSER-AUTOFILL BEI CODE-FELDERN
+// ============================================================================
+window.fflwNeutralizeCodeInput = function (inputEl) {
+  if (!inputEl) return;
+  inputEl.setAttribute("autocomplete", "new-password");
+  inputEl.setAttribute("autocorrect", "off");
+  inputEl.setAttribute("autocapitalize", "off");
+  inputEl.setAttribute("spellcheck", "false");
+  inputEl.setAttribute("data-lpignore", "true");
+  inputEl.setAttribute("data-1p-ignore", "true");
+  inputEl.setAttribute("name", "fflw_code_" + Math.random().toString(36).slice(2, 9));
+  inputEl.value = "";
+  setTimeout(() => { if (!inputEl.dataset.userTyped) inputEl.value = ""; }, 80);
+  setTimeout(() => { if (!inputEl.dataset.userTyped) inputEl.value = ""; }, 350);
+  inputEl.addEventListener("input", () => { inputEl.dataset.userTyped = "1"; });
+  inputEl.addEventListener("focus", () => {
+    if (!inputEl.dataset.userTyped) inputEl.value = "";
+  });
+};
+
+// ============================================================================
 // SELEKTIVE ADRESSLEISTEN-TARNUNG (history.replaceState auf index.html)
 // ============================================================================
 function applySelectiveUrlMasking(currentPage, maskierteSeiten) {
@@ -14,7 +35,6 @@ function applySelectiveUrlMasking(currentPage, maskierteSeiten) {
     if (!liste.includes(currentPage)) return;
     if (currentPage === "index.html") return;
 
-    // Vor dem Maskieren eventuellen Einmal-Code (?c=... oder ?code=...) für die Seite sichern
     const params = new URLSearchParams(window.location.search);
     const cVal = params.get("c") || params.get("code") || "";
     if (cVal) {
@@ -29,7 +49,6 @@ function applySelectiveUrlMasking(currentPage, maskierteSeiten) {
   } catch (e) {}
 }
 
-// Sofort beim Laden ausführen, falls Seite bereits im Cache als maskiert markiert ist
 (function immediateMaskFromCache() {
   try {
     const currentPage = window.location.pathname.split("/").pop() || "index.html";
@@ -127,7 +146,8 @@ window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
     "sitemap.html",
     "fflw-international.html",
     "master.html",
-    "unterlagen.html"
+    "unterlagen.html",
+    "schatzsuche.html"
   ];
 
   const extraHiddenSet = new Set(Array.isArray(extraHiddenFiles) ? extraHiddenFiles : []);
@@ -287,7 +307,7 @@ function getCachedSiteStatus() {
       if (parsed && typeof parsed === "object") {
         return {
           wartungSeiten: Array.isArray(parsed.wartungSeiten) ? parsed.wartungSeiten : [],
-          versteckteSeiten: Array.isArray(parsed.versteckteSeiten) ? parsed.versteckteSeiten : ["unterlagen.html"],
+          versteckteSeiten: Array.isArray(parsed.versteckteSeiten) ? parsed.versteckteSeiten : ["unterlagen.html", "schatzsuche.html"],
           maskierteSeiten: Array.isArray(parsed.maskierteSeiten) ? parsed.maskierteSeiten : ["unterlagen.html", "master.html"],
           flaggenStil: ["A", "B", "C", "OFF"].includes(parsed.flaggenStil) ? parsed.flaggenStil : "A",
           zugangscode: typeof parsed.zugangscode === "string" ? parsed.zugangscode : "11"
@@ -297,7 +317,7 @@ function getCachedSiteStatus() {
   } catch (e) {}
   return {
     wartungSeiten: [],
-    versteckteSeiten: ["unterlagen.html"],
+    versteckteSeiten: ["unterlagen.html", "schatzsuche.html"],
     maskierteSeiten: ["unterlagen.html", "master.html"],
     flaggenStil: "A",
     zugangscode: "11"
@@ -313,7 +333,7 @@ function setCachedSiteStatus(statusObj) {
 function applyHiddenNavItems(versteckteSeiten) {
   const navContainer = document.getElementById("main-nav");
   if (!navContainer) return;
-  const hiddenSet = new Set(Array.isArray(versteckteSeiten) ? versteckteSeiten : ["unterlagen.html"]);
+  const hiddenSet = new Set(Array.isArray(versteckteSeiten) ? versteckteSeiten : ["unterlagen.html", "schatzsuche.html"]);
 
   navContainer.querySelectorAll("li").forEach(li => {
     const link = li.querySelector("a[href]");
@@ -433,7 +453,7 @@ function syncGlobalSiteStatus(currentPage) {
       if (!data || !data.ok) return;
       const fresh = {
         wartungSeiten: Array.isArray(data.wartungSeiten) ? data.wartungSeiten : [],
-        versteckteSeiten: Array.isArray(data.versteckteSeiten) ? data.versteckteSeiten : ["unterlagen.html"],
+        versteckteSeiten: Array.isArray(data.versteckteSeiten) ? data.versteckteSeiten : ["unterlagen.html", "schatzsuche.html"],
         maskierteSeiten: Array.isArray(data.maskierteSeiten) ? data.maskierteSeiten : ["unterlagen.html", "master.html"],
         flaggenStil: ["A", "B", "C", "OFF"].includes(data.flaggenStil) ? data.flaggenStil : "A",
         zugangscode: typeof data.zugangscode === "string" ? data.zugangscode : "11"
