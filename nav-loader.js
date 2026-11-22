@@ -147,7 +147,9 @@ window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
     "fflw-international.html",
     "master.html",
     "unterlagen.html",
-    "schatzsuche.html"
+    "schatzsuche.html",
+    "ideentafel.html",
+    "begegnung-tipps.html"
   ];
 
   const extraHiddenSet = new Set(Array.isArray(extraHiddenFiles) ? extraHiddenFiles : []);
@@ -204,7 +206,7 @@ window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
   const pages = repoHtmlFiles
     .filter(f => !systemExclude.has(f))
     .map(file => {
-      const inNavHtml = navMap.has(file) || file === "schatzsuche.html";
+      const inNavHtml = navMap.has(file) || file === "schatzsuche.html" || file === "ideentafel.html" || file === "begegnung-tipps.html";
       const isManuallyHidden = extraHiddenSet.has(file);
       const inMenu = inNavHtml && !isManuallyHidden;
       const isLegal = (file === "impressum.html" || file === "datenschutz.html");
@@ -349,23 +351,10 @@ function applyHiddenNavItems(versteckteSeiten) {
     }
   });
 
-  // Falls schatzsuche.html nicht versteckt ist, aber in nav.html noch nicht verlinkt wurde:
-  // unterhalb von "Mitmachen" im Menü einblenden ("Schatzsuche ✨" - Symbol hinten!)
   const navList = navContainer.querySelector("#nav-list") || navContainer.querySelector("ul");
-  if (navList && !hiddenSet.has("schatzsuche.html") && !hasSchatzLink) {
-    const li = document.createElement("li");
-    li.id = "auto-nav-schatzsuche";
-    const a = document.createElement("a");
-    a.href = "schatzsuche.html";
-    a.textContent = "Schatzsuche ✨";
-    const cur = (window.location.pathname.split("/").pop() || "index.html");
-    if (cur === "schatzsuche.html") {
-      a.setAttribute("aria-current", "page");
-      a.classList.add("active");
-    }
-    li.appendChild(a);
+  const cur = (window.location.pathname.split("/").pop() || "index.html");
 
-    // "Mitmachen" im Menü suchen (entweder als <details>-Untermenü oder als normaler Menüpunkt)
+  function insertBelowMitmachen(liEl, isCurrentPage) {
     let mitmachenLi = null;
     navList.querySelectorAll(":scope > li").forEach(topLi => {
       const txt = (topLi.textContent || "").toLowerCase();
@@ -375,26 +364,86 @@ function applyHiddenNavItems(versteckteSeiten) {
         mitmachenLi = topLi;
       }
     });
-
     if (mitmachenLi) {
       const subUl = mitmachenLi.querySelector("ul");
       if (subUl) {
-        // Wenn "Mitmachen" ein aufklappbares Untermenü (<details><ul>) hat, direkt dort einsortieren
-        subUl.appendChild(li);
-        if (cur === "schatzsuche.html") {
+        subUl.appendChild(liEl);
+        if (isCurrentPage) {
           const det = mitmachenLi.querySelector("details");
           if (det) det.setAttribute("open", "");
         }
       } else {
-        // Sonst direkt unterhalb von "Mitmachen" in die Hauptliste einfügen
-        mitmachenLi.insertAdjacentElement("afterend", li);
+        const schatzExisting = document.getElementById("auto-nav-schatzsuche");
+        if (schatzExisting && liEl.id === "auto-nav-ideentafel") {
+          schatzExisting.insertAdjacentElement("afterend", liEl);
+        } else {
+          mitmachenLi.insertAdjacentElement("afterend", liEl);
+        }
       }
     } else {
-      navList.appendChild(li);
+      navList.appendChild(liEl);
     }
+  }
+
+  if (navList && !hiddenSet.has("schatzsuche.html") && !hasSchatzLink) {
+    const li = document.createElement("li");
+    li.id = "auto-nav-schatzsuche";
+    const a = document.createElement("a");
+    a.href = "schatzsuche.html";
+    a.textContent = "Schatzsuche ✨";
+    if (cur === "schatzsuche.html") {
+      a.setAttribute("aria-current", "page");
+      a.classList.add("active");
+    }
+    li.appendChild(a);
+    insertBelowMitmachen(li, cur === "schatzsuche.html");
   } else if (hasSchatzLink && hiddenSet.has("schatzsuche.html")) {
     const autoLi = document.getElementById("auto-nav-schatzsuche");
     if (autoLi) autoLi.style.display = "none";
+  }
+
+  const hasIdeenLink = !!navContainer.querySelector('a[href="ideentafel.html"]');
+  if (navList && !hiddenSet.has("ideentafel.html") && !hasIdeenLink) {
+    const li2 = document.createElement("li");
+    li2.id = "auto-nav-ideentafel";
+    const a2 = document.createElement("a");
+    a2.href = "ideentafel.html";
+    a2.textContent = "Ideen & Lob-Tafel 💡";
+    if (cur === "ideentafel.html") {
+      a2.setAttribute("aria-current", "page");
+      a2.classList.add("active");
+    }
+    li2.appendChild(a2);
+    insertBelowMitmachen(li2, cur === "ideentafel.html");
+  }
+
+  const hasBegegnungTippsLink = !!navContainer.querySelector('a[href="begegnung-tipps.html"]');
+  if (navList && !hiddenSet.has("begegnung-tipps.html") && !hasBegegnungTippsLink) {
+    const li3 = document.createElement("li");
+    li3.id = "auto-nav-begegnung-tipps";
+    const a3 = document.createElement("a");
+    a3.href = "begegnung-tipps.html";
+    a3.textContent = "Begegnungs-Tipps 🤝";
+    if (cur === "begegnung-tipps.html") {
+      a3.setAttribute("aria-current", "page");
+      a3.classList.add("active");
+    }
+    li3.appendChild(a3);
+    // Wenn es einen Menüpunkt "Begegnung" gibt, direkt dort einordnen, sonst unter Mitmachen
+    let begegnungLi = null;
+    navList.querySelectorAll(":scope > li").forEach(topLi => {
+      const txt = (topLi.textContent || "").toLowerCase();
+      if (txt.includes("begegnung")) begegnungLi = topLi;
+    });
+    if (begegnungLi && begegnungLi.querySelector("ul")) {
+      begegnungLi.querySelector("ul").appendChild(li3);
+      if (cur === "begegnung-tipps.html") {
+        const det = begegnungLi.querySelector("details");
+        if (det) det.setAttribute("open", "");
+      }
+    } else {
+      insertBelowMitmachen(li3, cur === "begegnung-tipps.html");
+    }
   }
 }
 

@@ -187,9 +187,26 @@
           </div>
         </div>
 
+
         <label class="uk-label" for="uk-files">4. Fotos abfotografieren oder PDF-Dateien auswählen *</label>
         <input type="file" id="uk-files" class="uk-input" accept="image/*,application/pdf" multiple required style="padding:8px;">
         <div id="uk-file-preview" class="uk-file-list" style="display:none;"></div>
+
+        <!-- PDF-Verkleinerer & Schwarz-Weiß-Option (erscheint bei PDF-Auswahl automatisch) -->
+        <div id="uk-pdf-opt-box" style="display:none; background:#f0f7ff; border:2px solid #90caf9; border-radius:8px; padding:12px 14px; margin-top:10px;">
+          <strong style="color:#003366; display:block; margin-bottom:4px;">📄 Große PDF-Datei(en) automatisch verkleinern (direkt hier im Browser)</strong>
+          <p style="margin:0 0 8px 0; font-size:0.88rem; color:#222;">
+            Handy-Scans mit vielen Bildern werden oft sehr groß. Ihre PDF-Datei wird direkt auf Ihrem Gerät verkleinert (kein fremder Server, 100 % vertraulich):
+          </p>
+          <select id="uk-pdf-mode" class="uk-select">
+            <option value="sw">⚫⚪ Verkleinern &amp; in Schwarz-Weiß umwandeln (spart bis zu 85 % – ideal für Briefe &amp; Bescheide)</option>
+            <option value="color">🎨 Verkleinern, aber Farbe behalten (ideal für Ausweise &amp; bunte Dokumente)</option>
+            <option value="orig">📎 Original-PDF unverändert lassen (nur bis max. 15 MB)</option>
+          </select>
+          <div style="font-size:0.8rem; color:#455a64; margin-top:6px;">
+            Tipp für Windows-PC: Zum vorherigen Zusammenfügen oder Bearbeiten großer PDFs eignet sich auch das kostenlose Offline-Programm <a href="https://tools.pdf24.org/de/pdf-verkleinern" target="_blank" rel="noopener">PDF24</a>.
+          </div>
+        </div>
 
         <!-- Abgestufte Foto-Schutz-Abfrage (wird bei Fotos oder Thema "Fotos" besonders hervorgehoben) -->
         <div id="uk-photo-consent-box" class="uk-photo-consent-box">
@@ -248,6 +265,78 @@
     <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+<script>
+  window.fflwCompressPdfFile = async function (file, options) {
+    const opts = options || {};
+    const grayscale = !!opts.grayscale;
+    const targetScale = opts.scale || 1.35;
+    const jpegQuality = opts.quality || 0.68;
+
+    if (!window.pdfjsLib || !window.jspdf || !window.jspdf.jsPDF) {
+      throw new Error("PDF-Bibliothek im Browser nicht verfügbar.");
+    }
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const totalPages = pdfDoc.numPages;
+
+    let outPdf = null;
+    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+      if (typeof opts.onProgress === "function") {
+        opts.onProgress(pageNum, totalPages);
+      }
+      const page = await pdfDoc.getPage(pageNum);
+      const viewport = page.getViewport({ scale: targetScale });
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(viewport.width);
+      canvas.height = Math.round(viewport.height);
+      const ctx = canvas.getContext("2d");
+
+      await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+      if (grayscale) {
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imgData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          let lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+          lum = lum < 140 ? Math.max(0, lum * 0.85) : Math.min(255, lum * 1.08);
+          d[i] = d[i + 1] = d[i + 2] = lum;
+        }
+        ctx.putImageData(imgData, 0, 0);
+      }
+
+      const pageDataUrl = canvas.toDataURL("image/jpeg", jpegQuality);
+      const orientation = canvas.width > canvas.height ? "l" : "p";
+      const pageW = viewport.width * 0.264583;
+      const pageH = viewport.height * 0.264583;
+
+      if (pageNum === 1) {
+        outPdf = new window.jspdf.jsPDF({ orientation: orientation, unit: "mm", format: [pageW, pageH], compress: true });
+      } else {
+        outPdf.addPage([pageW, pageH], orientation);
+      }
+      outPdf.addImage(pageDataUrl, "JPEG", 0, 0, pageW, pageH, undefined, "FAST");
+    }
+
+    const base64Full = outPdf.output("datauristring");
+    const base64Pure = base64Full.split(",")[1];
+    const approxBytes = Math.round((base64Pure.length * 3) / 4);
+    const suffix = grayscale ? "_SW_klein.pdf" : "_klein.pdf";
+    const newName = file.name.replace(/\.pdf$/i, "") + suffix;
+
+    return {
+      fileName: newName,
+      mimeType: "application/pdf",
+      base64: base64Pure,
+      sizeBytes: approxBytes
+    };
+  };
+</script>
+
   <script src="nav-loader.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -271,15 +360,23 @@
 
       const fileInput = document.getElementById("uk-files");
       const previewEl = document.getElementById("uk-file-preview");
+      const pdfOptBox = document.getElementById("uk-pdf-opt-box");
       fileInput.addEventListener("change", function () {
         const list = Array.from(this.files || []);
         if (!list.length) {
           previewEl.style.display = "none";
+          pdfOptBox.style.display = "none";
           return;
         }
+        const hasPdf = list.some(f => (f.type === "application/pdf") || /\.pdf$/i.test(f.name));
+        pdfOptBox.style.display = hasPdf ? "block" : "none";
         previewEl.style.display = "block";
         previewEl.innerHTML = "<strong>Ausgewählte Dateien (" + list.length + "):</strong><ul style='margin:6px 0 0 18px; padding:0;'>" +
-          list.map(f => `<li>${f.name} (${Math.max(1, Math.round(f.size / 1024))} KB)</li>`).join("") +
+          list.map(f => {
+            const mb = (f.size / (1024 * 1024)).toFixed(2);
+            const sizeTxt = f.size >= 1024 * 1024 ? `${mb} MB` : `${Math.max(1, Math.round(f.size / 1024))} KB`;
+            return `<li>${f.name} (${sizeTxt})</li>`;
+          }).join("") +
           "</ul>";
       });
 
@@ -377,6 +474,30 @@
             };
             reader.onerror = reject;
             reader.readAsDataURL(file);
+          } else if (((file.type === "application/pdf") || /\.pdf$/i.test(file.name)) && document.getElementById("uk-pdf-mode").value !== "orig" && typeof window.fflwCompressPdfFile === "function") {
+            const mode = document.getElementById("uk-pdf-mode").value;
+            const msgEl = document.getElementById("uk-submit-msg");
+            window.fflwCompressPdfFile(file, {
+              grayscale: mode === "sw",
+              onProgress: (p, tot) => {
+                if (msgEl) msgEl.textContent = `Verkleinere PDF „${file.name}“ (Seite ${p} von ${tot}) …`;
+              }
+            }).then(res => {
+              const oldKb = Math.max(1, Math.round(file.size / 1024));
+              const newKb = Math.max(1, Math.round(res.sizeBytes / 1024));
+              if (msgEl) msgEl.textContent = `✓ PDF verkleinert: ${oldKb} KB → ${newKb} KB. Übertrage …`;
+              resolve({
+                fileName: res.fileName,
+                mimeType: res.mimeType,
+                base64: res.base64
+              });
+            }).catch(err => {
+              // Fallback auf Originaldatei
+              const reader = new FileReader();
+              reader.onload = ev => resolve({ fileName: file.name, mimeType: "application/pdf", base64: String(ev.target.result || "").split(",")[1] });
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            });
           } else {
             const reader = new FileReader();
             reader.onload = ev => {
@@ -411,10 +532,12 @@
           return;
         }
 
-        const tooBig = rawFiles.find(f => f.size > 15 * 1024 * 1024);
+        const pdfModeNow = document.getElementById("uk-pdf-mode").value;
+        const maxBytesAllowed = pdfModeNow === "orig" ? 15 * 1024 * 1024 : 50 * 1024 * 1024;
+        const tooBig = rawFiles.find(f => f.size > maxBytesAllowed);
         if (tooBig) {
           msgEl.style.color = "#c62828";
-          msgEl.textContent = `Die Datei „${tooBig.name}“ ist größer als 15 MB.`;
+          msgEl.textContent = `Die Datei „${tooBig.name}“ ist zu groß (bitte Verkleinerung aktivieren oder unter 50 MB bleiben).`;
           return;
         }
 

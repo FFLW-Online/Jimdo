@@ -208,9 +208,12 @@
           Bitte gib deinen persönlichen Team- oder Master-Code ein, um die freigegebenen Bereiche zu laden.
         </p>
         <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-          <input type="text" id="m-code-input" class="m-input fflw-masked-code-input" placeholder="Zugangscode eingeben …" style="max-width:240px; font-weight:bold;">
-          <button type="button" id="m-login-btn" class="m-btn">Anmelden</button>
-          <span id="m-login-msg" style="font-weight:bold;"></span>
+          <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:220px; max-width:320px;">
+            <input type="text" id="m-code-input" class="m-input fflw-masked-code-input" placeholder="Zugangscode eingeben …" style="min-height:44px; font-size:1.05rem; font-weight:bold;">
+            <button type="button" id="m-toggle-code-eye" class="m-btn m-btn-grey" title="Code sichtbar machen" style="min-height:44px; padding:0 12px; flex-shrink:0;">👁️</button>
+          </div>
+          <button type="button" id="m-login-btn" class="m-btn" style="min-height:44px; padding:10px 20px;">Anmelden</button>
+          <span id="m-login-msg" style="font-weight:bold; width:100%;"></span>
         </div>
       </section>
 
@@ -234,6 +237,7 @@
           <button type="button" class="m-tab-btn" id="tab-btn-kiimport" data-tab="kiimport" style="display:none; background:#eef2ff; color:#312e81; border-color:#a5b4fc;">🪄 Wohnungs-Import (KI)</button>
           <button type="button" class="m-tab-btn secret-tab" id="tab-btn-akten" data-tab="akten" style="display:none;">🗂️ Personen-Akten (<span id="cnt-akten">0</span>)</button>
           <button type="button" class="m-tab-btn treasure-tab" id="tab-btn-schatz" data-tab="schatz" style="display:none;">✨ Schatzkiste (<span id="cnt-schatz">0</span>)</button>
+          <button type="button" class="m-tab-btn" id="tab-btn-ideentafel" data-tab="ideentafel" style="display:none; background:#fefce8; color:#854d0e; border-color:#fde047;">💡 Ideen &amp; Lob (<span id="cnt-ideentafel">0</span>)</button>
           <button type="button" class="m-tab-btn" id="tab-btn-system" data-tab="system" style="display:none;">⚙ Seitenschutz, URL-Tarnung &amp; Codes</button>
         </div>
 
@@ -455,6 +459,18 @@
           <div id="list-schatz"></div>
         </section>
 
+
+        <!-- TAB 5B: IDEEN- & LOB-TAFEL MODERATION -->
+        <section id="tab-ideentafel" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#ca8a04; background:#fefce8;">
+            <h3 style="margin-top:0; color:#854d0e;">💡 Wichtiges, Ideen &amp; Lob-Tafel verwalten</h3>
+            <p style="margin:0; font-size:0.93rem;">
+              Hier siehst du alle eingereichten Ideen, Lob-Beiträge und wichtigen Hinweise. Du kannst Beiträge auf der öffentlichen Tafel freischalten, eine offizielle Antwort ergänzen oder Beiträge löschen.
+            </p>
+          </div>
+          <div id="list-ideentafel"></div>
+        </section>
+
         <!-- TAB 6: SYSTEM & SEITENSCHUTZ -->
         <section id="tab-system" class="m-tab-panel" style="display:none;">
           <div class="m-card">
@@ -536,6 +552,78 @@
     <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="intern-statistik.html">Statistik</a>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+<script>
+  window.fflwCompressPdfFile = async function (file, options) {
+    const opts = options || {};
+    const grayscale = !!opts.grayscale;
+    const targetScale = opts.scale || 1.35;
+    const jpegQuality = opts.quality || 0.68;
+
+    if (!window.pdfjsLib || !window.jspdf || !window.jspdf.jsPDF) {
+      throw new Error("PDF-Bibliothek im Browser nicht verfügbar.");
+    }
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const totalPages = pdfDoc.numPages;
+
+    let outPdf = null;
+    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+      if (typeof opts.onProgress === "function") {
+        opts.onProgress(pageNum, totalPages);
+      }
+      const page = await pdfDoc.getPage(pageNum);
+      const viewport = page.getViewport({ scale: targetScale });
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(viewport.width);
+      canvas.height = Math.round(viewport.height);
+      const ctx = canvas.getContext("2d");
+
+      await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+      if (grayscale) {
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imgData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          let lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+          lum = lum < 140 ? Math.max(0, lum * 0.85) : Math.min(255, lum * 1.08);
+          d[i] = d[i + 1] = d[i + 2] = lum;
+        }
+        ctx.putImageData(imgData, 0, 0);
+      }
+
+      const pageDataUrl = canvas.toDataURL("image/jpeg", jpegQuality);
+      const orientation = canvas.width > canvas.height ? "l" : "p";
+      const pageW = viewport.width * 0.264583;
+      const pageH = viewport.height * 0.264583;
+
+      if (pageNum === 1) {
+        outPdf = new window.jspdf.jsPDF({ orientation: orientation, unit: "mm", format: [pageW, pageH], compress: true });
+      } else {
+        outPdf.addPage([pageW, pageH], orientation);
+      }
+      outPdf.addImage(pageDataUrl, "JPEG", 0, 0, pageW, pageH, undefined, "FAST");
+    }
+
+    const base64Full = outPdf.output("datauristring");
+    const base64Pure = base64Full.split(",")[1];
+    const approxBytes = Math.round((base64Pure.length * 3) / 4);
+    const suffix = grayscale ? "_SW_klein.pdf" : "_klein.pdf";
+    const newName = file.name.replace(/\.pdf$/i, "") + suffix;
+
+    return {
+      fileName: newName,
+      mimeType: "application/pdf",
+      base64: base64Pure,
+      sizeBytes: approxBytes
+    };
+  };
+</script>
+
   <script src="nav-loader.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -553,6 +641,14 @@
       const codeInput = document.getElementById("m-code-input");
       if (typeof window.fflwNeutralizeCodeInput === "function") {
         window.fflwNeutralizeCodeInput(codeInput);
+      }
+      const eyeBtn = document.getElementById("m-toggle-code-eye");
+      if (eyeBtn && codeInput) {
+        eyeBtn.addEventListener("click", () => {
+          const isUnmasked = codeInput.classList.toggle("fflw-unmasked");
+          codeInput.style.webkitTextSecurity = isUnmasked ? "none" : "disc";
+          eyeBtn.textContent = isUnmasked ? "🙈" : "👁️";
+        });
       }
 
       let currentCode = sessionStorage.getItem("fflw_master_session_code") || "";
@@ -610,6 +706,7 @@
         document.getElementById("tab-btn-kiimport").style.display = canPublish ? "inline-block" : "none";
         document.getElementById("tab-btn-akten").style.display = isSuper ? "inline-block" : "none";
         document.getElementById("tab-btn-schatz").style.display = canSeeTreasure ? "inline-block" : "none";
+        document.getElementById("tab-btn-ideentafel").style.display = canSeeTreasure ? "inline-block" : "none";
         document.getElementById("tab-btn-system").style.display = isSuper ? "inline-block" : "none";
 
         renderAllSections(data);
@@ -618,7 +715,7 @@
       async function loadMasterData(codeToUse, silentBackground) {
         const msgEl = document.getElementById("m-login-msg");
         const loginBtn = document.getElementById("m-login-btn");
-        const code = String(codeToUse || codeInput.value || "").trim();
+        const code = String(codeToUse || codeInput.value || "").replace(/\s+/g, "").trim();
         if (!code) {
           msgEl.style.color = "#c62828";
           msgEl.textContent = "Bitte Zugangscode eingeben.";
@@ -778,8 +875,19 @@
         renderSchatzListe(schatzListe);
       }
 
-      function readAdminFile(file) {
+      function readAdminFile(file, pdfMode) {
         return new Promise((resolve, reject) => {
+          if (((file.type === "application/pdf") || /\.pdf$/i.test(file.name)) && pdfMode && pdfMode !== "orig" && typeof window.fflwCompressPdfFile === "function") {
+            window.fflwCompressPdfFile(file, { grayscale: pdfMode === "sw" })
+              .then(res => resolve({ fileName: res.fileName, mimeType: res.mimeType, base64: res.base64 }))
+              .catch(() => {
+                const reader = new FileReader();
+                reader.onload = ev => resolve({ fileName: file.name, mimeType: "application/pdf", base64: String(ev.target.result || "").split(",")[1] });
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+              });
+            return;
+          }
           if (file.type && file.type.startsWith("image/")) {
             const reader = new FileReader();
             reader.onload = ev => {
@@ -920,6 +1028,14 @@
                 <div>
                   <label style="font-size:0.8rem; font-weight:bold;">Datei(en) auswählen</label>
                   <input type="file" class="m-input adm-up-files" multiple style="padding:5px;">
+                </div>
+                <div>
+                  <label style="font-size:0.8rem; font-weight:bold;">PDF-Option (bei großen Scans)</label>
+                  <select class="m-select adm-up-pdfmode">
+                    <option value="sw">⚫⚪ PDF verkleinern + Schwarz-Weiß</option>
+                    <option value="color">🎨 PDF verkleinern (Farbe)</option>
+                    <option value="orig">📎 Original-PDF behalten</option>
+                  </select>
                 </div>
               </div>
               <div style="margin-top:8px;">
@@ -1106,7 +1222,8 @@
             if (!rawFiles.length) { alert("Bitte zuerst eine Datei auswählen."); return; }
             const task = async () => {
               const prepared = [];
-              for (let i = 0; i < rawFiles.length; i++) prepared.push(await readAdminFile(rawFiles[i]));
+              const pdfMode = (wrap.querySelector(".adm-up-pdfmode") && wrap.querySelector(".adm-up-pdfmode").value) || "sw";
+              for (let i = 0; i < rawFiles.length; i++) prepared.push(await readAdminFile(rawFiles[i], pdfMode));
               const res = await postAction({
                 action: "adminUploadToCase",
                 akteId: btn.dataset.akteid,
@@ -1417,6 +1534,68 @@
         await postAction({ action: "admin_release_all" });
         loadMasterData(currentCode, false);
       });
+
+
+      function renderIdeenTafelMaster(liste) {
+        const arr = Array.isArray(liste) ? liste : [];
+        const cntEl = document.getElementById("cnt-ideentafel");
+        const container = document.getElementById("list-ideentafel");
+        if (cntEl) cntEl.textContent = arr.length;
+        if (!container) return;
+        if (!arr.length) {
+          container.innerHTML = "<div class='m-card'><p>Noch keine Beiträge auf der Ideen- &amp; Lob-Tafel.</p></div>";
+          return;
+        }
+        container.innerHTML = arr.map(it => {
+          const isPublic = it.status === "freigegeben";
+          return `
+            <div class="m-card" style="border-left-color:${isPublic ? "#16a34a" : "#d97706"};">
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px;">
+                <div>
+                  <span class="m-badge" style="background:${isPublic ? "#dcfce7; color:#166534;" : "#fef3c7; color:#92400e;"}">${isPublic ? "🌐 Öffentlich" : "⏳ Neu / Wartet auf Freigabe"}</span>
+                  <span class="m-badge" style="background:#e0e7ff; color:#1e3a8a; margin-left:4px;">${it.typ || "Idee"}</span>
+                  <strong style="margin-left:6px; font-size:1.05rem;">${it.titel || "Ohne Titel"}</strong>
+                </div>
+                <div style="font-size:0.86rem; color:#475569;">
+                  von <strong>${it.autor || "Anonym"}</strong>${it.personenCode ? ` · Personen-Nr.: <strong>${it.personenCode}</strong>` : ""}
+                </div>
+              </div>
+              <p style="margin:8px 0; white-space:pre-line;">${it.text || ""}</p>
+              <div style="margin-top:8px;">
+                <label style="font-size:0.84rem; font-weight:bold;">Offizielle Antwort vom Freundeskreis (erscheint öffentlich unter dem Beitrag):</label>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:4px;">
+                  <input type="text" class="m-input it-adm-reply" data-fid="${it.fileId}" value="${String(it.antwortTeam || "").replace(/"/g, "&quot;")}" placeholder="Optional: Antwort oder Rückmeldung des Teams …" style="flex:1; min-width:240px;">
+                  <button type="button" class="m-btn m-btn-green btn-it-publish" data-fid="${it.fileId}">🌐 Freigeben &amp; Antwort speichern</button>
+                  ${isPublic ? `<button type="button" class="m-btn m-btn-grey btn-it-hide" data-fid="${it.fileId}">Verbergen</button>` : ""}
+                  <button type="button" class="m-btn m-btn-red btn-it-del" data-fid="${it.fileId}">🗑 Löschen</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        container.querySelectorAll(".btn-it-publish").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const fid = btn.dataset.fid;
+            const replyInp = container.querySelector(`.it-adm-reply[data-fid="${fid}"]`);
+            await postAction({ action: "manageIdeaWallEntry", fileId: fid, status: "freigegeben", antwortTeam: replyInp ? replyInp.value : "" });
+            loadMasterData(currentCode, false);
+          });
+        });
+        container.querySelectorAll(".btn-it-hide").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            await postAction({ action: "manageIdeaWallEntry", fileId: btn.dataset.fid, status: "neu" });
+            loadMasterData(currentCode, false);
+          });
+        });
+        container.querySelectorAll(".btn-it-del").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            if (!confirm("Diesen Beitrag wirklich löschen?")) return;
+            await postAction({ action: "manageIdeaWallEntry", fileId: btn.dataset.fid, mode: "delete" });
+            loadMasterData(currentCode, false);
+          });
+        });
+      }
 
       // =====================================================================
       // WOHNUNGS-IMPORT & KI-GRÖSSENSCHÄTZUNG (VARIANTE B)

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>Wichtiges, Ideen &amp; Lob-Tafel 💡 | FFLW</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .it-wrap { max-width: 960px; margin: 0 auto; }
+    .it-card {
+      background: #ffffff;
+      border: 1px solid #d0d7de;
+      border-left: 5px solid #004080;
+      border-radius: 10px;
+      padding: 20px 22px;
+      margin: 18px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .it-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+    .it-label { display: block; font-weight: bold; margin: 10px 0 5px 0; color: #003366; }
+    .it-input, .it-select, .it-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      border: 1px solid #9aa5b1;
+      border-radius: 7px;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    .it-btn {
+      background: #004080;
+      color: #ffffff;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .it-btn:hover { background: #002b57; }
+    .it-pin {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 12px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .it-pin.typ-lob { border-left: 6px solid #16a34a; background: #f0fdf4; }
+    .it-pin.typ-idee { border-left: 6px solid #2563eb; background: #eff6ff; }
+    .it-pin.typ-wichtig { border-left: 6px solid #d97706; background: #fffbeb; }
+    .it-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: bold;
+    }
+    .it-reply {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #ffffff;
+      border-left: 3px solid #004080;
+      border-radius: 6px;
+      font-size: 0.93rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <a href="index.html" class="brand-link" aria-label="Zur Startseite">
+          <img src="logo.png" alt="Logo Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden" class="brand-logo">
+          <div class="brand-text">
+            <h1>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</h1>
+            <p class="subtitle">Wichtiges, Ideen &amp; Lob-Tafel 💡</p>
+          </div>
+        </a>
+      </div>
+      <div id="main-nav"></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="it-wrap">
+      <h2>Wichtiges, Ideen &amp; Lob-Tafel 💡</h2>
+      <p>
+        Hier ist Platz für alles, was uns gemeinsam weiterbringt: <strong>gute Ideen für Begegnungen &amp; Angebote</strong>, ein <strong>herzliches Dankeschön oder Lob</strong> an Helferinnen, Helfer und Nachbarn oder ein <strong>wichtiger Hinweis</strong> für den Freundeskreis.
+      </p>
+
+      <!-- Beitrag einreichen -->
+      <section class="it-card" style="border-left-color:#15803d;">
+        <h3 style="margin-top:0; color:#14532d;">✍️ Neuen Beitrag an die Tafel heften</h3>
+        <form id="it-form">
+          <div class="it-grid">
+            <div>
+              <label class="it-label" for="it-typ">Art des Beitrags *</label>
+              <select id="it-typ" class="it-select">
+                <option value="Idee">💡 Idee / Verbesserungsvorschlag</option>
+                <option value="Lob">❤️ Lob / Dankeschön</option>
+                <option value="Wichtig">📌 Wichtiger Hinweis / Anliegen</option>
+              </select>
+            </div>
+            <div>
+              <label class="it-label" for="it-autor">Dein Name (oder „Anonym“)</label>
+              <input type="text" id="it-autor" class="it-input" placeholder="z. B. Ahmad, Maria oder Anonym">
+            </div>
+            <div>
+              <label class="it-label" for="it-code">Persönliche 6-stellige Nummer (optional)</label>
+              <input type="text" id="it-code" class="it-input" inputmode="numeric" maxlength="10" placeholder="Falls vorhanden (nur intern sichtbar)">
+            </div>
+          </div>
+
+          <label class="it-label" for="it-titel">Kurze Überschrift *</label>
+          <input type="text" id="it-titel" class="it-input" required placeholder="z. B. Gemeinsames Sommerfest, Danke für die Begleitung zum Amt, Idee für Schachgruppe …">
+
+          <label class="it-label" for="it-text">Deine Nachricht *</label>
+          <textarea id="it-text" class="it-textarea" rows="3" required placeholder="Schreibe hier deine Idee, dein Lob oder deinen Hinweis …"></textarea>
+
+          <p style="font-size:0.84rem; color:#475569; margin:8px 0 12px 0;">
+            Hinweis: Deine persönliche Nummer oder Kontaktdaten werden niemals öffentlich angezeigt. Neue Beiträge werden kurz vom Team gesichtet und danach auf der Tafel freigeschaltet.
+          </p>
+
+          <div style="display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
+            <button type="submit" id="it-submit-btn" class="it-btn">📌 Beitrag absenden</button>
+            <span id="it-msg" style="font-weight:bold;"></span>
+          </div>
+        </form>
+      </section>
+
+      <!-- Öffentliche Pinnwand -->
+      <section class="it-card">
+        <h3 style="margin-top:0; color:#003366;">📋 Veröffentlichte Ideen, Lob &amp; wichtige Hinweise</h3>
+        <div id="it-wall-list"><p style="color:#475569;">Lade Beiträge …</p></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    (function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      const wallEl = document.getElementById("it-wall-list");
+
+      async function loadWall() {
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=getIdeaWall&t=${Date.now()}`, { method: "GET", redirect: "follow" });
+          const res = await resp.json();
+          const list = (res && Array.isArray(res.liste)) ? res.liste : [];
+          if (!list.length) {
+            wallEl.innerHTML = "<p style='color:#475569;'>Noch keine veröffentlichten Beiträge vorhanden – mache gerne den Anfang!</p>";
+            return;
+          }
+          wallEl.innerHTML = list.map(item => {
+            const typLow = String(item.typ || "Idee").toLowerCase();
+            const cls = typLow.includes("lob") ? "typ-lob" : (typLow.includes("wichtig") ? "typ-wichtig" : "typ-idee");
+            const badgeBg = typLow.includes("lob") ? "#dcfce7; color:#166534;" : (typLow.includes("wichtig") ? "#fef3c7; color:#92400e;" : "#dbeafe; color:#1e40af;");
+            const icon = typLow.includes("lob") ? "❤️ Lob" : (typLow.includes("wichtig") ? "📌 Wichtig" : "💡 Idee");
+            const dateTxt = item.createdAt ? new Date(item.createdAt).toLocaleDateString("de-DE") : "";
+            return `
+              <article class="it-pin ${cls}">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; align-items:center;">
+                  <span class="it-badge" style="background:${badgeBg}">${icon}</span>
+                  <span style="font-size:0.84rem; color:#475569;">von <strong>${item.autor || "Anonym"}</strong>${dateTxt ? " · " + dateTxt : ""}</span>
+                </div>
+                <h4 style="margin:8px 0 6px 0; color:#0f172a;">${item.titel}</h4>
+                <p style="margin:0; white-space:pre-line;">${item.text}</p>
+                ${item.antwortTeam ? `<div class="it-reply"><strong>💬 Antwort vom Freundeskreis:</strong><br>${item.antwortTeam}</div>` : ""}
+              </article>
+            `;
+          }).join("");
+        } catch (e) {
+          wallEl.innerHTML = "<p style='color:#b91c1c;'>Beiträge konnten gerade nicht geladen werden.</p>";
+        }
+      }
+
+      document.getElementById("it-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const btn = document.getElementById("it-submit-btn");
+        const msgEl = document.getElementById("it-msg");
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.style.background = "#d97706";
+        btn.innerHTML = "⏳ Sende Beitrag …";
+
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "submitIdeaWallEntry",
+              typ: document.getElementById("it-typ").value,
+              autor: document.getElementById("it-autor").value.trim() || "Anonym",
+              personenCode: document.getElementById("it-code").value.trim(),
+              titel: document.getElementById("it-titel").value.trim(),
+              text: document.getElementById("it-text").value.trim()
+            })
+          });
+          const res = await resp.json();
+          if (res && res.ok) {
+            btn.disabled = false;
+            btn.style.background = "#15803d";
+            btn.innerHTML = "✓ Gesendet!";
+            msgEl.style.color = "#15803d";
+            msgEl.textContent = "Vielen Dank! Dein Beitrag ist eingegangen und wird in Kürze auf der Tafel veröffentlicht.";
+            this.reset();
+            setTimeout(() => { btn.style.background = "#004080"; btn.innerHTML = origHtml; }, 3500);
+          } else {
+            throw new Error((res && res.error) ? res.error : "Fehler beim Senden.");
+          }
+        } catch (err) {
+          btn.disabled = false;
+          btn.style.background = "#b91c1c";
+          btn.innerHTML = "✕ Fehler";
+          msgEl.style.color = "#b91c1c";
+          msgEl.textContent = err.message;
+          setTimeout(() => { btn.style.background = "#004080"; btn.innerHTML = origHtml; }, 3500);
+        }
+      });
+
+      loadWall();
+    })();
+  </script>
+</body>
+</html>
