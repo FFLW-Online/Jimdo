@@ -3,60 +3,25 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Begegnungs-Tipps – Offenes Wir &amp; Gesprächs-Ideen | FFLW</title>
+  <title>Begegnungs-Tipps (100 Ideen) | Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .fflw-dev-banner {
-      background: #fffbeb;
-      border: 1px solid #f59e0b;
-      border-left: 5px solid #d97706;
-      border-radius: 8px;
-      padding: 12px 15px;
-      margin: 12px 0 18px 0;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 0.93rem;
-    }
-    .fflw-dev-btn {
-      display: inline-block;
-      background: #b45309;
-      color: #ffffff !important;
-      text-decoration: none;
-      padding: 7px 13px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 0.88rem;
-      white-space: nowrap;
-    }
-    .bt-section {
+    .bt-card {
       background: #ffffff;
-      border: 1px solid #d0d7de;
-      border-left: 5px solid #004080;
-      border-radius: 8px;
-      padding: 16px 18px;
-      margin: 16px 0;
-    }
-    .bt-section.is-green { border-left-color: #2e7d32; }
-    .bt-section h3 { margin-top: 0; color: #003366; }
-    .bt-section.is-green h3 { color: #1b5e20; }
-    .bt-list { margin: 8px 0 0 0; padding-left: 20px; }
-    .bt-list li { margin-bottom: 8px; line-height: 1.5; }
-    .bt-quote {
-      background: #f4f8fc;
       border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      padding: 10px 12px;
-      margin: 8px 0;
+      border-left: 5px solid #004080;
+      border-radius: 9px;
+      padding: 16px 18px;
+      margin: 14px 0;
+      line-height: 1.55;
     }
     .bt-impulse {
       background: #f0fdf4;
-      border: 1px solid #86efac;
-      border-radius: 8px;
-      padding: 14px 16px;
-      margin-top: 12px;
+      border: 1.5px solid #86efac;
+      border-left: 6px solid #15803d;
+      border-radius: 9px;
+      padding: 16px 18px;
+      margin-top: 14px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
@@ -66,10 +31,28 @@
       background: #15803d;
       color: #ffffff;
       border: none;
-      padding: 9px 14px;
+      padding: 10px 16px;
       border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
+    }
+    .bt-btn-blue { background: #004080; }
+    .bt-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #94a3b8;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    .bt-all-list {
+      max-height: 360px;
+      overflow-y: auto;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #f8fafc;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -84,70 +67,46 @@
     <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
 
     <main class="content">
-      <h2>Begegnungs-Tipps – Ein „offenes Wir“ leben</h2>
+      <h2>Begegnungs-Tipps – 100 Gesprächs-Ideen für ein „offenes Wir“</h2>
 
-      <div class="fflw-dev-banner">
-        <span>🚧 <strong>Hinweis:</strong> Diese Seite ist noch in der Entwicklung. Für Hinweise zur Verbesserung oder falls etwas nicht funktioniert, sind wir dankbar.</span>
-        <a id="dev-feedback-mail" class="fflw-dev-btn" href="mailto:Kontakt@freundeleuwi.org">✉️ Hinweis per E-Mail senden</a>
+      <section class="bt-card">
+        <h3 style="margin-top:0; color:#003366;">Gute Gespräche entstehen oft durch eine kleine, herzliche Frage</h3>
+        <ul style="margin-bottom:0;">
+          <li><strong>Auf Augenhöhe &amp; mit Geduld:</strong> Einfache Sätze, ein Lächeln und gemeinsames Tun (Kochen, Spielen, Fotos zeigen) verbinden oft schneller als viele Worte.</li>
+          <li><strong>Interesse statt Ausfragen:</strong> Offene Fragen nach Lieblingsessen, Musik, Traditionen oder gemeinsamen Erlebnissen vor Ort schaffen Vertrauen.</li>
+        </ul>
+      </section>
+
+      <div class="bt-impulse">
+        <div style="font-size:0.86rem; color:#166534; font-weight:bold;">
+          Gesprächs-Idee <span id="bt-counter">1</span> von <span id="bt-total">100</span>:
+        </div>
+        <div id="bt-random-question" style="font-size:1.08rem; font-weight:bold; color:#0f172a; min-height:2.6em;">
+          „Welches Gericht aus deiner Heimat würdest du gerne einmal gemeinsam kochen?“
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button type="button" id="bt-next-question-btn" class="bt-btn">↻ Nächste Gesprächs-Idee</button>
+          <button type="button" id="bt-random-btn" class="bt-btn bt-btn-blue">🎲 Zufälliger Tipp</button>
+        </div>
       </div>
 
-      <p>
-        Unser Begegnungstreffen lebt davon, dass ein <strong>„offenes Wir“</strong> entsteht: ein Ort, an dem niemand allein am Rand sitzen muss und an dem man leicht miteinander ins Gespräch kommt. Manchmal weiß man im ersten Moment nicht genau, wie man anfangen soll – diese kleinen Tipps helfen beiden Seiten.
-      </p>
-
-      <section class="bt-section">
-        <h3>1. Für alle, die schon in einer Runde sitzen: Offene Augen, offene Herzen</h3>
-        <p style="margin-top:0;">
-          Wenn man sich gerade gut unterhält, schließt sich ein Stuhlkreis oft unbewusst. So bleibt unsere Runde offen für andere:
+      <!-- Eingabefeld darunter zum Erweitern der Tipps -->
+      <section class="bt-card" style="border-left-color:#d97706; background:#fffbeb;">
+        <h3 style="margin-top:0; color:#92400e;">✍️ Eigene Gesprächs-Idee oder Begegnungs-Tipp hinzufügen</h3>
+        <p style="margin-top:0; font-size:0.93rem;">
+          Hast du eine gute Frage oder einen Tipp, der bei Treffen super funktioniert hat? Ergänze die Liste direkt hier – dein Tipp wird sofort in die Auswahl aufgenommen und auch an unser Team übermittelt:
         </p>
-        <ul class="bt-list">
-          <li><strong>Einen Stuhl frei lassen:</strong> Die Stühle nicht ganz eng zusammenschieben, sondern eine sichtbare Lücke zum Raum hin lassen.</li>
-          <li><strong>Blickkontakt &amp; Lächeln:</strong> Immer wieder kurz zur Tür und in den Raum schauen. Wer neu hereinkommt, fühlt sich durch ein freundliches Nicken sofort willkommen.</li>
-          <li><strong>Aktiv einladen:</strong> Ein einfaches <em>„Hallo, komm gerne zu uns, hier ist noch ein Platz frei!“</em> nimmt jede Unsicherheit.</li>
-          <li><strong>Kurz abholen:</strong> Wenn jemand dazukommt, kurz den eigenen Namen sagen und in einem Satz erklären, worüber gerade gesprochen wird.</li>
-        </ul>
-      </section>
-
-      <section class="bt-section is-green">
-        <h3>2. Für alle, die neu dazukommen: Du darfst dich ausdrücklich dazusetzen!</h3>
-        <p style="margin-top:0;">
-          Vielleicht wirkt es im ersten Moment ungewohnt oder unhöflich, einfach an einen Tisch zu gehen, an dem schon Menschen sitzen. <strong>Bei uns ist genau das ausdrücklich gewünscht!</strong>
-        </p>
-        <ul class="bt-list">
-          <li><strong>Du störst nicht:</strong> Niemand erwartet, dass du allein wartest, bis dich jemand anspricht. Geh ruhig auf eine Gruppe zu.</li>
-          <li><strong>Ein Satz reicht als Türöffner:</strong> Mit <em>„Hallo, darf ich mich zu euch setzen?“</em> öffnest du jede Runde sofort.</li>
-          <li><strong>Kein perfektes Deutsch nötig:</strong> Hände, Füße, ein Lächeln, ein Foto auf dem Handy oder eine Übersetzungs-App helfen immer weiter.</li>
-          <li><strong>Auch Zuhören ist völlig in Ordnung:</strong> Du musst nicht sofort viel erzählen – einfach dabei sein und zuhören gehört genauso dazu.</li>
-        </ul>
-      </section>
-
-      <section class="bt-section">
-        <h3>3. Einfache Sätze für den Anfang</h3>
-        <div class="bt-quote"><strong>Zum Dazusetzen:</strong> „Hallo! Ist hier noch ein Platz frei? Darf ich mich zu euch setzen?“</div>
-        <div class="bt-quote"><strong>Zum Kennenlernen:</strong> „Ich bin heute zum ersten Mal hier – wie heißt du? Kommst du öfter zum Treffen?“</div>
-        <div class="bt-quote"><strong>Für Gastgeber in der Runde:</strong> „Schön, dass du da bist! Komm setz dich zu uns – möchtest du einen Kaffee oder Tee?“</div>
-        <div class="bt-quote"><strong>Wenn man etwas nicht versteht:</strong> „Kannst du das bitte noch einmal langsam sagen? Ich lerne noch Deutsch.“</div>
-      </section>
-
-      <section class="bt-section is-green">
-        <h3>4. Worüber kann man reden? Leichte Gesprächs-Ideen</h3>
-        <ul class="bt-list">
-          <li><strong>Essen &amp; Rezepte:</strong> Welches Gericht aus deiner Heimat isst du am liebsten – oder was schmeckt dir hier?</li>
-          <li><strong>Orte in der Umgebung:</strong> Welche schönen Spazierwege, Spielplätze oder Läden kennst du in Leutenbach und Winnenden?</li>
-          <li><strong>Alltag, Hobbys &amp; Musik:</strong> Was machst du gerne in deiner Freizeit (Fußball, Kochen, Garten, Musik, Basteln)?</li>
-          <li><strong>Sprache &amp; Wörter:</strong> Welches deutsche Wort fandest du am Anfang besonders lustig oder schwierig?</li>
-        </ul>
-
-        <div class="bt-impulse">
-          <div>
-            <div style="font-size:0.84rem; color:#475569; font-weight:bold;">Gesprächs-Idee zum Ausprobieren:</div>
-            <div id="bt-random-question" style="font-size:1.02rem; font-weight:bold; color:#0f172a; margin-top:2px;">
-              „Welches Gericht aus deiner Heimat würdest du gerne einmal gemeinsam kochen?“
-            </div>
-          </div>
-          <button type="button" id="bt-next-question-btn" class="bt-btn">↻ Nächste Gesprächs-Idee</button>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+          <input type="text" id="bt-new-tip-input" class="bt-input" placeholder="z. B. Welches Lied aus deiner Heimat erinnert dich an deine Kindheit?" style="flex:1 1 280px;">
+          <button type="button" id="bt-add-tip-btn" class="bt-btn">➕ Tipp hinzufügen</button>
         </div>
+        <div id="bt-add-msg" style="margin-top:8px; font-weight:bold;"></div>
       </section>
+
+      <details class="bt-card" style="cursor:pointer;">
+        <summary style="font-weight:bold; color:#003366;">📖 Alle <span id="bt-summary-count">100</span> Begegnungs-Tipps auf einen Blick anzeigen</summary>
+        <ol id="bt-all-ol" class="bt-all-list"></ol>
+      </details>
     </main>
   </div>
 
@@ -157,46 +116,82 @@
   </section>
 
   <footer class="legal-footer">
-    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="sitemap.html">Sitemap</a>
   </footer>
 
   <script src="nav-loader.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const pageTitle = document.title || "Begegnungs-Tipps";
-      const pageUrl = window.location.href;
-      const devBtn = document.getElementById("dev-feedback-mail");
-      if (devBtn) {
-        const subj = encodeURIComponent(`Hinweis zur Webseite (${pageTitle})`);
-        const body = encodeURIComponent(`Hallo Team,
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      const CUSTOM_KEY = "fflw_custom_begegnung_tips_v1";
+      const baseTips = ["Welches Gericht aus deiner Heimat würdest du gerne einmal gemeinsam kochen?", "Welches deutsche Wort klingt für dich besonders lustig oder schwierig?", "Welche Musik hörst du gerne, wenn du gute Laune bekommen möchtest?", "Was war dein schönstes Erlebnis in Leutenbach oder Winnenden bisher?", "Welchen Ort in deiner Heimat würdest du mir auf einem Foto zeigen?", "Wie begrüßt man sich in deiner Muttersprache unter guten Freunden?", "Welches Fest feiert deine Familie am liebsten – und was gehört unbedingt dazu?", "Trinkst du morgens lieber Tee oder Kaffee – und wie wird er bei euch zubereitet?", "Welches Spiel aus deiner Kindheit kennst du, das wir hier einmal ausprobieren könnten?", "Was hat dich in Deutschland am meisten überrascht?", "Welches Handwerk oder welche Tätigkeit macht dir besonders viel Freude?", "Gibt es ein Sprichwort aus deiner Heimat, das dir im Alltag oft einfällt?", "Welcher Wochentag ist dein Lieblingstag und warum?", "Was hilft dir am meisten beim Deutschlernen im Alltag?", "Welchen Beruf oder welche Ausbildung findest du besonders spannend?", "Was machst du am liebsten an einem sonnigen Sonntagnachmittag?", "Welches Gemüse oder Gewürz darf in deiner Küche niemals fehlen?", "Kannst du mir beibringen, wie man in deiner Sprache ‚Schön, dass du da bist‘ sagt?", "Welche Jahreszeit magst du lieber: Frühling, Sommer, Herbst oder Winter?", "Was war früher in der Schule dein Lieblingsfach?", "Gibt es ein Lied, bei dem in deiner Heimat sofort alle mittanzen?", "Welchen Tipp würdest du jemandem geben, der ganz neu nach Winnenden oder Leutenbach zieht?", "Was bedeutet dein Vorname – hat er eine besondere Geschichte?", "Welches Tier magst du besonders gerne?", "Hast du ein Lieblingsbuch, einen Lieblingsfilm oder eine Serie?", "Wie sieht ein typisches Frühstück in deinem Herkunftsland aus?", "Welchen Sport schaust oder machst du am liebsten?", "Was war das Mutigste, das du in den letzten Jahren gemacht hast?", "Welcher Duft erinnert dich sofort an Zuhause?", "Worüber musstest du diese Woche herzlich lachen?", "Möchtest du lieber im Wald spazieren gehen oder durch die Stadt bummeln?", "Welche Erfindung im Alltag findest du am praktischsten?", "Gibt es eine Tradition bei Hochzeiten in deiner Heimat, die besonders schön ist?", "Welches deutsche Essen hat dir bisher am besten geschmeckt?", "Welches deutsche Essen fandest du am Anfang eher gewöhnungsbedürftig?", "Wofür bist du heute besonders dankbar?", "Wenn du einen Wunsch für unsere Nachbarschaft frei hättest, welcher wäre das?", "Welche Sprache würdest du neben Deutsch gerne noch sprechen können?", "Hast du früher gerne gemalt, gebastelt oder etwas repariert?", "Was machst du, wenn du nach einem anstrengenden Tag entspannen willst?", "Welcher Platz in der Natur rund um Leutenbach & Winnenden gefällt dir besonders gut?", "Welche Süßigkeit oder welchen Kuchen sollte ich unbedingt einmal probieren?", "Wie verbringt man in deiner Heimat normalerweise die Abende im Sommer?", "Gibt es ein Brettspiel oder Kartenspiel, das du mir erklären kannst?", "Was ist dir bei einer guten Freundschaft am wichtigsten?", "Welches Werkzeug kannst du besonders gut bedienen?", "Welche Geschichte aus deiner Familie wird immer wieder gerne erzählt?", "Fährst du gerne Fahrrad – und wohin würdest du gerne einmal eine Tour machen?", "Was war dein erstes deutsches Wort, das du dir sofort merken konntest?", "Welche Farben magst du bei Kleidung oder in der Wohnung am liebsten?", "Gibt es einen Film, den man auch ohne viele Worte gut versteht?", "Wie feiert man bei euch Geburtstage?", "Was würdest du gerne einmal neu ausprobieren, wozu bisher keine Zeit war?", "Welches Geräusch findest du besonders beruhigend (z. B. Regen, Meer, Musik)?", "Hast du einen Geheimtipp gegen Heimweh?", "Welche Pflanze oder Blume wächst in deiner Heimat besonders schön?", "Was schätzt du am Zusammenleben hier im Ort?", "Welches Obst isst du im Sommer am liebsten?", "Kannst du bis zehn in deiner Muttersprache zählen – ich spreche es dir nach!", "Welcher Beruf in deiner Familie hat eine lange Tradition?", "Was macht ein Treffen für dich zu einem richtig guten Treffen?", "Liest du lieber Nachrichten auf dem Handy oder in einer Zeitung?", "Welches Bauwerk oder welche Stadt auf der Welt würdest du gerne einmal besuchen?", "Wie sagt man ‚Guten Appetit‘ in deiner Sprache?", "Was hilft gegen Nervosität vor einem wichtigen Termin oder Vorstellungsgespräch?", "Welches Tier hast du als Kind besonders gerne beobachtet?", "Gibt es ein Hobby, bei dem man gar nicht viel sprechen muss, um Spaß zu haben?", "Welchen Tee trinkt man bei euch, wenn jemand erkältet ist?", "Was war dein schönstes Geschenk, das du jemals bekommen hast?", "Wie sieht für dich ein perfektes Wochenende aus?", "Welche Arbeit im Haushalt oder Garten machst du sogar ganz gerne?", "Welches deutsche Wort hat eine völlig andere Bedeutung, als du zuerst dachtest?", "Singst du manchmal unter der Dusche oder beim Kochen?", "Welcher Filmheld oder welche Persönlichkeit beeindruckt dich?", "Wie wichtig ist Gastfreundschaft in deiner Kultur – wie empfängt man Gäste?", "Was war dein schönster Ausflug in Baden-Württemberg bisher?", "Welche App auf deinem Handy nutzt du jeden Tag?", "Magst du lieber Berge oder das Meer?", "Welches Handyspiel oder Rätsel macht dir Spaß?", "Wie sagt man ‚Danke schön‘ und ‚Bitte sehr‘ in deiner Sprache?", "Welches Foto auf deinem Handy zeigt einen besonders schönen Moment?", "Was würdest du Kindern heute als wichtigsten Ratschlag mitgeben?", "Welche Suppe oder welchen Eintopf isst man bei euch an kalten Tagen?", "Was gefällt dir am Begegnungstreffen am besten?", "Welche Fähigkeit von dir wissen viele andere noch gar nicht?", "Wie begrüßen sich Nachbarn in deiner Heimat auf der Straße?", "Was ist dein Lieblingsgetränk an heißen Sommertagen?", "Welchen Wunschtraum hast du für die nächsten fünf Jahre?", "Gibt es ein Musikinstrument, dessen Klang du besonders liebst?", "Was hat dir am Anfang beim Zurechtfinden im Supermarkt oder Bus geholfen?", "Welches gemeinsame Projekt könnten wir im Freundeskreis einmal starten?", "Wie verbringt man bei euch den Sonntag?", "Welche Blumen oder Kräuter riechen für dich am besten?", "Was bedeutet ‚Zuhause‘ für dich?", "Welches Kompliment hat dich in letzter Zeit besonders gefreut?", "Kannst du ein Zungenbrecher-Wort aus deiner Sprache vorsagen?", "Worauf freust du dich in den nächsten Wochen besonders?", "Welchen Ort in Winnenden oder Leutenbach sollten wir zusammen besuchen?", "Wie sagt man ‚Auf Wiedersehen und bis bald‘ in deiner Muttersprache?", "Was möchtest du einem neuen Ehrenamtlichen mit auf den Weg geben?"];
 
-mein Hinweis bezieht sich auf folgende Seite:
-Seite: ${pageTitle}
-Link: ${pageUrl}
-
-Mein Hinweis / Verbesserungsvorschlag:
-`);
-        devBtn.href = `mailto:Kontakt@freundeleuwi.org?subject=${subj}&body=${body}`;
+      function getAllTips() {
+        let extra = [];
+        try { extra = JSON.parse(localStorage.getItem(CUSTOM_KEY) || "[]"); } catch (e) {}
+        return [...baseTips, ...extra];
       }
 
-      const questions = [
-        "„Welches Gericht aus deiner Heimat würdest du gerne einmal gemeinsam kochen?“",
-        "„Welcher Ort in Leutenbach, Winnenden oder der Umgebung gefällt dir bisher am besten?“",
-        "„Was hast du früher in deiner Freizeit besonders gerne gemacht – oder was möchtest du mal lernen?“",
-        "„Welches Wort auf Deutsch fandest du am Anfang besonders lustig oder schwierig?“",
-        "„Trinkst du lieber Kaffee oder Tee – und wie bereitet man ihn bei euch zu Hause zu?“",
-        "„Gibt es ein Lied, ein Musikinstrument oder einen Sport, der dir sofort gute Laune macht?“",
-        "„Was war in den letzten Tagen ein kleiner schöner Moment für dich?“"
-      ];
-      let idx = 0;
-      const qEl = document.getElementById("bt-random-question");
-      const btn = document.getElementById("bt-next-question-btn");
-      if (btn && qEl) {
-        btn.addEventListener("click", () => {
-          idx = (idx + 1) % questions.length;
-          qEl.textContent = questions[idx];
-        });
+      let allTips = getAllTips();
+      let currentIdx = 0;
+
+      function renderTip(idx) {
+        allTips = getAllTips();
+        if (!allTips.length) return;
+        currentIdx = ((idx % allTips.length) + allTips.length) % allTips.length;
+        document.getElementById("bt-counter").textContent = currentIdx + 1;
+        document.getElementById("bt-total").textContent = allTips.length;
+        document.getElementById("bt-summary-count").textContent = allTips.length;
+        document.getElementById("bt-random-question").textContent = `„${allTips[currentIdx]}“`;
       }
+
+      function renderFullList() {
+        allTips = getAllTips();
+        const ol = document.getElementById("bt-all-ol");
+        ol.innerHTML = allTips.map((t, i) => `<li style="margin:5px 0;">${t}</li>`).join("");
+      }
+
+      document.getElementById("bt-next-question-btn").addEventListener("click", () => renderTip(currentIdx + 1));
+      document.getElementById("bt-random-btn").addEventListener("click", () => {
+        const r = Math.floor(Math.random() * allTips.length);
+        renderTip(r);
+      });
+
+      document.getElementById("bt-add-tip-btn").addEventListener("click", async function () {
+        const inp = document.getElementById("bt-new-tip-input");
+        const msg = document.getElementById("bt-add-msg");
+        const val = inp.value.trim();
+        if (!val) return;
+        let extra = [];
+        try { extra = JSON.parse(localStorage.getItem(CUSTOM_KEY) || "[]"); } catch (e) {}
+        extra.push(val);
+        try { localStorage.setItem(CUSTOM_KEY, JSON.stringify(extra)); } catch (e) {}
+        inp.value = "";
+        allTips = getAllTips();
+        renderTip(allTips.length - 1);
+        renderFullList();
+        msg.style.color = "#15803d";
+        msg.textContent = "✓ Vielen Dank! Dein Tipp wurde zur Liste hinzugefügt.";
+
+        // Optional auch ans Ideen-Backend senden
+        try {
+          await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "submitIdeaWallEntry",
+              typ: "Begegnungs-Tipp",
+              titel: "Neuer Gesprächs-Tipp",
+              text: val,
+              autor: "Besucher"
+            })
+          });
+        } catch (e) {}
+      });
+
+      renderTip(0);
+      renderFullList();
     });
   </script>
 </body>

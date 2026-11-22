@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eigenes Konto anlegen &amp; Login | Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .kt-hero {
+      background: #eef6fc;
+      border: 1.5px solid #90caf9;
+      border-left: 6px solid #004080;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 14px 0 18px 0;
+      line-height: 1.55;
+    }
+    .kt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 16px;
+    }
+    .kt-card {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-top: 5px solid #004080;
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .kt-card.green { border-top-color: #2e7d32; }
+    .kt-label { display: block; font-weight: bold; color: #003366; margin: 10px 0 4px 0; font-size: 0.93rem; }
+    .kt-input {
+      width: 100%; padding: 10px 12px; border: 1.5px solid #94a3b8; border-radius: 6px; font-size: 16px; box-sizing: border-box;
+    }
+    .kt-btn {
+      background: #004080; color: #ffffff; border: none; padding: 11px 18px; border-radius: 7px; font-weight: bold; font-size: 0.96rem; cursor: pointer; margin-top: 12px;
+    }
+    .kt-btn-green { background: #2e7d32; }
+    .kt-btn-grey { background: #64748b; }
+    .kt-active-box {
+      background: #f0fdf4; border: 2px solid #4ade80; border-left: 6px solid #16a34a; border-radius: 10px; padding: 16px 20px; margin-bottom: 18px; display: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>👤 Eigenes Konto anlegen &amp; verwalten</h2>
+
+      <section class="kt-hero">
+        <h3 style="margin-top:0; color:#003366;">Warum lohnt sich ein eigenes Konto beim Freundeskreis?</h3>
+        <ul style="margin:6px 0;">
+          <li><strong>Kein ständiges Neu-Eintippen:</strong> Einmal eingeloggt, sind Name, Kontakt und deine 6-stellige Nummer automatisch für <strong>Schatzsuche, Bedarfsanmeldung, Möbel-Reservierungen und Radanfragen</strong> bereit.</li>
+          <li><strong>Keine Verwechslung bei Namen:</strong> Wenn Namen aus anderen Sprachen ins Deutsche übertragen werden, gibt es oft verschiedene Schreibweisen – dein Konto ordnet alles eindeutig dir zu.</li>
+          <li><strong>🕵️ Anonym-Option jederzeit umschaltbar:</strong> Wenn du möchtest, kannst du dein Konto mit einem Klick auf <strong>„Anonym“</strong> umstellen – dann erscheint nach außen hin nicht dein Klarnamen.</li>
+          <li><strong>Prüfung &amp; Freischaltung durch unser Team:</strong> Nach der Registrierung prüfen wir dein Konto kurz und schalten es frei. Falls du dein Passwort einmal vergisst, kann unser Team dir weiterhelfen.</li>
+        </ul>
+        <p style="margin-bottom:0; font-size:0.92rem; color:#1e3a8a;">
+          <em>Hinweis:</em> Auch <strong>ohne eigenes Konto</strong> kannst du im Warenhaus weiterhin jederzeit Angebote mit dem Zugangscode <strong>11</strong> reservieren!
+        </p>
+      </section>
+
+      <!-- Aktives Konto Panel (wenn eingeloggt) -->
+      <section id="kt-logged-in-box" class="kt-active-box">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+          <div>
+            <h3 style="margin:0; color:#14532d;">✓ Du bist angemeldet: <span id="kt-disp-user"></span></h3>
+            <p id="kt-disp-details" style="margin:4px 0 0 0; font-size:0.93rem;"></p>
+          </div>
+          <button type="button" id="kt-logout-btn" class="kt-btn kt-btn-grey" style="margin-top:0;">Abmelden</button>
+        </div>
+        <div style="margin-top:12px; padding-top:12px; border-top:1px solid #86efac;">
+          <label style="display:flex; align-items:center; gap:10px; font-weight:bold; cursor:pointer; color:#14532d;">
+            <input type="checkbox" id="kt-anonym-toggle" style="width:20px; height:20px;">
+            🕵️ Konto auf „Anonym“ stellen (bei Anfragen und Einträgen keinen Klarnamen anzeigen)
+          </label>
+          <div id="kt-pref-msg" style="margin-top:6px; font-weight:bold; font-size:0.9rem;"></div>
+        </div>
+      </section>
+
+      <div class="kt-grid">
+        <!-- Login -->
+        <section class="kt-card">
+          <h3 style="margin-top:0; color:#003366;">🔑 Mit bestehendem Konto anmelden</h3>
+          <form id="kt-login-form">
+            <label class="kt-label" for="kt-login-user">Benutzername *</label>
+            <input type="text" id="kt-login-user" class="kt-input" required placeholder="Dein Benutzername">
+
+            <label class="kt-label" for="kt-login-pass">Passwort *</label>
+            <input type="password" id="kt-login-pass" class="kt-input" required placeholder="Dein Passwort">
+
+            <button type="submit" id="kt-login-btn" class="kt-btn">Anmelden</button>
+            <div id="kt-login-msg" style="margin-top:8px; font-weight:bold;"></div>
+          </form>
+        </section>
+
+        <!-- Neu registrieren -->
+        <section class="kt-card green">
+          <h3 style="margin-top:0; color:#1b5e20;">✨ Neues Konto beantragen</h3>
+          <form id="kt-reg-form">
+            <label class="kt-label" for="kt-reg-user">Gewünschter Benutzername * <small>(mind. 3 Zeichen, ohne Leerzeichen)</small></label>
+            <input type="text" id="kt-reg-user" class="kt-input" required minlength="3" placeholder="z. B. ahmad.k">
+
+            <label class="kt-label" for="kt-reg-pass">Eigenes Passwort * <small>(Vorgabe: mind. 6 Zeichen)</small></label>
+            <input type="text" id="kt-reg-pass" class="kt-input" required minlength="6" placeholder="Mindestens 6 Zeichen">
+
+            <label class="kt-label" for="kt-reg-name">Vor- und Nachname *</label>
+            <input type="text" id="kt-reg-name" class="kt-input" required placeholder="Dein Name">
+
+            <label class="kt-label" for="kt-reg-kontakt">Telefon / WhatsApp oder E-Mail *</label>
+            <input type="text" id="kt-reg-kontakt" class="kt-input" required placeholder="Für Rückfragen & Freischaltung">
+
+            <label class="kt-label" for="kt-reg-code">Bestehende 6-stellige Nummer (optional)</label>
+            <input type="text" id="kt-reg-code" class="kt-input" inputmode="numeric" maxlength="10" placeholder="Falls du schon eine Schatzsuche-Nummer hast">
+
+            <label style="display:flex; align-items:center; gap:8px; margin-top:10px; font-size:0.92rem; cursor:pointer;">
+              <input type="checkbox" id="kt-reg-anonym" style="width:18px; height:18px;">
+              Direkt im <strong>Anonym-Modus</strong> starten
+            </label>
+
+            <button type="submit" id="kt-reg-btn" class="kt-btn kt-btn-green">Konto beantragen</button>
+            <div id="kt-reg-msg" style="margin-top:8px; font-weight:bold;"></div>
+          </form>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="sitemap.html">Sitemap</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+
+      function renderActiveAccount() {
+        if (!window.FFLW_Account) return;
+        const acc = window.FFLW_Account.get();
+        const box = document.getElementById("kt-logged-in-box");
+        if (acc && acc.username) {
+          box.style.display = "block";
+          document.getElementById("kt-disp-user").textContent = acc.username;
+          document.getElementById("kt-disp-details").textContent =
+            `Name: ${acc.name || "-"} | Kontakt: ${acc.kontakt || "-"} ${acc.code ? "| 6-stellige Nr.: " + acc.code : ""}`;
+          document.getElementById("kt-anonym-toggle").checked = !!acc.anonym;
+        } else {
+          box.style.display = "none";
+        }
+      }
+      renderActiveAccount();
+
+      document.getElementById("kt-logout-btn").addEventListener("click", () => {
+        if (window.FFLW_Account) window.FFLW_Account.clear();
+        renderActiveAccount();
+      });
+
+      document.getElementById("kt-anonym-toggle").addEventListener("change", async function () {
+        if (!window.FFLW_Account) return;
+        const acc = window.FFLW_Account.get();
+        if (!acc || !acc.username) return;
+        const msg = document.getElementById("kt-pref-msg");
+        msg.style.color = "#b45309";
+        msg.textContent = "⏳ Speichere Einstellung …";
+        const newAnonym = this.checked;
+        window.FFLW_Account.save({ anonym: newAnonym });
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "updateUserAccountPrefs",
+              username: acc.username,
+              passwort: acc.passwort || "",
+              anonym: newAnonym
+            })
+          });
+          const res = await resp.json();
+          if (res && res.ok) {
+            msg.style.color = "#15803d";
+            msg.textContent = newAnonym ? "✓ Konto ist jetzt auf ANONYM gestellt." : "✓ Klarnamen-Anzeige wieder aktiv.";
+          } else {
+            msg.style.color = "#15803d";
+            msg.textContent = "✓ Lokal gespeichert.";
+          }
+        } catch (e) {
+          msg.style.color = "#15803d";
+          msg.textContent = "✓ Lokal gespeichert.";
+        }
+      });
+
+      document.getElementById("kt-login-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const btn = document.getElementById("kt-login-btn");
+        const msg = document.getElementById("kt-login-msg");
+        const username = document.getElementById("kt-login-user").value.trim();
+        const passwort = document.getElementById("kt-login-pass").value.trim();
+        btn.disabled = true;
+        msg.style.color = "#b45309";
+        msg.textContent = "⏳ Prüfe Zugangsdaten …";
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "loginUserAccount", username, passwort })
+          });
+          const res = await resp.json();
+          btn.disabled = false;
+          if (res && res.ok && res.account) {
+            if (window.FFLW_Account) {
+              window.FFLW_Account.save({ ...res.account, passwort });
+            }
+            msg.style.color = "#15803d";
+            msg.textContent = "✓ Erfolgreich angemeldet!";
+            renderActiveAccount();
+          } else {
+            msg.style.color = "#b91c1c";
+            msg.textContent = (res && res.error) || "Anmeldung fehlgeschlagen.";
+          }
+        } catch (err) {
+          btn.disabled = false;
+          msg.style.color = "#b91c1c";
+          msg.textContent = "Verbindungsfehler: " + err.message;
+        }
+      });
+
+      document.getElementById("kt-reg-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const btn = document.getElementById("kt-reg-btn");
+        const msg = document.getElementById("kt-reg-msg");
+        btn.disabled = true;
+        msg.style.color = "#b45309";
+        msg.textContent = "⏳ Sende Konto-Antrag …";
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "registerUserAccount",
+              username: document.getElementById("kt-reg-user").value.trim(),
+              passwort: document.getElementById("kt-reg-pass").value.trim(),
+              name: document.getElementById("kt-reg-name").value.trim(),
+              kontakt: document.getElementById("kt-reg-kontakt").value.trim(),
+              personenCode: document.getElementById("kt-reg-code").value.trim(),
+              anonym: document.getElementById("kt-reg-anonym").checked
+            })
+          });
+          const res = await resp.json();
+          btn.disabled = false;
+          if (res && res.ok) {
+            msg.style.color = "#15803d";
+            msg.textContent = "✓ Dein Konto-Antrag ist eingegangen! Sobald unser Team ihn freigeschaltet hat, kannst du dich links einloggen.";
+            document.getElementById("kt-reg-form").reset();
+          } else {
+            msg.style.color = "#b91c1c";
+            msg.textContent = (res && res.error) || "Registrierung fehlgeschlagen.";
+          }
+        } catch (err) {
+          btn.disabled = false;
+          msg.style.color = "#b91c1c";
+          msg.textContent = "Verbindungsfehler: " + err.message;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

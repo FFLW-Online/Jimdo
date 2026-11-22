@@ -1234,6 +1234,9 @@ window.FFLW_Account = {
       kontakt: String(data.kontakt || prev.kontakt || "").trim(),
       email: String(data.email || prev.email || "").trim(),
       herkunftsland: String(data.herkunftsland || prev.herkunftsland || "").trim(),
+      username: String(data.username !== undefined ? data.username : (prev.username || "")).trim(),
+      passwort: String(data.passwort !== undefined ? data.passwort : (prev.passwort || "")).trim(),
+      anonym: data.anonym !== undefined ? !!data.anonym : !!prev.anonym,
       updatedAt: new Date().toISOString()
     };
     try { localStorage.setItem(this.KEY, JSON.stringify(merged)); } catch (e) {}

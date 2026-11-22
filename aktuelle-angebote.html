@@ -183,6 +183,13 @@
 
     <main class="content">
       <h2>Aktuelle Angebote im Virtuellen Warenhaus</h2>
+      <div style="background:#eff6ff; border:1.5px solid #93c5fd; border-left:6px solid #004080; border-radius:9px; padding:12px 16px; margin:12px 0 16px 0; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+        <div id="aa-acc-info" style="font-size:0.93rem; color:#1e3a8a;">
+          <strong>👤 Konto-Vorteil:</strong> Eingeloggt werden Name &amp; Kontakt beim Reservieren automatisch ausgefüllt (inkl. Anonym-Option). <em>Ohne Konto kannst du weiterhin ganz normal mit Code <strong>11</strong> reservieren.</em>
+        </div>
+        <a href="konto-anlegen.html" style="background:#004080; color:#ffffff; text-decoration:none; padding:8px 14px; border-radius:6px; font-weight:bold; font-size:0.9rem; white-space:nowrap;">👤 Eigenes Konto / Login</a>
+      </div>
+
 
       <p>
         Hier findest du gut erhaltene Möbel und Haushaltssachen, die uns aktuell zur Vermittlung an bedürftige Personen und Familien zur Verfügung gestellt wurden. <strong>Angebote, die schnell abgeholt werden müssen, stehen ganz oben.</strong> Über die Ansicht <em>„Nach Anbieter / Haushalt gruppieren“</em> siehst du sofort, welche Sachen am selben Abholort stehen.
@@ -493,6 +500,19 @@
           countEl.textContent = "Verbindungsfehler beim Laden.";
         });
 
+            if (window.FFLW_Account) {
+        const acc = window.FFLW_Account.get();
+        if (acc && (acc.username || acc.name)) {
+          const infoEl = document.getElementById("aa-acc-info");
+          if (infoEl) {
+            infoEl.innerHTML = `✓ Angemeldet als <strong>${acc.anonym ? "Anonym (" + (acc.username || "Konto") + ")" : (acc.name || acc.username)}</strong> – deine Kontaktdaten werden beim Reservieren automatisch eingetragen.`;
+          }
+          const nEl = document.getElementById("fflw-req-name");
+          const kEl = document.getElementById("fflw-req-kontakt");
+          if (nEl) nEl.value = acc.anonym ? `Anonym (Konto: ${acc.username || acc.code || "Mitglied"})` : (acc.name || "");
+          if (kEl) kEl.value = acc.kontakt || acc.email || "";
+        }
+      }
       const reqModal = document.getElementById("fflw-req-modal");
       document.getElementById("fflw-req-close").addEventListener("click", () => { reqModal.style.display = "none"; });
 

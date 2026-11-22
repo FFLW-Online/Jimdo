@@ -316,9 +316,10 @@
             <!-- Schritt 3: KI-Erkennung starten ODER Text/JSON einfügen -->
             <div style="background:#ffffff; border:1px solid #c7d2fe; border-radius:8px; padding:12px 14px;">
               <strong style="color:#312e81;">3. Automatische KI-Analyse &amp; Größenschätzung starten:</strong>
-              <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-                <input type="password" id="ki-gemini-key" class="m-input" placeholder="Google Gemini API-Key (AIza…) – wird lokal gemerkt" style="max-width:340px;">
-                <button type="button" id="ki-analyze-btn" class="m-btn" style="background:#4338ca;">🪄 Bilder mit KI analysieren &amp; Maße schätzen</button>
+              <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                <input type="password" id="ki-gemini-key" class="m-input" placeholder="Google Gemini API-Key (AIza…)" style="max-width:290px;">
+                <button type="button" id="ki-save-key-backend-btn" class="m-btn m-btn-green" title="Speichert den Schlüssel sicher im Google Script für das gesamte Team">💾 Key dauerhaft im Script speichern</button>
+                <button type="button" id="ki-analyze-btn" class="m-btn" style="background:#4338ca;">🪄 Bilder mit KI analysieren &amp; Einzelbilder ausschneiden</button>
                 <span id="ki-status-msg" style="font-weight:bold;"></span>
               </div>
               <div style="font-size:0.82rem; color:#475569; margin-top:6px;">
@@ -522,6 +523,18 @@
           </div>
           <div id="list-rad-anfragen"></div>
           <div id="list-rad-ausgaben"></div>
+        </section>
+
+        
+        <!-- TAB: BENUTZER-KONTEN (PASSWÖRTER EINSEHEN & FREISCHALTEN) -->
+        <section id="tab-konten" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#004080; background:#f8fbff;">
+            <h3 style="margin-top:0; color:#003366;">👤 Registrierte Benutzer-Konten prüfen &amp; freischalten</h3>
+            <p style="margin-top:0; font-size:0.92rem;">
+              Hier sehen Sie alle angelegten Benutzer-Konten inklusive hinterlegtem Passwort (falls jemand sein Passwort vergisst), Status (Wartend / Freigegeben / Gesperrt) und Anonym-Einstellung.
+            </p>
+            <div id="list-user-accounts"></div>
+          </div>
         </section>
 
         <!-- TAB 6: SYSTEM & SEITENSCHUTZ -->
@@ -851,6 +864,49 @@
         const schatzListe = data.schatzkiste || [];
 
         document.getElementById("cnt-eingang").textContent = eingang.length;
+        // API-Key aus Backend nachladen, falls lokal leer
+        if (kiKeyInput && !kiKeyInput.value.trim()) {
+          fetch(`${WEB_APP_URL}?action=getGeminiApiKey&masterCode=${encodeURIComponent(currentCode)}&t=${Date.now()}`, { method: "GET", redirect: "follow" })
+            .then(r => r.json())
+            .then(kd => { if (kd && kd.ok && kd.apiKey && !kiKeyInput.value.trim()) kiKeyInput.value = kd.apiKey; })
+            .catch(() => {});
+        }
+        // Benutzer-Konten rendern
+        const userAccounts = Array.isArray(data.userAccounts) ? data.userAccounts : [];
+        const cntK = document.getElementById("cnt-konten");
+        if (cntK) cntK.textContent = userAccounts.length;
+        const listK = document.getElementById("list-user-accounts");
+        if (listK) {
+          listK.innerHTML = !userAccounts.length
+            ? `<p style="margin:0;">Noch keine registrierten Benutzer-Konten vorhanden.</p>`
+            : userAccounts.map(acc => `
+              <div class="m-card" style="padding:12px 14px; margin:8px 0; border-left-color:${acc.status === "freigegeben" ? "#16a34a" : (acc.status === "gesperrt" ? "#dc2626" : "#d97706")};">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+                  <div>
+                    <strong style="font-size:1.02rem; color:#003366;">👤 ${acc.username}</strong>
+                    <span class="m-badge" style="margin-left:6px; background:${acc.status === "freigegeben" ? "#dcfce7" : "#fef3c7"}; color:#111;">${acc.status}</span>
+                    ${acc.anonym ? `<span class="m-badge" style="margin-left:4px; background:#e0e7ff; color:#1e3a8a;">🕵️ Anonym aktiv</span>` : ""}
+                    <div style="font-size:0.9rem; margin-top:4px;">
+                      <strong>Name:</strong> ${acc.name} | <strong>Kontakt:</strong> ${acc.kontakt} | <strong>6-stellige Nr.:</strong> ${acc.personenCode || "-"}<br>
+                      <strong>Hinterlegtes Passwort:</strong> <code style="background:#f1f5f9; padding:2px 6px; border-radius:4px;">${acc.passwort}</code>
+                    </div>
+                  </div>
+                  <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                    ${acc.status !== "freigegeben" ? `<button type="button" class="m-btn m-btn-green btn-acc-op" data-id="${acc.fileId}" data-op="approve">✓ Freischalten</button>` : ""}
+                    ${acc.status === "freigegeben" ? `<button type="button" class="m-btn m-btn-warn btn-acc-op" data-id="${acc.fileId}" data-op="block">Sperren</button>` : ""}
+                    <button type="button" class="m-btn m-btn-red btn-acc-op" data-id="${acc.fileId}" data-op="delete">🗑️ Löschen</button>
+                  </div>
+                </div>
+              </div>
+            `).join("");
+          listK.querySelectorAll(".btn-acc-op").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              if (btn.dataset.op === "delete" && !confirm("Dieses Konto wirklich löschen?")) return;
+              await postAction({ action: "manageUserAccount", fileId: btn.dataset.id, op: btn.dataset.op });
+              loadMasterData(currentCode, false);
+            });
+          });
+        }
         document.getElementById("cnt-online").textContent = online.length;
         document.getElementById("cnt-bedarfe").textContent = bedarfe.length;
         document.getElementById("cnt-akten").textContent = akten.length;
@@ -897,7 +953,7 @@
                     const ids = matching.map(x => x.folderId).join(",");
                     const sampleTitle = matching[0].titel.replace(/^\d+\s*[x×]\s*/i, "").trim();
                     return `<div style="margin-top:5px;">• <strong>${matching.length}× ${sampleTitle}</strong>
-                      <button type="button" class="m-btn m-btn-warn btn-bundle-eingang" data-ids="${ids}" data-count="${matching.length}" data-title="${sampleTitle}" style="margin-left:6px; padding:3px 9px; font-size:0.82rem;">🔗 Als „${matching.length}× ${sampleTitle}“ bündeln</button>
+                      <button type="button" class="m-btn m-btn-warn btn-bundle-eingang" data-ids="${ids}" data-count="${matching.length}" data-title="${sampleTitle}" style="margin-left:6px; padding:3px 9px; font-size:0.82rem;">🔗 Als „${matching.length}× ${sampleTitle}“ bündeln</button> <button type="button" class="m-btn m-btn-red btn-del-dups-eingang" data-ids="${ids}" style="margin-left:4px; padding:3px 9px; font-size:0.82rem;">🗑️ Alle Dubletten bis auf 1 löschen</button>
                     </div>`;
                   }).join("")}
                 </div>
@@ -966,6 +1022,15 @@
             btn.disabled = true;
             const res = await postAction({ action: "bulkDeleteEingang", folderIds: [btn.dataset.id] });
             if (res && res.ok) await loadMasterData(currentCode, false);
+          });
+        });
+        eingangEl.querySelectorAll(".btn-del-dups-eingang").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const ids = btn.dataset.ids.split(",").filter(Boolean);
+            if (!confirm(`Wirklich ${ids.length - 1} doppelte Einträge löschen und nur 1 behalten?`)) return;
+            btn.disabled = true;
+            await postAction({ action: "deleteDuplicateEingang", folderIds: ids });
+            loadMasterData(currentCode, false);
           });
         });
         eingangEl.querySelectorAll(".btn-bundle-eingang").forEach(btn => {
@@ -2110,6 +2175,69 @@
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
 
+      // Hilfsfunktion: Einzelgegenstand per box_2d [ymin, xmin, ymax, xmax] (0..1000) aus Raumfoto ausschneiden
+      function cropPhotoByBox2d(photoObj, box2d) {
+        return new Promise((resolve) => {
+          if (!photoObj || !Array.isArray(box2d) || box2d.length !== 4) {
+            resolve(null);
+            return;
+          }
+          const [ymin, xmin, ymax, xmax] = box2d.map(Number);
+          if ([ymin, xmin, ymax, xmax].some(v => isNaN(v)) || ymax <= ymin || xmax <= xmin) {
+            resolve(null);
+            return;
+          }
+          const img = new Image();
+          img.onload = function () {
+            try {
+              const pad = 35; // 3.5% Sicherheitsrand rund ums Möbelstück
+              const y1 = Math.max(0, (ymin - pad) / 1000) * img.naturalHeight;
+              const x1 = Math.max(0, (xmin - pad) / 1000) * img.naturalWidth;
+              const y2 = Math.min(1, (ymax + pad) / 1000) * img.naturalHeight;
+              const x2 = Math.min(1, (xmax + pad) / 1000) * img.naturalWidth;
+              const cw = Math.max(80, Math.round(x2 - x1));
+              const ch = Math.max(80, Math.round(y2 - y1));
+
+              const canvas = document.createElement("canvas");
+              const scale = Math.min(1, 1000 / Math.max(cw, ch));
+              canvas.width = Math.round(cw * scale);
+              canvas.height = Math.round(ch * scale);
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, x1, y1, cw, ch, 0, 0, canvas.width, canvas.height);
+              const dataUrl = canvas.toDataURL("image/jpeg", 0.86);
+              resolve({
+                dataUrl: dataUrl,
+                base64: dataUrl.split(",")[1],
+                mimeType: "image/jpeg"
+              });
+            } catch (e) {
+              resolve(null);
+            }
+          };
+          img.onerror = () => resolve(null);
+          img.src = photoObj.dataUrl;
+        });
+      }
+
+      const saveKeyBackendBtn = document.getElementById("ki-save-key-backend-btn");
+      if (saveKeyBackendBtn) {
+        saveKeyBackendBtn.addEventListener("click", async function () {
+          const apiKey = kiKeyInput.value.trim();
+          const statusEl = document.getElementById("ki-status-msg");
+          try { localStorage.setItem("fflw_gemini_api_key", apiKey); } catch (e) {}
+          this.disabled = true;
+          const res = await postAction({ action: "saveGeminiApiKey", apiKey: apiKey });
+          this.disabled = false;
+          if (res && res.ok) {
+            statusEl.style.color = "#15803d";
+            statusEl.textContent = apiKey ? "✓ API-Key dauerhaft im Google Script gespeichert!" : "✓ API-Key im Script gelöscht.";
+          } else {
+            statusEl.style.color = "#b91c1c";
+            statusEl.textContent = "Fehler: " + ((res && res.error) || "Speichern fehlgeschlagen");
+          }
+        });
+      }
+
       document.getElementById("ki-analyze-btn").addEventListener("click", async function () {
         const apiKey = kiKeyInput.value.trim();
         const statusEl = document.getElementById("ki-status-msg");
@@ -2120,14 +2248,14 @@
         }
         if (!apiKey) {
           statusEl.style.color = "#c62828";
-          statusEl.textContent = "Bitte Gemini API-Key eingeben (oder unten JSON einfügen).";
+          statusEl.textContent = "Bitte Gemini API-Key eingeben.";
           return;
         }
         try { localStorage.setItem("fflw_gemini_api_key", apiKey); } catch (e) {}
 
         const task = async () => {
           statusEl.style.color = "#312e81";
-          statusEl.textContent = "KI analysiert Räume und schätzt Möbelmaße …";
+          statusEl.textContent = "KI analysiert Räume, schätzt Maße und schneidet Einzelbilder aus …";
 
           const parts = [
             {
@@ -2135,12 +2263,11 @@
                 "Du hilfst einem ehrenamtlichen Flüchtlings-Freundeskreis bei der Wohnungsausstattung. " +
                 "Analysiere die folgenden Wohnungsbilder (nummeriert als Bild #1, Bild #2, ...). " +
                 "Liste ALLE gut erkennbaren, sinnvollen Möbelstücke, Haushaltsgeräte und Einrichtungsgegenstände auf. " +
-                "WICHTIG: Wenn mehrere identische Gegenstände zusammengehören (z. B. 6 gleiche Stühle, 4 Teller, 2 Nachttische), fasse sie als EINEN Eintrag mit Stückzahl im Titel zusammen (z. B. '6× Esszimmerstuhl')! " +
-                "die sich als Sachspende eignen (keine Müllteile oder winzige Deko). " +
-                "Schätze für jeden Gegenstand anhand von Standard-Türhöhen (ca. 200 cm), Sitzhöhen (ca. 45 cm) und Raumproportionen " +
-                "realistische ungefähre Außenmaße im Format 'ca. B x T x H cm' (z. B. 'ca. 160 x 80 x 75 cm'). " +
+                "WICHTIG 1: Wenn mehrere identische Gegenstände zusammengehören (z. B. 6 gleiche Stühle), fasse sie als EINEN Eintrag mit Stückzahl im Titel zusammen (z. B. '6× Esszimmerstuhl')! " +
+                "WICHTIG 2: Gib für jeden Gegenstand die genaue Bounding-Box im jeweiligen Bild an als 'box_2d': [ymin, xmin, ymax, xmax] (normiert auf 0 bis 1000), damit wir das einzelne Möbelstück sauber aus dem Raumfoto ausschneiden können! " +
+                "Schätze außerdem realistische ungefähre Außenmaße im Format 'ca. B x T x H cm'. " +
                 "Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array ohne Markdown-Blöcke in diesem Schema: " +
-                '[{"titel":"...","kategorie":"Wohnzimmer|Schlafzimmer|Küche & Haushalt|Kinderzimmer|Elektro & Technik|Garten & Fahrrad|Sonstiges","beschreibung":"...","masse":"ca. ... cm","bildIndex":1}]'
+                '[{"titel":"...","kategorie":"Wohnzimmer|Schlafzimmer|Küche & Haushalt|Kinderzimmer|Elektro & Technik|Garten & Fahrrad|Sonstiges","beschreibung":"...","masse":"ca. ... cm","bildIndex":1,"box_2d":[100,150,850,700]}]'
             }
           ];
 
@@ -2149,7 +2276,7 @@
             parts.push({ inline_data: { mime_type: p.mimeType, data: p.base64 } });
           });
 
-          const candidateModels = ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-3.0-flash", "gemini-2.5-flash"];
+          const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
           let data = null;
           let resp = { ok: false };
           for (const modelName of candidateModels) {
@@ -2162,9 +2289,7 @@
               })
             });
             data = await resp.json();
-            if (resp.ok && data && data.candidates && data.candidates[0]) {
-              break;
-            }
+            if (resp.ok && data && data.candidates && data.candidates[0]) break;
           }
           if (!resp.ok || !data || !data.candidates || !data.candidates[0]) {
             const errMsg = (data && data.error && data.error.message) ? data.error.message : "KI-Anfrage fehlgeschlagen.";
@@ -2178,63 +2303,132 @@
           const parsed = JSON.parse(rawText);
           if (!Array.isArray(parsed)) throw new Error("Antwort war keine Liste.");
 
-          kiDetectedItems = parsed.map(x => ({
-            selected: true,
-            titel: x.titel || "Gegenstand",
-            kategorie: x.kategorie || "Sonstiges",
-            beschreibung: x.beschreibung || "",
-            masse: x.masse || "",
-            bildIndex: Number(x.bildIndex || 1)
-          }));
+          const enriched = [];
+          for (const x of parsed) {
+            const bIdx = Number(x.bildIndex || 1);
+            const photoObj = (bIdx >= 1 && kiLoadedPhotos[bIdx - 1]) ? kiLoadedPhotos[bIdx - 1] : null;
+            const cropped = await cropPhotoByBox2d(photoObj, x.box_2d);
+            enriched.push({
+              selected: true,
+              titel: x.titel || "Gegenstand",
+              kategorie: x.kategorie || "Sonstiges",
+              beschreibung: x.beschreibung || "",
+              masse: x.masse || "",
+              bildIndex: bIdx,
+              useCrop: !!cropped,
+              croppedPhoto: cropped
+            });
+          }
+          kiDetectedItems = enriched;
 
           statusEl.style.color = "#1b5e20";
-          statusEl.textContent = `✓ ${kiDetectedItems.length} Gegenstände erkannt & Maße geschätzt!`;
+          statusEl.textContent = `✓ ${kiDetectedItems.length} Gegenstände erkannt, Maße geschätzt & Einzelbilder ausgeschnitten!`;
           renderKiPreviewTable();
           return { ok: true };
         };
 
         try {
           if (typeof window.fflwRunButtonAction === "function") {
-            await window.fflwRunButtonAction(this, task, { loadingText: "Analysiere Bilder …", successText: "✓ Fertig!" });
+            await window.fflwRunButtonAction(this, task, { loadingText: "KI analysiert …", successText: "✓ Fertig!" });
           } else {
             await task();
           }
         } catch (err) {
           statusEl.style.color = "#c62828";
-          statusEl.textContent = "Fehler bei der Auswertung: " + err.message;
+          statusEl.textContent = "Fehler: " + err.message;
         }
       });
 
-      document.getElementById("ki-parse-json-btn").addEventListener("click", () => {
-        try {
-          const arr = JSON.parse(document.getElementById("ki-raw-json").value.trim());
-          if (!Array.isArray(arr)) throw new Error("Bitte ein JSON-Array [...] eingeben.");
-          kiDetectedItems = arr.map(x => ({
-            selected: true,
-            titel: x.titel || "Gegenstand",
-            kategorie: x.kategorie || "Sonstiges",
-            beschreibung: x.beschreibung || "",
-            masse: x.masse || "",
-            bildIndex: Number(x.bildIndex || (kiLoadedPhotos.length ? 1 : 0))
-          }));
+      function renderKiPreviewTable() {
+        const card = document.getElementById("ki-preview-card");
+        const listEl = document.getElementById("ki-items-list");
+        const cntEl = document.getElementById("ki-items-count");
+        if (!kiDetectedItems.length) {
+          card.style.display = "none";
+          return;
+        }
+        card.style.display = "block";
+        cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
+
+        const photoOptionsHtml = (selIdx) => {
+          const opts = [`<option value="0" ${!selIdx ? "selected" : ""}>– Kein Foto –</option>`];
+          kiLoadedPhotos.forEach((p, i) => {
+            const num = i + 1;
+            opts.push(`<option value="${num}" ${Number(selIdx) === num ? "selected" : ""}>Bild #${num} (${p.name.substring(0, 18)})</option>`);
+          });
+          return opts.join("");
+        };
+
+        listEl.innerHTML = kiDetectedItems.map((item, idx) => {
+          const pIdx = Number(item.bildIndex || 0);
+          const origPhoto = (pIdx >= 1 && kiLoadedPhotos[pIdx - 1]) ? kiLoadedPhotos[pIdx - 1] : null;
+          const activeDataUrl = (item.useCrop && item.croppedPhoto) ? item.croppedPhoto.dataUrl : (origPhoto ? origPhoto.dataUrl : "");
+          const thumbHtml = activeDataUrl
+            ? `<img src="${activeDataUrl}" style="width:96px; height:76px; object-fit:cover; border-radius:6px; border:1px solid #94a3b8;">`
+            : `<div style="width:96px; height:76px; background:#f1f5f9; border:1px dashed #94a3b8; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#64748b;">Ohne Bild</div>`;
+
+          return `
+            <div class="m-card" style="padding:12px 14px; margin:10px 0; border-left-color:${item.selected !== false ? "#2e7d32" : "#94a3b8"}; background:${item.selected !== false ? "#ffffff" : "#f8fafc"};">
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
+                  <label style="font-size:0.82rem; font-weight:bold; cursor:pointer;">
+                    <input type="checkbox" class="ki-row-chk" data-idx="${idx}" ${item.selected !== false ? "checked" : ""}> Übernehmen
+                  </label>
+                  ${thumbHtml}
+                  ${item.croppedPhoto ? `<label style="font-size:0.74rem; color:#1e40af; cursor:pointer;"><input type="checkbox" class="ki-row-crop" data-idx="${idx}" ${item.useCrop ? "checked" : ""}> Einzel-Ausschnitt</label>` : ""}
+                </div>
+                <div style="flex:1; min-width:250px; display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Artikel-Titel *</label>
+                    <input type="text" class="m-input ki-row-titel" data-idx="${idx}" value="${String(item.titel || "").replace(/"/g, "&quot;")}">
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Kategorie</label>
+                    <select class="m-select ki-row-kat" data-idx="${idx}">
+                      ${["Wohnzimmer", "Schlafzimmer", "Küche & Haushalt", "Kinderzimmer", "Elektro & Technik", "Garten & Fahrrad", "Sonstiges"].map(k =>
+                        `<option value="${k}" ${item.kategorie === k ? "selected" : ""}>${k}</option>`
+                      ).join("")}
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Geschätzte Maße (ca. B × T × H)</label>
+                    <input type="text" class="m-input ki-row-masse" data-idx="${idx}" value="${String(item.masse || "").replace(/"/g, "&quot;")}" placeholder="z. B. ca. 180 x 90 x 75 cm">
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Zugeordnetes Foto</label>
+                    <select class="m-select ki-row-img" data-idx="${idx}">${photoOptionsHtml(pIdx)}</select>
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <label style="font-size:0.78rem; font-weight:bold;">Beschreibung / Zustand</label>
+                    <input type="text" class="m-input ki-row-desc" data-idx="${idx}" value="${String(item.beschreibung || "").replace(/"/g, "&quot;")}">
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        listEl.querySelectorAll(".ki-row-chk").forEach(el => el.addEventListener("change", () => {
+          kiDetectedItems[Number(el.dataset.idx)].selected = el.checked;
+          cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
+        }));
+        listEl.querySelectorAll(".ki-row-crop").forEach(el => el.addEventListener("change", () => {
+          kiDetectedItems[Number(el.dataset.idx)].useCrop = el.checked;
           renderKiPreviewTable();
-        } catch (e) {
-          alert("JSON ungültig: " + e.message);
-        }
-      });
+        }));
+        listEl.querySelectorAll(".ki-row-titel").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].titel = el.value; }));
+        listEl.querySelectorAll(".ki-row-kat").forEach(el => el.addEventListener("change", () => { kiDetectedItems[Number(el.dataset.idx)].kategorie = el.value; }));
+        listEl.querySelectorAll(".ki-row-masse").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].masse = el.value; }));
+        listEl.querySelectorAll(".ki-row-desc").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].beschreibung = el.value; }));
+        listEl.querySelectorAll(".ki-row-img").forEach(el => el.addEventListener("change", () => {
+          const i = Number(el.dataset.idx);
+          kiDetectedItems[i].bildIndex = Number(el.value);
+          kiDetectedItems[i].useCrop = false;
+          renderKiPreviewTable();
+        }));
+      }
 
-      document.getElementById("ki-add-empty-row-btn").addEventListener("click", () => {
-        kiDetectedItems.push({
-          selected: true,
-          titel: "",
-          kategorie: "Wohnzimmer",
-          beschreibung: "",
-          masse: "ca. ",
-          bildIndex: kiLoadedPhotos.length ? 1 : 0
-        });
-        renderKiPreviewTable();
-      });
-
+      // Einzeln nacheinander speichern, damit kein Timeout-Fehler bei vielen Bildern auftritt!
       async function executeBulkKiImport(triggerBtn) {
         const spenderName = document.getElementById("ki-spender").value.trim() || "Wohnungsauflösung / Sachspende";
         const ort = document.getElementById("ki-ort").value.trim() || "Leutenbach / Winnenden";
@@ -2246,7 +2440,8 @@
           .filter(x => x.selected !== false && String(x.titel || "").trim())
           .map(x => {
             const pIdx = Number(x.bildIndex || 0);
-            const photoObj = (pIdx >= 1 && kiLoadedPhotos[pIdx - 1]) ? kiLoadedPhotos[pIdx - 1] : null;
+            const origPhoto = (pIdx >= 1 && kiLoadedPhotos[pIdx - 1]) ? kiLoadedPhotos[pIdx - 1] : null;
+            const chosenPhoto = (x.useCrop && x.croppedPhoto) ? x.croppedPhoto : origPhoto;
             const fullDesc = [
               x.beschreibung || "",
               x.masse ? `Geschätzte Maße (KI): ${x.masse}` : ""
@@ -2257,9 +2452,9 @@
               kategorie: x.kategorie || "Sonstiges",
               beschreibung: fullDesc,
               masse: x.masse || "",
-              photoBase64: photoObj ? photoObj.base64 : "",
-              photoMime: photoObj ? photoObj.mimeType : "",
-              photoName: photoObj ? photoObj.name : ""
+              photoBase64: chosenPhoto ? chosenPhoto.base64 : "",
+              photoMime: chosenPhoto ? chosenPhoto.mimeType : "",
+              photoName: origPhoto ? origPhoto.name : ""
             };
           });
 
@@ -2269,31 +2464,36 @@
         }
 
         const task = async () => {
-          msgEl.style.color = "#312e81";
-          msgEl.textContent = `Speichere ${toImport.length} Artikel im System …`;
-          const res = await postAction({
-            action: "bulkImportApartmentItems",
-            spenderName: spenderName,
-            ort: ort,
-            telefon: telefon,
-            zielStatus: zielStatus,
-            items: toImport
-          });
-          if (res && res.ok) {
-            msgEl.style.color = "#1b5e20";
-            msgEl.textContent = `✓ ${res.importedCount} Artikel erfolgreich übernommen!`;
-            loadMasterData(currentCode, false);
-            return { ok: true };
+          let savedOk = 0;
+          for (let i = 0; i < toImport.length; i++) {
+            msgEl.style.color = "#312e81";
+            msgEl.textContent = `⏳ Speichere Artikel ${i + 1} von ${toImport.length}: „${toImport[i].titel}“ …`;
+            const res = await postAction({
+              action: "bulkImportApartmentItems",
+              spenderName: spenderName,
+              ort: ort,
+              telefon: telefon,
+              zielStatus: zielStatus,
+              items: [toImport[i]]
+            });
+            if (res && res.ok) {
+              savedOk += (res.importedCount || 1);
+            } else {
+              msgEl.style.color = "#c62828";
+              msgEl.textContent = `Fehler bei Artikel ${i + 1} (${toImport[i].titel}): ` + ((res && res.error) || "Unbekannt");
+              return { ok: false };
+            }
           }
-          msgEl.style.color = "#c62828";
-          msgEl.textContent = "Fehler beim Import: " + (res && res.error ? res.error : "Unbekannt");
-          return { ok: false };
+          msgEl.style.color = "#1b5e20";
+          msgEl.textContent = `✓ Alle ${savedOk} Artikel erfolgreich gespeichert!`;
+          loadMasterData(currentCode, false);
+          return { ok: true };
         };
 
         if (typeof window.fflwRunButtonAction === "function") {
           await window.fflwRunButtonAction(triggerBtn, task, {
             loadingText: "Speichere Artikel …",
-            successText: "✓ Übernommen!"
+            successText: "✓ Gespeichert!"
           });
         } else {
           await task();
