@@ -627,7 +627,13 @@
         <!-- TAB 6: SYSTEM & SEITENSCHUTZ -->
         <section id="tab-system" class="m-tab-panel" style="display:none;">
           <div class="m-card" style="border-left-color:#15803d; background:#f0fdf4;">
-            <h3 style="margin-top:0; color:#14532d;">📊 Seiten-Aufrufe &amp; Hits pro Unterseite</h3>
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+              <h3 style="margin:0; color:#14532d;">📊 Seiten-Aufrufe &amp; Hits pro Unterseite</h3>
+              <button type="button" id="btn-reset-visit-stats" class="m-btn m-btn-grey" style="font-size:0.82rem;">Statistik auf 0 zurücksetzen</button>
+            </div>
+            <p style="margin:0 0 10px 0; font-size:0.86rem; color:#334155;">
+              Jeder Aufruf einer öffentlichen Unterseite wird gezählt (<code>master.html</code> selbst wird nicht mitgezählt; wenn du selbst eine öffentliche Seite im Browser geöffnet hast, wirst du unter „Aktuell“ für 5 Minuten mitgezählt). Die oberste Zeile ist immer die exakte Summe der darunterliegenden Seiten.
+            </p>
             <div id="sys-page-hits-table">Lade Seitenstatistik …</div>
           </div>
 
@@ -2686,6 +2692,34 @@
           backBtn.addEventListener("click", showMasterHub);
         }
       })();
+
+  
+      const resetStatsBtn = document.getElementById("btn-reset-visit-stats");
+      if (resetStatsBtn) {
+        resetStatsBtn.addEventListener("click", async () => {
+          if (!confirm("Möchtest du alle bisherigen Test-Aufrufe wirklich auf 0 zurücksetzen?")) return;
+          resetStatsBtn.disabled = true;
+          try {
+            const resp = await fetch(WEB_APP_URL, {
+              method: "POST",
+              redirect: "follow",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({ action: "reset_visit_stats", masterCode: currentCode })
+            });
+            const res = await resp.json();
+            resetStatsBtn.disabled = false;
+            if (res && res.ok) {
+              alert("Die Seitenstatistik wurde sauber auf 0 zurückgesetzt.");
+              location.reload();
+            } else {
+              alert("Fehler: " + ((res && res.error) || "Nicht erlaubt"));
+            }
+          } catch (e) {
+            resetStatsBtn.disabled = false;
+            alert("Verbindungsfehler: " + e.message);
+          }
+        });
+      }
 
   </script>
 </body>
