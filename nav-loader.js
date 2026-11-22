@@ -573,6 +573,9 @@ function syncGlobalSiteStatus(currentPage) {
 function trackFflwVisitor(currentPage) {
   if (!currentPage || currentPage === "master.html" || currentPage === "unterlagen.html") return;
   try {
+    if (localStorage.getItem("fflw_ignore_my_visits") === "1") return;
+  } catch (e) {}
+  try {
     let vid = sessionStorage.getItem("fflw_anon_vid");
     if (!vid) {
       vid = "v_" + Math.random().toString(36).slice(2, 11) + Date.now().toString(36).slice(-4);

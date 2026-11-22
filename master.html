@@ -631,8 +631,12 @@
               <h3 style="margin:0; color:#14532d;">📊 Seiten-Aufrufe &amp; Hits pro Unterseite</h3>
               <button type="button" id="btn-reset-visit-stats" class="m-btn m-btn-grey" style="font-size:0.82rem;">Statistik auf 0 zurücksetzen</button>
             </div>
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; background:#ffffff; border:1px solid #bbf7d0; border-radius:7px; padding:8px 12px; margin-bottom:10px;">
+              <span id="my-device-ignore-status" style="font-size:0.86rem; font-weight:bold; color:#15803d;">✓ Dieses Gerät (Notebook/Handy) ist von der Besucherzählung ausgeschlossen.</span>
+              <button type="button" id="btn-toggle-ignore-device" class="m-btn m-btn-grey" style="font-size:0.8rem;">Geräte-Ausschluss umschalten</button>
+            </div>
             <p style="margin:0 0 10px 0; font-size:0.86rem; color:#334155;">
-              Jeder Aufruf einer öffentlichen Unterseite wird gezählt (<code>master.html</code> selbst wird nicht mitgezählt; wenn du selbst eine öffentliche Seite im Browser geöffnet hast, wirst du unter „Aktuell“ für 5 Minuten mitgezählt). Die oberste Zeile ist immer die exakte Summe der darunterliegenden Seiten.
+              Jeder Aufruf einer öffentlichen Unterseite wird gezählt (<code>master.html</code> und jedes Gerät, auf dem du dich einmal im Master angemeldet hast, werden nicht mitgezählt). Die oberste Zeile ist immer die exakte Summe der darunterliegenden Seiten.
             </p>
             <div id="sys-page-hits-table">Lade Seitenstatistik …</div>
           </div>
@@ -860,7 +864,8 @@
         document.getElementById("m-sync-hint").textContent = fromCache ? "⏳ Aktualisiere im Hintergrund …" : "✓ Aktuell";
 
         if (data.visitStats) {
-          document.getElementById("m-live-badge").textContent =
+          try { localStorage.setItem("fflw_ignore_my_visits", "1"); } catch (e) {}
+        document.getElementById("m-live-badge").textContent =
             `Live: ${data.visitStats.onlineNow || 0} online · Heute: ${data.visitStats.counts.today || 0} · Gesamt: ${data.visitStats.counts.total || 0} Aufrufe`;
           const statsBox = document.getElementById("sys-page-hits-table");
           if (statsBox) {
@@ -2720,6 +2725,32 @@
           }
         });
       }
+
+  
+      (function initIgnoreMyDeviceToggle() {
+        const statusEl = document.getElementById("my-device-ignore-status");
+        const toggleBtn = document.getElementById("btn-toggle-ignore-device");
+        function refreshIgnoreUi() {
+          let ignored = false;
+          try { ignored = localStorage.getItem("fflw_ignore_my_visits") === "1"; } catch (e) {}
+          if (statusEl) {
+            statusEl.textContent = ignored
+              ? "✓ Dieses Gerät (Notebook/Handy) wird NICHT als Besucher mitgezählt."
+              : "⚠ Dieses Gerät wird aktuell als normaler Besucher mitgezählt.";
+            statusEl.style.color = ignored ? "#15803d" : "#b45309";
+          }
+        }
+        refreshIgnoreUi();
+        if (toggleBtn) {
+          toggleBtn.addEventListener("click", () => {
+            try {
+              const cur = localStorage.getItem("fflw_ignore_my_visits") === "1";
+              localStorage.setItem("fflw_ignore_my_visits", cur ? "0" : "1");
+            } catch (e) {}
+            refreshIgnoreUi();
+          });
+        }
+      })();
 
   </script>
 </body>
