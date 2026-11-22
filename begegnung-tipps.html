@@ -147,6 +147,15 @@
           </div>
           <button type="button" id="bt-next-question-btn" class="bt-btn">↻ Nächste Gesprächs-Idee</button>
         </div>
+
+        <div style="margin-top:16px; padding:14px 16px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px;">
+          <strong style="color:#003366; display:block; margin-bottom:6px;">Eigene Gesprächs-Idee vorschlagen (wird nach Freigabe durch unser Team ergänzt):</strong>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+            <input type="text" id="bt-suggest-input" placeholder="Deine Frage oder Gesprächs-Idee …" style="flex:1 1 240px; padding:9px 11px; border:1.5px solid #94a3b8; border-radius:6px; font-size:15px;">
+            <button type="button" id="bt-suggest-btn" class="bt-btn" style="background:#004080;">Vorschlag zur Freigabe senden</button>
+          </div>
+          <div id="bt-suggest-msg" style="margin-top:6px; font-weight:bold; font-size:0.9rem;"></div>
+        </div>
       </section>
     </main>
   </div>
@@ -223,6 +232,47 @@ Mein Hinweis / Verbesserungsvorschlag:
         btn.addEventListener("click", () => {
           idx = (idx + 1) % questions.length;
           qEl.textContent = questions[idx];
+        });
+      }
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      const sugBtn = document.getElementById("bt-suggest-btn");
+      const sugInp = document.getElementById("bt-suggest-input");
+      const sugMsg = document.getElementById("bt-suggest-msg");
+      if (sugBtn && sugInp && sugMsg) {
+        sugBtn.addEventListener("click", async () => {
+          const txt = sugInp.value.trim();
+          if (!txt) return;
+          sugBtn.disabled = true;
+          sugMsg.style.color = "#b45309";
+          sugMsg.textContent = "Sende Vorschlag an das Team …";
+          try {
+            const resp = await fetch(WEB_APP_URL, {
+              method: "POST",
+              redirect: "follow",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({
+                action: "submitIdeaWallEntry",
+                typ: "Begegnungs-Tipp (Vorschlag)",
+                titel: "Neue Gesprächs-Idee",
+                text: txt,
+                autor: "Besucher"
+              })
+            });
+            const res = await resp.json();
+            sugBtn.disabled = false;
+            if (res && res.ok) {
+              sugInp.value = "";
+              sugMsg.style.color = "#15803d";
+              sugMsg.textContent = "Vielen Dank! Dein Vorschlag wurde übermittelt und erscheint nach Freigabe durch unser Team.";
+            } else {
+              sugMsg.style.color = "#b91c1c";
+              sugMsg.textContent = "Fehler beim Senden: " + ((res && res.error) || "Unbekannt");
+            }
+          } catch (err) {
+            sugBtn.disabled = false;
+            sugMsg.style.color = "#b91c1c";
+            sugMsg.textContent = "Verbindungsfehler: " + err.message;
+          }
         });
       }
     });

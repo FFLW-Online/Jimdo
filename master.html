@@ -539,6 +539,11 @@
 
         <!-- TAB 6: SYSTEM & SEITENSCHUTZ -->
         <section id="tab-system" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#15803d; background:#f0fdf4;">
+            <h3 style="margin-top:0; color:#14532d;">📊 Seiten-Aufrufe &amp; Hits pro Unterseite</h3>
+            <div id="sys-page-hits-table">Lade Seitenstatistik …</div>
+          </div>
+
           <div class="m-card">
             <h3 style="margin-top:0;">Zugangscodes &amp; Flaggenband</h3>
             <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
@@ -763,7 +768,17 @@
 
         if (data.visitStats) {
           document.getElementById("m-live-badge").textContent =
-            `Live: ${data.visitStats.onlineNow || 0} online · Heute: ${data.visitStats.counts.today || 0} Aufrufe`;
+            `Live: ${data.visitStats.onlineNow || 0} online · Heute: ${data.visitStats.counts.today || 0} · Gesamt: ${data.visitStats.counts.total || 0} Aufrufe`;
+          const statsBox = document.getElementById("sys-page-hits-table");
+          if (statsBox) {
+            const pList = Array.isArray(data.visitStats.pagesList) ? data.visitStats.pagesList : [];
+            statsBox.innerHTML = !pList.length
+              ? `<p style="margin:0; font-size:0.9rem;">Noch keine Einzel-Seitenaufrufe aufgezeichnet.</p>`
+              : `<div style="margin-bottom:8px; font-weight:bold; color:#003366;">Heute: ${data.visitStats.counts.today || 0} Aufrufe | Gesamt: ${data.visitStats.counts.total || 0} Aufrufe | Aktuell online: ${data.visitStats.onlineNow || 0}</div>
+                 <table class="m-table"><thead><tr><th>Unterseite</th><th>Aufrufe gesamt</th></tr></thead><tbody>` +
+                 pList.map(p => `<tr><td><code>${p.page}</code></td><td><strong>${p.count}</strong></td></tr>`).join("") +
+                 `</tbody></table>`;
+          }
         }
 
         const isSuper = data.role === "master";

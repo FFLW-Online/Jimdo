@@ -423,7 +423,7 @@ function applyHiddenNavItems(versteckteSeiten) {
     li3.id = "auto-nav-begegnung-tipps";
     const a3 = document.createElement("a");
     a3.href = "begegnung-tipps.html";
-    a3.textContent = "Begegnungs-Tipps 🤝";
+    a3.textContent = "Begegnungs-Tipps";
     if (cur === "begegnung-tipps.html") {
       a3.setAttribute("aria-current", "page");
       a3.classList.add("active");
@@ -1109,24 +1109,7 @@ document.addEventListener("DOMContentLoaded", function () {
           });
         }
 
-        if (activeLang && activeLang !== "de" && navList) {
-          const helpLi = document.createElement("li");
-          helpLi.style.backgroundColor = "#8e1c24";
-          helpLi.style.borderBottom = "2px solid #ffd700";
-
-          const helpMenuLink = document.createElement("a");
-          helpMenuLink.href = "#";
-          helpMenuLink.style.cssText = "font-size: 0.78rem; line-height: 1.25; padding-top: 7px; padding-bottom: 7px;";
-          helpMenuLink.innerHTML = "🌐 Probleme mit dem<br>Übersetzungstool";
-          helpMenuLink.addEventListener("click", function (e) {
-            e.preventDefault();
-            openTranslationHelpDialog(activeLang);
-          });
-          helpLi.appendChild(helpMenuLink);
-          navList.prepend(helpLi);
-
-          // Deutsch (Original) wird oben quer über beide Spalten eingeblendet
-        }
+        // Übersetzung läuft zuverlässig – kein Problem-Banner mehr nötig
 
         startGoogleTranslate(activeLang);
       })
