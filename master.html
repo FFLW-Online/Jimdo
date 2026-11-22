@@ -1009,6 +1009,10 @@
         return await resp.json();
       }
 
+      async function postMasterAction(actionName, extraObj) {
+        return await postAction(Object.assign({ action: actionName }, extraObj || {}));
+      }
+
       function renderAllSections(data) {
         const eingang = data.eingang || [];
         const online = data.online || [];
@@ -2421,7 +2425,23 @@
           const batchSize = 4;
           const totalBatches = Math.ceil(kiLoadedPhotos.length / batchSize);
           const allParsed = [];
-          const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
+          // Verfügbare Gemini-Vision-Modelle automatisch beim API-Key abfragen (nie wieder "model not found"!)
+          let candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-flash-latest"];
+          try {
+            const listResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
+            if (listResp.ok) {
+              const listData = await listResp.json();
+              const valid = (listData.models || [])
+                .filter(mod => Array.isArray(mod.supportedGenerationMethods) && mod.supportedGenerationMethods.includes("generateContent"))
+                .map(mod => String(mod.name || "").replace(/^models\//, ""))
+                .filter(name => name.includes("gemini") && !name.includes("embedding") && !name.includes("tts") && !name.includes("imagen"));
+              if (valid.length) {
+                const preferred = valid.filter(n => n.includes("flash") && !n.includes("8b"));
+                const others = valid.filter(n => !preferred.includes(n));
+                candidateModels = [...preferred, ...others];
+              }
+            }
+          } catch (e) {}
 
           for (let b = 0; b < totalBatches; b++) {
             const startIdx = b * batchSize;
@@ -2775,8 +2795,13 @@
           const res = await postAction({ action: "reset_visit_stats", mode: mode });
           if (triggerBtn) triggerBtn.disabled = false;
           if (res && res.ok) {
+            try { sessionStorage.removeItem(CACHE_KEY); } catch (e) {}
+            if (res.visitStats && currentData) {
+              currentData.visitStats = res.visitStats;
+              applyDashboardData(currentData, false);
+            }
+            await loadMasterData(currentCode, true);
             alert(mode === "today" ? "✓ Heutige Zähler wurden auf 0 gesetzt." : "✓ Alle Besucherzahlen wurden komplett auf 0 zurückgesetzt.");
-            location.reload();
           } else {
             alert("Fehler: " + ((res && res.error) || "Nicht erlaubt (nur Supermaster)"));
           }
