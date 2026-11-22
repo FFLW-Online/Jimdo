@@ -1184,42 +1184,6 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// ============================================================================
-// TOP-BALKEN "DEUTSCH (ORIGINAL)" QUER ÜBER BEIDE SPALTEN & "MEIN KONTO" HELPER
-// ============================================================================
-(function initTopOriginalLangBar() {
-  document.addEventListener("DOMContentLoaded", function () {
-    const activeLang = (typeof getActiveLanguage === "function") ? getActiveLanguage() : null;
-    if (!activeLang || activeLang === "de") return;
-    if (document.getElementById("fflw-top-lang-bar")) return;
-
-    const realPage = (window.history.state && window.history.state.fflwMaskedFrom)
-      || window.location.pathname.split("/").pop()
-      || "index.html";
-
-    const topBar = document.createElement("div");
-    topBar.id = "fflw-top-lang-bar";
-    topBar.className = "fflw-top-lang-bar notranslate";
-    topBar.setAttribute("translate", "no");
-
-    const resetLink = document.createElement("a");
-    resetLink.href = realPage;
-    resetLink.textContent = "🇩🇪 Zurück zum deutschen Original (Deutsch)";
-    resetLink.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (typeof setLanguage === "function") setLanguage("de");
-    });
-
-    topBar.appendChild(resetLink);
-    const layoutEl = document.querySelector(".layout");
-    if (layoutEl && layoutEl.parentNode) {
-      layoutEl.parentNode.insertBefore(topBar, layoutEl);
-    } else {
-      document.body.insertBefore(topBar, document.body.firstChild);
-    }
-  });
-})();
-
 window.FFLW_Account = {
   KEY: "fflw_my_account_v1",
   get: function () {
@@ -1246,63 +1210,3 @@ window.FFLW_Account = {
     try { localStorage.removeItem(this.KEY); } catch (e) {}
   }
 };
-
-document.addEventListener("DOMContentLoaded", function () {
-  const navList = document.getElementById("nav-list");
-  if (!navList) return;
-  const cur = (window.history.state && window.history.state.fflwMaskedFrom)
-    || window.location.pathname.split("/").pop()
-    || "index.html";
-
-  function appendSubItemsToParent(matchTerms, items) {
-    let targetLi = null;
-    navList.querySelectorAll(":scope > li").forEach(li => {
-      const txt = (li.textContent || "").toLowerCase();
-      if (matchTerms.some(t => txt.includes(t))) targetLi = li;
-    });
-    if (!targetLi) return;
-    let subUl = targetLi.querySelector("ul");
-    if (!subUl) {
-      const det = document.createElement("details");
-      const sum = document.createElement("summary");
-      const origLink = targetLi.querySelector("a");
-      sum.textContent = origLink ? origLink.textContent : targetLi.textContent.trim();
-      det.appendChild(sum);
-      subUl = document.createElement("ul");
-      if (origLink) {
-        const firstLi = document.createElement("li");
-        firstLi.appendChild(origLink.cloneNode(true));
-        subUl.appendChild(firstLi);
-      }
-      det.appendChild(subUl);
-      targetLi.innerHTML = "";
-      targetLi.appendChild(det);
-    }
-    items.forEach(it => {
-      if (subUl.querySelector(`a[href="${it.href}"]`)) return;
-      const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.href = it.href;
-      a.textContent = it.label;
-      if (cur === it.href) {
-        a.setAttribute("aria-current", "page");
-        a.classList.add("active");
-        const det = targetLi.querySelector("details");
-        if (det) det.setAttribute("open", "");
-      }
-      li.appendChild(a);
-      subUl.appendChild(li);
-    });
-  }
-
-  appendSubItemsToParent(["radwerkstatt", "fahrrad"], [
-    { href: "mobile-radwerkstatt.html", label: "🚐 Mobile Radwerkstatt" },
-    { href: "radanfrage.html", label: "🚲 Radanfrage (Vorbestellung)" }
-  ]);
-
-  appendSubItemsToParent(["vorträge", "aktionen"], [
-    { href: "feste.html", label: "🎉 Feste" },
-    { href: "nabu-aktionen.html", label: "🦉 Aktionen des NABU" },
-    { href: "malteser.html", label: "➕ Malteser" }
-  ]);
-});
