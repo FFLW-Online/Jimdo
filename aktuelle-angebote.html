@@ -87,10 +87,75 @@
     }
     .fflw-offer-img {
       width: 100%;
-      height: 210px;
+      height: 155px;
       object-fit: cover;
       background: #f4f4f4;
       display: block;
+      cursor: zoom-in;
+      transition: opacity 0.15s ease;
+    }
+    .fflw-offer-img:hover { opacity: 0.92; }
+    .fflw-img-wrap { position: relative; background: #f1f5f9; }
+    .fflw-img-zoom-hint {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      background: rgba(15, 23, 42, 0.78);
+      color: #ffffff;
+      font-size: 0.78rem;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 5px;
+      pointer-events: none;
+    }
+    .fflw-offers-grid.is-compact {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .fflw-offers-grid.is-compact .fflw-offer-card {
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .fflw-offers-grid.is-compact .fflw-offer-card > div:first-child {
+      display: flex;
+      align-items: center;
+      flex: 1 1 320px;
+    }
+    .fflw-offers-grid.is-compact .fflw-img-wrap {
+      width: 108px;
+      min-width: 108px;
+      height: 108px;
+    }
+    .fflw-offers-grid.is-compact .fflw-offer-img {
+      width: 108px;
+      height: 108px;
+    }
+    .fflw-offers-grid.is-compact .fflw-img-zoom-hint { display: none; }
+    .fflw-offers-grid.is-compact .fflw-offer-footer {
+      background: transparent;
+      border-top: none;
+      padding: 10px 14px;
+    }
+    #fflw-lightbox-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 2147483646;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    #fflw-lightbox-img {
+      max-width: 94vw;
+      max-height: 78vh;
+      border-radius: 8px;
+      border: 2px solid #ffffff;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      object-fit: contain;
+      background: #111111;
     }
     .fflw-offer-body {
       padding: 14px 16px;
@@ -228,10 +293,15 @@
           </select>
 
           <select id="fflw-f-urgent" class="fflw-filter-select">
-            <option value="urgent_first">Ansicht: Dringend zuerst</option>
-            <option value="group_provider">Ansicht: Nach Anbieter / Haushalt gruppieren</option>
+            <option value="urgent_first">Sortierung: Dringend zuerst</option>
+            <option value="group_provider">Sortierung: Nach Anbieter / Haushalt gruppieren</option>
             <option value="only_urgent">Nur „Muss schnell raus“</option>
             <option value="flexible">Nur „Auf Abruf“ (flexibel)</option>
+          </select>
+
+          <select id="fflw-f-imgmode" class="fflw-filter-select">
+            <option value="cards">Bilder: Normale Karten (Klick = Großbild)</option>
+            <option value="compact">Bilder: Kompakte Liste (kleine Vorschau)</option>
           </select>
         </div>
       </section>
@@ -272,6 +342,19 @@
           Unverbindliche Anfrage absenden
         </button>
       </form>
+    </div>
+  </div>
+
+  <div id="fflw-lightbox-modal" role="dialog" aria-modal="true" aria-label="Bildvergrößerung">
+    <div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:920px; color:#ffffff; margin-bottom:10px; gap:10px;">
+      <strong id="fflw-lightbox-caption" style="font-size:1rem;">Bildansicht</strong>
+      <button type="button" id="fflw-lightbox-close" style="background:#ffffff; color:#111111; border:none; border-radius:6px; padding:6px 14px; font-weight:bold; cursor:pointer;">✕ Schließen</button>
+    </div>
+    <img id="fflw-lightbox-img" src="" alt="Vergrößerte Ansicht">
+    <div id="fflw-lightbox-nav" style="display:none; gap:12px; margin-top:12px; align-items:center;">
+      <button type="button" id="fflw-lightbox-prev" style="background:#004080; color:#ffffff; border:1px solid #90caf9; border-radius:6px; padding:8px 16px; font-weight:bold; cursor:pointer;">◀ Vorheriges Foto</button>
+      <span id="fflw-lightbox-counter" style="color:#ffffff; font-weight:bold;">1 / 1</span>
+      <button type="button" id="fflw-lightbox-next" style="background:#004080; color:#ffffff; border:1px solid #90caf9; border-radius:6px; padding:8px 16px; font-weight:bold; cursor:pointer;">Nächstes Foto ▶</button>
     </div>
   </div>
 
@@ -345,7 +428,12 @@
         card.innerHTML = `
           <div>
             ${urgent ? `<div class="fflw-urgent-badge"><span>Muss schnell raus${fristText}</span><span>Eilig</span></div>` : ""}
-            ${imgUrl ? `<img src="${imgUrl}" alt="${item.titel || "Möbelstück"}" class="fflw-offer-img">` : ""}
+            ${imgUrl ? `
+              <div class="fflw-img-wrap">
+                <img src="${imgUrl}" alt="${item.titel || "Möbelstück"}" class="fflw-offer-img" loading="lazy">
+                <span class="fflw-img-zoom-hint">🔍 Vergrößern${(item.bilder && item.bilder.length > 1) ? ` (${item.bilder.length} Fotos)` : ""}</span>
+              </div>
+            ` : ""}
             <div class="fflw-offer-body">
               <h3 style="margin: 0 0 8px 0; font-size: 1.12rem; color: #003366;">${item.titel || item.pfad || "Sachspende"}</h3>
               <div style="margin-bottom: 8px;">
@@ -367,6 +455,13 @@
             <button type="button" class="fflw-btn-req">Dieses Stück anfragen</button>
           </div>
         `;
+
+        const imgEl = card.querySelector(".fflw-offer-img");
+        if (imgEl && item.bilder && item.bilder.length > 0) {
+          imgEl.addEventListener("click", () => {
+            openOfferLightbox(item.bilder, 0, item.titel || "Möbelstück");
+          });
+        }
 
         const jumpBtn = card.querySelector(".fflw-provider-link");
         if (jumpBtn) {
@@ -558,6 +653,54 @@
           await sendTask();
         }
       });
+    
+      // Lightbox & Bildansicht-Umschalter (Kompakt / Normale Karten)
+      const fImgMode = document.getElementById("fflw-f-imgmode");
+      if (fImgMode && container) {
+        fImgMode.addEventListener("change", () => {
+          container.classList.toggle("is-compact", fImgMode.value === "compact");
+        });
+      }
+
+      const lbModal = document.getElementById("fflw-lightbox-modal");
+      const lbImg = document.getElementById("fflw-lightbox-img");
+      const lbCap = document.getElementById("fflw-lightbox-caption");
+      const lbNav = document.getElementById("fflw-lightbox-nav");
+      const lbCounter = document.getElementById("fflw-lightbox-counter");
+      let lbImages = [];
+      let lbIndex = 0;
+
+      function updateLightboxView() {
+        if (!lbImages.length) return;
+        const cur = lbImages[lbIndex];
+        const fullUrl = String(cur.url || "").replace("&sz=w1000", "&sz=w1800");
+        lbImg.src = fullUrl;
+        lbCounter.textContent = `${lbIndex + 1} / ${lbImages.length}`;
+        lbNav.style.display = lbImages.length > 1 ? "flex" : "none";
+      }
+
+      function openOfferLightbox(bilder, startIdx, title) {
+        lbImages = Array.isArray(bilder) ? bilder : [];
+        lbIndex = startIdx || 0;
+        if (!lbImages.length || !lbModal) return;
+        lbCap.textContent = title || "Bildansicht";
+        updateLightboxView();
+        lbModal.style.display = "flex";
+      }
+
+      if (lbModal) {
+        document.getElementById("fflw-lightbox-close").addEventListener("click", () => { lbModal.style.display = "none"; });
+        lbModal.addEventListener("click", (e) => { if (e.target === lbModal) lbModal.style.display = "none"; });
+        document.getElementById("fflw-lightbox-prev").addEventListener("click", () => {
+          lbIndex = (lbIndex - 1 + lbImages.length) % lbImages.length;
+          updateLightboxView();
+        });
+        document.getElementById("fflw-lightbox-next").addEventListener("click", () => {
+          lbIndex = (lbIndex + 1) % lbImages.length;
+          updateLightboxView();
+        });
+      }
+
     });
   </script>
 </body>

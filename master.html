@@ -27,6 +27,49 @@
       margin: 14px 0;
       box-shadow: 0 3px 10px rgba(0, 64, 128, 0.08);
     }
+    .m-hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+    .m-hub-tile {
+      background: #ffffff;
+      border: 2px solid #90caf9;
+      border-left: 6px solid #004080;
+      border-radius: 10px;
+      padding: 15px 16px;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 64, 128, 0.08);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .m-hub-tile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 14px rgba(0, 64, 128, 0.16);
+      background: #f4f9ff;
+    }
+    .m-hub-tile.is-secret { border-color: #ef9a9a; border-left-color: #8e1c24; background: #fffafa; }
+    .m-hub-tile.is-treasure { border-color: #fcd34d; border-left-color: #b45309; background: #fffdf5; }
+    .m-hub-tile.is-ai { border-color: #a5b4fc; border-left-color: #4338ca; background: #f8f9ff; }
+    .m-hub-tile-title { font-size: 1.05rem; font-weight: bold; color: #003366; }
+    .m-hub-tile-desc { font-size: 0.86rem; color: #475569; line-height: 1.35; }
+    .m-subview-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: #eef6fc;
+      border: 2px solid #90caf9;
+      border-radius: 9px;
+      padding: 10px 14px;
+      margin: 14px 0;
+    }
     .m-tabs {
       display: flex;
       flex-wrap: wrap;
@@ -230,7 +273,51 @@
           </div>
         </div>
 
-        <div class="m-tabs" id="m-tab-bar">
+        <div id="m-hub-overview" class="m-hub-grid">
+          <button type="button" class="m-hub-tile" data-open-tab="eingang">
+            <span class="m-hub-tile-title">📥 Eingangs-Prüfung (<span id="hub-cnt-eingang">0</span>)</span>
+            <span class="m-hub-tile-desc">Neue Sachspenden &amp; Importe prüfen und freigeben</span>
+          </button>
+          <button type="button" class="m-hub-tile" data-open-tab="online">
+            <span class="m-hub-tile-title">🌐 Online &amp; Reserviert (<span id="hub-cnt-online">0</span>)</span>
+            <span class="m-hub-tile-desc">Aktive Angebote verwalten, Reservierungen &amp; Archiv</span>
+          </button>
+          <button type="button" class="m-hub-tile" data-open-tab="bedarfe">
+            <span class="m-hub-tile-title">📋 Offene Bedarfe (<span id="hub-cnt-bedarfe">0</span>)</span>
+            <span class="m-hub-tile-desc">Gesuche einsehen &amp; erfüllte Bedarfe abschließen</span>
+          </button>
+          <button type="button" class="m-hub-tile is-ai" id="hub-tile-kiimport" data-open-tab="kiimport" style="display:none;">
+            <span class="m-hub-tile-title">🪄 Wohnungs-Import (KI)</span>
+            <span class="m-hub-tile-desc">Mehrere Fotos hochladen &amp; automatisch erkennen lassen</span>
+          </button>
+          <button type="button" class="m-hub-tile is-secret" id="hub-tile-akten" data-open-tab="akten" style="display:none;">
+            <span class="m-hub-tile-title">🗂️ Personen-Akten (<span id="hub-cnt-akten">0</span>)</span>
+            <span class="m-hub-tile-desc">Vertrauliche Akten, Familien-Zuordnung &amp; Dokumente</span>
+          </button>
+          <button type="button" class="m-hub-tile is-treasure" id="hub-tile-schatz" data-open-tab="schatz" style="display:none;">
+            <span class="m-hub-tile-title">✨ Schatzkiste (<span id="hub-cnt-schatz">0</span>)</span>
+            <span class="m-hub-tile-desc">Talente, Fähigkeiten &amp; Unterstützer-Verzeichnis</span>
+          </button>
+          <button type="button" class="m-hub-tile" id="hub-tile-ideentafel" data-open-tab="ideentafel" style="display:none; border-color:#fde047; border-left-color:#ca8a04; background:#fefce8;">
+            <span class="m-hub-tile-title">💡 Ideen, Lob &amp; Tipps (<span id="hub-cnt-ideentafel">0</span>)</span>
+            <span class="m-hub-tile-desc">Eingereichte Ideen &amp; Gesprächs-Tipps freigeben</span>
+          </button>
+          <button type="button" class="m-hub-tile" id="hub-tile-radwerkstatt" data-open-tab="radwerkstatt">
+            <span class="m-hub-tile-title">🚲 Radwerkstatt</span>
+            <span class="m-hub-tile-desc">Rad-Ausgaben &amp; Vorbestellungen verwalten</span>
+          </button>
+          <button type="button" class="m-hub-tile" id="hub-tile-system" data-open-tab="system" style="display:none;">
+            <span class="m-hub-tile-title">📊 Seiten-Hits, Codes &amp; System</span>
+            <span class="m-hub-tile-desc">Besucher-Statistik pro Seite, Wartung &amp; Zugangs-Codes</span>
+          </button>
+        </div>
+
+        <div id="m-subview-bar" class="m-subview-bar">
+          <button type="button" id="m-back-to-hub-btn" class="m-btn">← Zurück zur Master-Übersicht</button>
+          <strong id="m-subview-title" style="color:#003366; font-size:1.05rem;">Bereich</strong>
+        </div>
+
+        <div class="m-tabs" id="m-tab-bar" style="display:none;">
           <button type="button" class="m-tab-btn active" data-tab="eingang">📥 Eingangs-Prüfung (<span id="cnt-eingang">0</span>)</button>
           <button type="button" class="m-tab-btn" data-tab="online">🌐 Online &amp; Reserviert (<span id="cnt-online">0</span>)</button>
           <button type="button" class="m-tab-btn" data-tab="bedarfe">📋 Offene Bedarfe (<span id="cnt-bedarfe">0</span>)</button>
@@ -243,7 +330,7 @@
         </div>
 
         <!-- TAB 1: EINGANG -->
-        <section id="tab-eingang" class="m-tab-panel"><div id="list-eingang"></div></section>
+        <section id="tab-eingang" class="m-tab-panel" style="display:none;"><div id="list-eingang"></div></section>
 
         <!-- TAB 2: ONLINE & RESERVIERT -->
         <section id="tab-online" class="m-tab-panel" style="display:none;">
@@ -772,12 +859,38 @@
           const statsBox = document.getElementById("sys-page-hits-table");
           if (statsBox) {
             const pList = Array.isArray(data.visitStats.pagesList) ? data.visitStats.pagesList : [];
+            const c = data.visitStats.counts || {};
             statsBox.innerHTML = !pList.length
               ? `<p style="margin:0; font-size:0.9rem;">Noch keine Einzel-Seitenaufrufe aufgezeichnet.</p>`
-              : `<div style="margin-bottom:8px; font-weight:bold; color:#003366;">Heute: ${data.visitStats.counts.today || 0} Aufrufe | Gesamt: ${data.visitStats.counts.total || 0} Aufrufe | Aktuell online: ${data.visitStats.onlineNow || 0}</div>
-                 <table class="m-table"><thead><tr><th>Unterseite</th><th>Aufrufe gesamt</th></tr></thead><tbody>` +
-                 pList.map(p => `<tr><td><code>${p.page}</code></td><td><strong>${p.count}</strong></td></tr>`).join("") +
-                 `</tbody></table>`;
+              : `<div class="m-table-wrap"><table class="m-table">
+                  <thead>
+                    <tr>
+                      <th>Unterseite</th>
+                      <th style="text-align:right;">Aktuell</th>
+                      <th style="text-align:right;">Heute</th>
+                      <th style="text-align:right;">Woche</th>
+                      <th style="text-align:right;">Monat</th>
+                      <th style="text-align:right;">Gesamt</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="background:#e0f2fe; font-weight:bold;">
+                      <td>Alle Seiten zusammen</td>
+                      <td style="text-align:right; color:#15803d;">${data.visitStats.onlineNow || 0}</td>
+                      <td style="text-align:right;">${c.today || 0}</td>
+                      <td style="text-align:right;">${c.week || 0}</td>
+                      <td style="text-align:right;">${c.month || 0}</td>
+                      <td style="text-align:right;">${c.total || 0}</td>
+                    </tr>` +
+                    pList.map(p => `<tr>
+                      <td><code>${p.page}</code></td>
+                      <td style="text-align:right; font-weight:bold; color:${p.active > 0 ? "#15803d" : "#64748b"};">${p.active || 0}</td>
+                      <td style="text-align:right;">${p.today || 0}</td>
+                      <td style="text-align:right;">${p.week || 0}</td>
+                      <td style="text-align:right;">${p.month || 0}</td>
+                      <td style="text-align:right;"><strong>${p.total || p.count || 0}</strong></td>
+                    </tr>`).join("") +
+                  `</tbody></table></div>`;
           }
         }
 
@@ -789,6 +902,17 @@
         document.getElementById("tab-btn-schatz").style.display = canSeeTreasure ? "inline-block" : "none";
         document.getElementById("tab-btn-ideentafel").style.display = canSeeTreasure ? "inline-block" : "none";
         document.getElementById("tab-btn-system").style.display = isSuper ? "inline-block" : "none";
+
+        const syncHubTile = (hubId, tabBtnId) => {
+          const hEl = document.getElementById(hubId);
+          const tEl = document.getElementById(tabBtnId);
+          if (hEl && tEl) hEl.style.display = tEl.style.display;
+        };
+        syncHubTile("hub-tile-kiimport", "tab-btn-kiimport");
+        syncHubTile("hub-tile-akten", "tab-btn-akten");
+        syncHubTile("hub-tile-schatz", "tab-btn-schatz");
+        syncHubTile("hub-tile-ideentafel", "tab-btn-ideentafel");
+        syncHubTile("hub-tile-system", "tab-btn-system");
 
         renderAllSections(data);
       }
@@ -879,6 +1003,7 @@
         const schatzListe = data.schatzkiste || [];
 
         document.getElementById("cnt-eingang").textContent = eingang.length;
+        if (document.getElementById("hub-cnt-eingang")) document.getElementById("hub-cnt-eingang").textContent = eingang.length;
         // API-Key aus Backend nachladen, falls lokal leer
         if (kiKeyInput && !kiKeyInput.value.trim()) {
           fetch(`${WEB_APP_URL}?action=getGeminiApiKey&masterCode=${encodeURIComponent(currentCode)}&t=${Date.now()}`, { method: "GET", redirect: "follow" })
@@ -923,9 +1048,13 @@
           });
         }
         document.getElementById("cnt-online").textContent = online.length;
+        if (document.getElementById("hub-cnt-online")) document.getElementById("hub-cnt-online").textContent = online.length;
         document.getElementById("cnt-bedarfe").textContent = bedarfe.length;
+        if (document.getElementById("hub-cnt-bedarfe")) document.getElementById("hub-cnt-bedarfe").textContent = bedarfe.length;
         document.getElementById("cnt-akten").textContent = akten.length;
+        if (document.getElementById("hub-cnt-akten")) document.getElementById("hub-cnt-akten").textContent = akten.length;
         document.getElementById("cnt-schatz").textContent = schatzListe.length;
+        if (document.getElementById("hub-cnt-schatz")) document.getElementById("hub-cnt-schatz").textContent = schatzListe.length;
 
         // Hauptakten-Auswahl im Anlege-Formular befüllen
         const parentSel = document.getElementById("ak-new-parent");
@@ -2519,6 +2648,45 @@
       document.getElementById("ki-import-all-btn-bottom").addEventListener("click", function () { executeBulkKiImport(this); });
 
     });
+  
+      // Supermaster Kachel-Übersicht & Zurück-Navigation
+      (function initMasterHubNavigation() {
+        const hubOverview = document.getElementById("m-hub-overview");
+        const subviewBar = document.getElementById("m-subview-bar");
+        const subviewTitle = document.getElementById("m-subview-title");
+        const backBtn = document.getElementById("m-back-to-hub-btn");
+        const panels = document.querySelectorAll(".m-tab-panel");
+
+        function openMasterSection(tabName, labelText) {
+          if (hubOverview) hubOverview.style.display = "none";
+          if (subviewBar) subviewBar.style.display = "flex";
+          if (subviewTitle) subviewTitle.textContent = labelText || tabName;
+          panels.forEach(p => {
+            p.style.display = (p.id === "tab-" + tabName) ? "block" : "none";
+          });
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function showMasterHub() {
+          panels.forEach(p => { p.style.display = "none"; });
+          if (subviewBar) subviewBar.style.display = "none";
+          if (hubOverview) hubOverview.style.display = "grid";
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        document.querySelectorAll(".m-hub-tile[data-open-tab]").forEach(tile => {
+          tile.addEventListener("click", () => {
+            const tab = tile.getAttribute("data-open-tab");
+            const titleEl = tile.querySelector(".m-hub-tile-title");
+            openMasterSection(tab, titleEl ? titleEl.textContent.trim() : tab);
+          });
+        });
+
+        if (backBtn) {
+          backBtn.addEventListener("click", showMasterHub);
+        }
+      })();
+
   </script>
 </body>
 </html>
