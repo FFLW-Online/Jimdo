@@ -629,7 +629,10 @@
           <div class="m-card" style="border-left-color:#15803d; background:#f0fdf4;">
             <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
               <h3 style="margin:0; color:#14532d;">📊 Seiten-Aufrufe &amp; Hits pro Unterseite</h3>
-              <button type="button" id="btn-reset-visit-stats" class="m-btn m-btn-grey" style="font-size:0.82rem;">Statistik auf 0 zurücksetzen</button>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <button type="button" id="btn-reset-visit-today" class="m-btn m-btn-grey" style="font-size:0.82rem;">Nur Heute auf 0 setzen</button>
+                <button type="button" id="btn-reset-visit-all" class="m-btn m-btn-red" style="font-size:0.82rem;">Echter Komplett-Reset (Alles auf 0)</button>
+              </div>
             </div>
             <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; background:#ffffff; border:1px solid #bbf7d0; border-radius:7px; padding:8px 12px; margin-bottom:10px;">
               <span id="my-device-ignore-status" style="font-size:0.86rem; font-weight:bold; color:#15803d;">✓ Dieses Gerät (Notebook/Handy) ist von der Besucherzählung ausgeschlossen.</span>
@@ -2120,21 +2123,26 @@
           reader.onload = ev => {
             const img = new Image();
             img.onload = () => {
-              const maxDim = 1280;
-              let w = img.width, h = img.height;
-              if (w > maxDim || h > maxDim) {
-                if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-                else { w = Math.round(w * maxDim / h); h = maxDim; }
-              }
-              const c = document.createElement("canvas");
-              c.width = w; c.height = h;
-              c.getContext("2d").drawImage(img, 0, 0, w, h);
-              const dataUrl = c.toDataURL("image/jpeg", 0.82);
+              // Für Google Drive Speicherung (1024px) & für schnelle KI-Analyse (768px) aufbereiten -> kein NetworkError!
+              const makeScaled = (maxDim, quality) => {
+                let w = img.width, h = img.height;
+                if (w > maxDim || h > maxDim) {
+                  if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                  else { w = Math.round(w * maxDim / h); h = maxDim; }
+                }
+                const c = document.createElement("canvas");
+                c.width = w; c.height = h;
+                c.getContext("2d").drawImage(img, 0, 0, w, h);
+                return c.toDataURL("image/jpeg", quality);
+              };
+              const dataUrl = makeScaled(1024, 0.80);
+              const aiDataUrl = makeScaled(768, 0.72);
               resolve({
                 name: file.name,
                 dataUrl: dataUrl,
                 mimeType: "image/jpeg",
-                base64: dataUrl.split(",")[1]
+                base64: dataUrl.split(",")[1],
+                aiBase64: aiDataUrl.split(",")[1]
               });
             };
             img.onerror = reject;
@@ -2409,67 +2417,95 @@
         try { localStorage.setItem("fflw_gemini_api_key", apiKey); } catch (e) {}
 
         const task = async () => {
-          statusEl.style.color = "#312e81";
-          statusEl.textContent = "KI analysiert Räume, schätzt Maße und schneidet Einzelbilder aus …";
-
-          const parts = [
-            {
-              text:
-                "Du hilfst einem ehrenamtlichen Flüchtlings-Freundeskreis bei der Wohnungsausstattung. " +
-                "Analysiere die folgenden Wohnungsbilder (nummeriert als Bild #1, Bild #2, ...). " +
-                "Liste ALLE gut erkennbaren, sinnvollen Möbelstücke, Haushaltsgeräte und Einrichtungsgegenstände auf. " +
-                "WICHTIG 1: Wenn mehrere identische Gegenstände zusammengehören (z. B. 6 gleiche Stühle), fasse sie als EINEN Eintrag mit Stückzahl im Titel zusammen (z. B. '6× Esszimmerstuhl')! " +
-                "WICHTIG 2: Gib für jeden Gegenstand die genaue Bounding-Box im jeweiligen Bild an als 'box_2d': [ymin, xmin, ymax, xmax] (normiert auf 0 bis 1000), damit wir das einzelne Möbelstück sauber aus dem Raumfoto ausschneiden können! " +
-                "Schätze außerdem realistische ungefähre Außenmaße im Format 'ca. B x T x H cm'. " +
-                "Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array ohne Markdown-Blöcke in diesem Schema: " +
-                '[{"titel":"...","kategorie":"Wohnzimmer|Schlafzimmer|Küche & Haushalt|Kinderzimmer|Elektro & Technik|Garten & Fahrrad|Sonstiges","beschreibung":"...","masse":"ca. ... cm","bildIndex":1,"box_2d":[100,150,850,700]}]'
-            }
-          ];
-
-          kiLoadedPhotos.forEach((p, idx) => {
-            parts.push({ text: `Bild #${idx + 1}:` });
-            parts.push({ inline_data: { mime_type: p.mimeType, data: p.base64 } });
-          });
-
+          // Paketweise (max. 4 komprimierte Bilder pro Anfrage), damit auf Handy & Notebook kein NetworkError auftritt!
+          const batchSize = 4;
+          const totalBatches = Math.ceil(kiLoadedPhotos.length / batchSize);
+          const allParsed = [];
           const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"];
-          let data = null;
-          let resp = { ok: false };
-          for (const modelName of candidateModels) {
-            resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                contents: [{ parts: parts }],
-                generationConfig: { temperature: 0.2 }
-              })
-            });
-            data = await resp.json();
-            if (resp.ok && data && data.candidates && data.candidates[0]) break;
-          }
-          if (!resp.ok || !data || !data.candidates || !data.candidates[0]) {
-            const errMsg = (data && data.error && data.error.message) ? data.error.message : "KI-Anfrage fehlgeschlagen.";
-            statusEl.style.color = "#c62828";
-            statusEl.textContent = "Fehler: " + errMsg;
-            return { ok: false };
-          }
 
-          let rawText = data.candidates[0].content.parts.map(pt => pt.text || "").join("").trim();
-          rawText = rawText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
-          const parsed = JSON.parse(rawText);
-          if (!Array.isArray(parsed)) throw new Error("Antwort war keine Liste.");
+          for (let b = 0; b < totalBatches; b++) {
+            const startIdx = b * batchSize;
+            const slice = kiLoadedPhotos.slice(startIdx, startIdx + batchSize);
+            statusEl.style.color = "#312e81";
+            statusEl.textContent = totalBatches > 1
+              ? `⏳ KI analysiert Bild-Paket ${b + 1} von ${totalBatches} (Bilder #${startIdx + 1}–#${startIdx + slice.length}) …`
+              : "⏳ KI analysiert Bilder, gruppiert gleiche Artikel & schätzt Maße …";
+
+            const parts = [
+              {
+                text:
+                  "Du hilfst einem ehrenamtlichen Flüchtlings-Freundeskreis bei der Wohnungsausstattung. " +
+                  "Analysiere die folgenden Wohnungsbilder (nummeriert mit ihren exakten Bildnummern). " +
+                  "Liste ALLE gut erkennbaren, sinnvollen Möbelstücke, Haushaltsgeräte und Einrichtungsgegenstände auf. " +
+                  "WICHTIG 1 (Mehrere Fotos desselben Artikels zusammenfassen): Wenn dasselbe Möbelstück auf mehreren Bildern aus verschiedenen Blickwinkeln oder mit Detail-/Innenansicht zu sehen ist (z. B. Bild #1 und Bild #2 zeigen denselben Schrank), fasse sie als EINEN gemeinsamen Eintrag zusammen und gib ALLE dazugehörigen Bildnummern im Array 'bildIndizes' an (z. B. [1, 2])! " +
+                  "WICHTIG 2 (Sets zusammenfassen): Wenn mehrere identische Gegenstände zusammengehören (z. B. 6 gleiche Stühle), fasse sie als EINEN Eintrag mit Stückzahl im Titel zusammen (z. B. '6× Esszimmerstuhl'). " +
+                  "WICHTIG 3: Gib für die Hauptansicht ('bildIndex') die Bounding-Box im Bild an als 'box_2d': [ymin, xmin, ymax, xmax] (normiert auf 0 bis 1000). " +
+                  "Schätze außerdem realistische ungefähre Außenmaße im Format 'ca. B x T x H cm'. " +
+                  "Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array ohne Markdown-Blöcke in diesem Schema: " +
+                  '[{"titel":"...","kategorie":"Wohnzimmer|Schlafzimmer|Küche & Haushalt|Kinderzimmer|Elektro & Technik|Garten & Fahrrad|Sonstiges","beschreibung":"...","masse":"ca. ... cm","bildIndex":1,"bildIndizes":[1,2],"box_2d":[100,150,850,700]}]'
+              }
+            ];
+
+            slice.forEach((p, localIdx) => {
+              const globalNum = startIdx + localIdx + 1;
+              parts.push({ text: `Bild #${globalNum}:` });
+              parts.push({ inline_data: { mime_type: "image/jpeg", data: p.aiBase64 || p.base64 } });
+            });
+
+            let data = null;
+            let resp = { ok: false };
+            let lastNetErr = "";
+            for (const modelName of candidateModels) {
+              try {
+                resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    contents: [{ parts: parts }],
+                    generationConfig: { temperature: 0.2 }
+                  })
+                });
+                data = await resp.json();
+                if (resp.ok && data && data.candidates && data.candidates[0]) break;
+              } catch (netErr) {
+                lastNetErr = netErr.message || "Netzwerkfehler";
+              }
+            }
+            if (!resp.ok || !data || !data.candidates || !data.candidates[0]) {
+              const errMsg = (data && data.error && data.error.message) ? data.error.message : (lastNetErr || "KI-Anfrage fehlgeschlagen.");
+              statusEl.style.color = "#c62828";
+              statusEl.textContent = "Fehler: " + errMsg;
+              return { ok: false };
+            }
+
+            let rawText = data.candidates[0].content.parts.map(pt => pt.text || "").join("").trim();
+            rawText = rawText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+            const parsed = JSON.parse(rawText);
+            if (Array.isArray(parsed)) {
+              allParsed.push(...parsed);
+            }
+          }
 
           const enriched = [];
-          for (const x of parsed) {
-            const bIdx = Number(x.bildIndex || 1);
-            const photoObj = (bIdx >= 1 && kiLoadedPhotos[bIdx - 1]) ? kiLoadedPhotos[bIdx - 1] : null;
-            const cropped = await cropPhotoByBox2d(photoObj, x.box_2d);
+          for (const x of allParsed) {
+            const rawList = Array.isArray(x.bildIndizes) && x.bildIndizes.length
+              ? x.bildIndizes.map(n => Number(n)).filter(n => n >= 1 && n <= kiLoadedPhotos.length)
+              : [];
+            const primaryIdx = Number(x.bildIndex || rawList[0] || 1);
+            const uniqueIndices = Array.from(new Set([primaryIdx, ...rawList].filter(n => n >= 1 && n <= kiLoadedPhotos.length)));
+
+            const photoObj = (primaryIdx >= 1 && kiLoadedPhotos[primaryIdx - 1]) ? kiLoadedPhotos[primaryIdx - 1] : null;
+            // Einzel-Ausschnitt nur dann vorschlagen, wenn nur 1 Foto zugeordnet ist (bei mehreren Fotos eines Artikels direkt die Originalfotos behalten)
+            const cropped = (uniqueIndices.length <= 1) ? await cropPhotoByBox2d(photoObj, x.box_2d) : null;
+
             enriched.push({
               selected: true,
               titel: x.titel || "Gegenstand",
               kategorie: x.kategorie || "Sonstiges",
               beschreibung: x.beschreibung || "",
               masse: x.masse || "",
-              bildIndex: bIdx,
+              bildIndex: primaryIdx,
+              bildIndizes: uniqueIndices.length ? uniqueIndices : (primaryIdx ? [primaryIdx] : []),
               useCrop: !!cropped,
               croppedPhoto: cropped
             });
@@ -2477,7 +2513,7 @@
           kiDetectedItems = enriched;
 
           statusEl.style.color = "#1b5e20";
-          statusEl.textContent = `✓ ${kiDetectedItems.length} Gegenstände erkannt, Maße geschätzt & Einzelbilder ausgeschnitten!`;
+          statusEl.textContent = `✓ ${kiDetectedItems.length} Artikel erkannt (zusammengehörige Fotos wurden gebündelt)!`;
           renderKiPreviewTable();
           return { ok: true };
         };
@@ -2494,6 +2530,15 @@
         }
       });
 
+      function parseBildIndizesStr(strVal) {
+        return Array.from(new Set(
+          String(strVal || "")
+            .split(/[,;\s]+/)
+            .map(s => Number(s.replace(/[^\d]/g, "")))
+            .filter(n => n >= 1 && n <= kiLoadedPhotos.length)
+        ));
+      }
+
       function renderKiPreviewTable() {
         const card = document.getElementById("ki-preview-card");
         const listEl = document.getElementById("ki-items-list");
@@ -2505,22 +2550,23 @@
         card.style.display = "block";
         cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
 
-        const photoOptionsHtml = (selIdx) => {
-          const opts = [`<option value="0" ${!selIdx ? "selected" : ""}>– Kein Foto –</option>`];
-          kiLoadedPhotos.forEach((p, i) => {
-            const num = i + 1;
-            opts.push(`<option value="${num}" ${Number(selIdx) === num ? "selected" : ""}>Bild #${num} (${p.name.substring(0, 18)})</option>`);
-          });
-          return opts.join("");
-        };
-
         listEl.innerHTML = kiDetectedItems.map((item, idx) => {
-          const pIdx = Number(item.bildIndex || 0);
-          const origPhoto = (pIdx >= 1 && kiLoadedPhotos[pIdx - 1]) ? kiLoadedPhotos[pIdx - 1] : null;
-          const activeDataUrl = (item.useCrop && item.croppedPhoto) ? item.croppedPhoto.dataUrl : (origPhoto ? origPhoto.dataUrl : "");
-          const thumbHtml = activeDataUrl
-            ? `<img src="${activeDataUrl}" style="width:96px; height:76px; object-fit:cover; border-radius:6px; border:1px solid #94a3b8;">`
-            : `<div style="width:96px; height:76px; background:#f1f5f9; border:1px dashed #94a3b8; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#64748b;">Ohne Bild</div>`;
+          const indices = Array.isArray(item.bildIndizes) && item.bildIndizes.length
+            ? item.bildIndizes
+            : (Number(item.bildIndex || 0) >= 1 ? [Number(item.bildIndex)] : []);
+
+          let thumbsHtml = "";
+          if (item.useCrop && item.croppedPhoto) {
+            thumbsHtml = `<img src="${item.croppedPhoto.dataUrl}" style="width:92px; height:72px; object-fit:cover; border-radius:6px; border:1px solid #94a3b8;">`;
+          } else if (indices.length > 0) {
+            thumbsHtml = `<div style="display:flex; flex-wrap:wrap; gap:4px; max-width:196px; justify-content:center;">` +
+              indices.map(num => {
+                const ph = kiLoadedPhotos[num - 1];
+                return ph ? `<div style="position:relative;"><img src="${ph.dataUrl}" style="width:${indices.length > 1 ? "60px" : "92px"}; height:${indices.length > 1 ? "52px" : "72px"}; object-fit:cover; border-radius:5px; border:1px solid #94a3b8;"><span style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.72); color:#fff; font-size:0.68rem; padding:1px 4px; border-radius:3px;">#${num}</span></div>` : "";
+              }).join("") + `</div>`;
+          } else {
+            thumbsHtml = `<div style="width:92px; height:72px; background:#f1f5f9; border:1px dashed #94a3b8; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#64748b;">Ohne Bild</div>`;
+          }
 
           return `
             <div class="m-card" style="padding:12px 14px; margin:10px 0; border-left-color:${item.selected !== false ? "#2e7d32" : "#94a3b8"}; background:${item.selected !== false ? "#ffffff" : "#f8fafc"};">
@@ -2529,8 +2575,8 @@
                   <label style="font-size:0.82rem; font-weight:bold; cursor:pointer;">
                     <input type="checkbox" class="ki-row-chk" data-idx="${idx}" ${item.selected !== false ? "checked" : ""}> Übernehmen
                   </label>
-                  ${thumbHtml}
-                  ${item.croppedPhoto ? `<label style="font-size:0.74rem; color:#1e40af; cursor:pointer;"><input type="checkbox" class="ki-row-crop" data-idx="${idx}" ${item.useCrop ? "checked" : ""}> Einzel-Ausschnitt</label>` : ""}
+                  ${thumbsHtml}
+                  ${(item.croppedPhoto && indices.length <= 1) ? `<label style="font-size:0.74rem; color:#1e40af; cursor:pointer;"><input type="checkbox" class="ki-row-crop" data-idx="${idx}" ${item.useCrop ? "checked" : ""}> Einzel-Ausschnitt</label>` : ""}
                 </div>
                 <div style="flex:1; min-width:250px; display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
                   <div>
@@ -2550,8 +2596,8 @@
                     <input type="text" class="m-input ki-row-masse" data-idx="${idx}" value="${String(item.masse || "").replace(/"/g, "&quot;")}" placeholder="z. B. ca. 180 x 90 x 75 cm">
                   </div>
                   <div>
-                    <label style="font-size:0.78rem; font-weight:bold;">Zugeordnetes Foto</label>
-                    <select class="m-select ki-row-img" data-idx="${idx}">${photoOptionsHtml(pIdx)}</select>
+                    <label style="font-size:0.78rem; font-weight:bold;">Zugeordnete Bild-Nr. (mehrere mit Komma, z. B. 1, 2)</label>
+                    <input type="text" class="m-input ki-row-imgs" data-idx="${idx}" value="${indices.join(", ")}" placeholder="z. B. 1, 2">
                   </div>
                   <div style="grid-column: 1 / -1;">
                     <label style="font-size:0.78rem; font-weight:bold;">Beschreibung / Zustand</label>
@@ -2575,15 +2621,17 @@
         listEl.querySelectorAll(".ki-row-kat").forEach(el => el.addEventListener("change", () => { kiDetectedItems[Number(el.dataset.idx)].kategorie = el.value; }));
         listEl.querySelectorAll(".ki-row-masse").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].masse = el.value; }));
         listEl.querySelectorAll(".ki-row-desc").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].beschreibung = el.value; }));
-        listEl.querySelectorAll(".ki-row-img").forEach(el => el.addEventListener("change", () => {
+        listEl.querySelectorAll(".ki-row-imgs").forEach(el => el.addEventListener("change", () => {
           const i = Number(el.dataset.idx);
-          kiDetectedItems[i].bildIndex = Number(el.value);
+          const parsedList = parseBildIndizesStr(el.value);
+          kiDetectedItems[i].bildIndizes = parsedList;
+          kiDetectedItems[i].bildIndex = parsedList[0] || 0;
           kiDetectedItems[i].useCrop = false;
           renderKiPreviewTable();
         }));
       }
 
-      // Einzeln nacheinander speichern, damit kein Timeout-Fehler bei vielen Bildern auftritt!
+      // Einzeln pro Artikel nacheinander speichern (inkl. aller gebündelten Fotos in einem Artikel-Unterordner!)
       async function executeBulkKiImport(triggerBtn) {
         const spenderName = document.getElementById("ki-spender").value.trim() || "Wohnungsauflösung / Sachspende";
         const ort = document.getElementById("ki-ort").value.trim() || "Leutenbach / Winnenden";
@@ -2594,9 +2642,30 @@
         const toImport = kiDetectedItems
           .filter(x => x.selected !== false && String(x.titel || "").trim())
           .map(x => {
-            const pIdx = Number(x.bildIndex || 0);
-            const origPhoto = (pIdx >= 1 && kiLoadedPhotos[pIdx - 1]) ? kiLoadedPhotos[pIdx - 1] : null;
-            const chosenPhoto = (x.useCrop && x.croppedPhoto) ? x.croppedPhoto : origPhoto;
+            const indices = Array.isArray(x.bildIndizes) && x.bildIndizes.length
+              ? x.bildIndizes
+              : (Number(x.bildIndex || 0) >= 1 ? [Number(x.bildIndex)] : []);
+
+            let photosPayload = [];
+            if (x.useCrop && x.croppedPhoto && indices.length <= 1) {
+              photosPayload.push({
+                photoBase64: x.croppedPhoto.base64,
+                photoMime: x.croppedPhoto.mimeType,
+                photoName: "ausschnitt.jpg"
+              });
+            } else {
+              indices.forEach(num => {
+                const ph = kiLoadedPhotos[num - 1];
+                if (ph && ph.base64) {
+                  photosPayload.push({
+                    photoBase64: ph.base64,
+                    photoMime: ph.mimeType || "image/jpeg",
+                    photoName: ph.name || `bild_${num}.jpg`
+                  });
+                }
+              });
+            }
+
             const fullDesc = [
               x.beschreibung || "",
               x.masse ? `Geschätzte Maße (KI): ${x.masse}` : ""
@@ -2607,9 +2676,7 @@
               kategorie: x.kategorie || "Sonstiges",
               beschreibung: fullDesc,
               masse: x.masse || "",
-              photoBase64: chosenPhoto ? chosenPhoto.base64 : "",
-              photoMime: chosenPhoto ? chosenPhoto.mimeType : "",
-              photoName: origPhoto ? origPhoto.name : ""
+              photos: photosPayload
             };
           });
 
@@ -2622,7 +2689,7 @@
           let savedOk = 0;
           for (let i = 0; i < toImport.length; i++) {
             msgEl.style.color = "#312e81";
-            msgEl.textContent = `⏳ Speichere Artikel ${i + 1} von ${toImport.length}: „${toImport[i].titel}“ …`;
+            msgEl.textContent = `⏳ Speichere Artikel ${i + 1} von ${toImport.length}: „${toImport[i].titel}“ (${toImport[i].photos.length} Foto/s) …`;
             const res = await postAction({
               action: "bulkImportApartmentItems",
               spenderName: spenderName,
@@ -2640,7 +2707,7 @@
             }
           }
           msgEl.style.color = "#1b5e20";
-          msgEl.textContent = `✓ Alle ${savedOk} Artikel erfolgreich gespeichert!`;
+          msgEl.textContent = `✓ Alle ${savedOk} Artikel (inkl. gebündelter Mehrfach-Fotos) erfolgreich gespeichert!`;
           loadMasterData(currentCode, false);
           return { ok: true };
         };
@@ -2698,33 +2765,36 @@
         }
       })();
 
-  
-      const resetStatsBtn = document.getElementById("btn-reset-visit-stats");
-      if (resetStatsBtn) {
-        resetStatsBtn.addEventListener("click", async () => {
-          if (!confirm("Möchtest du alle bisherigen Test-Aufrufe wirklich auf 0 zurücksetzen?")) return;
-          resetStatsBtn.disabled = true;
-          try {
-            const resp = await fetch(WEB_APP_URL, {
-              method: "POST",
-              redirect: "follow",
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify({ action: "reset_visit_stats", masterCode: currentCode })
-            });
-            const res = await resp.json();
-            resetStatsBtn.disabled = false;
-            if (res && res.ok) {
-              alert("Die Seitenstatistik wurde sauber auf 0 zurückgesetzt.");
-              location.reload();
-            } else {
-              alert("Fehler: " + ((res && res.error) || "Nicht erlaubt"));
-            }
-          } catch (e) {
-            resetStatsBtn.disabled = false;
-            alert("Verbindungsfehler: " + e.message);
+      async function runVisitStatsReset(mode, triggerBtn) {
+        const msg = mode === "today"
+          ? "Möchtest du nur die heutigen Seitenaufrufe auf 0 zurücksetzen?"
+          : "ECHTER KOMPLETT-RESET: Möchtest du wirklich ALLE bisherigen Besucherzahlen (Heute, Woche, Monat und Gesamt) unwiderruflich auf 0 setzen?";
+        if (!confirm(msg)) return;
+        if (triggerBtn) triggerBtn.disabled = true;
+        try {
+          const res = await postAction({ action: "reset_visit_stats", mode: mode });
+          if (triggerBtn) triggerBtn.disabled = false;
+          if (res && res.ok) {
+            alert(mode === "today" ? "✓ Heutige Zähler wurden auf 0 gesetzt." : "✓ Alle Besucherzahlen wurden komplett auf 0 zurückgesetzt.");
+            location.reload();
+          } else {
+            alert("Fehler: " + ((res && res.error) || "Nicht erlaubt (nur Supermaster)"));
           }
-        });
+        } catch (e) {
+          if (triggerBtn) triggerBtn.disabled = false;
+          alert("Verbindungsfehler: " + e.message);
+        }
       }
+
+      const btnResetToday = document.getElementById("btn-reset-visit-today");
+      if (btnResetToday) btnResetToday.addEventListener("click", () => runVisitStatsReset("today", btnResetToday));
+
+      const btnResetAll = document.getElementById("btn-reset-visit-all");
+      if (btnResetAll) btnResetAll.addEventListener("click", () => runVisitStatsReset("all", btnResetAll));
+
+
+  
+
 
   
       (function initIgnoreMyDeviceToggle() {
