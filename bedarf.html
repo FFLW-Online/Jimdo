@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aktueller Bedarf | Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .bd-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-left: 5px solid #004080;
+      border-radius: 9px;
+      padding: 15px 18px;
+      margin: 12px 0;
+    }
+    .bd-card.is-urgent { border-left-color: #dc2626; background: #fffafa; }
+    .bd-header-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .bd-title {
+      font-size: 1.08rem;
+      font-weight: bold;
+      color: #003366;
+      word-break: break-word;
+    }
+    .bd-badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .bd-badge-dauer { background: #e0f2fe; color: #0369a1; border: 1px solid #7dd3fc; }
+    .bd-badge-urgent { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+    .bd-form-box {
+      background: #f8fbff;
+      border: 1px solid #bfdbfe;
+      border-left: 5px solid #2e7d32;
+      border-radius: 9px;
+      padding: 16px 18px;
+      margin-top: 22px;
+    }
+    .bd-label { display: block; font-weight: bold; color: #003366; margin: 10px 0 4px 0; }
+    .bd-input, .bd-select, .bd-textarea {
+      width: 100%; padding: 9px 11px; border: 1px solid #94a3b8; border-radius: 6px; font-size: 16px; box-sizing: border-box;
+    }
+    .bd-btn {
+      background: #004080; color: #ffffff; border: none; padding: 11px 18px; border-radius: 7px; font-weight: bold; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>Aktueller Bedarf – Was wird gerade dringend gesucht?</h2>
+      <p>
+        Hier sehen Sie sowohl unseren regelmäßigen <strong>Dauerbedarf</strong> als auch <strong>aktuell gemeldete Einzelbedarfe</strong> für Familien und Einzelpersonen in Leutenbach und Winnenden. Wenn Sie helfen können, melden Sie sich gerne über <a href="spenden.html">Möbel &amp; Sachen spenden</a> oder per E-Mail.
+      </p>
+
+      <h3 style="color:#003366;">Dauerbedarf &amp; Grundausstattung</h3>
+      <div class="bd-card">
+        <div class="bd-header-row">
+          <span class="bd-title">🧺 Waschmaschinen</span>
+          <span class="bd-badge bd-badge-dauer">Dauerbedarf</span>
+        </div>
+        <p style="margin:6px 0 0 0; font-size:0.93rem;">Funktionstüchtige Frontlader-Waschmaschinen werden laufend für Erstausstattungen von Wohnungen benötigt.</p>
+      </div>
+      <div class="bd-card">
+        <div class="bd-header-row">
+          <span class="bd-title">🚲 Verkehrssichere Fahrräder &amp; Kinderfahrräder</span>
+          <span class="bd-badge bd-badge-dauer">Dauerbedarf</span>
+        </div>
+        <p style="margin:6px 0 0 0; font-size:0.93rem;">Für den Weg zur Arbeit, zum Sprachkurs und zur Schule (inkl. Schlössern und Helmen).</p>
+      </div>
+      <div class="bd-card">
+        <div class="bd-header-row">
+          <span class="bd-title">🛏️ Kleiderschränke, Betten &amp; Kommoden</span>
+          <span class="bd-badge bd-badge-dauer">Dauerbedarf</span>
+        </div>
+        <p style="margin:6px 0 0 0; font-size:0.93rem;">Stabile, gut auf- und abbaubare Schränke und Betten (90×200 cm oder 140×200 cm).</p>
+      </div>
+
+      <h3 style="color:#003366; margin-top:22px;">Aktuell gemeldete Bedarfe</h3>
+      <div id="bd-live-list"><p>Lade aktuelle Bedarfe …</p></div>
+
+      <section class="bd-form-box">
+        <h3 style="margin-top:0; color:#1b5e20;">Neuen Bedarf anmelden</h3>
+        <form id="bd-form">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:10px;">
+            <div>
+              <label class="bd-label" for="bd-artikel">Gesuchter Gegenstand *</label>
+              <input type="text" id="bd-artikel" class="bd-input" required placeholder="z. B. Kinderbett, Kühlschrank, Schreibtisch">
+            </div>
+            <div>
+              <label class="bd-label" for="bd-prio">Dringlichkeit</label>
+              <select id="bd-prio" class="bd-select">
+                <option value="normal">Normal</option>
+                <option value="dringend">Dringend</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:10px;">
+            <div>
+              <label class="bd-label" for="bd-name">Ihr Name *</label>
+              <input type="text" id="bd-name" class="bd-input" required placeholder="Vor- und Nachname">
+            </div>
+            <div>
+              <label class="bd-label" for="bd-kontakt">Telefon / E-Mail (bleibt intern) *</label>
+              <input type="text" id="bd-kontakt" class="bd-input" required placeholder="Für Rückfragen durch das Team">
+            </div>
+            <div>
+              <label class="bd-label" for="bd-code">Persönliche 6-stellige Nummer (optional)</label>
+              <input type="text" id="bd-code" class="bd-input" inputmode="numeric" maxlength="10" placeholder="Falls vorhanden">
+            </div>
+          </div>
+          <label class="bd-label" for="bd-details">Details / Maße / Ort (optional)</label>
+          <textarea id="bd-details" class="bd-textarea" rows="2" placeholder="z. B. maximale Breite, Stadtteil …"></textarea>
+          <div style="margin-top:12px; display:flex; align-items:center; gap:10px;">
+            <button type="submit" id="bd-submit-btn" class="bd-btn">Bedarf eintragen</button>
+            <span id="bd-msg" style="font-weight:bold;"></span>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+
+      if (window.FFLW_Account) {
+        const acc = window.FFLW_Account.get();
+        if (acc) {
+          if (acc.name) document.getElementById("bd-name").value = acc.name;
+          if (acc.kontakt || acc.email) document.getElementById("bd-kontakt").value = acc.kontakt || acc.email;
+          if (acc.code) document.getElementById("bd-code").value = acc.code;
+        }
+      }
+
+      async function loadOpenDemands() {
+        const listEl = document.getElementById("bd-live-list");
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=getOpenDemands&t=${Date.now()}`, { method: "GET", redirect: "follow" });
+          const data = await resp.json();
+          const arr = (data && Array.isArray(data.bedarfe)) ? data.bedarfe : [];
+          if (!arr.length) {
+            listEl.innerHTML = `<div class="bd-card"><p style="margin:0;">Aktuell sind keine zusätzlichen Einzelbedarfe eingetragen.</p></div>`;
+            return;
+          }
+          listEl.innerHTML = arr.map(b => {
+            const isUrg = String(b.prioritaet || "").toLowerCase().includes("dringend");
+            return `
+              <div class="bd-card ${isUrg ? "is-urgent" : ""}">
+                <div class="bd-header-row">
+                  <span class="bd-title">${b.artikelName || "Bedarf"}</span>
+                  ${isUrg ? `<span class="bd-badge bd-badge-urgent">Dringend</span>` : `<span class="bd-badge bd-badge-dauer">Aktuell gesucht</span>`}
+                </div>
+                ${b.ortDetails ? `<p style="margin:6px 0 0 0; font-size:0.92rem; color:#334155;">${b.ortDetails}</p>` : ""}
+              </div>
+            `;
+          }).join("");
+        } catch (err) {
+          listEl.innerHTML = `<div class="bd-card"><p style="margin:0; color:#b91c1c;">Aktuelle Bedarfe konnten gerade nicht geladen werden.</p></div>`;
+        }
+      }
+
+      document.getElementById("bd-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const btn = document.getElementById("bd-submit-btn");
+        const msg = document.getElementById("bd-msg");
+        btn.disabled = true;
+        btn.textContent = "⏳ Speichere …";
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "submitDemand",
+              artikelName: document.getElementById("bd-artikel").value.trim(),
+              prioritaet: document.getElementById("bd-prio").value,
+              name: document.getElementById("bd-name").value.trim(),
+              kontakt: document.getElementById("bd-kontakt").value.trim(),
+              editCode: document.getElementById("bd-code").value.trim(),
+              ortDetails: document.getElementById("bd-details").value.trim()
+            })
+          });
+          const res = await resp.json();
+          btn.disabled = false;
+          btn.textContent = "Bedarf eintragen";
+          if (res && res.ok) {
+            msg.style.color = "#15803d";
+            msg.textContent = "✓ Bedarf wurde eingetragen!";
+            document.getElementById("bd-artikel").value = "";
+            document.getElementById("bd-details").value = "";
+            await loadOpenDemands();
+          } else {
+            throw new Error((res && res.error) || "Fehler");
+          }
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = "Bedarf eintragen";
+          msg.style.color = "#b91c1c";
+          msg.textContent = "Fehler: " + err.message;
+        }
+      });
+
+      loadOpenDemands();
+    });
+  </script>
+</body>
+</html>

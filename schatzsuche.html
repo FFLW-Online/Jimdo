@@ -309,7 +309,10 @@
           </summary>
           <div style="margin-top:8px; font-size:0.91rem; color:#334155; line-height:1.5;">
             <p style="margin-top:0;">
-              <strong>Dein persönlicher Schlüssel:</strong> Damit deine Angaben aus der Schatzsuche und deine Unterlagen im Briefkasten sicher zusammengehören – ohne dass deine Daten öffentlich im Internet stehen –, erhältst du eine 6-stellige Nummer. Damit kannst du deine Schatzsuche jederzeit später wieder öffnen und ergänzen.
+              <strong>Dein persönlicher Schlüssel (wie ein eigenes Konto):</strong> Damit deine Angaben aus der Schatzsuche, deine Unterlagen im Briefkasten und deine Wünsche im Warenhaus sicher zusammengehören – ohne dass deine Daten öffentlich im Internet stehen –, erhältst du eine 6-stellige Nummer. Damit kannst du deine Daten jederzeit wieder öffnen und musst Namen &amp; Telefonnummer nicht immer neu eintippen.
+            </p>
+            <p>
+              <strong>Warum nicht einfach über den Namen?</strong> Wenn wir nur eure Namen verwenden würden, gibt es oft Missverständnisse: Wenn Namen aus anderen Sprachen (z. B. Arabisch, Persisch, Ukrainisch oder Tigrinya) ins Deutsche übersetzt bzw. in lateinische Buchstaben übertragen werden, gibt es oft mehrere Schreibweisen und es ist nicht eindeutig. Um Verwirrung zu vermeiden, nutzen wir diese eindeutige persönliche Nummer.
             </p>
             <p style="margin-bottom:0;">
               <strong>100 % aufwärts-kompatibel:</strong> Wenn du bereits eine frühere 6-stellige Nummer von uns bekommen hast, bleibt sie selbstverständlich dauerhaft gültig!
@@ -451,7 +454,7 @@
         <section class="sz-card" style="border-left-color:#2e7d32;">
           <h3>2. Wähle die Bereiche aus, die dich interessieren oder in denen du etwas kannst</h3>
           <p style="margin-top:0; font-size:0.94rem;">
-            Tippe auf eine Kachel – sie öffnet sich direkt darunter. Bei jedem angekreuzten Unterpunkt kannst du genau angeben, wie gut du dich darin auskennst (oder ob es ein Traum zum Lernen ist).
+            Tippe auf eine Kachel – sie öffnet sich direkt darunter. Bei jedem angekreuzten Unterpunkt kannst du genau angeben, wie gut du dich darin auskennst (oder ob es ein Traum zum Lernen ist). <strong>Tipp: Alles, was du oben angeklickt hast, kannst du im freien Textfeld direkt darunter (unter „Vertiefung“) noch genauer erläutern!</strong>
           </p>
 
           <div class="sz-topic-grid" id="sz-topic-tiles"></div>
@@ -1024,6 +1027,20 @@ Mein Hinweis / Verbesserungsvorschlag:
 
       document.getElementById("sz-load-btn").addEventListener("click", () => loadExistingSchatz());
 
+      
+      if (window.FFLW_Account) {
+        const savedAcc = window.FFLW_Account.get();
+        if (savedAcc) {
+          if (savedAcc.name && !document.getElementById("sz-name").value) document.getElementById("sz-name").value = savedAcc.name;
+          if (savedAcc.kontakt && !document.getElementById("sz-kontakt").value) document.getElementById("sz-kontakt").value = savedAcc.kontakt;
+          if (savedAcc.email && !document.getElementById("sz-email").value) document.getElementById("sz-email").value = savedAcc.email;
+          if (savedAcc.herkunftsland && !document.getElementById("sz-herkunft").value) document.getElementById("sz-herkunft").value = savedAcc.herkunftsland;
+          if (savedAcc.code && !urlSc && !loadInput.value) {
+            loadInput.value = savedAcc.code;
+          }
+        }
+      }
+
       const urlParams = new URLSearchParams(window.location.search);
       const urlSc = urlParams.get("sc") || urlParams.get("schatzcode");
       const urlAc = urlParams.get("c") || urlParams.get("code");
@@ -1153,6 +1170,7 @@ Mein Hinweis / Verbesserungsvorschlag:
           if (timerId) clearInterval(timerId);
           if (res && res.ok) {
             activeSchatzCode = res.schatzCode || activeSchatzCode;
+            if (window.FFLW_Account) window.FFLW_Account.save({ code: activeSchatzCode, name: document.getElementById("sz-name").value, kontakt: document.getElementById("sz-kontakt").value, email: document.getElementById("sz-email").value, herkunftsland: document.getElementById("sz-herkunft").value });
             if (triggerBtn) {
               triggerBtn.disabled = false;
               triggerBtn.classList.remove("sz-btn-saving");

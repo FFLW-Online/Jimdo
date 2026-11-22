@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Radanfrage (Vorbestellung) | Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+    .fflw-dev-banner {
+      background: #fffbeb;
+      border: 1px solid #f59e0b;
+      border-left: 5px solid #d97706;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin: 12px 0 18px 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.93rem;
+    }
+    .fflw-dev-btn {
+      display: inline-block;
+      background: #b45309;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+    .ra-card {
+      background: #ffffff; border: 1px solid #cbd5e1; border-left: 5px solid #004080; border-radius: 9px; padding: 18px 20px; margin: 16px 0;
+    }
+    .ra-label { display: block; font-weight: bold; color: #003366; margin: 10px 0 4px 0; }
+    .ra-input, .ra-select, .ra-textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid #94a3b8; border-radius: 6px; font-size: 16px; box-sizing: border-box;
+    }
+    .ra-btn {
+      background: #004080; color: #ffffff; border: none; padding: 12px 20px; border-radius: 7px; font-weight: bold; font-size: 1rem; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>🚲 Radanfrage &amp; Vorbestellung</h2>
+      <div class="fflw-dev-banner">
+        <span>🚧 <strong>Hinweis:</strong> Diese Seite ist noch in der Entwicklung. Für Hinweise zur Verbesserung oder falls etwas nicht funktioniert, sind wir dankbar.</span>
+        <a id="dev-feedback-mail" class="fflw-dev-btn" href="mailto:Kontakt@freundeleuwi.org">✉️ Hinweis per E-Mail senden</a>
+      </div>
+
+      <p>
+        Sie benötigen ein verkehrssicheres Fahrrad für den Weg zur Arbeit, zum Deutschkurs, zum Einkaufen oder für Ihre Kinder? Tragen Sie hier Ihren Wunsch ein – sobald ein passendes Fahrrad in unserer Werkstatt fertiggestellt ist, melden wir uns bei Ihnen und dokumentieren die Übergabe (inkl. eventuellem kleinem Unkostenbeitrag für Ersatzteile).
+      </p>
+
+      <section class="ra-card">
+        <h3 style="margin-top:0; color:#003366;">Fahrrad-Wunsch eintragen</h3>
+        <form id="ra-form">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
+            <div>
+              <label class="ra-label" for="ra-name">Ihr Name *</label>
+              <input type="text" id="ra-name" class="ra-input" required placeholder="Vor- und Nachname">
+            </div>
+            <div>
+              <label class="ra-label" for="ra-code">Persönliche 6-stellige Nummer (optional)</label>
+              <input type="text" id="ra-code" class="ra-input" inputmode="numeric" maxlength="10" placeholder="Falls vorhanden">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
+            <div>
+              <label class="ra-label" for="ra-kontakt">Telefon / WhatsApp oder E-Mail *</label>
+              <input type="text" id="ra-kontakt" class="ra-input" required placeholder="z. B. 0171 1234567">
+            </div>
+            <div>
+              <label class="ra-label" for="ra-typ">Gewünschter Fahrrad-Typ *</label>
+              <select id="ra-typ" class="ra-select">
+                <option value="Damenrad (26 / 28 Zoll)">Damenrad (tiefer Einstieg, 26 / 28 Zoll)</option>
+                <option value="Herrenrad / Trekkingrad (28 Zoll)">Herrenrad / Trekkingrad (28 Zoll)</option>
+                <option value="Jugendrad (24 / 26 Zoll)">Jugendrad (24 / 26 Zoll)</option>
+                <option value="Kinderfahrrad (12 bis 20 Zoll)">Kinderfahrrad (bitte Alter/Größe angeben)</option>
+              </select>
+            </div>
+            <div>
+              <label class="ra-label" for="ra-groesse">Körpergröße (in cm)</label>
+              <input type="text" id="ra-groesse" class="ra-input" placeholder="z. B. 172 cm">
+            </div>
+          </div>
+
+          <label class="ra-label" for="ra-bemerkung">Wofür wird das Rad benötigt / Besonderheiten?</label>
+          <textarea id="ra-bemerkung" class="ra-textarea" rows="3" placeholder="z. B. Weg zur Arbeit nach Winnenden, Kindersitz benötigt …"></textarea>
+
+          <div style="margin-top:14px; display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
+            <button type="submit" id="ra-submit-btn" class="ra-btn">Radanfrage absenden</button>
+            <span id="ra-msg" style="font-weight:bold;"></span>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      const pageTitle = document.title || document.querySelector("h2")?.textContent || "Webseite";
+      const pageUrl = window.location.href;
+      const devBtn = document.getElementById("dev-feedback-mail");
+      if (devBtn) {
+        const subj = encodeURIComponent(`Hinweis zur Webseite (${pageTitle})`);
+        const body = encodeURIComponent(`Hallo Team,\n\nmein Hinweis bezieht sich auf folgende Seite:\nSeite: ${pageTitle}\nLink: ${pageUrl}\n\nMein Hinweis / Verbesserungsvorschlag:\n`);
+        devBtn.href = `mailto:Kontakt@freundeleuwi.org?subject=${subj}&body=${body}`;
+      }
+      if (window.FFLW_Account) {
+        const acc = window.FFLW_Account.get();
+        if (acc) {
+          if (acc.name) document.getElementById("ra-name").value = acc.name;
+          if (acc.code) document.getElementById("ra-code").value = acc.code;
+          if (acc.kontakt || acc.email) document.getElementById("ra-kontakt").value = acc.kontakt || acc.email;
+        }
+      }
+
+      document.getElementById("ra-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const btn = document.getElementById("ra-submit-btn");
+        const msg = document.getElementById("ra-msg");
+        const orig = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "⏳ Wird gesendet …";
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "submitBikeRequest",
+              name: document.getElementById("ra-name").value.trim(),
+              personenCode: document.getElementById("ra-code").value.trim(),
+              kontakt: document.getElementById("ra-kontakt").value.trim(),
+              radTyp: document.getElementById("ra-typ").value,
+              groesse: document.getElementById("ra-groesse").value.trim(),
+              bemerkung: document.getElementById("ra-bemerkung").value.trim()
+            })
+          });
+          const res = await resp.json();
+          btn.disabled = false;
+          if (res && res.ok) {
+            if (window.FFLW_Account) window.FFLW_Account.save({
+              code: document.getElementById("ra-code").value.trim(),
+              name: document.getElementById("ra-name").value.trim(),
+              kontakt: document.getElementById("ra-kontakt").value.trim()
+            });
+            btn.textContent = "✓ Gespeichert!";
+            msg.style.color = "#15803d";
+            msg.textContent = "✓ Vielen Dank! Ihre Radanfrage ist eingegangen.";
+            document.getElementById("ra-form").reset();
+            setTimeout(() => { btn.textContent = orig; }, 3000);
+          } else {
+            throw new Error((res && res.error) || "Fehler");
+          }
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = orig;
+          msg.style.color = "#b91c1c";
+          msg.textContent = "Fehler: " + err.message;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Warenhaus – Kostenlose Möbel &amp; Haushaltswaren | FFLW</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .wh-account-bar {
+      background: #fffdf7;
+      border: 1.5px solid #f59e0b;
+      border-left: 5px solid #d97706;
+      border-radius: 9px;
+      padding: 13px 16px;
+      margin: 12px 0 18px 0;
+    }
+    .wh-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+    .wh-item {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-left: 5px solid #2e7d32;
+      border-radius: 9px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .wh-item.is-res { border-left-color: #d97706; opacity: 0.85; }
+    .wh-input {
+      padding: 8px 11px; border: 1px solid #94a3b8; border-radius: 6px; font-size: 15px;
+    }
+    .wh-btn {
+      background: #004080; color: #ffffff; border: none; padding: 9px 14px; border-radius: 6px; font-weight: bold; cursor: pointer;
+    }
+    .wh-btn-green { background: #2e7d32; }
+    .wh-modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 9999; align-items: center; justify-content: center; padding: 16px;
+    }
+    .wh-modal-box {
+      background: #ffffff; border-radius: 10px; padding: 20px; max-width: 440px; width: 100%; border-top: 6px solid #004080;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>Warenhaus – Kostenlose Möbel &amp; Haushaltssachen</h2>
+      <p>
+        Hier finden Sie gut erhaltene gespendete Möbel und Haushaltsgegenstände zur kostenlosen Vermittlung in Leutenbach und Winnenden.
+      </p>
+
+      <section class="wh-account-bar">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+          <div>
+            <strong style="color:#78350f;">🔑 Mein Konto / Persönliche 6-stellige Nummer (optional):</strong>
+            <div id="wh-acc-status" style="font-size:0.9rem; color:#334155; margin-top:2px;">
+              Mit deiner 6-stelligen Nummer werden Name &amp; Kontakt beim Reservieren automatisch ausgefüllt.
+            </div>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+            <input type="text" id="wh-acc-code" class="wh-input" inputmode="numeric" maxlength="10" placeholder="6-stellige Nr. …" style="width:150px; font-weight:bold;">
+            <button type="button" id="wh-acc-load-btn" class="wh-btn">Anmelden / Laden</button>
+          </div>
+        </div>
+      </section>
+
+      <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+        <input type="search" id="wh-search" class="wh-input" placeholder="Nach Möbeln suchen (z. B. Schrank, Tisch, Stuhl) …" style="flex:1 1 240px;">
+      </div>
+
+      <div id="wh-grid" class="wh-grid"><p>Lade Angebote …</p></div>
+    </main>
+  </div>
+
+  <div id="wh-res-modal" class="wh-modal">
+    <div class="wh-modal-box">
+      <h3 style="margin-top:0; color:#003366;">Artikel reservieren</h3>
+      <p id="wh-modal-title" style="font-weight:bold; color:#1b5e20;"></p>
+      <div style="display:flex; flex-direction:column; gap:9px;">
+        <input type="text" id="wh-res-code" class="wh-input" inputmode="numeric" maxlength="10" placeholder="Persönliche 6-stellige Nummer (optional)">
+        <input type="text" id="wh-res-name" class="wh-input" placeholder="Ihr Name *">
+        <input type="text" id="wh-res-kontakt" class="wh-input" placeholder="Telefon / WhatsApp oder E-Mail *">
+        <input type="text" id="wh-res-notiz" class="wh-input" placeholder="Kurzer Hinweis (optional)">
+      </div>
+      <div id="wh-res-msg" style="margin-top:8px; font-weight:bold;"></div>
+      <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end;">
+        <button type="button" id="wh-modal-cancel" class="wh-btn" style="background:#64748b;">Abbrechen</button>
+        <button type="button" id="wh-modal-confirm" class="wh-btn wh-btn-green">✓ Verbindlich anfragen</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      let allItems = [];
+      let selectedItemId = "";
+
+      function applyAccountToWarenhaus(acc) {
+        if (!acc) return;
+        const st = document.getElementById("wh-acc-status");
+        if (acc.code) document.getElementById("wh-acc-code").value = acc.code;
+        if (acc.code) document.getElementById("wh-res-code").value = acc.code;
+        if (acc.name) document.getElementById("wh-res-name").value = acc.name;
+        if (acc.kontakt || acc.email) document.getElementById("wh-res-kontakt").value = acc.kontakt || acc.email;
+        if (st && (acc.name || acc.code)) {
+          st.innerHTML = `✓ Angemeldet als <strong>${acc.name || "Teilnehmer"}</strong> ${acc.code ? `(Konto-Nr. <strong>${acc.code}</strong>)` : ""} – Daten werden automatisch eingefügt.`;
+        }
+      }
+
+      if (window.FFLW_Account) applyAccountToWarenhaus(window.FFLW_Account.get());
+
+      document.getElementById("wh-acc-load-btn").addEventListener("click", async function () {
+        const c = document.getElementById("wh-acc-code").value.trim();
+        const st = document.getElementById("wh-acc-status");
+        if (!c) return;
+        this.disabled = true;
+        this.textContent = "⏳ Prüfe …";
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=getTreasureEntry&code=${encodeURIComponent(c)}&t=${Date.now()}`, { method: "GET", redirect: "follow" });
+          const res = await resp.json();
+          this.disabled = false;
+          this.textContent = "Anmelden / Laden";
+          if (res && res.ok && res.entry) {
+            const saved = window.FFLW_Account ? window.FFLW_Account.save({
+              code: c, name: res.entry.name, kontakt: res.entry.kontakt, email: res.entry.email
+            }) : { code: c, name: res.entry.name, kontakt: res.entry.kontakt };
+            applyAccountToWarenhaus(saved);
+          } else {
+            const saved = window.FFLW_Account ? window.FFLW_Account.save({ code: c }) : { code: c };
+            applyAccountToWarenhaus(saved);
+            st.textContent = `✓ Nummer ${c} gemerkt!`;
+          }
+        } catch (e) {
+          this.disabled = false;
+          this.textContent = "Anmelden / Laden";
+        }
+      });
+
+      function renderItems() {
+        const q = document.getElementById("wh-search").value.toLowerCase().trim();
+        const grid = document.getElementById("wh-grid");
+        const filtered = allItems.filter(it => !q || `${it.titel} ${it.beschreibung} ${it.kategorie}`.toLowerCase().includes(q));
+        if (!filtered.length) {
+          grid.innerHTML = `<div class="wh-item"><p style="margin:0;">Aktuell keine passenden Angebote gefunden.</p></div>`;
+          return;
+        }
+        grid.innerHTML = filtered.map(it => `
+          <article class="wh-item ${it.reserviert ? "is-res" : ""}">
+            <div>
+              ${it.bildUrl ? `<img src="${it.bildUrl}" alt="${it.titel}" style="width:100%; height:170px; object-fit:cover; border-radius:6px; margin-bottom:8px;">` : ""}
+              <h3 style="margin:0 0 6px 0; color:#003366; font-size:1.06rem;">${it.titel}</h3>
+              <p style="margin:0; font-size:0.91rem; color:#334155;">${it.beschreibung || ""}</p>
+              ${it.ort ? `<div style="font-size:0.83rem; color:#64748b; margin-top:6px;">📍 Standort: ${it.ort}</div>` : ""}
+            </div>
+            <div>
+              ${it.reserviert
+                ? `<span style="display:inline-block; background:#fef3c7; color:#92400e; padding:6px 10px; border-radius:6px; font-weight:bold; font-size:0.88rem;">Bereits reserviert</span>`
+                : `<button type="button" class="wh-btn wh-btn-green btn-open-res" data-id="${it.id}" data-titel="${it.titel}">Reservieren / Anfragen</button>`}
+            </div>
+          </article>
+        `).join("");
+
+        grid.querySelectorAll(".btn-open-res").forEach(btn => {
+          btn.addEventListener("click", () => {
+            selectedItemId = btn.dataset.id;
+            document.getElementById("wh-modal-title").textContent = btn.dataset.titel;
+            document.getElementById("wh-res-msg").textContent = "";
+            document.getElementById("wh-res-modal").style.display = "flex";
+          });
+        });
+      }
+
+      document.getElementById("wh-search").addEventListener("input", renderItems);
+      document.getElementById("wh-modal-cancel").addEventListener("click", () => {
+        document.getElementById("wh-res-modal").style.display = "none";
+      });
+      document.getElementById("wh-modal-confirm").addEventListener("click", async function () {
+        const name = document.getElementById("wh-res-name").value.trim();
+        const kontakt = document.getElementById("wh-res-kontakt").value.trim();
+        const code = document.getElementById("wh-res-code").value.trim();
+        const msg = document.getElementById("wh-res-msg");
+        if (!name || !kontakt) { msg.style.color = "#b91c1c"; msg.textContent = "Bitte Name und Kontakt angeben."; return; }
+        this.disabled = true;
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "reserveItem",
+              itemId: selectedItemId,
+              name: name,
+              kontakt: kontakt,
+              personenCode: code,
+              notiz: document.getElementById("wh-res-notiz").value.trim()
+            })
+          });
+          const res = await resp.json();
+          this.disabled = false;
+          if (res && res.ok) {
+            if (window.FFLW_Account) window.FFLW_Account.save({ code: code, name: name, kontakt: kontakt });
+            document.getElementById("wh-res-modal").style.display = "none";
+            await loadItems();
+          } else {
+            throw new Error((res && res.error) || "Reservierung fehlgeschlagen.");
+          }
+        } catch (err) {
+          this.disabled = false;
+          msg.style.color = "#b91c1c";
+          msg.textContent = "Fehler: " + err.message;
+        }
+      });
+
+      async function loadItems() {
+        const grid = document.getElementById("wh-grid");
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=getOffers&t=${Date.now()}`, { method: "GET", redirect: "follow" });
+          const data = await resp.json();
+          allItems = (data && Array.isArray(data.items)) ? data.items : [];
+          renderItems();
+        } catch (e) {
+          grid.innerHTML = `<p style="color:#b91c1c;">Angebote konnten gerade nicht geladen werden.</p>`;
+        }
+      }
+      loadItems();
+    });
+  </script>
+</body>
+</html>

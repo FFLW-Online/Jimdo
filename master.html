@@ -238,6 +238,7 @@
           <button type="button" class="m-tab-btn secret-tab" id="tab-btn-akten" data-tab="akten" style="display:none;">🗂️ Personen-Akten (<span id="cnt-akten">0</span>)</button>
           <button type="button" class="m-tab-btn treasure-tab" id="tab-btn-schatz" data-tab="schatz" style="display:none;">✨ Schatzkiste (<span id="cnt-schatz">0</span>)</button>
           <button type="button" class="m-tab-btn" id="tab-btn-ideentafel" data-tab="ideentafel" style="display:none; background:#fefce8; color:#854d0e; border-color:#fde047;">💡 Ideen &amp; Lob (<span id="cnt-ideentafel">0</span>)</button>
+          <button type="button" class="m-tab-btn" id="tab-btn-radwerkstatt" data-tab="radwerkstatt">🚲 Rad-Ausgabe &amp; Anfragen</button>
           <button type="button" class="m-tab-btn" id="tab-btn-system" data-tab="system" style="display:none;">⚙ Seitenschutz, URL-Tarnung &amp; Codes</button>
         </div>
 
@@ -258,7 +259,10 @@
         <!-- TAB 3B: WOHNUNGS-IMPORT & KI-GRÖSSENSCHÄTZUNG -->
         <section id="tab-kiimport" class="m-tab-panel" style="display:none;">
           <div class="m-card" style="border-left-color:#4338ca; background:#f8f9ff;">
-            <h3 style="margin-top:0; color:#312e81;">🪄 Wohnungs-Bilder &amp; KI-Größenschätzung (Schnell-Befüllung)</h3>
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
+              <h3 style="margin:0; color:#312e81;">🪄 Wohnungs-Bilder &amp; KI-Größenschätzung (Schnell-Befüllung)</h3>
+              <button type="button" id="ki-reset-next-apt-btn" class="m-btn m-btn-orange">🔄 Zurücksetzen / Nächste Wohnung einlesen</button>
+            </div>
             <p style="margin-top:0; font-size:0.93rem;">
               Lade mehrere Raum- oder Möbelfotos einer kompletten Wohnung hoch. Die KI erkennt alle verwertbaren Gegenstände, schätzt die ungefähren Maße (<strong>ca. B × T × H in cm</strong>) aus den Raumproportionen und bereitet alle Angebote zur Prüfung und Übernahme ins Warenhaus vor.
             </p>
@@ -479,6 +483,45 @@
             </p>
           </div>
           <div id="list-ideentafel"></div>
+        </section>
+
+        
+        <!-- TAB 5C: RADWERKSTATT ANFRAGEN & AUSGABE-DOKUMENTATION -->
+        <section id="tab-radwerkstatt" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#0284c7; background:#f0f9ff;">
+            <h3 style="margin-top:0; color:#0369a1;">🚲 Fahrrad-Ausgabe dokumentieren &amp; Vorbestellungen verwalten</h3>
+            <p style="margin:0 0 12px 0; font-size:0.93rem;">
+              Hier dokumentiert ihr, <strong>wer welches Fahrrad erhalten hat</strong> (inkl. Datum, Rahmennummer/Beschreibung und eventuellem Unkostenbeitrag) und seht alle eingegangenen Radanfragen.
+            </p>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:10px;">
+              <div>
+                <label style="font-size:0.85rem; font-weight:bold;">Empfänger (Name) *</label>
+                <input type="text" id="rad-doc-name" class="m-input" placeholder="Vor- und Nachname">
+              </div>
+              <div>
+                <label style="font-size:0.85rem; font-weight:bold;">6-stellige Personen-Nr. (optional)</label>
+                <input type="text" id="rad-doc-code" class="m-input" inputmode="numeric" maxlength="10" placeholder="z. B. 482910">
+              </div>
+              <div>
+                <label style="font-size:0.85rem; font-weight:bold;">Fahrrad (Typ / Farbe / Rahmennr.) *</label>
+                <input type="text" id="rad-doc-bike" class="m-input" placeholder="z. B. Damenrad 28 Zoll blau, Nr. 1234">
+              </div>
+              <div>
+                <label style="font-size:0.85rem; font-weight:bold;">Unkostenbeitrag (€) / Hinweis</label>
+                <input type="text" id="rad-doc-fee" class="m-input" placeholder="z. B. 20 € bezahlt / kostenlos">
+              </div>
+              <div>
+                <label style="font-size:0.85rem; font-weight:bold;">Ausgabe-Datum</label>
+                <input type="date" id="rad-doc-date" class="m-input">
+              </div>
+            </div>
+            <div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+              <button type="button" id="rad-doc-save-btn" class="m-btn m-btn-green">✓ Fahrrad-Ausgabe speichern</button>
+              <span id="rad-doc-msg" style="font-weight:bold;"></span>
+            </div>
+          </div>
+          <div id="list-rad-anfragen"></div>
+          <div id="list-rad-ausgaben"></div>
         </section>
 
         <!-- TAB 6: SYSTEM & SEITENSCHUTZ -->
@@ -821,24 +864,122 @@
         parentSel.innerHTML = `<option value="">– Eigene Hauptakte (alleinstehend / Oberhaupt) –</option>` +
           mainAkten.map(m => `<option value="${m.id}">${m.personenName} (${m.herkunftsland || "-"}, Code ${m.aktenCode})</option>`).join("");
 
-        // 1. Eingang
+        // 1. Eingang (mit Massen-Freischaltung Opt-Out, Löschen & Dubletten-Bündelung)
         const eingangEl = document.getElementById("list-eingang");
+        const titleNormCounts = {};
+        eingang.forEach(it => {
+          const norm = String(it.titel || "").replace(/^\d+\s*[x×]\s*/i, "").toLowerCase().trim();
+          if (norm) titleNormCounts[norm] = (titleNormCounts[norm] || 0) + 1;
+        });
+        const dupGroups = Object.keys(titleNormCounts).filter(k => titleNormCounts[k] > 1);
+
         eingangEl.innerHTML = eingang.length === 0
           ? `<div class="m-card">Keine neuen Eingänge zur Prüfung vorhanden.</div>`
-          : eingang.map(it => `
-            <div class="m-card">
-              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px;">
+          : `
+            <div class="m-card" style="background:#f0fdf4; border-left-color:#15803d;">
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
                 <div>
-                  <strong style="font-size:1.05rem; color:#003366;">${it.titel}</strong>
-                  <div style="font-size:0.9rem; color:#333;">Spender: ${it.spenderName} (${it.ort || "-"}) · Tel: ${it.telefon || "-"}</div>
+                  <strong style="color:#14532d;">Sammel-Aktionen (${eingang.length} Eingänge – alle vorausgewählt, einzelne bei Bedarf abhaken):</strong>
+                  <div style="margin-top:4px; font-size:0.86rem;">
+                    <label style="cursor:pointer; font-weight:bold;"><input type="checkbox" id="eingang-select-all" checked> Alle auswählen / abwählen (Opt-Out)</label>
+                  </div>
                 </div>
                 <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                  <button type="button" class="m-btn m-btn-green btn-pub" data-id="${it.folderId}" data-whole="${it.isWholeProvider ? "1" : "0"}">✓ Freischalten</button>
-                  <button type="button" class="m-btn m-btn-grey btn-arch" data-id="${it.folderId}">Archivieren</button>
+                  <button type="button" id="btn-eingang-bulk-pub" class="m-btn m-btn-green">✅ Alle markierten freischalten</button>
+                  <button type="button" id="btn-eingang-bulk-del" class="m-btn m-btn-red">🗑️ Markierte löschen</button>
                 </div>
               </div>
+              ${dupGroups.length ? `
+                <div style="margin-top:10px; padding:8px 10px; background:#fffbeb; border:1px solid #f59e0b; border-radius:6px; font-size:0.88rem;">
+                  <strong>⚠️ Ähnliche / mehrfache Gegenstände erkannt (${dupGroups.length} Gruppe(n)):</strong>
+                  ${dupGroups.map(g => {
+                    const matching = eingang.filter(x => String(x.titel || "").replace(/^\d+\s*[x×]\s*/i, "").toLowerCase().trim() === g);
+                    const ids = matching.map(x => x.folderId).join(",");
+                    const sampleTitle = matching[0].titel.replace(/^\d+\s*[x×]\s*/i, "").trim();
+                    return `<div style="margin-top:5px;">• <strong>${matching.length}× ${sampleTitle}</strong>
+                      <button type="button" class="m-btn m-btn-warn btn-bundle-eingang" data-ids="${ids}" data-count="${matching.length}" data-title="${sampleTitle}" style="margin-left:6px; padding:3px 9px; font-size:0.82rem;">🔗 Als „${matching.length}× ${sampleTitle}“ bündeln</button>
+                    </div>`;
+                  }).join("")}
+                </div>
+              ` : ""}
             </div>
-          `).join("");
+          ` + eingang.map(it => {
+            const norm = String(it.titel || "").replace(/^\d+\s*[x×]\s*/i, "").toLowerCase().trim();
+            const isDup = norm && titleNormCounts[norm] > 1;
+            return `
+              <div class="m-card" style="${isDup ? "border-left-color:#d97706; background:#fffdf7;" : ""}">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+                  <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <input type="checkbox" class="eingang-row-chk" data-id="${it.folderId}" data-whole="${it.isWholeProvider ? "1" : "0"}" checked style="width:19px; height:19px; margin-top:3px;">
+                    <div>
+                      <strong style="font-size:1.05rem; color:#003366;">${it.titel}</strong>
+                      ${isDup ? `<span class="m-badge" style="background:#fef3c7; color:#92400e; margin-left:6px;">Mehrfach (${titleNormCounts[norm]}×)</span>` : ""}
+                      <div style="font-size:0.9rem; color:#333;">Spender: ${it.spenderName} (${it.ort || "-"}) · Tel: ${it.telefon || "-"}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <button type="button" class="m-btn m-btn-green btn-pub" data-id="${it.folderId}" data-whole="${it.isWholeProvider ? "1" : "0"}">✓ Freischalten</button>
+                    <button type="button" class="m-btn m-btn-grey btn-arch" data-id="${it.folderId}">Archivieren</button>
+                    <button type="button" class="m-btn m-btn-red btn-del-eingang" data-id="${it.folderId}">🗑️ Löschen</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
+
+        const selAllEl = document.getElementById("eingang-select-all");
+        if (selAllEl) {
+          selAllEl.addEventListener("change", () => {
+            document.querySelectorAll(".eingang-row-chk").forEach(c => { c.checked = selAllEl.checked; });
+          });
+        }
+        const bulkPubBtn = document.getElementById("btn-eingang-bulk-pub");
+        if (bulkPubBtn) {
+          bulkPubBtn.addEventListener("click", async () => {
+            const chks = Array.from(document.querySelectorAll(".eingang-row-chk:checked"));
+            if (!chks.length) return alert("Bitte mindestens einen Artikel markieren.");
+            bulkPubBtn.disabled = true;
+            bulkPubBtn.textContent = `⏳ Schalte ${chks.length} frei …`;
+            const ids = chks.map(c => c.dataset.id);
+            const res = await postAction({ action: "bulkPublishEingang", folderIds: ids });
+            if (res && res.ok) await loadMasterData(currentCode, false);
+            else { bulkPubBtn.disabled = false; bulkPubBtn.textContent = "✅ Alle markierten freischalten"; alert((res && res.error) || "Fehler"); }
+          });
+        }
+        const bulkDelBtn = document.getElementById("btn-eingang-bulk-del");
+        if (bulkDelBtn) {
+          bulkDelBtn.addEventListener("click", async () => {
+            const chks = Array.from(document.querySelectorAll(".eingang-row-chk:checked"));
+            if (!chks.length) return alert("Bitte mindestens einen Artikel markieren.");
+            if (!confirm(`${chks.length} markierte Eingänge wirklich endgültig löschen?`)) return;
+            bulkDelBtn.disabled = true;
+            bulkDelBtn.textContent = "⏳ Lösche …";
+            const ids = chks.map(c => c.dataset.id);
+            const res = await postAction({ action: "bulkDeleteEingang", folderIds: ids });
+            if (res && res.ok) await loadMasterData(currentCode, false);
+            else { bulkDelBtn.disabled = false; bulkDelBtn.textContent = "🗑️ Markierte löschen"; alert((res && res.error) || "Fehler"); }
+          });
+        }
+        eingangEl.querySelectorAll(".btn-del-eingang").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            if (!confirm("Diesen Eingang wirklich löschen?")) return;
+            btn.disabled = true;
+            const res = await postAction({ action: "bulkDeleteEingang", folderIds: [btn.dataset.id] });
+            if (res && res.ok) await loadMasterData(currentCode, false);
+          });
+        });
+        eingangEl.querySelectorAll(".btn-bundle-eingang").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const ids = btn.dataset.ids.split(",").filter(Boolean);
+            const newTitle = `${btn.dataset.count}× ${btn.dataset.title}`;
+            if (!confirm(`Alle ${ids.length} Einträge zu einem Artikel „${newTitle}“ zusammenfassen?`)) return;
+            btn.disabled = true;
+            btn.textContent = "⏳ Bündele …";
+            const res = await postAction({ action: "bundleEingangItems", folderIds: ids, newTitle: newTitle });
+            if (res && res.ok) await loadMasterData(currentCode, false);
+            else alert((res && res.error) || "Fehler beim Bündeln.");
+          });
+        });
 
         // 2. Online & Reserviert
         const onlineEl = document.getElementById("list-online");
@@ -883,6 +1024,7 @@
           renderSystemConfig(data);
         }
         renderSchatzListe(schatzListe);
+        if (typeof renderRadListe === "function") renderRadListe(data.radwerkstatt || {});
       }
 
       function readAdminFile(file, pdfMode) {
@@ -1305,6 +1447,79 @@
       }
 
       let lastFilteredSchatz = [];
+      
+      function renderRadListe(radData) {
+        const anfEl = document.getElementById("list-rad-anfragen");
+        const ausEl = document.getElementById("list-rad-ausgaben");
+        if (!anfEl || !ausEl) return;
+        const anfragen = (radData && Array.isArray(radData.anfragen)) ? radData.anfragen : [];
+        const ausgaben = (radData && Array.isArray(radData.ausgaben)) ? radData.ausgaben : [];
+
+        anfEl.innerHTML = `<h4 style="color:#003366; margin:14px 0 6px 0;">📋 Offene Radanfragen / Vorbestellungen (${anfragen.length})</h4>` +
+          (anfragen.length === 0
+            ? `<div class="m-card">Keine offenen Radanfragen vorhanden.</div>`
+            : anfragen.map(a => `
+              <div class="m-card" style="border-left-color:#d97706;">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px;">
+                  <div>
+                    <strong>${a.name || "Unbekannt"}</strong> ${a.personenCode ? `(Nr. ${a.personenCode})` : ""} · <strong>${a.radTyp || "Fahrrad"}</strong> (${a.groesse || "-"})
+                    <div style="font-size:0.88rem; color:#333;">Kontakt: ${a.kontakt || "-"} · Bemerkung: ${a.bemerkung || "-"}</div>
+                  </div>
+                  <button type="button" class="m-btn m-btn-green btn-rad-to-doc" data-id="${a.id}" data-name="${a.name || ""}" data-code="${a.personenCode || ""}" data-typ="${a.radTyp || ""}">→ Als ausgegeben übernehmen</button>
+                </div>
+              </div>
+            `).join(""));
+
+        ausEl.innerHTML = `<h4 style="color:#1b5e20; margin:16px 0 6px 0;">✅ Dokumentierte Fahrrad-Ausgaben (${ausgaben.length})</h4>` +
+          (ausgaben.length === 0
+            ? `<div class="m-card">Noch keine Fahrrad-Ausgaben eingetragen.</div>`
+            : ausgaben.map(g => `
+              <div class="m-card" style="border-left-color:#2e7d32;">
+                <strong>${g.datum || "-"}: ${g.name}</strong> ${g.personenCode ? `(Nr. ${g.personenCode})` : ""} → <strong>${g.fahrrad}</strong>
+                <div style="font-size:0.88rem; color:#333;">Unkostenbeitrag / Info: ${g.unkostenbeitrag || "–"}</div>
+              </div>
+            `).join(""));
+
+        anfEl.querySelectorAll(".btn-rad-to-doc").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.getElementById("rad-doc-name").value = btn.dataset.name;
+            document.getElementById("rad-doc-code").value = btn.dataset.code;
+            document.getElementById("rad-doc-bike").value = btn.dataset.typ;
+            document.getElementById("rad-doc-date").value = new Date().toISOString().slice(0, 10);
+            document.getElementById("rad-doc-name").scrollIntoView({ behavior: "smooth", block: "center" });
+          });
+        });
+      }
+
+      const radSaveBtn = document.getElementById("rad-doc-save-btn");
+      if (radSaveBtn) {
+        radSaveBtn.addEventListener("click", async () => {
+          const name = document.getElementById("rad-doc-name").value.trim();
+          const bike = document.getElementById("rad-doc-bike").value.trim();
+          const msg = document.getElementById("rad-doc-msg");
+          if (!name || !bike) { msg.style.color = "#b91c1c"; msg.textContent = "Bitte Empfänger und Fahrrad angeben."; return; }
+          radSaveBtn.disabled = true;
+          const res = await postAction({
+            action: "saveBikeHandover",
+            name: name,
+            personenCode: document.getElementById("rad-doc-code").value.trim(),
+            fahrrad: bike,
+            unkostenbeitrag: document.getElementById("rad-doc-fee").value.trim(),
+            datum: document.getElementById("rad-doc-date").value || new Date().toISOString().slice(0, 10)
+          });
+          radSaveBtn.disabled = false;
+          if (res && res.ok) {
+            msg.style.color = "#15803d";
+            msg.textContent = "✓ Gespeichert!";
+            ["rad-doc-name", "rad-doc-code", "rad-doc-bike", "rad-doc-fee"].forEach(id => { document.getElementById(id).value = ""; });
+            await loadMasterData(currentCode, false);
+          } else {
+            msg.style.color = "#b91c1c";
+            msg.textContent = (res && res.error) || "Fehler beim Speichern.";
+          }
+        });
+      }
+
       function renderSchatzListe(liste) {
         const q = (document.getElementById("sz-search").value || "").trim().toLowerCase();
         const domFilter = document.getElementById("sz-domain-filter").value;
@@ -1867,6 +2082,34 @@
         });
       }
 
+      
+      document.getElementById("ki-reset-next-apt-btn").addEventListener("click", () => {
+        kiLoadedPhotos = [];
+        kiDetectedItems = [];
+        const pInp = document.getElementById("ki-photos-input");
+        if (pInp) pInp.value = "";
+        const dInp = document.getElementById("ki-drive-folder");
+        if (dInp) dInp.value = "";
+        const dSt = document.getElementById("ki-drive-status");
+        if (dSt) dSt.textContent = "";
+        const sMsg = document.getElementById("ki-status-msg");
+        if (sMsg) sMsg.textContent = "";
+        const iMsg = document.getElementById("ki-import-msg");
+        if (iMsg) iMsg.textContent = "";
+        const cEl = document.getElementById("ki-photos-count");
+        if (cEl) cEl.textContent = "0 Bilder geladen";
+        const tEl = document.getElementById("ki-thumbs-grid");
+        if (tEl) tEl.innerHTML = "";
+        const rawJ = document.getElementById("ki-raw-json");
+        if (rawJ) rawJ.value = "";
+        ["ki-spender", "ki-ort", "ki-telefon"].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = "";
+        });
+        renderKiPreviewTable();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
       document.getElementById("ki-analyze-btn").addEventListener("click", async function () {
         const apiKey = kiKeyInput.value.trim();
         const statusEl = document.getElementById("ki-status-msg");
@@ -1891,7 +2134,8 @@
               text:
                 "Du hilfst einem ehrenamtlichen Flüchtlings-Freundeskreis bei der Wohnungsausstattung. " +
                 "Analysiere die folgenden Wohnungsbilder (nummeriert als Bild #1, Bild #2, ...). " +
-                "Liste ALLE gut erkennbaren, sinnvollen Möbelstücke, Haushaltsgeräte und Einrichtungsgegenstände auf, " +
+                "Liste ALLE gut erkennbaren, sinnvollen Möbelstücke, Haushaltsgeräte und Einrichtungsgegenstände auf. " +
+                "WICHTIG: Wenn mehrere identische Gegenstände zusammengehören (z. B. 6 gleiche Stühle, 4 Teller, 2 Nachttische), fasse sie als EINEN Eintrag mit Stückzahl im Titel zusammen (z. B. '6× Esszimmerstuhl')! " +
                 "die sich als Sachspende eignen (keine Müllteile oder winzige Deko). " +
                 "Schätze für jeden Gegenstand anhand von Standard-Türhöhen (ca. 200 cm), Sitzhöhen (ca. 45 cm) und Raumproportionen " +
                 "realistische ungefähre Außenmaße im Format 'ca. B x T x H cm' (z. B. 'ca. 160 x 80 x 75 cm'). " +

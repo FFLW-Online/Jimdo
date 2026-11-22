@@ -732,3 +732,55 @@ button:active:not(:disabled),
 body { top: 0 !important; }
 .goog-te-gadget { color: #ffffff !important; font-size: 0.85rem !important; }
 .goog-te-gadget select { padding: 4px; border-radius: 3px; width: 100%; margin-top: 4px; }
+
+
+/* Top-Balken "Deutsch (Original)" quer über beide Spalten bei aktiver Fremdsprache */
+.fflw-top-lang-bar {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 16px;
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.24) 0%,
+    rgba(0, 0, 0, 0.24) 33.3%,
+    rgba(221, 0, 0, 0.22) 33.3%,
+    rgba(221, 0, 0, 0.22) 66.6%,
+    rgba(255, 206, 0, 0.30) 66.6%,
+    rgba(255, 206, 0, 0.30) 100%
+  );
+  border-bottom: 1.5px solid rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(2px);
+}
+.fflw-top-lang-bar a {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111111 !important;
+  font-weight: bold;
+  font-size: 0.95rem;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(0, 0, 0, 0.35);
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
+}
+.fflw-top-lang-bar a:hover {
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Fix Grafikfehler bei langen Titeln mit (Dauerbedarf) auf bedarf.html */
+.bedarf-card-header, .demand-header, .wh-card-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+.dauerbedarf-badge, .badge-dauerbedarf {
+  display: inline-block;
+  white-space: nowrap;
+  flex-shrink: 0;
+  vertical-align: middle;
+}

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Möbel &amp; Sachen spenden | Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .sp-green-hero {
+      background: #eaf6ec;
+      border: 2px solid #81c784;
+      border-left: 6px solid #2e7d32;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 14px 0 18px 0;
+      color: #143d18;
+      line-height: 1.55;
+    }
+    .sp-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-left: 5px solid #004080;
+      border-radius: 9px;
+      padding: 18px 20px;
+      margin: 16px 0;
+    }
+    .sp-label { display: block; font-weight: bold; color: #003366; margin: 11px 0 4px 0; }
+    .sp-input, .sp-select, .sp-textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid #94a3b8; border-radius: 6px; font-size: 16px; box-sizing: border-box;
+    }
+    .sp-btn {
+      background: #2e7d32; color: #ffffff; border: none; padding: 12px 20px; border-radius: 7px; font-weight: bold; font-size: 1rem; cursor: pointer;
+    }
+    .sp-btn:disabled { opacity: 0.65; cursor: wait; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>Möbel &amp; Sachen spenden</h2>
+
+      <section class="sp-green-hero">
+        <p style="margin-top:0; font-size:1.05rem;">
+          <strong>Herzlichen Dank, dass Sie gut erhaltene Möbel oder Haushaltssachen spenden möchten!</strong>
+        </p>
+        <p>
+          <strong>Unsere Möglichkeiten für Sie:</strong> Wir können die gespendeten Gegenstände gerne <strong>bei Ihnen abholen und bei Bedarf auch fachgerecht abbauen</strong> (alternativ können Sie kleinere Sachen nach kurzer Terminabsprache auch direkt vorbeibringen).
+        </p>
+        <p style="margin-bottom:0;">
+          <strong>Bitte geben Sie uns eine schnelle Kontaktmöglichkeit (Telefon, WhatsApp oder E-Mail):</strong> Damit wir zeitnah mit Ihnen sprechen und einen passenden Termin für Besichtigung, Abbau oder Abholung vereinbaren können, füllen Sie bitte kurz das untenstehende Formular aus.
+        </p>
+      </section>
+
+      <section class="sp-card">
+        <h3 style="margin-top:0; color:#003366;">Spende anmelden &amp; Kontakt hinterlassen</h3>
+        <form id="sp-form">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+            <div>
+              <label class="sp-label" for="sp-name">Ihr Name *</label>
+              <input type="text" id="sp-name" class="sp-input" required placeholder="Vor- und Nachname">
+            </div>
+            <div>
+              <label class="sp-label" for="sp-ort">Ort / Stadtteil *</label>
+              <input type="text" id="sp-ort" class="sp-input" required placeholder="z. B. Leutenbach, Nellmersbach, Winnenden">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+            <div>
+              <label class="sp-label" for="sp-telefon">Telefon / WhatsApp (für schnelle Absprache) *</label>
+              <input type="text" id="sp-telefon" class="sp-input" required placeholder="z. B. 0171 1234567">
+            </div>
+            <div>
+              <label class="sp-label" for="sp-email">E-Mail-Adresse (optional)</label>
+              <input type="email" id="sp-email" class="sp-input" placeholder="name@example.com">
+            </div>
+          </div>
+
+          <label class="sp-label" for="sp-titel">Was möchten Sie spenden? (Kurze Übersicht) *</label>
+          <input type="text" id="sp-titel" class="sp-input" required placeholder="z. B. Kleiderschrank, Esstisch mit 4 Stühlen, Waschmaschine …">
+
+          <label class="sp-label" for="sp-abholung">Wie passt es für Sie am besten?</label>
+          <select id="sp-abholung" class="sp-select">
+            <option value="Abholung + Abbau gewünscht">🚚 Abholung und Abbau durch den Freundeskreis gewünscht</option>
+            <option value="Abholung (bereits abgebaut)">🚚 Abholung gewünscht (Möbel sind schon abgebaut / tragbar)</option>
+            <option value="Selbstanlieferung nach Absprache">🚗 Ich kann die Sachen nach Terminabsprache selbst bringen</option>
+          </select>
+
+          <label class="sp-label" for="sp-beschreibung">Beschreibung, ungefähre Maße &amp; wann wir Sie gut erreichen</label>
+          <textarea id="sp-beschreibung" class="sp-textarea" rows="4" placeholder="Zustand, ungefähre Maße, Stockwerk oder beste Erreichbarkeit …"></textarea>
+
+          <div style="margin-top:14px; display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
+            <button type="submit" id="sp-submit-btn" class="sp-btn">Spende melden &amp; Rückruf anfordern</button>
+            <span id="sp-msg" style="font-weight:bold;"></span>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      document.getElementById("sp-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const btn = document.getElementById("sp-submit-btn");
+        const msg = document.getElementById("sp-msg");
+        const orig = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "⏳ Wird gesendet …";
+        msg.style.color = "#b45309";
+        msg.textContent = "⏳ Bitte kurz warten …";
+
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "submitDonation",
+              spenderName: document.getElementById("sp-name").value.trim(),
+              ort: document.getElementById("sp-ort").value.trim(),
+              telefon: document.getElementById("sp-telefon").value.trim(),
+              email: document.getElementById("sp-email").value.trim(),
+              titel: document.getElementById("sp-titel").value.trim(),
+              abholung: document.getElementById("sp-abholung").value,
+              beschreibung: document.getElementById("sp-beschreibung").value.trim()
+            })
+          });
+          const res = await resp.json();
+          btn.disabled = false;
+          if (res && res.ok) {
+            btn.textContent = "✓ Gesendet!";
+            msg.style.color = "#15803d";
+            msg.textContent = "✓ Vielen Dank! Ihre Spendenmeldung ist eingegangen – wir melden uns zeitnah bei Ihnen.";
+            document.getElementById("sp-form").reset();
+            setTimeout(() => { btn.textContent = orig; }, 3000);
+          } else {
+            throw new Error((res && res.error) || "Fehler beim Senden.");
+          }
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = orig;
+          msg.style.color = "#b91c1c";
+          msg.textContent = "Fehler: " + err.message;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

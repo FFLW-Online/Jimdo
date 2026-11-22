@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feste & Begegnungen | Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+    .fflw-dev-banner {
+      background: #fffbeb;
+      border: 1px solid #f59e0b;
+      border-left: 5px solid #d97706;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin: 12px 0 18px 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.93rem;
+    }
+    .fflw-dev-btn {
+      display: inline-block;
+      background: #b45309;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+    .sub-card {
+      background: #ffffff; border: 1px solid #cbd5e1; border-left: 5px solid #d97706; border-radius: 9px; padding: 16px 18px; margin: 16px 0; line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>🎉 Feste & Gemeinsame Feiern</h2>
+      <div class="fflw-dev-banner">
+        <span>🚧 <strong>Hinweis:</strong> Diese Seite ist noch in der Entwicklung. Für Hinweise zur Verbesserung oder falls etwas nicht funktioniert, sind wir dankbar.</span>
+        <a id="dev-feedback-mail" class="fflw-dev-btn" href="mailto:Kontakt@freundeleuwi.org">✉️ Hinweis per E-Mail senden</a>
+      </div>
+      <p>
+        Gemeinsam feiern verbindet über alle Sprachen und Kulturen hinweg: Ob Sommerfest, interkulturelles Buffet, Nachbarschaftsfest oder Beteiligung an Ortsfesten in Leutenbach und Winnenden – hier kommen alte und neue Nachbarn ins Gespräch.
+      </p>
+      <section class="sub-card">
+        <h3 style="margin-top:0; color:#92400e;">Was unsere Feste besonders macht</h3>
+        <ul>
+          <li><strong>Kulinarische Vielfalt:</strong> Jeder bringt gerne eine Spezialität aus seiner Heimat mit – so entsteht ein buntes Buffet für alle.</li>
+          <li><strong>Programm für Groß &amp; Klein:</strong> Musik, Spiele für Kinder, Tanz und viel Raum zum Kennenlernen.</li>
+          <li><strong>Mitmachen erwünscht:</strong> Ideen für das nächste Fest nehmen wir jederzeit gerne über <a href="ideen-lob-kritik.html">Eure Ideen – Lob &amp; Kritik</a> entgegen!</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const pageTitle = document.title || document.querySelector("h2")?.textContent || "Webseite";
+      const pageUrl = window.location.href;
+      const devBtn = document.getElementById("dev-feedback-mail");
+      if (devBtn) {
+        const subj = encodeURIComponent(`Hinweis zur Webseite (${pageTitle})`);
+        const body = encodeURIComponent(`Hallo Team,\n\nmein Hinweis bezieht sich auf folgende Seite:\nSeite: ${pageTitle}\nLink: ${pageUrl}\n\nMein Hinweis / Verbesserungsvorschlag:\n`);
+        devBtn.href = `mailto:Kontakt@freundeleuwi.org?subject=${subj}&body=${body}`;
+      }
+    });
+  </script>
+</body>
+</html>

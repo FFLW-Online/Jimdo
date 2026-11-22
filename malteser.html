@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kooperation & Aktionen mit den Maltesern | Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+
+    .fflw-dev-banner {
+      background: #fffbeb;
+      border: 1px solid #f59e0b;
+      border-left: 5px solid #d97706;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin: 12px 0 18px 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.93rem;
+    }
+    .fflw-dev-btn {
+      display: inline-block;
+      background: #b45309;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+    .sub-card {
+      background: #ffffff; border: 1px solid #cbd5e1; border-left: 5px solid #b91c1c; border-radius: 9px; padding: 16px 18px; margin: 16px 0; line-height: 1.55;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>➕ Aktionen & Projekte mit den Maltesern</h2>
+      <div class="fflw-dev-banner">
+        <span>🚧 <strong>Hinweis:</strong> Diese Seite ist noch in der Entwicklung. Für Hinweise zur Verbesserung oder falls etwas nicht funktioniert, sind wir dankbar.</span>
+        <a id="dev-feedback-mail" class="fflw-dev-btn" href="mailto:Kontakt@freundeleuwi.org">✉️ Hinweis per E-Mail senden</a>
+      </div>
+      <p>
+        Gemeinsam mit den <strong>Maltesern</strong> organisieren wir hilfreiche Informationsveranstaltungen, Erste-Hilfe-Angebote und Begegnungsprojekte für Geflüchtete und Ehrenamtliche.
+      </p>
+      <section class="sub-card">
+        <h3 style="margin-top:0; color:#991b1b;">Schwerpunkte der Zusammenarbeit</h3>
+        <ul>
+          <li><strong>Erste-Hilfe-Kurse &amp; Notfallwissen:</strong> Praxisnahe Schulungen für den Alltag, für Kinder-Notfälle und für den Führerschein.</li>
+          <li><strong>Gesundheit &amp; Orientierung:</strong> Verständliche Informationen rund um das deutsche Gesundheitssystem und Vorsorge.</li>
+          <li><strong>Gemeinsame Aktionen:</strong> Begleitete Ausflüge, Gesprächsrunden und ehrenamtliche Unterstützung vor Ort.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const pageTitle = document.title || document.querySelector("h2")?.textContent || "Webseite";
+      const pageUrl = window.location.href;
+      const devBtn = document.getElementById("dev-feedback-mail");
+      if (devBtn) {
+        const subj = encodeURIComponent(`Hinweis zur Webseite (${pageTitle})`);
+        const body = encodeURIComponent(`Hallo Team,\n\nmein Hinweis bezieht sich auf folgende Seite:\nSeite: ${pageTitle}\nLink: ${pageUrl}\n\nMein Hinweis / Verbesserungsvorschlag:\n`);
+        devBtn.href = `mailto:Kontakt@freundeleuwi.org?subject=${subj}&body=${body}`;
+      }
+    });
+  </script>
+</body>
+</html>
