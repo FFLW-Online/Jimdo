@@ -1905,16 +1905,24 @@
             parts.push({ inline_data: { mime_type: p.mimeType, data: p.base64 } });
           });
 
-          const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: parts }],
-              generationConfig: { temperature: 0.2 }
-            })
-          });
-          const data = await resp.json();
-          if (!resp.ok || !data.candidates || !data.candidates[0]) {
+          const candidateModels = ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-3.0-flash", "gemini-2.5-flash"];
+          let data = null;
+          let resp = { ok: false };
+          for (const modelName of candidateModels) {
+            resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: parts }],
+                generationConfig: { temperature: 0.2 }
+              })
+            });
+            data = await resp.json();
+            if (resp.ok && data && data.candidates && data.candidates[0]) {
+              break;
+            }
+          }
+          if (!resp.ok || !data || !data.candidates || !data.candidates[0]) {
             const errMsg = (data && data.error && data.error.message) ? data.error.message : "KI-Anfrage fehlgeschlagen.";
             statusEl.style.color = "#c62828";
             statusEl.textContent = "Fehler: " + errMsg;
