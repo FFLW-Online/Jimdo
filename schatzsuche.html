@@ -1,14 +1,3 @@
-<!-- ==========================================================================
-  DATEI: schatzsuche.html – von Gemini
-  ERSTELLT VON GEMINI AM: 2026-11-21 16:35 CET
-  BESCHREIBUNG: Schatzsuche – Wo liegen deine Begabungen, Träume und Talente?
-    - Baukasten-System mit Themen-Kacheln (man öffnet nur, was interessiert!)
-    - 5 differenzierte Stufen inkl. ✨ Funkelnde Sterne (Traum & Neugier)
-    - Intelligente Detail-Vertiefung (z. B. Hotel-/Großküche, Smartphone vs. Löten,
-      Chor-Gesang & Musikinstrumente, Garten & Tiere, Mobilität & LKW)
-    - Persönlicher 6-stelliger Schatzsuche-Code zum späteren Weiterbearbeiten
-      und Verfeinern, ohne doppelte Einträge in der Datenbank zu erzeugen
-========================================================================== -->
 <!doctype html>
 <html lang="de">
 <head>
@@ -17,13 +6,38 @@
   <title>Schatzsuche – Wo liegen deine Begabungen und Talente? | FFLW</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    .fflw-dev-banner {
+      background: #fffbeb;
+      border: 1px solid #f59e0b;
+      border-left: 5px solid #d97706;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin: 12px 0 18px 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.93rem;
+    }
+    .fflw-dev-btn {
+      display: inline-block;
+      background: #b45309;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
     .sz-intro {
       background: linear-gradient(180deg, #eef6fc 0%, #ffffff 100%);
       border: 2px solid #b8d4ec;
       border-left: 6px solid #004080;
       border-radius: 10px;
-      padding: 20px 22px;
-      margin: 14px 0 20px 0;
+      padding: 18px 20px;
+      margin: 14px 0 18px 0;
       color: #111111;
     }
     .sz-card {
@@ -58,10 +72,43 @@
       background: #ffffff;
       box-sizing: border-box;
     }
-    /* Themen-Kacheln zum entspannten Antippen */
-    .sz-topic-grid {
+    .sz-field-invalid {
+      border: 2.5px solid #dc2626 !important;
+      background: #fef2f2 !important;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18) !important;
+    }
+    .sz-field-err-hint {
+      color: #b91c1c;
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-top: 5px;
+      display: none;
+    }
+    .sz-field-err-hint.visible { display: block; }
+    .sz-code-mode-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .sz-code-mode-opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 9px 11px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      cursor: pointer;
+      font-size: 0.92rem;
+    }
+    .sz-code-mode-opt.active {
+      border-color: #004080;
+      background: #eff6ff;
+    }
+    .sz-topic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 10px;
       margin: 12px 0;
     }
@@ -76,15 +123,12 @@
       background: #f4f8fc;
       color: #003366;
       font-weight: bold;
-      font-size: 0.98rem;
+      font-size: 0.97rem;
       cursor: pointer;
       text-align: left;
       transition: all 0.16s ease;
     }
-    .sz-topic-tile:hover {
-      background: #e6eff9;
-      border-color: #004080;
-    }
+    .sz-topic-tile:hover { background: #e6eff9; border-color: #004080; }
     .sz-topic-tile.selected {
       background: #004080;
       color: #ffffff;
@@ -92,25 +136,23 @@
       box-shadow: 0 3px 10px rgba(0, 64, 128, 0.22);
     }
     .sz-topic-tile .sz-tile-badge {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       padding: 2px 7px;
       border-radius: 12px;
       background: rgba(255,255,255,0.22);
+      white-space: nowrap;
     }
-    /* Geöffnete Bereichs-Karte */
     .sz-domain-panel {
       display: none;
       background: #ffffff;
       border: 2px solid #81c784;
-      border-left: 7px solid #2e7d32;
+      border-left: 6px solid #2e7d32;
       border-radius: 10px;
-      padding: 18px 20px;
+      padding: 16px 18px;
       margin: 16px 0;
       box-shadow: 0 3px 12px rgba(46, 125, 50, 0.08);
     }
-    .sz-domain-panel.is-open {
-      display: block;
-    }
+    .sz-domain-panel.is-open { display: block; }
     .sz-domain-header {
       display: flex;
       flex-wrap: wrap;
@@ -121,80 +163,47 @@
       padding-bottom: 8px;
       margin-bottom: 12px;
     }
-    .sz-domain-header h4 {
-      margin: 0;
-      color: #1b5e20;
-      font-size: 1.12rem;
-    }
+    .sz-domain-header h4 { margin: 0; color: #1b5e20; font-size: 1.12rem; }
     .sz-close-domain {
       background: #f1f5f9;
       color: #334155;
       border: 1px solid #cbd5e1;
       border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 0.84rem;
+      padding: 6px 11px;
+      font-size: 0.86rem;
       cursor: pointer;
     }
-    /* 5 differenzierte Stufen */
-    .sz-levels-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 7px;
-      margin: 8px 0 14px 0;
+    .sz-sub-list { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 12px 0; }
+    .sz-sub-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 9px 11px;
     }
-    .sz-level-opt {
+    .sz-sub-row.is-checked { background: #f0fdf4; border-color: #4ade80; }
+    .sz-sub-label {
       display: flex;
       align-items: flex-start;
-      gap: 10px;
-      padding: 9px 12px;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 8px;
-      background: #f8fafc;
+      gap: 9px;
+      flex: 1 1 250px;
       cursor: pointer;
       font-size: 0.94rem;
       line-height: 1.4;
     }
-    .sz-level-opt:hover {
-      background: #eef6fc;
-      border-color: #90caf9;
-    }
-    .sz-level-opt input[type="checkbox"] {
-      width: 19px;
-      height: 19px;
-      margin-top: 2px;
-      flex-shrink: 0;
-    }
-    .sz-level-opt[data-lvl="dream"] {
-      background: #fffbeb;
-      border-color: #fcd34d;
-    }
-    .sz-level-opt[data-lvl="pro"] {
-      background: #f0fdf4;
-      border-color: #86efac;
-    }
-    /* Sub-Optionen & Vertiefung */
-    .sz-sub-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 7px;
-      margin: 8px 0 12px 0;
-    }
-    .sz-sub-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      background: #f4f8fc;
-      border: 1px solid #d0e1f2;
-      border-radius: 7px;
-      padding: 7px 10px;
-      font-size: 0.91rem;
-      cursor: pointer;
-    }
-    .sz-sub-item input[type="checkbox"] {
-      width: 17px;
-      height: 17px;
-      margin-top: 2px;
-      flex-shrink: 0;
+    .sz-sub-label input[type="checkbox"] { width: 19px; height: 19px; margin-top: 2px; flex-shrink: 0; }
+    .sz-sub-level-select {
+      padding: 6px 9px;
+      border: 1px solid #94a3b8;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      background: #ffffff;
+      color: #0f172a;
+      max-width: 100%;
     }
     .sz-deep-box {
       background: #f8fafc;
@@ -213,7 +222,6 @@
       font-size: 0.96rem;
       cursor: pointer;
     }
-
     .sz-btn-draft {
       background: #0284c7;
       color: #ffffff;
@@ -223,35 +231,20 @@
       font-weight: bold;
       font-size: 0.94rem;
       cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.1s ease;
     }
-    .sz-btn-draft:hover { background: #0369a1; }
     .sz-btn-submit {
       background: #2e7d32;
       color: #ffffff;
       border: none;
-      padding: 14px 26px;
+      padding: 14px 24px;
       border-radius: 8px;
       font-weight: bold;
-      font-size: 1.06rem;
+      font-size: 1.05rem;
       cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.1s ease;
     }
-    .sz-btn-submit:hover { background: #1b5e20; }
-    .sz-btn-saving {
-      background: #d97706 !important;
-      color: #ffffff !important;
-      cursor: wait !important;
-    }
-    .sz-btn-saved-ok {
-      background: #15803d !important;
-      color: #ffffff !important;
-      box-shadow: 0 0 0 3px #bbf7d0;
-    }
-    .sz-btn-saved-err {
-      background: #b91c1c !important;
-      color: #ffffff !important;
-    }
+    .sz-btn-saving { background: #d97706 !important; color: #ffffff !important; cursor: wait !important; }
+    .sz-btn-saved-ok { background: #15803d !important; color: #ffffff !important; box-shadow: 0 0 0 3px #bbf7d0; }
+    .sz-btn-saved-err { background: #b91c1c !important; color: #ffffff !important; }
     .sz-domain-footer {
       margin-top: 12px;
       padding-top: 10px;
@@ -262,7 +255,19 @@
       align-items: center;
       gap: 10px;
     }
-
+    .sz-level-opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      background: #ffffff;
+      cursor: pointer;
+      font-size: 0.94rem;
+      line-height: 1.4;
+    }
+    .sz-level-opt input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0; }
   </style>
 </head>
 <body>
@@ -278,44 +283,98 @@
     <main class="content">
       <h2>Schatzsuche ✨ – Wo liegen deine Begabungen, Träume und Talente?</h2>
 
+      <div class="fflw-dev-banner">
+        <span>🚧 <strong>Hinweis:</strong> Diese Seite ist noch in der Entwicklung. Für Hinweise zur Verbesserung oder falls etwas nicht funktioniert, sind wir dankbar.</span>
+        <a id="dev-feedback-mail" class="fflw-dev-btn" href="mailto:Kontakt@freundeleuwi.org">✉️ Hinweis per E-Mail senden</a>
+      </div>
+
       <section class="sz-intro">
         <p style="margin-top:0;">
-          Jeder Mensch trägt wertvolle Erfahrungen, besondere Begabungen und oft auch lang gehegte Träume in sich – ob im Handwerk, beim Kochen, in der Musik, im Garten oder im Umgang mit Technik. Mit dieser <strong>Schatzsuche</strong> möchten wir sichtbar machen, was in Leutenbach und Winnenden an Können, Hobbys und Wünschen zusammenkommt.
+          Jeder Mensch trägt wertvolle Erfahrungen, besondere Begabungen und oft auch lang gehegte Träume in sich – ob im Handwerk, beim Kochen, in der Musik, im Garten, im Sport oder im Umgang mit Technik. Mit dieser <strong>Schatzsuche</strong> möchten wir sichtbar machen, was in Leutenbach und Winnenden an Können, Hobbys und Wünschen zusammenkommt.
         </p>
         <p>
-          Vielleicht suchst du Menschen mit ähnlichen Interessen, möchtest etwas Neues ausprobieren (zum Beispiel gemeinsam singen oder ein Instrument lernen), dein Wissen an andere weitergeben oder suchst berufliche Kontakte. <strong>Alles ist vollkommen freiwillig:</strong> Arbeit, Deutschlernen und die Familie haben immer Vorrang – und niemand geht hiermit eine Verpflichtung ein.
+          Vielleicht suchst du Menschen mit ähnlichen Interessen, möchtest etwas Neues ausprobieren, dein Wissen an andere weitergeben oder suchst berufliche Kontakte. <strong>Alles ist vollkommen freiwillig:</strong> Arbeit, Deutschlernen und die Familie haben immer Vorrang – und niemand geht hiermit eine Verpflichtung ein.
         </p>
         <p style="margin-bottom:0; background:#eaf6ec; border:1px solid #a5d6a7; padding:10px 12px; border-radius:7px;">
-          <strong>In Ruhe ausfüllen &amp; jederzeit zwischenspeichern:</strong> Tippe unten nur die Themen an, die dich interessieren. Du kannst nach jedem Bereich <strong>zwischenspeichern</strong>, dir andere Bereiche ansehen oder alles am Ende <strong>endgültig absenden</strong> – mit deinem persönlichen <strong>6-stelligen Schatzsuche-Code</strong>.
+          <strong>In Ruhe ausfüllen &amp; jederzeit zwischenspeichern:</strong> Tippe unten nur die Themen an, die dich interessieren. Du kannst nach jedem Bereich <strong>zwischenspeichern</strong>, dir andere Bereiche ansehen oder alles am Ende <strong>endgültig absenden</strong>.
         </p>
       </section>
 
-      <!-- Optional: Bestehenden Schatzsuche-Code laden zum Weiterbearbeiten -->
       <section class="sz-card" style="background:#fffdf7; border-left-color:#d97706;">
-        <details id="sz-resume-details">
-          <summary style="cursor:pointer; font-weight:bold; color:#78350f; font-size:1rem;">
-            🔑 Hast du schon deine persönliche 6-stellige Nummer (aus Akte oder Schatzsuche)?
+        <h3 style="margin-top:0; color:#78350f; border-bottom-color:#fde68a;">🔑 Deine persönliche 6-stellige Nummer</h3>
+
+        <details style="margin-bottom:10px; background:#ffffff; border:1px solid #fcd34d; border-radius:7px; padding:9px 12px;">
+          <summary style="cursor:pointer; font-weight:bold; color:#92400e; font-size:0.94rem;">
+            ℹ️ Warum gibt es diese persönliche Nummer – und bleiben alte Nummern gültig?
           </summary>
-          <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-            <input type="text" id="sz-load-code" class="sz-input" inputmode="numeric" maxlength="10" placeholder="Dein 6-stelliger Schatzsuche-Code …" style="max-width:250px; font-weight:bold;">
+          <div style="margin-top:8px; font-size:0.91rem; color:#334155; line-height:1.5;">
+            <p style="margin-top:0;">
+              <strong>Dein persönlicher Schlüssel:</strong> Damit deine Angaben aus der Schatzsuche und deine Unterlagen im Briefkasten sicher zusammengehören – ohne dass deine Daten öffentlich im Internet stehen –, erhältst du eine 6-stellige Nummer. Damit kannst du deine Schatzsuche jederzeit später wieder öffnen und ergänzen.
+            </p>
+            <p style="margin-bottom:0;">
+              <strong>100 % aufwärts-kompatibel:</strong> Wenn du bereits eine frühere 6-stellige Nummer von uns bekommen hast, bleibt sie selbstverständlich dauerhaft gültig!
+            </p>
+          </div>
+        </details>
+
+        <div class="sz-code-mode-grid" id="sz-code-mode-grid">
+          <label class="sz-code-mode-opt active" data-mode="new">
+            <input type="radio" name="sz-code-mode" value="new" checked>
+            <span><strong>Noch kein Code</strong><br><small>Ich fülle neu aus (System vergibt automatisch eine Nummer).</small></span>
+          </label>
+          <label class="sz-code-mode-opt" data-mode="existing">
+            <input type="radio" name="sz-code-mode" value="existing">
+            <span><strong>Ich habe schon eine Nummer</strong><br><small>Vorhandenen 6-stelligen Code eingeben &amp; laden.</small></span>
+          </label>
+          <label class="sz-code-mode-opt" data-mode="custom">
+            <input type="radio" name="sz-code-mode" value="custom">
+            <span><strong>Eigenen Wunsch-Code wählen</strong><br><small>Selbst 6 Ziffern festlegen (wird auf Verfügbarkeit geprüft).</small></span>
+          </label>
+          <label class="sz-code-mode-opt" data-mode="forgot">
+            <input type="radio" name="sz-code-mode" value="forgot">
+            <span><strong>Code bekommen, aber vergessen</strong><br><small>Kein Problem – einfach neu ausfüllen oder Hilfe anfordern.</small></span>
+          </label>
+        </div>
+
+        <div id="sz-code-box-existing" style="display:none; margin-top:10px; padding:10px 12px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px;">
+          <label class="sz-q-title" for="sz-load-code" style="margin-top:0;">Deine 6-stellige Nummer eingeben:</label>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+            <input type="text" id="sz-load-code" class="sz-input" inputmode="numeric" maxlength="10" placeholder="z. B. 482910" style="max-width:220px; font-weight:bold;">
             <button type="button" id="sz-load-btn" class="sz-btn-primary">Meine Daten laden</button>
             <span id="sz-load-msg" style="font-weight:bold;"></span>
           </div>
-        </details>
+        </div>
+
+        <div id="sz-code-box-custom" style="display:none; margin-top:10px; padding:10px 12px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px;">
+          <label class="sz-q-title" for="sz-custom-code" style="margin-top:0;">Deinen eigenen 6-stelligen Wunsch-Code festlegen (6 Ziffern):</label>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+            <input type="text" id="sz-custom-code" class="sz-input" inputmode="numeric" maxlength="6" placeholder="z. B. 250890" style="max-width:220px; font-weight:bold;">
+            <button type="button" id="sz-check-custom-btn" class="sz-btn-primary">Verfügbarkeit prüfen</button>
+            <span id="sz-custom-msg" style="font-weight:bold;"></span>
+          </div>
+        </div>
+
+        <div id="sz-code-box-forgot" style="display:none; margin-top:10px; padding:10px 12px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; font-size:0.93rem;">
+          <p style="margin-top:0;">
+            <strong>Gar kein Problem!</strong> Du kannst das Formular unten einfach mit deinem Namen neu ausfüllen – unser Team führt doppelte Einträge im Hintergrund automatisch mit deinem bestehenden Datensatz zusammen.
+          </p>
+          <a href="mailto:Kontakt@freundeleuwi.org?subject=Pers%C3%B6nliche%206-stellige%20Nummer%20vergessen&body=Hallo%20Team%2C%0A%0Aich%20habe%20meine%20pers%C3%B6nliche%206-stellige%20Nummer%20vergessen.%0AMein%20Name%3A%20%0AMeine%20Telefonnummer%3A%20" class="sz-btn-primary" style="display:inline-block; text-decoration:none; font-size:0.88rem;">✉️ Nummer per E-Mail erfragen</a>
+        </div>
       </section>
 
-      <form id="sz-form">
-        <!-- SCHRITT 1: PERSÖNLICHE BASISDATEN -->
+      <form id="sz-form" novalidate>
         <section class="sz-card">
           <h3>1. Über dich &amp; deine Sprachen</h3>
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
             <div>
               <label class="sz-q-title" for="sz-name">Dein Name (Vorname, Nachname) *</label>
               <input type="text" id="sz-name" class="sz-input" required placeholder="Vorname Nachname">
+              <div id="err-sz-name" class="sz-field-err-hint">Bitte gib hier deinen Namen ein (Pflichtfeld).</div>
             </div>
             <div>
               <label class="sz-q-title" for="sz-herkunft">Dein Heimatland / Wohnort *</label>
               <input type="text" id="sz-herkunft" class="sz-input" list="sz-laender-list" required placeholder="z. B. Deutschland / Leutenbach, Syrien, Ukraine …">
+              <div id="err-sz-herkunft" class="sz-field-err-hint">Bitte gib dein Heimatland oder deinen Wohnort an (Pflichtfeld).</div>
               <datalist id="sz-laender-list">
                 <option value="Deutschland (Leutenbach / Winnenden)">
                 <option value="Syrien"><option value="Ukraine"><option value="Afghanistan">
@@ -331,6 +390,7 @@
             <div>
               <label class="sz-q-title" for="sz-kontakt">Telefon / WhatsApp (oder E-Mail) *</label>
               <input type="text" id="sz-kontakt" class="sz-input" required placeholder="z. B. 0171 1234567">
+              <div id="err-sz-kontakt" class="sz-field-err-hint">Bitte gib eine Telefonnummer oder E-Mail-Adresse für Rückfragen an (Pflichtfeld).</div>
             </div>
             <div>
               <label class="sz-q-title" for="sz-email">E-Mail-Adresse (optional)</label>
@@ -338,7 +398,7 @@
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
             <div>
               <label class="sz-q-title" for="sz-muttersprache">Deine Muttersprache(n)</label>
               <input type="text" id="sz-muttersprache" class="sz-input" placeholder="z. B. Arabisch, Kurdisch, Ukrainisch">
@@ -348,12 +408,23 @@
               <input type="text" id="sz-sprachen" class="sz-input" placeholder="z. B. Deutsch, Englisch, Französisch">
             </div>
             <div>
-              <label class="sz-q-title" for="sz-geburt">Geburtsjahr (optional)</label>
-              <input type="text" id="sz-geburt" class="sz-input" placeholder="z. B. 1992">
+              <label class="sz-q-title" for="sz-sprachniveau">Deutsch-Kenntnisse / Sprachniveau (Selbsteinschätzung)</label>
+              <select id="sz-sprachniveau" class="sz-select">
+                <option value="">– Optional auswählen –</option>
+                <option value="Anfänger (A1/A2 – erste Sätze & Alltag)">Anfänger (A1/A2 – erste Sätze im Alltag)</option>
+                <option value="Alltagsgespräche (B1 – ich komme im Alltag gut zurecht)">Alltagsgespräche (B1 – ich komme im Alltag gut zurecht)</option>
+                <option value="Gut für Arbeit & Behörden (B2 – fließende Gespräche)">Gut für Arbeit &amp; Behörden (B2 – fließende Gespräche)</option>
+                <option value="Sehr sicher / Verhandlungssicher (C1/C2)">Sehr sicher / Verhandlungssicher (C1/C2)</option>
+                <option value="Muttersprache Deutsch">Muttersprache Deutsch</option>
+              </select>
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
+            <div>
+              <label class="sz-q-title" for="sz-geburt">Geburtsdatum (freiwillig – für Geburtstagsgrüße 🎂)</label>
+              <input type="date" id="sz-geburt" class="sz-input">
+            </div>
             <div>
               <label class="sz-q-title" for="sz-familie">Familie / Kinder (optional)</label>
               <input type="text" id="sz-familie" class="sz-input" placeholder="z. B. verheiratet, 2 Kinder">
@@ -375,63 +446,58 @@
               <button type="button" id="sz-foto-clear" class="sz-close-domain">Foto entfernen</button>
             </div>
           </div>
-
         </section>
 
-        <!-- SCHRITT 2: THEMEN-KACHELN ZUM FREIEN AUSWÄHLEN -->
         <section class="sz-card" style="border-left-color:#2e7d32;">
           <h3>2. Wähle die Bereiche aus, die dich interessieren oder in denen du etwas kannst</h3>
           <p style="margin-top:0; font-size:0.94rem;">
-            Tippe einfach auf die Kacheln, die zu dir passen. Es öffnen sich dann nur diese Bereiche – alles andere kannst du überspringen!
+            Tippe auf eine Kachel – sie öffnet sich direkt darunter. Bei jedem angekreuzten Unterpunkt kannst du genau angeben, wie gut du dich darin auskennst (oder ob es ein Traum zum Lernen ist).
           </p>
 
           <div class="sz-topic-grid" id="sz-topic-tiles"></div>
           <div id="sz-active-domains-container"></div>
         </section>
 
-
-        <!-- OFFENES FELD FÜR NEUE THEMEN & FEHLENDE BEREICHE -->
         <section class="sz-card" style="border-left-color:#7c3aed; background:#faf5ff;">
-          <h3 style="margin-top:0; color:#5b21b6;">💡 Fehlt ein Themenfeld oder hast du ein besonderes Hobby?</h3>
+          <h3 style="margin-top:0; color:#5b21b6;">💡 Fehlt noch ein Themenfeld oder hast du ein besonderes Hobby?</h3>
           <p style="margin:0 0 8px 0; font-size:0.93rem;">
-            Ob <strong>Schreiben &amp; Journalismus</strong>, <strong>Schulfächer</strong>, <strong>Gleitschirmfliegen</strong>, <strong>Imkerei</strong>, <strong>Schach</strong> oder etwas ganz anderes: Wenn dein Thema oben noch nicht dabei war, trage es hier einfach frei ein. Wenn mehrere Menschen ein ähnliches Thema nennen, nehmen wir es als eigenes neues Feld in die Schatzsuche auf!
+            Wenn dein Thema oben noch nicht dabei war, trage es hier einfach frei ein. Wenn mehrere Menschen ein ähnliches Thema nennen, nehmen wir es als eigenes neues Feld in die Schatzsuche auf!
           </p>
-          <textarea id="sz-vorschlag-feld" class="sz-textarea" rows="3" placeholder="z. B. Ich fliege Gleitschirm / bin Journalist / gebe gerne Nachhilfe in Physik / wünsche mir eine Schachgruppe …"></textarea>
+          <textarea id="sz-vorschlag-feld" class="sz-textarea" rows="3" placeholder="Schreibe hier gerne weitere Hobbys, Fähigkeiten oder Themenwünsche auf …"></textarea>
         </section>
 
-        <!-- SCHRITT 3: DATENSCHUTZ & ABSENDEN -->
         <section class="sz-card" style="background:#f8fbff;">
           <h3>3. Vertraulichkeit &amp; Absenden</h3>
           <label class="sz-q-title" for="sz-sichtbarkeit">Wer im Freundeskreis darf deine Talente sehen?</label>
           <select id="sz-sichtbarkeit" class="sz-select">
-            <option value="team">Das Vermittlungs-Team (für Job-, Chor-, Vereins- &amp; Ehrenamts-Kontakte)</option>
+            <option value="team">Das Vermittlungs-Team (für Job-, Vereins- &amp; Ehrenamts-Kontakte)</option>
             <option value="nur_koordinator">Nur die Haupt-Koordination (streng vertraulich)</option>
           </select>
 
-          <label class="sz-level-opt" style="margin-top:12px; background:#ffffff; border-color:#1565c0;">
+          <label id="sz-dsgvo-box" class="sz-level-opt" style="margin-top:12px; background:#ffffff; border-color:#1565c0;">
             <input type="checkbox" id="sz-dsgvo" required>
             <span>
-              <strong>Einwilligung (DSGVO):</strong> Ich bin damit einverstanden, dass meine freiwilligen Angaben im <em>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</em> gespeichert und für die ehrenamtliche Unterstützung, Kontaktvermittlung und Jobsuche genutzt werden. Ich kann dies jederzeit ändern oder löschen lassen.
+              <strong>Einwilligung (DSGVO) *:</strong> Ich bin damit einverstanden, dass meine freiwilligen Angaben im <em>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</em> gespeichert und für die ehrenamtliche Unterstützung, Kontaktvermittlung und Jobsuche genutzt werden. Ich kann dies jederzeit ändern oder löschen lassen.
             </span>
           </label>
+          <div id="err-sz-dsgvo" class="sz-field-err-hint">Bitte setze hier noch das Häkchen bei der Datenschutz-Einwilligung (Pflichtfeld).</div>
 
           <div id="sz-draft-banner" style="display:none; margin-top:12px; padding:10px 13px; background:#e0f2fe; border:1px solid #7dd3fc; border-radius:8px; color:#0c4a6e; font-size:0.92rem;"></div>
           <div style="margin-top:16px; display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
-            <button type="button" id="sz-draft-btn" class="sz-btn-draft" style="padding:13px 20px; font-size:1rem;">💾 Zwischenspeichern (später weiterbearbeiten)</button>
+            <button type="button" id="sz-draft-btn" class="sz-btn-draft" style="padding:13px 18px; font-size:0.98rem;">💾 Zwischenspeichern (und weiter ausfüllen oder später weitermachen)</button>
             <button type="submit" id="sz-submit-btn" class="sz-btn-submit">✅ Endgültig speichern &amp; absenden</button>
           </div>
           <div id="sz-msg" style="font-weight:bold; margin-top:10px; font-size:0.96rem;"></div>
         </section>
       </form>
 
-      <!-- BESTÄTIGUNG MIT SCHATZSUCHE-CODE -->
       <section id="sz-done" class="sz-intro" style="display:none; background:#eaf6ec; border-color:#2e7d32; border-left-color:#2e7d32;">
         <h3 style="margin-top:0; color:#1b5e20;">✓ Vielen herzlichen Dank! Deine Schatzsuche ist gespeichert.</h3>
         <p>
           Wenn dir später noch weitere Talente, Ideen oder Wünsche einfallen, kannst du deine Schatzsuche jederzeit wieder öffnen und ergänzen.
         </p>
         <div style="background:#ffffff; border:2px solid #2e7d32; border-radius:9px; padding:14px 16px; margin:12px 0;">
-          <div style="font-size:0.9rem; color:#333;">Deine persönliche 6-stellige Nummer (für Schatzsuche, Unterlagen & Weiterbearbeiten):</div>
+          <div style="font-size:0.9rem; color:#333;">Deine persönliche 6-stellige Nummer (für Schatzsuche, Unterlagen &amp; Weiterbearbeiten):</div>
           <div id="sz-result-code" style="font-size:1.6rem; font-weight:bold; color:#004080; letter-spacing:3px; margin:4px 0;">------</div>
           <button type="button" id="sz-copy-my-code" class="sz-btn-primary" style="padding:7px 14px; font-size:0.88rem;">📋 Code &amp; Link kopieren</button>
         </div>
@@ -457,47 +523,59 @@
     document.addEventListener("DOMContentLoaded", function () {
       const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
 
-      const LEVEL_DEFS = [
-        { id: "dream", label: "✨ Traum & Neugier – „Das war schon immer ein Traum von mir / Ich möchte mich gerne einarbeiten“" },
-        { id: "everyday", label: "🏠 Alltag & Eigenbedarf – „Ich mache das gerne für mich und meine Familie“" },
-        { id: "helper", label: "🤝 Helfende Hand – „Ich kenne mich gut aus und kann anderen im Alltag dabei helfen“" },
-        { id: "experienced", label: "🛠️ Erfahrene Fachkraft – „Ich habe darin viel Praxis oder beruflich gearbeitet“" },
-        { id: "master", label: "🎓 Meister / Lehrer / Spezialist – „Ich beherrsche das auf Profi-Niveau und kann andere anleiten oder unterrichten“" }
+      const pageTitle = document.title || "Schatzsuche";
+      const pageUrl = window.location.href;
+      const devBtn = document.getElementById("dev-feedback-mail");
+      if (devBtn) {
+        const subj = encodeURIComponent(`Hinweis zur Webseite (${pageTitle})`);
+        const body = encodeURIComponent(`Hallo Team,
+
+mein Hinweis bezieht sich auf folgende Seite:
+Seite: ${pageTitle}
+Link: ${pageUrl}
+
+Mein Hinweis / Verbesserungsvorschlag:
+`);
+        devBtn.href = `mailto:Kontakt@freundeleuwi.org?subject=${subj}&body=${body}`;
+      }
+
+      const SKILL_LEVELS = [
+        { id: "dream", label: "✨ Traum & Neugier (möchte ich lernen / ausprobieren)" },
+        { id: "everyday", label: "🏠 Alltag & Grundkenntnisse (für mich & Familie)" },
+        { id: "helper", label: "🤝 Helfende Hand (kann anderen gut dabei helfen)" },
+        { id: "experienced", label: "🛠️ Erfahrene Fachkraft (viel Praxis / Berufserfahrung)" },
+        { id: "master", label: "🎓 Meister / Lehrer / Anleiter (kann Kurse / Gruppen leiten)" }
       ];
 
       const DOMAINS = [
         {
-          key: "musik",
-          icon: "🎵",
-          title: "Musik, Chor & Gesang",
+          key: "musik", icon: "🎵", title: "Musik, Chor & Gesang",
           subOptions: [
-            "Im Chor mitsingen (z. B. offener Chor / Geflüchteten-Chor)",
-            "Solo-Gesang",
-            "Chorleitung / Musikgruppe anleiten",
-            "Musikinstrument spielen",
+            "Gemeinsam singen / in einem offenen Chor mitsingen",
+            "Solo-Gesang / traditionelle Lieder",
+            "Chorleitung / Gesangsgruppe musikalisch anleiten",
+            "Musikinstrument spielen (z. B. Gitarre, Klavier, Oud, Geige, Trommel)",
             "Musikinstrument neu lernen",
-            "Anderen ein Instrument beibringen"
+            "Anderen ein Musikinstrument beibringen",
+            "Tontechnik, Aufnahmen & Musik-Veranstaltungen begleiten"
           ],
-          deepLabel: "Vertiefung (Welches Instrument, welche Stimmlage, wie viele Jahre Erfahrung?):",
-          deepPlaceholder: "z. B. Ich möchte gerne im Chor singen, spiele seit 8 Jahren Oud / Klavier / Gitarre …"
+          deepLabel: "Vertiefung (Welches Instrument, welche Stimmlage, welche Musikrichtung?):",
+          deepPlaceholder: "z. B. Spiele seit 8 Jahren Klavier oder Oud, singe gerne im Chor …"
         },
         {
-          key: "kochen",
-          icon: "🍳",
-          title: "Kochen, Backen & Gastronomie",
+          key: "kochen", icon: "🍳", title: "Kochen, Backen & Gastronomie",
           subOptions: [
             "Für mich & Familie kochen",
             "Gemeinsam mit anderen kochen & Rezepte tauschen",
-            "Kochkurse / Backkurse geben",
+            "Kochkurse / Backkurse anleiten",
+            "Brot, Gebäck & Kuchen backen",
             "Erfahrung in Restaurant / Großküche / Hotel / Bäckerei"
           ],
-          deepLabel: "Vertiefung (z. B. Küchenrichtung, Großküche / Hotel / Bäckerei, Spezialitäten):",
+          deepLabel: "Vertiefung (Küchenrichtung, Großküche / Hotel / Bäckerei, Spezialitäten):",
           deepPlaceholder: "z. B. 5 Jahre Koch in großem Hotel, syrische & arabische Küche, Backwaren …"
         },
         {
-          key: "it",
-          icon: "📱",
-          title: "Handy, Computer & Technik",
+          key: "it", icon: "📱", title: "Handy, Computer & Technik",
           subOptions: [
             "Smartphone im Alltag (WhatsApp, E-Mail, Apps einrichten)",
             "Anderen beim Handykauf & Einrichten helfen",
@@ -507,30 +585,28 @@
             "Hardware reparieren / Elektronik löten"
           ],
           deepLabel: "Vertiefung (Was genau beherrschst du oder möchtest du lernen?):",
-          deepPlaceholder: "z. B. Android/iPhone Hilfe für Senioren, oder Webentwicklung, oder Platinen löten …"
+          deepPlaceholder: "z. B. Android/iPhone Hilfe, Webentwicklung, Platinen löten …"
         },
         {
-          key: "reparatur",
-          icon: "🔧",
-          title: "Handwerk, Bau & Reparatur",
+          key: "reparatur", icon: "🔧", title: "Handwerk, Bau & Reparatur",
           subOptions: [
-            "Fahrräder reparieren",
-            "Möbel auf- und abbauen / Transport helfen",
-            "Küchen einbauen",
+            "Fahrräder reparieren & warten",
+            "Möbel auf- und abbauen / Umzugshilfe",
+            "Küchen einbauen & anpassen",
             "Waschmaschine / Geschirrspüler anschließen",
             "Elektrische Geräte & Leitungen",
-            "Heizung, Wasser & Abwasser",
-            "Maler-, Holz- oder Bauarbeiten"
+            "Heizung, Wasser & Abwasser (Sanitär)",
+            "Maler- & Tapezierarbeiten",
+            "Holzarbeiten & Schreinerei",
+            "Bauarbeiten, Fliesenlegen & Renovierung"
           ],
           deepLabel: "Vertiefung (Gelerntes Handwerk, Werkzeuge, besondere Erfahrung):",
-          deepPlaceholder: "z. B. Elektriker, Schreiner, Klempner, Fahrradwerkstatt …"
+          deepPlaceholder: "z. B. Elektriker, Schreiner, Maler, Fliesenleger, Fahrradwerkstatt …"
         },
         {
-          key: "garten",
-          icon: "🌿",
-          title: "Garten, Natur & Landwirtschaft",
+          key: "garten", icon: "🌿", title: "Garten, Natur & Landwirtschaft",
           subOptions: [
-            "Gartenarbeit & Austausch",
+            "Gartenarbeit, Gemüse- & Blumenbeete pflegen",
             "Mitarbeit in einem Gartenbau-Verein",
             "Wunsch nach einem eigenen Garten zum Pachten",
             "Erfahrung in der Landwirtschaft / Ackerbau",
@@ -540,34 +616,32 @@
             "Obstbäume & Obstbaumschnitt"
           ],
           deepLabel: "Vertiefung (Welche Kulturen, Tiere oder Maschinen kennst du?):",
-          deepPlaceholder: "z. B. Obstbaumschnitt, Gemüseanbau, Schafhaltung, Traktor …"
+          deepPlaceholder: "z. B. Obstbaumschnitt, Gemüseanbau, Imkerei, Schafhaltung, Traktor …"
         },
         {
-          key: "mobilitaet",
-          icon: "🚲",
-          title: "Mobilität (Fahrrad, Auto, LKW)",
+          key: "mobilitaet", icon: "🚲", title: "Mobilität (Fahrrad, Radkurier, Auto, LKW)",
           subOptions: [
-            "Möchte gerne Fahrrad fahren lernen",
-            "Kann Fahrrad fahren, brauche aber ein Fahrrad",
-            "Kann anderen Fahrrad fahren beibringen",
+            "Ich kann Fahrrad fahren",
+            "Ich brauche ein Fahrrad",
+            "Ich möchte gerne Fahrrad fahren lernen",
+            "Ich kann anderen Fahrrad fahren beibringen",
+            "Ich könnte mir vorstellen, als „Radkurier“ kleine Transporte durchzuführen",
             "Möchte gerne Auto fahren lernen",
             "Führerschein aus Heimatland vorhanden",
             "Gültiger deutscher Führerschein (ohne eigenes Auto)",
             "Eigenes Auto in Deutschland vorhanden",
-            "Erfahrung mit Anhänger",
+            "Erfahrung mit Anhänger / Transporter",
             "Berufskraftfahrer: Taxi / Bus / LKW"
           ],
-          deepLabel: "Vertiefung (Führerscheinklassen, Berufserfahrung als Fahrer):",
-          deepPlaceholder: "z. B. Klasse B, C/CE (LKW), Busfahrer …"
+          deepLabel: "Vertiefung (Führerscheinklassen, Lastenrad-Interesse, Berufserfahrung als Fahrer):",
+          deepPlaceholder: "z. B. Klasse B, C/CE (LKW), gerne mit Fahrradanhänger unterwegs …"
         },
         {
-          key: "kunst",
-          icon: "🎨",
-          title: "Malerei, Bildhauerei & Ton",
+          key: "kunst", icon: "🎨", title: "Malerei, Bildhauerei & Ton",
           subOptions: [
-            "Interesse an Malerei / Zeichnen",
-            "Erfahrung in Malerei & gerne weitergeben",
-            "Andere Künstler kennenlernen",
+            "Malerei & Zeichnen",
+            "Kalligrafie & Schriftkunst",
+            "Andere Künstler kennenlernen & gemeinsam arbeiten",
             "Bildhauerei & Arbeiten mit Ton / Lehm / Keramik",
             "Kunstunterricht an Schule oder Hochschule gegeben"
           ],
@@ -575,36 +649,31 @@
           deepPlaceholder: "z. B. Ölmalerei, Kalligrafie, Töpfern, Steinbildhauerei …"
         },
         {
-          key: "naehen",
-          icon: "🧵",
-          title: "Nähen, Schneidern & Textil",
+          key: "naehen", icon: "🧵", title: "Nähen, Schneidern & Textil",
           subOptions: [
             "Nähe gerne für mich und meine Familie",
             "Gemeinsam mit anderen nähen & ausbessern",
             "Nähkurse geben / Schnittmuster erstellen",
-            "Berufserfahrung als Schneider(in)"
+            "Berufserfahrung als Schneider(in)",
+            "Stricken, Häkeln & Stickerei"
           ],
           deepLabel: "Vertiefung (Nähmaschine, Änderungsschneiderei, Stickerei):",
           deepPlaceholder: "z. B. 10 Jahre Herrenschneider, Änderungen an Kleidung …"
         },
         {
-          key: "papier",
-          icon: "📄",
-          title: "Papierkram, Übersetzen & Behörden",
+          key: "papier", icon: "📄", title: "Papierkram, Übersetzen & Behörden",
           subOptions: [
             "Unterstützung beim Ordnen von Briefen & Unterlagen",
             "Begleitung / Sprachmittlung bei Terminen & Behörden",
-            "Hilfe beim Ausfüllen von Formularen"
+            "Hilfe beim Ausfüllen von Formularen & Anträgen",
+            "Schriftliche Übersetzungen"
           ],
           deepLabel: "Vertiefung (In welchen Sprachen oder Bereichen kannst du helfen?):",
           deepPlaceholder: "z. B. Arabisch-Deutsch bei Arzt- oder Behördenterminen …"
         },
         {
-          key: "schreiben",
-          icon: "✍️",
-          title: "Schreiben, Literatur & Journalismus",
-          short: "Texte, Gedichte, Reportagen, Bücher & Interviews",
-          options: [
+          key: "schreiben", icon: "✍️", title: "Schreiben, Literatur & Journalismus",
+          subOptions: [
             "Geschichten, Romane oder Gedichte schreiben",
             "Journalismus, Artikel, Reportagen & Interviews",
             "Reden, Briefe oder Texte formulieren & lektorieren",
@@ -615,11 +684,8 @@
           deepPlaceholder: "z. B. Journalist in der Heimat, Gedichte auf Arabisch/Deutsch, Vereinsberichte …"
         },
         {
-          key: "bildung",
-          icon: "📚",
-          title: "Bildung, Schulfächer & Nachhilfe",
-          short: "Mathe, Naturwissenschaften, Geschichte, Nachhilfe & Unterricht",
-          options: [
+          key: "bildung", icon: "📚", title: "Bildung, Schulfächer & Nachhilfe",
+          subOptions: [
             "Mathematik, Physik, Chemie oder Biologie erklären",
             "Geschichte, Geografie, Politik oder Wirtschaft",
             "Lesen, Schreiben & Hausaufgabenhilfe für Kinder",
@@ -630,11 +696,8 @@
           deepPlaceholder: "z. B. Mathelehrer, Hausaufgabenhilfe Grundschule, Geschichte …"
         },
         {
-          key: "sport_hobbys",
-          icon: "🪂",
-          title: "Sport, Bewegung & besondere Hobbys",
-          short: "Fußball, Schwimmen, Wandern, Fliegen, Schach & mehr",
-          options: [
+          key: "sport_hobbys", icon: "🪂", title: "Sport, Bewegung & besondere Hobbys",
+          subOptions: [
             "Fußball, Volleyball, Tischtennis oder Laufgruppe",
             "Wandern, Radtouren & Natur erkunden",
             "Schwimmen lernen oder Schwimmtraining",
@@ -645,27 +708,12 @@
           deepPlaceholder: "z. B. Gleitschirmfliegen, Schachverein, Fußballtrainer, Fotografie …"
         },
         {
-          key: "eigene_ideen",
-          icon: "✨",
-          title: "Weitere Schätze, Hobbys & fehlende Themen",
-          short: "Alles, was oben noch fehlt – eigene Talente & Ideen für neue Bereiche",
-          options: [
-            "Ich habe ein ganz anderes Hobby oder Spezialwissen",
-            "Ich möchte einen neuen Treffpunkt oder Kurs anregen",
-            "Ich schlage unten ein neues Themenfeld für die Schatzsuche vor"
-          ],
-          deepLabel: "Dein freies Feld (Welche Begabung, welches Hobby oder welches Thema fehlt uns noch?):",
-          deepPlaceholder: "Schreibe hier alles auf, was in den anderen Kacheln noch nicht vorkam – wenn viele etwas Ähnliches nennen, machen wir ein eigenes Themenfeld daraus!"
-        },
-        {
-          key: "ehrenamt",
-          icon: "🤝",
-          title: "Bisheriges Ehrenamt & Vereine",
+          key: "ehrenamt", icon: "🤝", title: "Bisheriges Ehrenamt & Vereine",
           subOptions: [
             "Feuerwehr / Katastrophenschutz",
             "Rettungswesen (Rotes Kreuz / Roter Halbmond)",
             "Sportverein / Trainer",
-            "Musikverein",
+            "Musikverein / Kulturverein",
             "Altenhilfe / Besuchsdienst",
             "Krankenhaus / Pflege",
             "Naturschutz / Tierschutz",
@@ -673,10 +721,73 @@
           ],
           deepLabel: "Vertiefung (Was hast du dort genau gemacht?):",
           deepPlaceholder: "z. B. Jugendtrainer Fußball, Sanitäter, Besuchsdienst …"
+        },
+        {
+          key: "eigene_ideen", icon: "✨", title: "Weitere Schätze, Hobbys & fehlende Themen",
+          subOptions: [
+            "Ich habe ein ganz anderes Hobby oder Spezialwissen",
+            "Ich möchte einen neuen Treffpunkt oder Kurs anregen",
+            "Ich schlage ein neues Themenfeld für die Schatzsuche vor"
+          ],
+          deepLabel: "Dein freies Feld (Welche Begabung, welches Hobby oder welches Thema fehlt uns noch?):",
+          deepPlaceholder: "Schreibe hier alles auf, was oben noch nicht vorkam – wenn viele etwas Ähnliches nennen, machen wir ein eigenes Feld daraus!"
         }
       ];
 
       let activeSchatzCode = "";
+      let selectedCodeMode = "new";
+
+      document.querySelectorAll('input[name="sz-code-mode"]').forEach(r => {
+        r.addEventListener("change", () => {
+          selectedCodeMode = r.value;
+          document.querySelectorAll(".sz-code-mode-opt").forEach(lbl => {
+            lbl.classList.toggle("active", lbl.dataset.mode === selectedCodeMode);
+          });
+          document.getElementById("sz-code-box-existing").style.display = selectedCodeMode === "existing" ? "block" : "none";
+          document.getElementById("sz-code-box-custom").style.display = selectedCodeMode === "custom" ? "block" : "none";
+          document.getElementById("sz-code-box-forgot").style.display = selectedCodeMode === "forgot" ? "block" : "none";
+        });
+      });
+
+      const loadInput = document.getElementById("sz-load-code");
+      const customInput = document.getElementById("sz-custom-code");
+      const aktenInput = document.getElementById("sz-aktencode");
+      if (typeof window.fflwNeutralizeCodeInput === "function") {
+        window.fflwNeutralizeCodeInput(loadInput);
+        window.fflwNeutralizeCodeInput(customInput);
+        window.fflwNeutralizeCodeInput(aktenInput);
+      }
+
+      document.getElementById("sz-check-custom-btn").addEventListener("click", async function () {
+        const val = String(customInput.value || "").replace(/\D/g, "").trim();
+        const msgEl = document.getElementById("sz-custom-msg");
+        if (!/^\d{6}$/.test(val)) {
+          msgEl.style.color = "#b91c1c";
+          msgEl.textContent = "Bitte genau 6 Ziffern eingeben (z. B. 250890).";
+          return;
+        }
+        const orig = this.textContent;
+        this.disabled = true;
+        this.textContent = "⏳ Prüfe …";
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=checkCodeAvailability&code=${encodeURIComponent(val)}&t=${Date.now()}`, { method: "GET", redirect: "follow" });
+          const res = await resp.json();
+          this.disabled = false;
+          this.textContent = orig;
+          if (res && res.available) {
+            msgEl.style.color = "#15803d";
+            msgEl.textContent = `✓ Die Nummer ${val} ist noch frei und wird beim Speichern für dich reserviert!`;
+          } else {
+            msgEl.style.color = "#b91c1c";
+            msgEl.textContent = `✕ Die Nummer ${val} ist leider schon vergeben. Bitte wähle eine andere 6-stellige Zahl.`;
+          }
+        } catch (err) {
+          this.disabled = false;
+          this.textContent = orig;
+          msgEl.style.color = "#b91c1c";
+          msgEl.textContent = "Prüfung gerade nicht möglich: " + err.message;
+        }
+      });
 
       let currentFotoDataUrl = "";
       const fotoInput = document.getElementById("sz-foto");
@@ -696,7 +807,6 @@
       }
 
       document.getElementById("sz-foto-clear").addEventListener("click", () => updateFotoPreview(""));
-
       fotoInput.addEventListener("change", function () {
         const f = this.files && this.files[0];
         if (!f) return;
@@ -720,19 +830,10 @@
         reader.readAsDataURL(f);
       });
 
-
-      const loadInput = document.getElementById("sz-load-code");
-      const aktenInput = document.getElementById("sz-aktencode");
-      if (typeof window.fflwNeutralizeCodeInput === "function") {
-        window.fflwNeutralizeCodeInput(loadInput);
-        window.fflwNeutralizeCodeInput(aktenInput);
-      }
-
       const tilesContainer = document.getElementById("sz-topic-tiles");
       const domainsContainer = document.getElementById("sz-active-domains-container");
 
       DOMAINS.forEach(dom => {
-        // Kachel erzeugen
         const tile = document.createElement("button");
         tile.type = "button";
         tile.className = "sz-topic-tile";
@@ -740,37 +841,31 @@
         tile.innerHTML = `<span>${dom.icon} ${dom.title}</span><span class="sz-tile-badge">+ Öffnen</span>`;
         tilesContainer.appendChild(tile);
 
-        // Bereichs-Panel erzeugen
         const panel = document.createElement("div");
         panel.className = "sz-domain-panel";
         panel.id = `panel-${dom.key}`;
         panel.innerHTML = `
           <div class="sz-domain-header">
             <h4>${dom.icon} ${dom.title}</h4>
-            <button type="button" class="sz-close-domain" data-key="${dom.key}">Bereich ausblenden</button>
+            <button type="button" class="sz-close-domain btn-hide-domain" data-key="${dom.key}">Bereich einklappen</button>
           </div>
-          <span class="sz-q-title" style="margin-top:0;">1. Wie sieht deine Verbindung zu diesem Thema aus? (Mehrfachauswahl möglich)</span>
-          <div class="sz-levels-grid">
-            ${LEVEL_DEFS.map(lv => `
-              <label class="sz-level-opt" data-lvl="${lv.id}">
-                <input type="checkbox" class="sz-lvl-chk" data-domain="${dom.key}" value="${lv.id}">
-                <span>${lv.label}</span>
-              </label>
-            `).join("")}
-          </div>
-
-          <span class="sz-q-title">2. Was genau passt hier für dich? (Optional antippen)</span>
-          <div class="sz-sub-grid">
-            ${dom.subOptions.map(opt => `
-              <label class="sz-sub-item">
-                <input type="checkbox" class="sz-sub-chk" data-domain="${dom.key}" value="${opt}">
-                <span>${opt}</span>
-              </label>
+          <span class="sz-q-title" style="margin-top:0;">1. Wähle passende Punkte aus &amp; gib jeweils deine Stufe an:</span>
+          <div class="sz-sub-list">
+            ${dom.subOptions.map((opt, idx) => `
+              <div class="sz-sub-row" data-domain="${dom.key}" data-idx="${idx}">
+                <label class="sz-sub-label">
+                  <input type="checkbox" class="sz-sub-chk" data-domain="${dom.key}" data-idx="${idx}" value="${opt}">
+                  <span>${opt}</span>
+                </label>
+                <select class="sz-sub-level-select" data-domain="${dom.key}" data-idx="${idx}" aria-label="Fähigkeits-Stufe für ${opt}">
+                  ${SKILL_LEVELS.map(lv => `<option value="${lv.id}" ${lv.id === "helper" ? "selected" : ""}>${lv.label}</option>`).join("")}
+                </select>
+              </div>
             `).join("")}
           </div>
 
           <div class="sz-deep-box">
-            <label class="sz-q-title" for="deep-${dom.key}" style="margin-top:0;">3. ${dom.deepLabel}</label>
+            <label class="sz-q-title" for="deep-${dom.key}" style="margin-top:0;">2. ${dom.deepLabel}</label>
             <textarea id="deep-${dom.key}" class="sz-textarea" rows="2" placeholder="${dom.deepPlaceholder}"></textarea>
           </div>
           <div class="sz-domain-footer">
@@ -778,21 +873,40 @@
               <button type="button" class="sz-btn-draft btn-domain-draft-save" data-key="${dom.key}">💾 Zwischenspeichern</button>
               <button type="button" class="sz-close-domain btn-domain-back-topics" data-key="${dom.key}">↑ Zurück zur Themen-Auswahl</button>
             </div>
-            <span class="sz-domain-save-status" id="status-${dom.key}" style="font-size:0.88rem; font-weight:bold;"></span>
+            <span class="sz-domain-save-status" id="status-${dom.key}" style="font-size:0.9rem; font-weight:bold;"></span>
           </div>
         `;
         domainsContainer.appendChild(panel);
 
+        panel.querySelectorAll(".sz-sub-chk").forEach(chk => {
+          chk.addEventListener("change", () => {
+            const row = chk.closest(".sz-sub-row");
+            if (row) row.classList.toggle("is-checked", chk.checked);
+          });
+        });
+
+        panel.querySelectorAll(".sz-sub-level-select").forEach(sel => {
+          sel.addEventListener("change", () => {
+            const idx = sel.dataset.idx;
+            const chk = panel.querySelector(`.sz-sub-chk[data-idx="${idx}"]`);
+            if (chk && !chk.checked) {
+              chk.checked = true;
+              const row = chk.closest(".sz-sub-row");
+              if (row) row.classList.add("is-checked");
+            }
+          });
+        });
+
         tile.addEventListener("click", () => {
           const isOpen = panel.classList.toggle("is-open");
           tile.classList.toggle("selected", isOpen);
-          tile.querySelector(".sz-tile-badge").textContent = isOpen ? "✓ Aktiv" : "+ Öffnen";
+          tile.querySelector(".sz-tile-badge").textContent = isOpen ? "✓ Offen" : "+ Öffnen";
           if (isOpen) {
-            panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            setTimeout(() => { panel.scrollIntoView({ behavior: "smooth", block: "start" }); }, 60);
           }
         });
 
-        panel.querySelector(".sz-close-domain").addEventListener("click", () => {
+        panel.querySelector(".btn-hide-domain").addEventListener("click", () => {
           panel.classList.remove("is-open");
           tile.classList.remove("selected");
           tile.querySelector(".sz-tile-badge").textContent = "+ Öffnen";
@@ -805,32 +919,37 @@
         if (panel && tile) {
           panel.classList.add("is-open");
           tile.classList.add("selected");
-          tile.querySelector(".sz-tile-badge").textContent = "✓ Aktiv";
+          tile.querySelector(".sz-tile-badge").textContent = "✓ Offen";
         }
       }
 
-      // Bestehenden Schatzsuche-Datensatz per Code laden
       async function loadExistingSchatz(codeRaw) {
         const code = String(codeRaw || loadInput.value || "").trim();
         const msgEl = document.getElementById("sz-load-msg");
         const btn = document.getElementById("sz-load-btn");
         if (!code) {
           msgEl.style.color = "#c62828";
-          msgEl.textContent = "Bitte Schatzsuche-Code eingeben.";
+          msgEl.textContent = "Bitte deine 6-stellige Nummer eingeben.";
           return { ok: false };
         }
+        const origText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "⏳ Lade …";
+        msgEl.style.color = "#b45309";
+        msgEl.textContent = "⏳ Suche deine Daten …";
 
-        const task = async () => {
-          const resp = await fetch(`${WEB_APP_URL}?action=getTreasureEntry&code=${encodeURIComponent(code)}&t=${Date.now()}`, {
-            method: "GET",
-            redirect: "follow"
-          });
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=getTreasureEntry&code=${encodeURIComponent(code)}&t=${Date.now()}`, { method: "GET", redirect: "follow" });
           const res = await resp.json();
+          btn.disabled = false;
           if (!res || !res.ok || !res.entry) {
+            btn.textContent = origText;
             msgEl.style.color = "#c62828";
-            msgEl.textContent = (res && res.error) ? res.error : "Code nicht gefunden.";
+            msgEl.textContent = (res && res.error) ? res.error : "Nummer nicht gefunden.";
             return { ok: false };
           }
+          btn.textContent = "✓ Geladen!";
+          setTimeout(() => { btn.textContent = origText; }, 2500);
 
           const d = res.entry;
           activeSchatzCode = d.schatzCode || code;
@@ -840,6 +959,7 @@
           document.getElementById("sz-email").value = d.email || "";
           document.getElementById("sz-muttersprache").value = d.muttersprache || "";
           document.getElementById("sz-sprachen").value = d.sprachen || "";
+          if (d.sprachniveau) document.getElementById("sz-sprachniveau").value = d.sprachniveau;
           document.getElementById("sz-geburt").value = d.geburt || "";
           document.getElementById("sz-familie").value = d.familie || "";
           document.getElementById("sz-aktencode").value = d.aktenCode || "";
@@ -848,42 +968,58 @@
           document.getElementById("sz-vorschlag-feld").value = d.vorschlagNeuesFeld || "";
           if (d.fotoDataUrl) updateFotoPreview(d.fotoDataUrl);
 
-          // Alle Häkchen zurücksetzen und gespeicherte Werte wiederherstellen
-          document.querySelectorAll(".sz-lvl-chk, .sz-sub-chk").forEach(c => { c.checked = false; });
+          document.querySelectorAll(".sz-sub-chk").forEach(c => {
+            c.checked = false;
+            const r = c.closest(".sz-sub-row");
+            if (r) r.classList.remove("is-checked");
+          });
 
           const detailsMap = d.domainDetails || {};
           Object.keys(detailsMap).forEach(key => {
             const det = detailsMap[key];
             if (!det) return;
-            const hasContent = (det.levels && det.levels.length) || (det.options && det.options.length) || (det.detail && det.detail.trim());
+            const hasContent = (det.subSkills && det.subSkills.length) || (det.options && det.options.length) || (det.detail && det.detail.trim());
             if (hasContent) {
               openDomainPanel(key);
-              (det.levels || []).forEach(lv => {
-                const chk = document.querySelector(`.sz-lvl-chk[data-domain="${key}"][value="${lv}"]`);
-                if (chk) chk.checked = true;
-              });
-              (det.options || []).forEach(opt => {
-                const chk = document.querySelector(`.sz-sub-chk[data-domain="${key}"][value="${CSS.escape(opt)}"]`);
-                if (chk) chk.checked = true;
-              });
+              const fallbackLevel = (det.levels && det.levels[0]) || "helper";
+              if (Array.isArray(det.subSkills) && det.subSkills.length) {
+                det.subSkills.forEach(sk => {
+                  const chk = document.querySelector(`.sz-sub-chk[data-domain="${key}"][value="${CSS.escape(sk.option)}"]`);
+                  if (chk) {
+                    chk.checked = true;
+                    const row = chk.closest(".sz-sub-row");
+                    if (row) row.classList.add("is-checked");
+                    const sel = row ? row.querySelector(".sz-sub-level-select") : null;
+                    if (sel && sk.level) sel.value = sk.level;
+                  }
+                });
+              } else {
+                (det.options || []).forEach(opt => {
+                  const chk = document.querySelector(`.sz-sub-chk[data-domain="${key}"][value="${CSS.escape(opt)}"]`);
+                  if (chk) {
+                    chk.checked = true;
+                    const row = chk.closest(".sz-sub-row");
+                    if (row) row.classList.add("is-checked");
+                    const sel = row ? row.querySelector(".sz-sub-level-select") : null;
+                    if (sel) sel.value = fallbackLevel;
+                  }
+                });
+              }
               const ta = document.getElementById(`deep-${key}`);
               if (ta) ta.value = det.detail || "";
             }
           });
 
-          msgEl.style.color = "#1b5e20";
-          msgEl.textContent = `✓ Deine bisherigen Angaben (Code ${activeSchatzCode}) wurden geladen!`;
+          msgEl.style.color = "#15803d";
+          msgEl.textContent = `✓ Deine bisherigen Angaben (Nummer ${activeSchatzCode}) wurden geladen!`;
           return { ok: true };
-        };
-
-        if (typeof window.fflwRunButtonAction === "function") {
-          return await window.fflwRunButtonAction(btn, task, {
-            loadingText: "Lade …",
-            successText: "✓ Geladen!",
-            resetAfterMs: 1400
-          });
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = origText;
+          msgEl.style.color = "#c62828";
+          msgEl.textContent = "Fehler beim Laden: " + err.message;
+          return { ok: false };
         }
-        return await task();
       }
 
       document.getElementById("sz-load-btn").addEventListener("click", () => loadExistingSchatz());
@@ -891,43 +1027,86 @@
       const urlParams = new URLSearchParams(window.location.search);
       const urlSc = urlParams.get("sc") || urlParams.get("schatzcode");
       const urlAc = urlParams.get("c") || urlParams.get("code");
-      if (urlAc) {
-        aktenInput.value = urlAc.trim();
-        aktenInput.dataset.userTyped = "1";
-      }
+      if (urlAc) { aktenInput.value = urlAc.trim(); aktenInput.dataset.userTyped = "1"; }
       if (urlSc) {
-        document.getElementById("sz-resume-details").open = true;
+        const radioEx = document.querySelector('input[name="sz-code-mode"][value="existing"]');
+        if (radioEx) { radioEx.checked = true; radioEx.dispatchEvent(new Event("change")); }
         loadInput.value = urlSc.trim();
         loadInput.dataset.userTyped = "1";
         loadExistingSchatz(urlSc.trim());
       }
 
+      ["sz-name", "sz-herkunft", "sz-kontakt"].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener("input", () => {
+          el.classList.remove("sz-field-invalid");
+          const hint = document.getElementById("err-" + id);
+          if (hint) hint.classList.remove("visible");
+        });
+      });
+      document.getElementById("sz-dsgvo").addEventListener("change", function () {
+        document.getElementById("sz-dsgvo-box").classList.remove("sz-field-invalid");
+        document.getElementById("err-sz-dsgvo").classList.remove("visible");
+      });
+
+      function validateFormFields(isDraft) {
+        let firstInvalidEl = null;
+        ["sz-name", "sz-herkunft", "sz-kontakt"].forEach(id => {
+          const el = document.getElementById(id);
+          const hint = document.getElementById("err-" + id);
+          if (!el.value.trim()) {
+            el.classList.add("sz-field-invalid");
+            if (hint) hint.classList.add("visible");
+            if (!firstInvalidEl) firstInvalidEl = el;
+          } else {
+            el.classList.remove("sz-field-invalid");
+            if (hint) hint.classList.remove("visible");
+          }
+        });
+        if (!isDraft && !document.getElementById("sz-dsgvo").checked) {
+          const box = document.getElementById("sz-dsgvo-box");
+          const hint = document.getElementById("err-sz-dsgvo");
+          box.classList.add("sz-field-invalid");
+          hint.classList.add("visible");
+          if (!firstInvalidEl) firstInvalidEl = box;
+        }
+        if (firstInvalidEl) {
+          firstInvalidEl.scrollIntoView({ behavior: "smooth", block: "center" });
+          if (typeof firstInvalidEl.focus === "function") firstInvalidEl.focus();
+          return false;
+        }
+        return true;
+      }
+
       function buildTreasurePayload(isDraft) {
         const domainDetails = {};
         DOMAINS.forEach(dom => {
-          const levels = Array.from(document.querySelectorAll(`.sz-lvl-chk[data-domain="${dom.key}"]:checked`)).map(c => c.value);
-          const options = Array.from(document.querySelectorAll(`.sz-sub-chk[data-domain="${dom.key}"]:checked`)).map(c => c.value);
+          const checkedChks = Array.from(document.querySelectorAll(`.sz-sub-chk[data-domain="${dom.key}"]:checked`));
+          const subSkills = checkedChks.map(chk => {
+            const idx = chk.dataset.idx;
+            const sel = document.querySelector(`.sz-sub-level-select[data-domain="${dom.key}"][data-idx="${idx}"]`);
+            return { option: chk.value, level: sel ? sel.value : "helper" };
+          });
+          const options = subSkills.map(s => s.option);
+          const levels = Array.from(new Set(subSkills.map(s => s.level)));
           const detail = (document.getElementById(`deep-${dom.key}`).value || "").trim();
-          if (levels.length || options.length || detail) {
-            domainDetails[dom.key] = {
-              title: dom.title,
-              levels: levels,
-              options: options,
-              detail: detail
-            };
+          if (subSkills.length || detail) {
+            domainDetails[dom.key] = { title: dom.title, levels, options, subSkills, detail };
           }
         });
-
+        const customCodeVal = (selectedCodeMode === "custom") ? String(customInput.value || "").replace(/\D/g, "").trim() : "";
         return {
           action: "submitTreasureSurvey",
           isDraft: !!isDraft,
           schatzCode: activeSchatzCode,
+          preferredCode: customCodeVal,
           name: document.getElementById("sz-name").value.trim(),
           herkunftsland: document.getElementById("sz-herkunft").value.trim(),
           kontakt: document.getElementById("sz-kontakt").value.trim(),
           email: document.getElementById("sz-email").value.trim(),
           muttersprache: document.getElementById("sz-muttersprache").value.trim(),
           sprachen: document.getElementById("sz-sprachen").value.trim(),
+          sprachniveau: document.getElementById("sz-sprachniveau").value,
           geburt: document.getElementById("sz-geburt").value.trim(),
           familie: document.getElementById("sz-familie").value.trim(),
           aktenCode: document.getElementById("sz-aktencode").value.trim(),
@@ -942,58 +1121,36 @@
       async function saveTreasureWithButtonFeedback(triggerBtn, isDraft, localStatusEl) {
         const msgEl = document.getElementById("sz-msg");
         const draftBanner = document.getElementById("sz-draft-banner");
-        const nameVal = document.getElementById("sz-name").value.trim();
-
-        if (!nameVal) {
-          const warn = "Bitte oben zuerst deinen Namen eingeben, damit wir deinen Zwischenstand zuordnen können.";
-          if (localStatusEl) { localStatusEl.style.color = "#c62828"; localStatusEl.textContent = warn; }
-          msgEl.style.color = "#c62828";
+        if (!validateFormFields(isDraft)) {
+          const warn = "⚠️ Bitte fülle zuerst die rot markierten Pflichtfelder aus.";
+          if (localStatusEl) { localStatusEl.style.color = "#b91c1c"; localStatusEl.textContent = warn; }
+          msgEl.style.color = "#b91c1c";
           msgEl.textContent = warn;
-          document.getElementById("sz-name").focus();
           return;
         }
-
-        if (!isDraft && !document.getElementById("sz-dsgvo").checked) {
-          msgEl.style.color = "#c62828";
-          msgEl.textContent = "Bitte bestätige vor dem endgültigen Absenden noch kurz die Datenschutz-Einwilligung.";
-          document.getElementById("sz-dsgvo").focus();
-          return;
-        }
-
         const origHtml = triggerBtn ? triggerBtn.innerHTML : "";
         let seconds = 0;
         let timerId = null;
-
         if (triggerBtn) {
           triggerBtn.disabled = true;
           triggerBtn.classList.remove("sz-btn-saved-ok", "sz-btn-saved-err");
           triggerBtn.classList.add("sz-btn-saving");
           triggerBtn.innerHTML = "⏳ Speichere … Bitte kurz warten";
-          timerId = setInterval(() => {
-            seconds++;
-            triggerBtn.innerHTML = `⏳ Speichere … (${seconds} Sek.)`;
-          }, 1000);
+          timerId = setInterval(() => { seconds++; triggerBtn.innerHTML = `⏳ Speichere … (${seconds} Sek.)`; }, 1000);
         }
-
-        if (localStatusEl) {
-          localStatusEl.style.color = "#b45309";
-          localStatusEl.textContent = "⏳ Wird zwischengespeichert …";
-        }
+        if (localStatusEl) { localStatusEl.style.color = "#b45309"; localStatusEl.textContent = "⏳ Wird zwischengespeichert …"; }
         msgEl.style.color = "#b45309";
         msgEl.textContent = "⏳ Verbindung zur Datenbank läuft …";
 
         try {
-          const payload = buildTreasurePayload(isDraft);
           const resp = await fetch(WEB_APP_URL, {
             method: "POST",
             redirect: "follow",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(buildTreasurePayload(isDraft))
           });
           const res = await resp.json();
-
           if (timerId) clearInterval(timerId);
-
           if (res && res.ok) {
             activeSchatzCode = res.schatzCode || activeSchatzCode;
             if (triggerBtn) {
@@ -1001,23 +1158,16 @@
               triggerBtn.classList.remove("sz-btn-saving");
               triggerBtn.classList.add("sz-btn-saved-ok");
               triggerBtn.innerHTML = isDraft ? "✓ Zwischengespeichert!" : "✓ Endgültig gespeichert!";
-              setTimeout(() => {
-                triggerBtn.classList.remove("sz-btn-saved-ok");
-                triggerBtn.innerHTML = origHtml;
-              }, 3500);
+              setTimeout(() => { triggerBtn.classList.remove("sz-btn-saved-ok"); triggerBtn.innerHTML = origHtml; }, 4000);
             }
-
             if (isDraft) {
               const nowTime = new Date().toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
-              const infoTxt = `✓ Zwischenstand um ${nowTime} Uhr gespeichert! Dein persönlicher Schatzsuche-Code lautet: ${activeSchatzCode}`;
-              if (localStatusEl) {
-                localStatusEl.style.color = "#15803d";
-                localStatusEl.textContent = `✓ Gespeichert (${nowTime} Uhr)`;
-              }
+              const infoTxt = `✓ Zwischenstand um ${nowTime} Uhr gespeichert! Deine persönliche 6-stellige Nummer lautet: ${activeSchatzCode}`;
+              if (localStatusEl) { localStatusEl.style.color = "#15803d"; localStatusEl.textContent = `✓ Gespeichert (${nowTime} Uhr)`; }
               msgEl.style.color = "#15803d";
               msgEl.textContent = infoTxt;
               draftBanner.style.display = "block";
-              draftBanner.innerHTML = `<strong>💾 Zwischenstand gesichert (${nowTime} Uhr):</strong> Dein persönlicher Schatzsuche-Code lautet <strong style="font-size:1.1rem; letter-spacing:2px; color:#004080;">${activeSchatzCode}</strong>. Du kannst jetzt weitere Themen öffnen, eine Pause machen oder unten auf <em>„✅ Endgültig speichern &amp; absenden“</em> klicken.`;
+              draftBanner.innerHTML = `<strong>✓ Zwischenstand gesichert (${nowTime} Uhr):</strong> Deine persönliche 6-stellige Nummer lautet <strong style="font-size:1.1rem; letter-spacing:2px; color:#004080;">${activeSchatzCode}</strong>. Du kannst jetzt weitere Themen öffnen, eine Pause machen oder unten auf <em>„✅ Endgültig speichern &amp; absenden“</em> klicken.`;
             } else {
               document.getElementById("sz-result-code").textContent = activeSchatzCode;
               document.getElementById("sz-form").style.display = "none";
@@ -1034,10 +1184,7 @@
             triggerBtn.classList.remove("sz-btn-saving");
             triggerBtn.classList.add("sz-btn-saved-err");
             triggerBtn.innerHTML = "✕ Fehler – erneut versuchen";
-            setTimeout(() => {
-              triggerBtn.classList.remove("sz-btn-saved-err");
-              triggerBtn.innerHTML = origHtml;
-            }, 3500);
+            setTimeout(() => { triggerBtn.classList.remove("sz-btn-saved-err"); triggerBtn.innerHTML = origHtml; }, 4000);
           }
           const errTxt = "Fehler beim Speichern: " + err.message;
           if (localStatusEl) { localStatusEl.style.color = "#b91c1c"; localStatusEl.textContent = errTxt; }
@@ -1046,41 +1193,27 @@
         }
       }
 
-      // Zwischenspeichern innerhalb jedes Themen-Panels + Zurück zu den Kacheln
       document.querySelectorAll(".btn-domain-draft-save").forEach(btn => {
-        btn.addEventListener("click", () => {
-          const key = btn.dataset.key;
-          const statusEl = document.getElementById(`status-${key}`);
-          saveTreasureWithButtonFeedback(btn, true, statusEl);
-        });
+        btn.addEventListener("click", () => saveTreasureWithButtonFeedback(btn, true, document.getElementById(`status-${btn.dataset.key}`)));
       });
-
       document.querySelectorAll(".btn-domain-back-topics").forEach(btn => {
         btn.addEventListener("click", () => {
-          tilesContainer.scrollIntoView({ behavior: "smooth", block: "start" });
+          const target = document.getElementById("sz-topic-tiles");
+          if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
         });
       });
-
-      // Zwischenspeichern unten im Formular
-      document.getElementById("sz-draft-btn").addEventListener("click", function () {
-        saveTreasureWithButtonFeedback(this, true, null);
-      });
-
-      // Endgültig speichern & absenden
-      document.getElementById("sz-form").addEventListener("submit", function (e) {
-        e.preventDefault();
-        saveTreasureWithButtonFeedback(document.getElementById("sz-submit-btn"), false, null);
-      });
-
+      document.getElementById("sz-draft-btn").addEventListener("click", function () { saveTreasureWithButtonFeedback(this, true, null); });
+      document.getElementById("sz-form").addEventListener("submit", function (e) { e.preventDefault(); saveTreasureWithButtonFeedback(document.getElementById("sz-submit-btn"), false, null); });
       document.getElementById("sz-copy-my-code").addEventListener("click", async function () {
         const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
         const link = `${baseDir}schatzsuche.html?sc=${encodeURIComponent(activeSchatzCode)}`;
-        await navigator.clipboard.writeText(`Meine Schatzsuche beim Freundeskreis:\nLink: ${link}\nPersönlicher Schatzsuche-Code: ${activeSchatzCode}`);
+        await navigator.clipboard.writeText(`Meine Schatzsuche beim Freundeskreis:
+Link: ${link}
+Persönliche 6-stellige Nummer: ${activeSchatzCode}`);
         this.textContent = "✓ Kopiert!";
         setTimeout(() => { this.textContent = "📋 Code & Link kopieren"; }, 2000);
       });
-
-      document.getElementById("sz-edit-again-btn").addEventListener("click", function () {
+      document.getElementById("sz-edit-again-btn").addEventListener("click", () => {
         document.getElementById("sz-done").style.display = "none";
         document.getElementById("sz-form").style.display = "block";
       });

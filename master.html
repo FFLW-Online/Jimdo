@@ -297,6 +297,16 @@
                 <span id="ki-photos-count" style="font-weight:bold; color:#312e81;">0 Bilder geladen</span>
               </div>
               <div id="ki-thumbs-grid" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
+              <div style="margin-top:10px; padding:10px 12px; background:#eff6ff; border:1px solid #93c5fd; border-radius:7px;">
+                <label for="ki-drive-folder" style="display:block; font-weight:bold; color:#1e3a8a; margin-bottom:6px;">
+                  📁 Oder Fotos direkt aus einem Google-Drive-Ordner laden (Ordner-Link oder Ordner-Name):
+                </label>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                  <input type="text" id="ki-drive-folder" class="m-input" placeholder="Google-Drive-Ordner-Link oder Name einfügen …" style="flex:1 1 240px;">
+                  <button type="button" id="ki-drive-import-btn" class="m-btn" style="background:#1d4ed8;">Bilder aus Drive holen</button>
+                  <span id="ki-drive-status" style="font-size:0.88rem; font-weight:bold;"></span>
+                </div>
+              </div>
             </div>
 
             <!-- Schritt 3: KI-Erkennung starten ODER Text/JSON einfügen -->
@@ -1329,8 +1339,23 @@
 
         const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
 
+        const allSchatzList = (cachedOverview && cachedOverview.schatzkiste) ? cachedOverview.schatzkiste : [];
+        const nameCountMap = {};
+        allSchatzList.forEach(item => {
+          const nn = String(item.name || "").toLowerCase().trim();
+          if (nn) nameCountMap[nn] = (nameCountMap[nn] || 0) + 1;
+        });
+        const vorschlaegeAll = allSchatzList.filter(item => item.vorschlagNeuesFeld && item.vorschlagNeuesFeld.trim());
+        const vorschlagBoxHtml = vorschlaegeAll.length ? `
+          <div class="m-card" style="border-left-color:#7c3aed; background:#faf5ff;">
+            <strong style="color:#5b21b6;">💡 Eingereichte Themen- &amp; Hobby-Vorschläge (${vorschlaegeAll.length}):</strong>
+            <ul style="margin:6px 0 0 0; padding-left:18px; font-size:0.9rem;">
+              ${vorschlaegeAll.map(v => `<li><strong>${v.name || "Anonym"}:</strong> ${v.vorschlagNeuesFeld}</li>`).join("")}
+            </ul>
+          </div>
+        ` : "";
         lastFilteredSchatz = filtered;
-        container.innerHTML = filtered.map(s => {
+        container.innerHTML = vorschlagBoxHtml + filtered.map(s => {
           const detMap = s.domainDetails || {};
           const domainKeys = Object.keys(detMap);
           const editLink = s.schatzCode ? `${baseDir}schatzsuche.html?sc=${encodeURIComponent(s.schatzCode)}` : "";
@@ -1373,9 +1398,54 @@
                   </div>
                 `;
               }).join("")}
+              ${s.sprachniveau ? `<div style="font-size:0.86rem; color:#334155; margin-top:4px;">🗣️ <strong>Deutsch-Sprachniveau:</strong> ${s.sprachniveau}</div>` : ""}
+              ${s.vorschlagNeuesFeld ? `<div style="margin-top:6px; padding:6px 9px; background:#faf5ff; border:1px solid #d8b4fe; border-radius:6px; font-size:0.87rem; color:#5b21b6;"><strong>💡 Themen-/Hobby-Vorschlag:</strong> ${s.vorschlagNeuesFeld}</div>` : ""}
+              ${(() => {
+                const nn = String(s.name || "").toLowerCase().trim();
+                const dups = (nn && nameCountMap[nn] > 1)
+                  ? allSchatzList.filter(o => o.fileId && s.fileId && o.fileId !== s.fileId && String(o.name || "").toLowerCase().trim() === nn)
+                  : [];
+                if (!dups.length) return "";
+                return `<div style="margin-top:8px; padding:8px 10px; background:#fffbeb; border:1px solid #f59e0b; border-radius:6px; font-size:0.87rem;">
+                  <strong>⚠️ Mögliche Dublette:</strong> Zweiter Eintrag für „${s.name}“ (Code ${dups[0].schatzCode || "—"}).
+                  <button type="button" class="m-btn m-btn-warn btn-merge-sz-dup" data-keep="${s.fileId}" data-drop="${dups[0].fileId}" style="margin-left:8px; padding:4px 10px; font-size:0.83rem;">🔗 Vereinigen</button>
+                </div>`;
+              })()}
+              ${s.fileId ? `
+                <details style="margin-top:8px; font-size:0.87rem;">
+                  <summary style="cursor:pointer; font-weight:bold; color:#004080;">🌐 Deutsche Übersetzung / Team-Notiz ${s.deutscheUebersetzung ? "(vorhanden)" : ""}</summary>
+                  <div style="margin-top:6px;">
+                    <textarea class="m-textarea sz-trans-ta" data-fileid="${s.fileId}" rows="2" placeholder="Hier deutsche Übersetzung fremdsprachiger Freitexte eintragen …">${s.deutscheUebersetzung || ""}</textarea>
+                    <button type="button" class="m-btn btn-save-sz-trans" data-fileid="${s.fileId}" style="margin-top:6px; padding:5px 11px; font-size:0.84rem;">Übersetzung speichern</button>
+                  </div>
+                </details>
+              ` : ""}
             </div>
           `;
         }).join("");
+
+        container.querySelectorAll(".btn-merge-sz-dup").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            if (!confirm("Möchtest du beide Einträge zu einem vollständigen Datensatz vereinigen?")) return;
+            btn.disabled = true;
+            btn.textContent = "⏳ Vereinige …";
+            const res = await postMasterAction("mergeTreasureEntries", { keepFileId: btn.dataset.keep, dropFileId: btn.dataset.drop });
+            if (res && res.ok) await loadMasterOverview();
+            else alert((res && res.error) || "Vereinigen fehlgeschlagen.");
+          });
+        });
+
+        container.querySelectorAll(".btn-save-sz-trans").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const fid = btn.dataset.fileid;
+            const ta = container.querySelector(`.sz-trans-ta[data-fileid="${fid}"]`);
+            btn.disabled = true;
+            btn.textContent = "⏳ Speichere …";
+            const res = await postMasterAction("saveTreasureTranslation", { fileId: fid, translationText: ta ? ta.value : "" });
+            btn.disabled = false;
+            btn.textContent = (res && res.ok) ? "✓ Gespeichert!" : "Fehler";
+          });
+        });
 
         container.querySelectorAll(".btn-copy-sz-edit").forEach(btn => {
           btn.addEventListener("click", async () => {
@@ -1639,6 +1709,51 @@
           reader.readAsDataURL(file);
         });
       }
+
+      document.getElementById("ki-drive-import-btn").addEventListener("click", async function () {
+        const q = document.getElementById("ki-drive-folder").value.trim();
+        const st = document.getElementById("ki-drive-status");
+        if (!q) { st.style.color = "#b91c1c"; st.textContent = "Bitte Drive-Ordner-Link oder Namen eingeben."; return; }
+        const orig = this.textContent;
+        this.disabled = true;
+        this.textContent = "⏳ Lade Bilder …";
+        st.style.color = "#b45309";
+        st.textContent = "⏳ Suche Bilder im Drive-Ordner …";
+        try {
+          const res = await postMasterAction("importPhotosFromDriveFolder", { folderQuery: q });
+          this.disabled = false;
+          this.textContent = orig;
+          if (!res || !res.ok) throw new Error((res && res.error) || "Fehler beim Laden.");
+          const arr = res.photos || [];
+          if (!arr.length) {
+            st.style.color = "#b45309";
+            st.textContent = `Im Ordner „${res.folderName}“ wurden keine Bilddateien gefunden.`;
+            return;
+          }
+          const thumbsEl = document.getElementById("ki-thumbs-grid");
+          const countEl = document.getElementById("ki-photos-count");
+          for (const p of arr) {
+            const respBlob = await fetch(`data:${p.mimeType};base64,${p.base64}`);
+            const blob = await respBlob.blob();
+            const file = new File([blob], p.name, { type: p.mimeType });
+            kiLoadedPhotos.push(await compressKiPhoto(file));
+          }
+          countEl.textContent = `${kiLoadedPhotos.length} Bild(er) bereit`;
+          thumbsEl.innerHTML = kiLoadedPhotos.map((p, idx) => `
+            <div style="border:1px solid #cbd5e1; border-radius:6px; padding:4px; background:#f8fafc; text-align:center; width:96px;">
+              <img src="${p.dataUrl}" alt="Bild ${idx + 1}" style="width:86px; height:64px; object-fit:cover; border-radius:4px;">
+              <div style="font-size:0.75rem; color:#475569; margin-top:2px;">Bild ${idx + 1}</div>
+            </div>
+          `).join("");
+          st.style.color = "#15803d";
+          st.textContent = `✓ ${arr.length} Foto(s) aus „${res.folderName}“ hinzugefügt!`;
+        } catch (err) {
+          this.disabled = false;
+          this.textContent = orig;
+          st.style.color = "#b91c1c";
+          st.textContent = "Fehler: " + err.message;
+        }
+      });
 
       document.getElementById("ki-photos-input").addEventListener("change", async function () {
         const files = Array.from(this.files || []);

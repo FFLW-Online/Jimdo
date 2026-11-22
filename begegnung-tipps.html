@@ -2,221 +2,184 @@
 <html lang="de">
 <head>
   <meta charset="utf-8">
-  <title>Offenes Wir &amp; Gesprächs-Tipps fürs Begegnungstreffen 🤝 | FFLW</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Begegnungs-Tipps – Offenes Wir &amp; Gesprächs-Ideen | FFLW</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .bt-wrap { max-width: 960px; margin: 0 auto; }
-    .bt-hero {
-      background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
-      border: 1px solid #bfdbfe;
-      border-left: 6px solid #004080;
-      border-radius: 10px;
-      padding: 20px 22px;
-      margin: 16px 0 22px 0;
-    }
-    .bt-two-col {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 16px;
-      margin: 18px 0;
-    }
-    .bt-card {
-      background: #ffffff;
-      border: 1px solid #d0d7de;
-      border-radius: 10px;
-      padding: 20px 22px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-    .bt-card.left-blue { border-top: 5px solid #0284c7; }
-    .bt-card.left-green { border-top: 5px solid #16a34a; }
-    .bt-card.left-amber { border-left: 6px solid #d97706; background: #fffbeb; margin: 18px 0; }
-    .bt-list { margin: 10px 0 0 0; padding-left: 20px; }
-    .bt-list li { margin-bottom: 9px; line-height: 1.5; }
-    .bt-phrase-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .bt-phrase {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
+    .fflw-dev-banner {
+      background: #fffbeb;
+      border: 1px solid #f59e0b;
+      border-left: 5px solid #d97706;
       border-radius: 8px;
-      padding: 12px 14px;
-    }
-    .bt-phrase strong { color: #003366; display: block; margin-bottom: 4px; }
-    .bt-topic-box {
-      background: #f0fdf4;
-      border: 1px solid #86efac;
-      border-radius: 10px;
-      padding: 18px 20px;
-      margin: 18px 0;
-    }
-    .bt-topic-chip {
-      display: inline-block;
-      background: #ffffff;
-      border: 1px solid #86efac;
-      color: #14532d;
-      padding: 6px 12px;
-      border-radius: 999px;
-      margin: 4px 5px 4px 0;
-      font-size: 0.92rem;
-      font-weight: 600;
-    }
-    .bt-random-box {
-      margin-top: 14px;
-      padding: 14px 16px;
-      background: #ffffff;
-      border: 2px dashed #16a34a;
-      border-radius: 8px;
+      padding: 12px 15px;
+      margin: 12px 0 18px 0;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
+      font-size: 0.93rem;
+    }
+    .fflw-dev-btn {
+      display: inline-block;
+      background: #b45309;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+    .bt-section {
+      background: #ffffff;
+      border: 1px solid #d0d7de;
+      border-left: 5px solid #004080;
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin: 16px 0;
+    }
+    .bt-section.is-green { border-left-color: #2e7d32; }
+    .bt-section h3 { margin-top: 0; color: #003366; }
+    .bt-section.is-green h3 { color: #1b5e20; }
+    .bt-list { margin: 8px 0 0 0; padding-left: 20px; }
+    .bt-list li { margin-bottom: 8px; line-height: 1.5; }
+    .bt-quote {
+      background: #f4f8fc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin: 8px 0;
+    }
+    .bt-impulse {
+      background: #f0fdf4;
+      border: 1px solid #86efac;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
     .bt-btn {
       background: #15803d;
       color: #ffffff;
       border: none;
-      padding: 10px 16px;
-      border-radius: 7px;
+      padding: 9px 14px;
+      border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
     }
-    .bt-btn:hover { background: #166534; }
   </style>
 </head>
 <body>
   <header class="site-header">
-    <div class="container header-inner">
-      <div class="brand">
-        <a href="index.html" class="brand-link" aria-label="Zur Startseite">
-          <img src="logo.png" alt="Logo Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden" class="brand-logo">
-          <div class="brand-text">
-            <h1>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</h1>
-            <p class="subtitle">Offenes Wir &amp; Gesprächs-Tipps fürs Begegnungstreffen 🤝</p>
-          </div>
-        </a>
-      </div>
-      <div id="main-nav"></div>
-    </div>
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
   </header>
 
-  <main class="container">
-    <div class="bt-wrap">
-      <h2>Offenes Wir &amp; Gesprächs-Tipps fürs Begegnungstreffen 🤝</h2>
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
 
-      <section class="bt-hero">
-        <p style="margin-top:0; font-size:1.05rem;">
-          <strong>Schön, dass du da bist!</strong> Unser Begegnungstreffen lebt davon, dass ein <strong>„offenes Wir“</strong> entsteht – ein Raum, in dem sich niemand allein an den Rand setzen muss und in dem aus Fremden Schritt für Schritt vertraute Gesichter werden.
-        </p>
-        <p style="margin-bottom:0;">
-          Manchmal ist der Anfang gar nicht so leicht: Wer schon länger kommt, freut sich über bekannte Gesichter – und wer neu dazukommt, fragt sich vielleicht: <em>„Darf ich mich einfach dazusetzen, oder störe ich gerade?“</em> Diese kleinen Tipps helfen beiden Seiten.
-        </p>
-      </section>
+    <main class="content">
+      <h2>Begegnungs-Tipps – Ein „offenes Wir“ leben</h2>
 
-      <!-- Zwei Perspektiven: Gruppe offen halten & Mut zum Dazusetzen -->
-      <div class="bt-two-col">
-        <section class="bt-card left-blue">
-          <h3 style="margin-top:0; color:#0369a1;">👀 Für alle, die schon in einer Runde sitzen: Offene Augen, offene Herzen</h3>
-          <p style="margin-top:0; font-size:0.95rem;">
-            Wenn man sich gerade gut unterhält, schließt sich ein Stuhlkreis oft ganz unbewusst. So bleibt unsere Runde ein <strong>offenes Wir</strong>:
-          </p>
-          <ul class="bt-list">
-            <li><strong>Ein Stuhl bleibt frei &amp; der Kreis bleibt offen:</strong> Stühle nicht ganz eng zusammenschieben, sondern bewusst eine Lücke zum Raum hin lassen.</li>
-            <li><strong>Blickkontakt &amp; kurzes Lächeln:</strong> Immer wieder mit offenen Augen zur Tür und in den Raum schauen. Wer neu hereinkommt, fühlt sich durch ein freundliches Nicken sofort willkommen.</li>
-            <li><strong>Aktiv einladen:</strong> Ein einfaches <em>„Hallo, komm gerne zu uns, hier ist noch ein Platz frei!“</em> nimmt sofort jede Unsicherheit.</li>
-            <li><strong>Kurz vorstellen &amp; abholen:</strong> Wenn jemand dazukommt, kurz den eigenen Namen sagen und in einem Satz erklären, worüber gerade gesprochen wird.</li>
-          </ul>
-        </section>
-
-        <section class="bt-card left-green">
-          <h3 style="margin-top:0; color:#15803d;">🌱 Für alle, die neu dazukommen: Du darfst dich ausdrücklich dazusetzen!</h3>
-          <p style="margin-top:0; font-size:0.95rem;">
-            Vielleicht wirkt es im ersten Moment ungewohnt oder unhöflich, einfach an einen Tisch zu gehen, an dem schon Menschen sitzen. <strong>Bei uns ist genau das ausdrücklich gewünscht!</strong>
-          </p>
-          <ul class="bt-list">
-            <li><strong>Du störst nicht – du bereicherst die Runde:</strong> Niemand erwartet, dass du allein wartest, bis dich jemand anspricht. Geh ruhig auf eine Gruppe zu.</li>
-            <li><strong>Ein Satz genügt als Türöffner:</strong> Mit einem freundlichen <em>„Hallo, darf ich mich zu euch setzen?“</em> öffnest du jede Runde sofort.</li>
-            <li><strong>Es muss kein perfektes Deutsch sein:</strong> Hände, Füße, ein Lächeln, ein Foto auf dem Handy oder ein Übersetzer helfen immer weiter.</li>
-            <li><strong>Auch Zuhören ist völlig in Ordnung:</strong> Du musst nicht sofort viel erzählen – einfach dabei sein, Tee oder Kaffee trinken und zuhören gehört genauso dazu.</li>
-          </ul>
-        </section>
+      <div class="fflw-dev-banner">
+        <span>🚧 <strong>Hinweis:</strong> Diese Seite ist noch in der Entwicklung. Für Hinweise zur Verbesserung oder falls etwas nicht funktioniert, sind wir dankbar.</span>
+        <a id="dev-feedback-mail" class="fflw-dev-btn" href="mailto:Kontakt@freundeleuwi.org">✉️ Hinweis per E-Mail senden</a>
       </div>
 
-      <!-- Praktische Türöffner-Sätze -->
-      <section class="bt-card">
-        <h3 style="margin-top:0; color:#003366;">💬 Kleine Türöffner-Sätze für den ersten Moment</h3>
-        <p style="margin-top:0; font-size:0.94rem;">
-          Wenn man noch nicht weiß, wie man anfangen soll, helfen diese ganz einfachen Sätze:
+      <p>
+        Unser Begegnungstreffen lebt davon, dass ein <strong>„offenes Wir“</strong> entsteht: ein Ort, an dem niemand allein am Rand sitzen muss und an dem man leicht miteinander ins Gespräch kommt. Manchmal weiß man im ersten Moment nicht genau, wie man anfangen soll – diese kleinen Tipps helfen beiden Seiten.
+      </p>
+
+      <section class="bt-section">
+        <h3>1. Für alle, die schon in einer Runde sitzen: Offene Augen, offene Herzen</h3>
+        <p style="margin-top:0;">
+          Wenn man sich gerade gut unterhält, schließt sich ein Stuhlkreis oft unbewusst. So bleibt unsere Runde offen für andere:
         </p>
-        <div class="bt-phrase-grid">
-          <div class="bt-phrase">
-            <strong>Zum Dazusetzen:</strong>
-            „Hallo! Ist hier noch ein Platz frei? Darf ich mich zu euch setzen?“
-          </div>
-          <div class="bt-phrase">
-            <strong>Zum Kennenlernen:</strong>
-            „Ich bin heute zum ersten Mal hier – wie heißt du? Kommst du öfter zum Treffen?“
-          </div>
-          <div class="bt-phrase">
-            <strong>Für Gastgeber in der Runde:</strong>
-            „Schön, dass du da bist! Komm setz dich zu uns – möchtest du einen Kaffee oder Tee?“
-          </div>
-          <div class="bt-phrase">
-            <strong>Wenn man etwas nicht versteht:</strong>
-            „Kannst du das bitte noch einmal langsam sagen? Ich lerne noch Deutsch.“
-          </div>
-        </div>
+        <ul class="bt-list">
+          <li><strong>Einen Stuhl frei lassen:</strong> Die Stühle nicht ganz eng zusammenschieben, sondern eine sichtbare Lücke zum Raum hin lassen.</li>
+          <li><strong>Blickkontakt &amp; Lächeln:</strong> Immer wieder kurz zur Tür und in den Raum schauen. Wer neu hereinkommt, fühlt sich durch ein freundliches Nicken sofort willkommen.</li>
+          <li><strong>Aktiv einladen:</strong> Ein einfaches <em>„Hallo, komm gerne zu uns, hier ist noch ein Platz frei!“</em> nimmt jede Unsicherheit.</li>
+          <li><strong>Kurz abholen:</strong> Wenn jemand dazukommt, kurz den eigenen Namen sagen und in einem Satz erklären, worüber gerade gesprochen wird.</li>
+        </ul>
       </section>
 
-      <!-- Gesprächs-Ideen & Zufalls-Impuls -->
-      <section class="bt-topic-box">
-        <h3 style="margin-top:0; color:#14532d;">💡 Worüber kann man reden? Leichte Gesprächs-Ideen für jeden</h3>
-        <p style="margin-top:0; font-size:0.94rem;">
-          Manchmal steht man beieinander und fragt sich: <em>„Worüber unterhalten wir uns jetzt?“</em> Diese Themen funktionieren fast immer – ganz ohne komplizierte Worte:
+      <section class="bt-section is-green">
+        <h3>2. Für alle, die neu dazukommen: Du darfst dich ausdrücklich dazusetzen!</h3>
+        <p style="margin-top:0;">
+          Vielleicht wirkt es im ersten Moment ungewohnt oder unhöflich, einfach an einen Tisch zu gehen, an dem schon Menschen sitzen. <strong>Bei uns ist genau das ausdrücklich gewünscht!</strong>
         </p>
-        <div>
-          <span class="bt-topic-chip">🍲 Lieblingsessen &amp; Rezepte aus der Heimat</span>
-          <span class="bt-topic-chip">🌳 Schöne Spazierwege &amp; Orte in Leutenbach &amp; Winnenden</span>
-          <span class="bt-topic-chip">⚽ Sport, Fußball, Musik &amp; Hobbys</span>
-          <span class="bt-topic-chip">🌦️ Wetter &amp; Jahreszeiten (hier und in der Heimat)</span>
-          <span class="bt-topic-chip">🛠️ Was man gerne bastelt, kocht oder repariert</span>
-          <span class="bt-topic-chip">🗣️ Lustige oder besondere Wörter in unseren Sprachen</span>
-          <span class="bt-topic-chip">👨‍👩‍👧‍👦 Familie, Kinder &amp; Alltag</span>
-          <span class="bt-topic-chip">✨ Träume &amp; Dinge, die man gerne mal ausprobieren möchte</span>
-        </div>
+        <ul class="bt-list">
+          <li><strong>Du störst nicht:</strong> Niemand erwartet, dass du allein wartest, bis dich jemand anspricht. Geh ruhig auf eine Gruppe zu.</li>
+          <li><strong>Ein Satz reicht als Türöffner:</strong> Mit <em>„Hallo, darf ich mich zu euch setzen?“</em> öffnest du jede Runde sofort.</li>
+          <li><strong>Kein perfektes Deutsch nötig:</strong> Hände, Füße, ein Lächeln, ein Foto auf dem Handy oder eine Übersetzungs-App helfen immer weiter.</li>
+          <li><strong>Auch Zuhören ist völlig in Ordnung:</strong> Du musst nicht sofort viel erzählen – einfach dabei sein und zuhören gehört genauso dazu.</li>
+        </ul>
+      </section>
 
-        <div class="bt-random-box">
+      <section class="bt-section">
+        <h3>3. Einfache Sätze für den Anfang</h3>
+        <div class="bt-quote"><strong>Zum Dazusetzen:</strong> „Hallo! Ist hier noch ein Platz frei? Darf ich mich zu euch setzen?“</div>
+        <div class="bt-quote"><strong>Zum Kennenlernen:</strong> „Ich bin heute zum ersten Mal hier – wie heißt du? Kommst du öfter zum Treffen?“</div>
+        <div class="bt-quote"><strong>Für Gastgeber in der Runde:</strong> „Schön, dass du da bist! Komm setz dich zu uns – möchtest du einen Kaffee oder Tee?“</div>
+        <div class="bt-quote"><strong>Wenn man etwas nicht versteht:</strong> „Kannst du das bitte noch einmal langsam sagen? Ich lerne noch Deutsch.“</div>
+      </section>
+
+      <section class="bt-section is-green">
+        <h3>4. Worüber kann man reden? Leichte Gesprächs-Ideen</h3>
+        <ul class="bt-list">
+          <li><strong>Essen &amp; Rezepte:</strong> Welches Gericht aus deiner Heimat isst du am liebsten – oder was schmeckt dir hier?</li>
+          <li><strong>Orte in der Umgebung:</strong> Welche schönen Spazierwege, Spielplätze oder Läden kennst du in Leutenbach und Winnenden?</li>
+          <li><strong>Alltag, Hobbys &amp; Musik:</strong> Was machst du gerne in deiner Freizeit (Fußball, Kochen, Garten, Musik, Basteln)?</li>
+          <li><strong>Sprache &amp; Wörter:</strong> Welches deutsche Wort fandest du am Anfang besonders lustig oder schwierig?</li>
+        </ul>
+
+        <div class="bt-impulse">
           <div>
-            <div style="font-size:0.84rem; color:#475569; font-weight:bold;">🎲 Kleiner Gesprächs-Impuls zum Ausprobieren:</div>
-            <div id="bt-random-question" style="font-size:1.05rem; font-weight:bold; color:#0f172a; margin-top:3px;">
+            <div style="font-size:0.84rem; color:#475569; font-weight:bold;">Gesprächs-Idee zum Ausprobieren:</div>
+            <div id="bt-random-question" style="font-size:1.02rem; font-weight:bold; color:#0f172a; margin-top:2px;">
               „Welches Gericht aus deiner Heimat würdest du gerne einmal gemeinsam kochen?“
             </div>
           </div>
           <button type="button" id="bt-next-question-btn" class="bt-btn">↻ Nächste Gesprächs-Idee</button>
         </div>
       </section>
+    </main>
+  </div>
 
-      <section class="bt-card left-amber">
-        <strong style="color:#92400e; display:block; margin-bottom:4px;">💛 Ein wichtiger Gedanke zum Schluss:</strong>
-        <p style="margin:0; font-size:0.94rem;">
-          Niemand muss beim Begegnungstreffen „unterhalten“ oder perfekt sein. Ein freundlicher Blick, ein ehrliches <em>„Schön, dass du da bist“</em> und ein bisschen Neugier auf den anderen reichen völlig aus, damit aus vielen Einzelnen ein warmes, offenes Wir wird.
-        </p>
-      </section>
-    </div>
-  </main>
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
 
-  <footer class="site-footer">
+  <footer class="legal-footer">
     <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
   </footer>
 
   <script src="nav-loader.js"></script>
   <script>
-    (function () {
+    document.addEventListener("DOMContentLoaded", function () {
+      const pageTitle = document.title || "Begegnungs-Tipps";
+      const pageUrl = window.location.href;
+      const devBtn = document.getElementById("dev-feedback-mail");
+      if (devBtn) {
+        const subj = encodeURIComponent(`Hinweis zur Webseite (${pageTitle})`);
+        const body = encodeURIComponent(`Hallo Team,
+
+mein Hinweis bezieht sich auf folgende Seite:
+Seite: ${pageTitle}
+Link: ${pageUrl}
+
+Mein Hinweis / Verbesserungsvorschlag:
+`);
+        devBtn.href = `mailto:Kontakt@freundeleuwi.org?subject=${subj}&body=${body}`;
+      }
+
       const questions = [
         "„Welches Gericht aus deiner Heimat würdest du gerne einmal gemeinsam kochen?“",
         "„Welcher Ort in Leutenbach, Winnenden oder der Umgebung gefällt dir bisher am besten?“",
@@ -235,7 +198,7 @@
           qEl.textContent = questions[idx];
         });
       }
-    })();
+    });
   </script>
 </body>
 </html>

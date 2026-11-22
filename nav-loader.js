@@ -148,7 +148,7 @@ window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
     "master.html",
     "unterlagen.html",
     "schatzsuche.html",
-    "ideentafel.html",
+    "ideen-lob-kritik.html",
     "begegnung-tipps.html"
   ];
 
@@ -206,7 +206,7 @@ window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
   const pages = repoHtmlFiles
     .filter(f => !systemExclude.has(f))
     .map(file => {
-      const inNavHtml = navMap.has(file) || file === "schatzsuche.html" || file === "ideentafel.html" || file === "begegnung-tipps.html";
+      const inNavHtml = navMap.has(file) || file === "schatzsuche.html" || file === "ideen-lob-kritik.html" || file === "begegnung-tipps.html";
       const isManuallyHidden = extraHiddenSet.has(file);
       const inMenu = inNavHtml && !isManuallyHidden;
       const isLegal = (file === "impressum.html" || file === "datenschutz.html");
@@ -374,7 +374,7 @@ function applyHiddenNavItems(versteckteSeiten) {
         }
       } else {
         const schatzExisting = document.getElementById("auto-nav-schatzsuche");
-        if (schatzExisting && liEl.id === "auto-nav-ideentafel") {
+        if (schatzExisting && liEl.id === "auto-nav-ideen-lob-kritik") {
           schatzExisting.insertAdjacentElement("afterend", liEl);
         } else {
           mitmachenLi.insertAdjacentElement("afterend", liEl);
@@ -402,19 +402,19 @@ function applyHiddenNavItems(versteckteSeiten) {
     if (autoLi) autoLi.style.display = "none";
   }
 
-  const hasIdeenLink = !!navContainer.querySelector('a[href="ideentafel.html"]');
-  if (navList && !hiddenSet.has("ideentafel.html") && !hasIdeenLink) {
+  const hasIdeenLink = !!navContainer.querySelector('a[href="ideen-lob-kritik.html"]');
+  if (navList && !hiddenSet.has("ideen-lob-kritik.html") && !hasIdeenLink) {
     const li2 = document.createElement("li");
-    li2.id = "auto-nav-ideentafel";
+    li2.id = "auto-nav-ideen-lob-kritik";
     const a2 = document.createElement("a");
-    a2.href = "ideentafel.html";
-    a2.textContent = "Ideen & Lob-Tafel 💡";
-    if (cur === "ideentafel.html") {
+    a2.href = "ideen-lob-kritik.html";
+    a2.textContent = "Eure Ideen – Lob & Kritik";
+    if (cur === "ideen-lob-kritik.html") {
       a2.setAttribute("aria-current", "page");
       a2.classList.add("active");
     }
     li2.appendChild(a2);
-    insertBelowMitmachen(li2, cur === "ideentafel.html");
+    insertBelowMitmachen(li2, cur === "ideen-lob-kritik.html");
   }
 
   const hasBegegnungTippsLink = !!navContainer.querySelector('a[href="begegnung-tipps.html"]');

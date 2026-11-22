@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eure Ideen – Lob &amp; Kritik | Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .fflw-dev-banner {
+      background: #fffbeb;
+      border: 1px solid #f59e0b;
+      border-left: 5px solid #d97706;
+      border-radius: 8px;
+      padding: 12px 15px;
+      margin: 12px 0 18px 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.93rem;
+    }
+    .fflw-dev-btn {
+      display: inline-block;
+      background: #b45309;
+      color: #ffffff !important;
+      text-decoration: none;
+      padding: 7px 13px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.88rem;
+      white-space: nowrap;
+    }
+    .ilk-box {
+      background: #ffffff;
+      border: 1px solid #d0d7de;
+      border-left: 5px solid #004080;
+      border-radius: 8px;
+      padding: 16px 18px;
+      margin: 16px 0;
+    }
+    .ilk-label {
+      display: block;
+      font-weight: bold;
+      color: #003366;
+      margin: 10px 0 4px 0;
+      font-size: 0.95rem;
+    }
+    .ilk-input, .ilk-select, .ilk-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #94a3b8;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+      background: #ffffff;
+    }
+    .ilk-btn {
+      background: #004080;
+      color: #ffffff;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.96rem;
+      cursor: pointer;
+    }
+    .ilk-btn:disabled { opacity: 0.65; cursor: wait; }
+    .ilk-post {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-left: 5px solid #2e7d32;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 12px 0;
+    }
+    .ilk-post.is-lob { border-left-color: #16a34a; background: #f0fdf4; }
+    .ilk-post.is-kritik { border-left-color: #d97706; background: #fffdf7; }
+    .ilk-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      background: #e0e7ff;
+      color: #1e3a8a;
+    }
+    .ilk-reply {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #ffffff;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      font-size: 0.92rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>Eure Ideen – Lob &amp; Kritik</h2>
+
+      <div class="fflw-dev-banner">
+        <span>🚧 <strong>Hinweis:</strong> Diese Seite ist noch in der Entwicklung. Für Hinweise zur Verbesserung oder falls etwas nicht funktioniert, sind wir dankbar.</span>
+        <a id="dev-feedback-mail" class="fflw-dev-btn" href="mailto:Kontakt@freundeleuwi.org">✉️ Hinweis per E-Mail senden</a>
+      </div>
+
+      <p>
+        Hier ist Platz für alles, was euch bewegt: neue Ideen für Treffen, Ausflüge oder Kurse, ein herzliches Dankeschön (Lob) oder auch ehrliche Kritik und Verbesserungsvorschläge. Nach einer kurzen Prüfung durch das Team erscheinen freigegebene Beiträge hier sichtbar für alle.
+      </p>
+
+      <section class="ilk-box">
+        <h3 style="margin-top:0; color:#003366;">Neuen Beitrag einreichen</h3>
+        <form id="ilk-form">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
+            <div>
+              <label class="ilk-label" for="ilk-typ">Art des Beitrags *</label>
+              <select id="ilk-typ" class="ilk-select">
+                <option value="Idee">💡 Idee / Wunsch / Vorschlag</option>
+                <option value="Lob">💛 Lob &amp; Dankeschön</option>
+                <option value="Kritik">🔧 Kritik / Verbesserungshinweis</option>
+                <option value="Wichtiges">📌 Wichtiger Hinweis</option>
+              </select>
+            </div>
+            <div>
+              <label class="ilk-label" for="ilk-autor">Dein Name (oder „Anonym“)</label>
+              <input type="text" id="ilk-autor" class="ilk-input" placeholder="z. B. Vorname oder Anonym">
+            </div>
+          </div>
+
+          <label class="ilk-label" for="ilk-titel">Überschrift / Thema *</label>
+          <input type="text" id="ilk-titel" class="ilk-input" required placeholder="Worum geht es kurz?">
+
+          <label class="ilk-label" for="ilk-text">Deine Nachricht *</label>
+          <textarea id="ilk-text" class="ilk-textarea" rows="4" required placeholder="Schreibe hier deine Idee, dein Lob oder deinen Hinweis auf …"></textarea>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap:12px;">
+            <div>
+              <label class="ilk-label" for="ilk-code">Falls vorhanden: Deine 6-stellige Personen-Nummer (optional)</label>
+              <input type="text" id="ilk-code" class="ilk-input" inputmode="numeric" maxlength="10" placeholder="Optional (bleibt intern)">
+            </div>
+            <div>
+              <label class="ilk-label" for="ilk-kontakt">Kontakt für Rückfragen (optional, bleibt intern)</label>
+              <input type="text" id="ilk-kontakt" class="ilk-input" placeholder="Telefon oder E-Mail (nicht öffentlich)">
+            </div>
+          </div>
+
+          <div style="margin-top:14px; display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
+            <button type="submit" id="ilk-submit-btn" class="ilk-btn">Beitrag absenden</button>
+            <span id="ilk-msg" style="font-weight:bold;"></span>
+          </div>
+        </form>
+      </section>
+
+      <section style="margin-top:24px;">
+        <h3 style="color:#003366;">Veröffentlichte Ideen, Lob &amp; Rückmeldungen</h3>
+        <div id="ilk-list"><p>Lade Beiträge …</p></div>
+      </section>
+    </main>
+  </div>
+
+  <section class="contact-block">
+    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+    <p><strong>Allgemeines:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
+  </section>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+
+      const pageTitle = document.title || "Eure Ideen – Lob & Kritik";
+      const pageUrl = window.location.href;
+      const devBtn = document.getElementById("dev-feedback-mail");
+      if (devBtn) {
+        const subj = encodeURIComponent(`Hinweis zur Webseite (${pageTitle})`);
+        const body = encodeURIComponent(`Hallo Team,
+
+mein Hinweis bezieht sich auf folgende Seite:
+Seite: ${pageTitle}
+Link: ${pageUrl}
+
+Mein Hinweis / Verbesserungsvorschlag:
+`);
+        devBtn.href = `mailto:Kontakt@freundeleuwi.org?subject=${subj}&body=${body}`;
+      }
+
+      const codeInp = document.getElementById("ilk-code");
+      if (typeof window.fflwNeutralizeCodeInput === "function") {
+        window.fflwNeutralizeCodeInput(codeInp);
+      }
+
+      async function loadPublicEntries() {
+        const listEl = document.getElementById("ilk-list");
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=getIdeaWall&t=${Date.now()}`, { method: "GET", redirect: "follow" });
+          const data = await resp.json();
+          const arr = (data && data.ok && Array.isArray(data.liste)) ? data.liste : [];
+          if (!arr.length) {
+            listEl.innerHTML = `<div class="ilk-post"><p style="margin:0;">Noch keine veröffentlichten Beiträge vorhanden – mach gerne oben den Anfang!</p></div>`;
+            return;
+          }
+          listEl.innerHTML = arr.map(it => {
+            const typLow = String(it.typ || "").toLowerCase();
+            const cls = typLow.includes("lob") ? "is-lob" : (typLow.includes("kritik") ? "is-kritik" : "");
+            const dateStr = it.createdAt ? new Date(it.createdAt).toLocaleDateString("de-DE") : "";
+            return `
+              <article class="ilk-post ${cls}">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:6px; align-items:center;">
+                  <div>
+                    <span class="ilk-badge">${it.typ || "Idee"}</span>
+                    <strong style="margin-left:6px; font-size:1.04rem; color:#003366;">${it.titel || "Beitrag"}</strong>
+                  </div>
+                  <span style="font-size:0.84rem; color:#475569;">von <strong>${it.autor || "Anonym"}</strong>${dateStr ? ` · ${dateStr}` : ""}</span>
+                </div>
+                <p style="margin:8px 0 0 0; white-space:pre-line;">${it.text || ""}</p>
+                ${it.antwortTeam ? `<div class="ilk-reply"><strong>Antwort vom Freundeskreis:</strong> ${it.antwortTeam}</div>` : ""}
+              </article>
+            `;
+          }).join("");
+        } catch (err) {
+          listEl.innerHTML = `<p style="color:#b91c1c;">Beiträge konnten gerade nicht geladen werden.</p>`;
+        }
+      }
+
+      document.getElementById("ilk-form").addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const btn = document.getElementById("ilk-submit-btn");
+        const msgEl = document.getElementById("ilk-msg");
+        const titel = document.getElementById("ilk-titel").value.trim();
+        const text = document.getElementById("ilk-text").value.trim();
+        if (!titel || !text) {
+          msgEl.style.color = "#b91c1c";
+          msgEl.textContent = "Bitte Überschrift und Nachricht ausfüllen.";
+          return;
+        }
+        const origText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = "⏳ Wird gesendet …";
+        msgEl.style.color = "#b45309";
+        msgEl.textContent = "⏳ Bitte kurz warten …";
+
+        try {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "submitIdeaWallEntry",
+              typ: document.getElementById("ilk-typ").value,
+              autor: document.getElementById("ilk-autor").value.trim() || "Anonym",
+              titel: titel,
+              text: text,
+              personenCode: document.getElementById("ilk-code").value.trim(),
+              kontakt: document.getElementById("ilk-kontakt").value.trim()
+            })
+          });
+          const res = await resp.json();
+          if (res && res.ok) {
+            btn.disabled = false;
+            btn.textContent = "✓ Gesendet!";
+            msgEl.style.color = "#15803d";
+            msgEl.textContent = "✓ Vielen Dank! Dein Beitrag ist eingegangen und wird nach kurzer Prüfung freigeschaltet.";
+            document.getElementById("ilk-form").reset();
+            setTimeout(() => { btn.textContent = origText; }, 3000);
+          } else {
+            throw new Error((res && res.error) ? res.error : "Senden fehlgeschlagen.");
+          }
+        } catch (err) {
+          btn.disabled = false;
+          btn.textContent = origText;
+          msgEl.style.color = "#b91c1c";
+          msgEl.textContent = "Fehler: " + err.message;
+        }
+      });
+
+      loadPublicEntries();
+    });
+  </script>
+</body>
+</html>
