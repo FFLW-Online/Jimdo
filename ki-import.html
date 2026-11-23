@@ -275,7 +275,8 @@
         const urlCode = params.get("code");
         let saved = "";
         try {
-          saved = urlCode || sessionStorage.getItem(STORAGE_CODE_KEY) || sessionStorage.getItem("fflw_master_session_code") || "";
+          const smCode = (window.FFLW_SupermasterDevice && window.FFLW_SupermasterDevice.getCode()) || "";
+          saved = urlCode || sessionStorage.getItem(STORAGE_CODE_KEY) || sessionStorage.getItem("fflw_master_session_code") || smCode || "";
         } catch (e) { saved = urlCode || ""; }
         if (saved) {
           codeInput.value = saved;

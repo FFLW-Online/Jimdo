@@ -1,0 +1,2998 @@
+<!-- ==========================================================================
+  DATEI: master.html – von Gemini
+  ERSTELLT VON GEMINI AM: 2026-11-21 16:35 CET
+  BESCHREIBUNG: Zentrale Steuerungs- & Koordinations-Konsole (Master & Untermaster)
+    - Familien-Verknüpfung in Personen-Akten (Hauptperson, Ehefrau/Ehegatte, Kinder,
+      nachträgliches Zuordnen & Rollentausch der Hauptakte)
+    - Länder-Gruppierung & fehlertolerante Namenssuche (Transliteration)
+    - Differenzierte Schatzkiste (5 Stufen inkl. ✨ Funkelnde Sterne + 6-stelliger
+      Weiterbearbeitungs-Code + Stufen-Filter)
+========================================================================== -->
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <title>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .m-card {
+      background: #ffffff;
+      color: #111111;
+      border: 2px solid #c5d7eb;
+      border-left: 6px solid #004080;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 14px 0;
+      box-shadow: 0 3px 10px rgba(0, 64, 128, 0.08);
+    }
+    .m-hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
+      gap: 14px;
+      margin: 16px 0;
+    }
+    .m-hub-tile {
+      background: #ffffff;
+      border: 2px solid #90caf9;
+      border-left: 6px solid #004080;
+      border-radius: 10px;
+      padding: 15px 16px;
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 64, 128, 0.08);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
+    .m-hub-tile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 14px rgba(0, 64, 128, 0.16);
+      background: #f4f9ff;
+    }
+    .m-hub-tile.is-secret { border-color: #ef9a9a; border-left-color: #8e1c24; background: #fffafa; }
+    .m-hub-tile.is-treasure { border-color: #fcd34d; border-left-color: #b45309; background: #fffdf5; }
+    .m-hub-tile.is-ai { border-color: #a5b4fc; border-left-color: #4338ca; background: #f8f9ff; }
+    .m-hub-tile-title { font-size: 1.05rem; font-weight: bold; color: #003366; }
+    .m-hub-tile-desc { font-size: 0.86rem; color: #475569; line-height: 1.35; }
+    .m-subview-bar {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: #eef6fc;
+      border: 2px solid #90caf9;
+      border-radius: 9px;
+      padding: 10px 14px;
+      margin: 14px 0;
+    }
+    .m-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .m-tab-btn {
+      background: #eef6fc;
+      color: #003366;
+      border: 2px solid #90caf9;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.94rem;
+    }
+    .m-tab-btn.active {
+      background: #004080;
+      color: #ffffff;
+      border-color: #002b59;
+    }
+    .m-tab-btn.secret-tab {
+      background: #fdf2f2;
+      color: #8e1c24;
+      border-color: #ef9a9a;
+    }
+    .m-tab-btn.secret-tab.active {
+      background: #8e1c24;
+      color: #ffffff;
+      border-color: #5c0f15;
+    }
+    .m-tab-btn.treasure-tab {
+      background: #fff8e1;
+      color: #7c2d12;
+      border-color: #fcd34d;
+    }
+    .m-tab-btn.treasure-tab.active {
+      background: #b45309;
+      color: #ffffff;
+      border-color: #78350f;
+    }
+    .m-btn {
+      background: #004080;
+      color: #ffffff;
+      border: none;
+      padding: 7px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.88rem;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .m-btn-green { background: #2e7d32; }
+    .m-btn-orange { background: #d97706; }
+    .m-btn-red { background: #b71c1c; }
+    .m-btn-grey { background: #455a64; }
+    .m-input, .m-select, .m-textarea {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #8faadc;
+      border-radius: 6px;
+      font-size: 15px;
+      color: #111111;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+    .m-table-wrap { overflow-x: auto; margin-top: 10px; }
+    .m-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; color: #111111; }
+    .m-table th { background: #004080; color: #ffffff; text-align: left; padding: 9px 10px; }
+    .m-table td { padding: 8px 10px; border-bottom: 1px solid #d8e3f0; vertical-align: top; }
+    .m-table tr:nth-child(even) td { background: #f8fbff; }
+    .m-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .m-country-group {
+      border: 2px solid #90caf9;
+      border-radius: 10px;
+      margin: 14px 0;
+      background: #f4f8fc;
+      overflow: hidden;
+    }
+    .m-country-summary {
+      padding: 12px 16px;
+      background: #004080;
+      color: #ffffff;
+      font-weight: bold;
+      font-size: 1.04rem;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .m-country-summary::-webkit-details-marker { display: none; }
+    .m-akte-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-left: 6px solid #8e1c24;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 12px;
+    }
+    .m-akte-card.is-family-member {
+      margin-left: 34px;
+      border-left: 6px solid #0284c7;
+      background: #fbfdff;
+    }
+    .m-file-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-top: 6px;
+    }
+    .m-chip {
+      background: #ffffff;
+      color: #003366;
+      border: 1px solid #90caf9;
+      border-radius: 16px;
+      padding: 5px 12px;
+      font-size: 0.86rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .m-chip.active {
+      background: #004080;
+      color: #ffffff;
+      border-color: #004080;
+    }
+    #m-file-viewer-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      z-index: 2147483646;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .m-viewer-box {
+      background: #ffffff;
+      color: #111111;
+      border-radius: 10px;
+      max-width: 920px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 3px solid #004080;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <h2>Radwerkstatt – Ausgabe & Vorbestellungen</h2>
+
+      <section id="m-login-box" class="m-card">
+        <p style="margin-top:0;">
+          <strong>Geschützter Arbeitsbereich: Radwerkstatt – Ausgabe & Vorbestellungen</strong><br><span style='font-size:0.9rem; color:#475569;'>Zugang: Supermaster-Code oder Radwerkstatt-Code (Standard: FFLW-RAD) (Als Supermaster wirst du auf deinem Gerät automatisch durchgelassen).</span>
+        </p>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+          <div style="display:flex; align-items:center; gap:6px; flex:1; min-width:220px; max-width:320px;">
+            <input type="text" id="m-code-input" class="m-input fflw-masked-code-input" placeholder="Zugangscode eingeben …" style="min-height:44px; font-size:1.05rem; font-weight:bold;">
+            <button type="button" id="m-toggle-code-eye" class="m-btn m-btn-grey" title="Code sichtbar machen" style="min-height:44px; padding:0 12px; flex-shrink:0;">👁️</button>
+          </div>
+          <button type="button" id="m-login-btn" class="m-btn" style="min-height:44px; padding:10px 20px;">Anmelden</button>
+          <span id="m-login-msg" style="font-weight:bold; width:100%;"></span>
+        </div>
+      </section>
+
+      <div id="m-dashboard" style="display:none;">
+        <div class="m-card" style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; background:#eef6fc;">
+          <div>
+            <strong id="m-role-label" style="color:#003366; font-size:1.05rem;">Angemeldet</strong>
+            <span id="m-live-badge" style="margin-left:10px; background:#eaf6ec; color:#1b5e20; border:1px solid #a5d6a7; padding:3px 9px; border-radius:6px; font-size:0.85rem; font-weight:bold;"></span>
+            <span id="m-sync-hint" style="margin-left:8px; font-size:0.84rem; color:#455a64;"></span>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button type="button" id="m-refresh-btn" class="m-btn">↻ Aktualisieren</button>
+            <button type="button" id="m-logout-btn" class="m-btn m-btn-grey">Abmelden</button>
+          </div>
+        </div>
+
+        <div id="m-hub-overview" class="m-hub-grid">
+          <button type="button" class="m-hub-tile" data-open-tab="eingang">
+            <span class="m-hub-tile-title">📥 Eingangs-Prüfung (<span id="hub-cnt-eingang">0</span>)</span>
+            <span class="m-hub-tile-desc">Neue Sachspenden &amp; Importe prüfen und freigeben</span>
+          </button>
+          <button type="button" class="m-hub-tile" data-open-tab="online">
+            <span class="m-hub-tile-title">🌐 Online &amp; Reserviert (<span id="hub-cnt-online">0</span>)</span>
+            <span class="m-hub-tile-desc">Aktive Angebote verwalten, Reservierungen &amp; Archiv</span>
+          </button>
+          <button type="button" class="m-hub-tile" data-open-tab="bedarfe">
+            <span class="m-hub-tile-title">📋 Offene Bedarfe (<span id="hub-cnt-bedarfe">0</span>)</span>
+            <span class="m-hub-tile-desc">Gesuche einsehen &amp; erfüllte Bedarfe abschließen</span>
+          </button>
+          <a href="ki-import.html" class="m-hub-tile is-ai" id="hub-tile-kiimport" style="display:none; text-decoration:none;">
+            <span class="m-hub-tile-title">🪄 Wohnungs-Import (KI) ↗</span>
+            <span class="m-hub-tile-desc">Öffnet die eigene KI-Erfassungsseite (auch für Helfer mit eigenem KI-Code nutzbar)</span>
+          </a>
+          <button type="button" class="m-hub-tile is-secret" id="hub-tile-akten" data-open-tab="akten" style="display:none;">
+            <span class="m-hub-tile-title">🗂️ Personen-Akten (<span id="hub-cnt-akten">0</span>)</span>
+            <span class="m-hub-tile-desc">Vertrauliche Akten, Familien-Zuordnung &amp; Dokumente</span>
+          </button>
+          <button type="button" class="m-hub-tile is-treasure" id="hub-tile-schatz" data-open-tab="schatz" style="display:none;">
+            <span class="m-hub-tile-title">✨ Schatzkiste (<span id="hub-cnt-schatz">0</span>)</span>
+            <span class="m-hub-tile-desc">Talente, Fähigkeiten &amp; Unterstützer-Verzeichnis</span>
+          </button>
+          <button type="button" class="m-hub-tile" id="hub-tile-ideentafel" data-open-tab="ideentafel" style="display:none; border-color:#fde047; border-left-color:#ca8a04; background:#fefce8;">
+            <span class="m-hub-tile-title">💡 Ideen, Lob &amp; Tipps (<span id="hub-cnt-ideentafel">0</span>)</span>
+            <span class="m-hub-tile-desc">Eingereichte Ideen &amp; Gesprächs-Tipps freigeben</span>
+          </button>
+          <button type="button" class="m-hub-tile" id="hub-tile-radwerkstatt" data-open-tab="radwerkstatt">
+            <span class="m-hub-tile-title">🚲 Radwerkstatt</span>
+            <span class="m-hub-tile-desc">Rad-Ausgaben &amp; Vorbestellungen verwalten</span>
+          </button>
+          <button type="button" class="m-hub-tile" id="hub-tile-konten" data-open-tab="konten" style="display:none;">
+            <span class="m-hub-tile-title">👤 Benutzer-Konten &amp; Passwörter (<span id="hub-cnt-konten">0</span>)</span>
+            <span class="m-hub-tile-desc">Registrierte Nutzer freischalten, Passwörter einsehen &amp; ändern</span>
+          </button>
+          <button type="button" class="m-hub-tile" id="hub-tile-system" data-open-tab="system" style="display:none;">
+            <span class="m-hub-tile-title">📊 Seiten-Hits, Codes &amp; System</span>
+            <span class="m-hub-tile-desc">Besucher-Statistik pro Seite, Team-/KI-Codes ändern &amp; Wartung</span>
+          </button>
+        </div>
+
+        <div id="m-subview-bar" class="m-subview-bar">
+          <a href="master.html" id="m-back-to-hub-btn" class="m-btn">← Zurück zur Master-Übersicht</a>
+          <strong id="m-subview-title" style="color:#003366; font-size:1.05rem;">Bereich</strong>
+        </div>
+
+        <div class="m-tabs" id="m-tab-bar" style="display:none;">
+          <button type="button" class="m-tab-btn active" data-tab="eingang">📥 Eingangs-Prüfung (<span id="cnt-eingang">0</span>)</button>
+          <button type="button" class="m-tab-btn" data-tab="online">🌐 Online &amp; Reserviert (<span id="cnt-online">0</span>)</button>
+          <button type="button" class="m-tab-btn" data-tab="bedarfe">📋 Offene Bedarfe (<span id="cnt-bedarfe">0</span>)</button>
+          <button type="button" class="m-tab-btn" id="tab-btn-kiimport" data-tab="kiimport" style="display:none; background:#eef2ff; color:#312e81; border-color:#a5b4fc;">🪄 Wohnungs-Import (KI)</button>
+          <button type="button" class="m-tab-btn secret-tab" id="tab-btn-akten" data-tab="akten" style="display:none;">🗂️ Personen-Akten (<span id="cnt-akten">0</span>)</button>
+          <button type="button" class="m-tab-btn treasure-tab" id="tab-btn-schatz" data-tab="schatz" style="display:none;">✨ Schatzkiste (<span id="cnt-schatz">0</span>)</button>
+          <button type="button" class="m-tab-btn" id="tab-btn-ideentafel" data-tab="ideentafel" style="display:none; background:#fefce8; color:#854d0e; border-color:#fde047;">💡 Ideen &amp; Lob (<span id="cnt-ideentafel">0</span>)</button>
+          <button type="button" class="m-tab-btn" id="tab-btn-radwerkstatt" data-tab="radwerkstatt">🚲 Rad-Ausgabe &amp; Anfragen</button>
+          <button type="button" class="m-tab-btn" id="tab-btn-system" data-tab="system" style="display:none;">⚙ Seitenschutz, URL-Tarnung &amp; Codes</button>
+        </div>
+
+        <!-- TAB 1: EINGANG -->
+        <section id="tab-eingang" class="m-tab-panel" style="display:none;"><div id="list-eingang"></div></section>
+
+        <!-- TAB 2: ONLINE & RESERVIERT -->
+        <section id="tab-online" class="m-tab-panel" style="display:none;">
+          <div style="margin-bottom:10px;">
+            <button type="button" id="m-release-all-btn" class="m-btn m-btn-green">Alle reservierten Artikel wieder freigeben</button>
+          </div>
+          <div id="list-online"></div>
+        </section>
+
+        <!-- TAB 3: BEDARFE -->
+        <section id="tab-bedarfe" class="m-tab-panel" style="display:none;"><div id="list-bedarfe"></div></section>
+
+        <!-- TAB 3B: WOHNUNGS-IMPORT & KI-GRÖSSENSCHÄTZUNG -->
+        <section id="tab-kiimport" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#4338ca; background:#f8f9ff;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
+              <h3 style="margin:0; color:#312e81;">🪄 Wohnungs-Bilder &amp; KI-Größenschätzung (Schnell-Befüllung)</h3>
+              <button type="button" id="ki-reset-next-apt-btn" class="m-btn m-btn-orange">🔄 Zurücksetzen / Nächste Wohnung einlesen</button>
+            </div>
+            <p style="margin-top:0; font-size:0.93rem;">
+              Lade mehrere Raum- oder Möbelfotos einer kompletten Wohnung hoch. Die KI erkennt alle verwertbaren Gegenstände, schätzt die ungefähren Maße (<strong>ca. B × T × H in cm</strong>) aus den Raumproportionen und bereitet alle Angebote zur Prüfung und Übernahme ins Warenhaus vor.
+            </p>
+
+            <!-- Schritt 1: Gemeinsame Anbieter-/Wohnungsdaten -->
+            <div style="background:#ffffff; border:1px solid #c7d2fe; border-radius:8px; padding:12px 14px; margin-bottom:12px;">
+              <strong style="color:#312e81;">1. Gemeinsame Angaben für diese Wohnung / Spende:</strong>
+              <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:8px;">
+                <div>
+                  <label style="font-size:0.84rem; font-weight:bold;">Spender-Name / Kürzel *</label>
+                  <input type="text" id="ki-spender" class="m-input" placeholder="z. B. Familie Müller / Haushaltsauflösung">
+                </div>
+                <div>
+                  <label style="font-size:0.84rem; font-weight:bold;">Ort / Stadtteil *</label>
+                  <input type="text" id="ki-ort" class="m-input" placeholder="z. B. Leutenbach / Winnenden">
+                </div>
+                <div>
+                  <label style="font-size:0.84rem; font-weight:bold;">Telefon / Kontakt (intern)</label>
+                  <input type="text" id="ki-telefon" class="m-input" placeholder="z. B. 0171 1234567">
+                </div>
+                <div>
+                  <label style="font-size:0.84rem; font-weight:bold;">Ziel-Status nach Import</label>
+                  <select id="ki-ziel-status" class="m-select">
+                    <option value="online">🌐 Direkt öffentlich im Warenhaus freischalten</option>
+                    <option value="eingang">📥 Zuerst in Eingangs-Prüfung ablegen</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Schritt 2: Fotos hochladen -->
+            <div style="background:#ffffff; border:1px solid #c7d2fe; border-radius:8px; padding:12px 14px; margin-bottom:12px;">
+              <strong style="color:#312e81;">2. Wohnungsfotos auswählen (mehrere Bilder gleichzeitig möglich):</strong>
+              <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+                <input type="file" id="ki-photos-input" class="m-input" accept="image/*" multiple style="max-width:420px; padding:6px;">
+                <span id="ki-photos-count" style="font-weight:bold; color:#312e81;">0 Bilder geladen</span>
+              </div>
+              <div id="ki-thumbs-grid" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
+              <div style="margin-top:10px; padding:10px 12px; background:#eff6ff; border:1px solid #93c5fd; border-radius:7px;">
+                <label for="ki-drive-folder" style="display:block; font-weight:bold; color:#1e3a8a; margin-bottom:6px;">
+                  📁 Oder Fotos direkt aus einem Google-Drive-Ordner laden (Ordner-Link oder Ordner-Name):
+                </label>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                  <input type="text" id="ki-drive-folder" class="m-input" placeholder="Google-Drive-Ordner-Link oder Name einfügen …" style="flex:1 1 240px;">
+                  <button type="button" id="ki-drive-import-btn" class="m-btn" style="background:#1d4ed8;">Bilder aus Drive holen</button>
+                  <span id="ki-drive-status" style="font-size:0.88rem; font-weight:bold;"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Schritt 3: KI-Erkennung starten ODER Text/JSON einfügen -->
+            <div style="background:#ffffff; border:1px solid #c7d2fe; border-radius:8px; padding:12px 14px;">
+              <strong style="color:#312e81;">3. Automatische KI-Analyse &amp; Größenschätzung starten:</strong>
+              <div style="margin-top:8px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                <input type="password" id="ki-gemini-key" class="m-input" placeholder="Google Gemini API-Key (AIza…)" style="max-width:290px;">
+                <button type="button" id="ki-save-key-backend-btn" class="m-btn m-btn-green" title="Speichert den Schlüssel sicher im Google Script für das gesamte Team">💾 Key dauerhaft im Script speichern</button>
+                <button type="button" id="ki-analyze-btn" class="m-btn" style="background:#4338ca;">🪄 Bilder mit KI analysieren &amp; Einzelbilder ausschneiden</button>
+                <span id="ki-status-msg" style="font-weight:bold;"></span>
+              </div>
+              <div style="font-size:0.82rem; color:#475569; margin-top:6px;">
+                Tipp: Ein kostenloser Gemini API-Key unter <code>aistudio.google.com</code> genügt. Alternativ kannst du unten auch eine fertige JSON-Liste einfügen oder Artikel manuell hinzufügen:
+              </div>
+              <details style="margin-top:8px;">
+                <summary style="cursor:pointer; font-size:0.88rem; font-weight:bold; color:#312e81;">📋 Alternative: Fertige KI-Liste (JSON) einfügen oder leere Zeile hinzufügen</summary>
+                <div style="margin-top:8px;">
+                  <textarea id="ki-raw-json" class="m-textarea" rows="4" placeholder='[{"titel":"Kleiderschrank 3-türig","kategorie":"Schlafzimmer","beschreibung":"Helles Holz, guter Zustand","masse":"ca. 150 x 60 x 205 cm","bildIndex":1}]'></textarea>
+                  <div style="margin-top:6px; display:flex; gap:8px;">
+                    <button type="button" id="ki-parse-json-btn" class="m-btn m-btn-grey">JSON übernehmen</button>
+                    <button type="button" id="ki-add-empty-row-btn" class="m-btn">+ Leere Artikel-Zeile hinzufügen</button>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <!-- Schritt 4: Vorschau & Feinschliff vor dem Import -->
+          <div id="ki-preview-card" class="m-card" style="display:none; border-left-color:#2e7d32;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+              <h3 style="margin:0; color:#1b5e20;">4. Erkannte Gegenstände prüfen &amp; ins Warenhaus übernehmen (<span id="ki-items-count">0</span>)</h3>
+              <button type="button" id="ki-import-all-btn" class="m-btn m-btn-green" style="font-size:0.98rem; padding:10px 16px;">⬆ Alle ausgewählten Artikel jetzt speichern</button>
+            </div>
+            <p style="font-size:0.88rem; color:#333; margin:6px 0 10px 0;">
+              Du kannst jeden Titel, die geschätzten Maße (<strong>ca. B × T × H</strong>), die Beschreibung und das zugeordnete Foto vor dem Speichern noch kurz anpassen oder unerwünschte Gegenstände abwählen.
+            </p>
+            <div id="ki-items-list"></div>
+            <div style="margin-top:12px; display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
+              <button type="button" id="ki-import-all-btn-bottom" class="m-btn m-btn-green" style="font-size:0.98rem; padding:10px 16px;">⬆ Alle ausgewählten Artikel jetzt speichern</button>
+              <span id="ki-import-msg" style="font-weight:bold;"></span>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- TAB 4: PERSONEN-AKTEN MIT FAMILIEN-VERKNÜPFUNG (NUR SUPERMASTER!) -->
+        <section id="tab-akten" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#8e1c24; background:#fffafa;">
+            <h3 style="margin-top:0; color:#8e1c24;">🔒 Vertraulicher Personen-Akten-Tresor (mit Familien-Verbund &amp; Länder-Gruppierung)</h3>
+            <p style="margin:0 0 12px 0; font-size:0.93rem;">
+              Lege eine Hauptakte an – oder ordne <strong>Ehefrau / Ehegatte</strong> sowie <strong>Kinder</strong> direkt einem bestehenden Familienverbund zu. Über <strong>„Familie &amp; Rolle verwalten“</strong> kannst du jederzeit nachträglich Personen verknüpfen oder die Hauptakte zwischen Ehepartnern wechseln.
+            </p>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Herkunftsland *</label>
+                <input type="text" id="ak-new-land" class="m-input" list="m-laender-datalist" placeholder="z. B. Syrien, Ukraine, Afghanistan">
+                <datalist id="m-laender-datalist">
+                  <option value="Syrien"><option value="Ukraine"><option value="Afghanistan">
+                  <option value="Irak"><option value="Iran"><option value="Türkei">
+                  <option value="Eritrea"><option value="Somalia"><option value="Nigeria">
+                  <option value="Gambia"><option value="Albanien"><option value="Kosovo">
+                  <option value="Serbien"><option value="Russland"><option value="Georgien">
+                </datalist>
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Name / Kürzel der Person *</label>
+                <input type="text" id="ak-new-name" class="m-input" placeholder="z. B. Al-Ahmad, Mohammed">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Rolle in der Familie</label>
+                <select id="ak-new-role" class="m-select">
+                  <option value="haupt">👤 Hauptperson / Familienoberhaupt</option>
+                  <option value="ehepartner">💍 Ehefrau / Ehegatte / Partner(in)</option>
+                  <option value="kind">👶 Kind / Jugendlicher</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Gehört zur Hauptakte von … (optional)</label>
+                <select id="ak-new-parent" class="m-select">
+                  <option value="">– Eigene Hauptakte (alleinstehend / Oberhaupt) –</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Alternative Schreibweisen / Suchwörter</label>
+                <input type="text" id="ak-new-alias" class="m-input" placeholder="z. B. Mohamed, Abu Ali">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Hauptthema</label>
+                <select id="ak-new-thema" class="m-select">
+                  <option value="Asylantrag & Aufenthalt">⚖️ Asylantrag &amp; Aufenthalt</option>
+                  <option value="Arbeit & Ehrenamt">💼 Arbeit &amp; Ehrenamt</option>
+                  <option value="Wohnung & Unterkunft">🏠 Wohnung &amp; Unterkunft</option>
+                  <option value="Fotos & Einverständnis">📷 Fotos &amp; Einverständnis</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Telefon / WhatsApp (optional)</label>
+                <input type="text" id="ak-new-tel" class="m-input" placeholder="z. B. 0171 1234567">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem; color:#003366;">Interne Notiz / Frist (optional)</label>
+                <input type="text" id="ak-new-notiz" class="m-input" placeholder="z. B. Anwaltstermin 12.12.">
+              </div>
+            </div>
+            <div style="margin-top:12px; display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
+              <button type="button" id="ak-create-btn" class="m-btn m-btn-green">+ Neue vertrauliche Akte &amp; Einwurf-Code anlegen</button>
+              <span id="ak-create-msg" style="font-weight:bold;"></span>
+            </div>
+          </div>
+
+          <div style="margin:12px 0; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+            <input type="text" id="ak-search" class="m-input" placeholder="Fehlertolerante Suche (Name, Variante, Land, Code, Notiz) …" style="max-width:440px;">
+          </div>
+          <div id="ak-country-chips" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;"></div>
+
+          <div id="list-akten"></div>
+        </section>
+
+        <!-- TAB 5: SCHATZKISTE (MIT 5 STUFEN INKL. ✨ FUNKELNDE STERNE & WEITERBEARBEITUNGS-CODE) -->
+        <section id="tab-schatz" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#b45309; background:#fffdf7;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+              <div>
+                <h3 style="margin:0; color:#78350f;">✨ Schatzkiste – Begabungen, Träume, Berufe &amp; Hobbys</h3>
+                <p style="margin:4px 0 0 0; font-size:0.92rem;">
+                  Filtere nach Erfahrungsstufe (z. B. <strong>✨ Traum &amp; Neugier</strong> für den Chor oder <strong>🎓 Meister / Spezialist</strong>) oder suche nach Stichwörtern wie <em>Hotel, Löten, Chor, Garten, Bienen, LKW</em>.
+                </p>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <a href="schatzsuche.html" target="_blank" class="m-btn m-btn-orange">📝 Fragebogen öffnen</a>
+                <button type="button" id="sz-copy-link-btn" class="m-btn">📋 Link zur Schatzsuche kopieren</button>
+              </div>
+            </div>
+            <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+              <input type="text" id="sz-search" class="m-input" placeholder="Stichwort (z. B. Chor, Hotel, Löten, Arabisch, Garten) …" style="max-width:310px;">
+              <select id="sz-domain-filter" class="m-select" style="max-width:250px;">
+                <option value="">Alle Themenbereiche</option>
+                <option value="musik">🎵 Musik, Chor &amp; Gesang</option>
+                <option value="kochen">🍳 Kochen, Backen &amp; Gastronomie</option>
+                <option value="it">📱 Handy, Computer &amp; Technik</option>
+                <option value="reparatur">🔧 Handwerk, Bau &amp; Reparatur</option>
+                <option value="garten">🌿 Garten, Natur &amp; Landwirtschaft</option>
+                <option value="mobilitaet">🚲 Mobilität (Fahrrad, Auto, LKW)</option>
+                <option value="kunst">🎨 Malerei, Bildhauerei &amp; Ton</option>
+                <option value="naehen">🧵 Nähen, Schneidern &amp; Textil</option>
+                <option value="papier">📄 Papierkram, Übersetzen &amp; Behörden</option>
+                <option value="ehrenamt">🤝 Bisheriges Ehrenamt &amp; Vereine</option>
+              </select>
+              <select id="sz-level-filter" class="m-select" style="max-width:270px;">
+                <option value="">Alle 5 Stufen anzeigen</option>
+                <option value="dream">✨ Traum &amp; Neugier (möchte einarbeiten)</option>
+                <option value="everyday">🏠 Alltag &amp; Eigenbedarf</option>
+                <option value="helper">🤝 Helfende Hand (unterstützt andere)</option>
+                <option value="experienced">🛠️ Erfahrene Fachkraft</option>
+                <option value="master">🎓 Meister / Lehrer / Spezialist</option>
+              </select>
+              <button type="button" id="sz-invite-filtered-btn" class="m-btn m-btn-green">✉️ Gefilterte Gruppe per E-Mail einladen</button>
+            </div>
+          </div>
+          <div id="list-schatz"></div>
+        </section>
+
+
+        <!-- TAB 5B: IDEEN- & LOB-TAFEL MODERATION -->
+        <section id="tab-ideentafel" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#ca8a04; background:#fefce8;">
+            <h3 style="margin-top:0; color:#854d0e;">💡 Wichtiges, Ideen &amp; Lob-Tafel verwalten</h3>
+            <p style="margin:0; font-size:0.93rem;">
+              Hier siehst du alle eingereichten Ideen, Lob-Beiträge und wichtigen Hinweise. Du kannst Beiträge auf der öffentlichen Tafel freischalten, eine offizielle Antwort ergänzen oder Beiträge löschen.
+            </p>
+          </div>
+          <div id="list-ideentafel"></div>
+        </section>
+
+        
+        <!-- TAB 5C: RADWERKSTATT ANFRAGEN & AUSGABE-DOKUMENTATION -->
+        <section id="tab-radwerkstatt" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#0284c7; background:#f0f9ff;">
+            <h3 style="margin-top:0; color:#0369a1;">🚲 Fahrrad-Ausgabe dokumentieren &amp; Vorbestellungen verwalten</h3>
+            <p style="margin:0 0 12px 0; font-size:0.93rem;">
+              Hier dokumentiert ihr, <strong>wer welches Fahrrad erhalten hat</strong> (inkl. Datum, Rahmennummer/Beschreibung und eventuellem Unkostenbeitrag) und seht alle eingegangenen Radanfragen.
+            </p>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:10px;">
+              <div>
+                <label style="font-size:0.85rem; font-weight:bold;">Empfänger (Name) *</label>
+                <input type="text" id="rad-doc-name" class="m-input" placeholder="Vor- und Nachname">
+              </div>
+              <div>
+                <label style="font-size:0.85rem; font-weight:bold;">6-stellige Personen-Nr. (optional)</label>
+                <input type="text" id="rad-doc-code" class="m-input" inputmode="numeric" maxlength="10" placeholder="z. B. 482910">
+              </div>
+              <div>
+                <label style="font-size:0.85rem; font-weight:bold;">Fahrrad (Typ / Farbe / Rahmennr.) *</label>
+                <input type="text" id="rad-doc-bike" class="m-input" placeholder="z. B. Damenrad 28 Zoll blau, Nr. 1234">
+              </div>
+              <div>
+                <label style="font-size:0.85rem; font-weight:bold;">Unkostenbeitrag (€) / Hinweis</label>
+                <input type="text" id="rad-doc-fee" class="m-input" placeholder="z. B. 20 € bezahlt / kostenlos">
+              </div>
+              <div>
+                <label style="font-size:0.85rem; font-weight:bold;">Ausgabe-Datum</label>
+                <input type="date" id="rad-doc-date" class="m-input">
+              </div>
+            </div>
+            <div style="margin-top:10px; display:flex; align-items:center; gap:10px;">
+              <button type="button" id="rad-doc-save-btn" class="m-btn m-btn-green">✓ Fahrrad-Ausgabe speichern</button>
+              <span id="rad-doc-msg" style="font-weight:bold;"></span>
+            </div>
+          </div>
+          <div id="list-rad-anfragen"></div>
+          <div id="list-rad-ausgaben"></div>
+        </section>
+
+        
+        <!-- TAB: BENUTZER-KONTEN (PASSWÖRTER EINSEHEN & FREISCHALTEN) -->
+        <section id="tab-konten" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#004080; background:#f8fbff;">
+            <h3 style="margin-top:0; color:#003366;">👤 Registrierte Benutzer-Konten prüfen &amp; freischalten</h3>
+            <p style="margin-top:0; font-size:0.92rem;">
+              Hier sehen Sie alle angelegten Benutzer-Konten inklusive hinterlegtem Passwort (falls jemand sein Passwort vergisst), Status (Wartend / Freigegeben / Gesperrt) und Anonym-Einstellung.
+            </p>
+            <div id="list-user-accounts"></div>
+          </div>
+        </section>
+
+        <!-- TAB 6: SYSTEM & SEITENSCHUTZ -->
+        <section id="tab-system" class="m-tab-panel" style="display:none;">
+          <div class="m-card" style="border-left-color:#15803d; background:#f0fdf4;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+              <h3 style="margin:0; color:#14532d;">📊 Seiten-Aufrufe &amp; Hits pro Unterseite</h3>
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <button type="button" id="btn-reset-visit-today" class="m-btn m-btn-grey" style="font-size:0.82rem;">Nur Heute auf 0 setzen</button>
+                <button type="button" id="btn-reset-visit-all" class="m-btn m-btn-red" style="font-size:0.82rem;">Echter Komplett-Reset (Alles auf 0)</button>
+              </div>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px; background:#ffffff; border:1px solid #bbf7d0; border-radius:7px; padding:8px 12px; margin-bottom:10px;">
+              <span id="my-device-ignore-status" style="font-size:0.86rem; font-weight:bold; color:#15803d;">✓ Dieses Gerät (Notebook/Handy) ist von der Besucherzählung ausgeschlossen.</span>
+              <button type="button" id="btn-toggle-ignore-device" class="m-btn m-btn-grey" style="font-size:0.8rem;">Geräte-Ausschluss umschalten</button>
+            </div>
+            <p style="margin:0 0 10px 0; font-size:0.86rem; color:#334155;">
+              Jeder Aufruf einer öffentlichen Unterseite wird gezählt (<code>master.html</code> und jedes Gerät, auf dem du dich einmal im Master angemeldet hast, werden nicht mitgezählt). Die oberste Zeile ist immer die exakte Summe der darunterliegenden Seiten.
+            </p>
+            <div id="sys-page-hits-table">Lade Seitenstatistik …</div>
+          </div>
+
+          <div class="m-card">
+            <h3 style="margin-top:0;">Zugangscodes &amp; Flaggenband</h3>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px;">
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Warenhaus-Zugangscode</label>
+                <input type="text" id="sys-zugangscode" class="m-input">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Supermaster-Code</label>
+                <input type="text" id="sys-code-master" class="m-input">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Freischalter-Code (Team)</label>
+                <input type="text" id="sys-code-team" class="m-input">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Koordinator-Code</label>
+                <input type="text" id="sys-code-koord" class="m-input">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Copilot-Code</label>
+                <input type="text" id="sys-code-copilot" class="m-input">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">KI-Import Helfer-Code (<code>ki-import.html</code>)</label>
+                <input type="text" id="sys-code-kiimport" class="m-input" placeholder="Standard: FFLW-KI">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Radwerkstatt-Code (<code>radwerkstatt-admin.html</code>)</label>
+                <input type="text" id="sys-code-rad" class="m-input" placeholder="Standard: FFLW-RAD">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Ideen-Team-Code (<code>ideen-admin.html</code>)</label>
+                <input type="text" id="sys-code-ideen" class="m-input" placeholder="Standard: FFLW-IDEEN">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Schatzkisten-Code (<code>schatzkiste-admin.html</code>)</label>
+                <input type="text" id="sys-code-schatz" class="m-input" placeholder="Standard: FFLW-SCHATZ">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Flaggenband-Stil</label>
+                <select id="sys-flaggen" class="m-select">
+                  <option value="A">Stil A (Sanftes Blau)</option>
+                  <option value="B">Stil B (Weiß mit Rahmen)</option>
+                  <option value="C">Stil C (Dezent)</option>
+                  <option value="OFF">Ausgeblendet</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="m-card">
+            <h3 style="margin-top:0;">Seiten-Steuerung: Wartung, Menü-Sichtbarkeit &amp; Adressleisten-Tarnung</h3>
+            <div class="m-table-wrap">
+              <table class="m-table">
+                <thead>
+                  <tr>
+                    <th>Datei</th>
+                    <th>Titel</th>
+                    <th>Wartung (sperren)</th>
+                    <th>Im Menü verstecken</th>
+                    <th>Adressleiste tarnen (index.html)</th>
+                  </tr>
+                </thead>
+                <tbody id="sys-pages-tbody"></tbody>
+              </table>
+            </div>
+            <div style="margin-top:14px; display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
+              <button type="button" id="sys-gen-strong-codes-btn" class="m-btn m-btn-orange" style="margin-right:8px;">🎲 Sichere Zufallscodes für Team/KI vorschlagen</button>
+            <button type="button" id="sys-save-btn" class="m-btn m-btn-green">Alle Einstellungen speichern</button>
+              <span id="sys-save-msg" style="font-weight:bold;"></span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Vorschau-Modal -->
+  <div id="m-file-viewer-modal">
+    <div class="m-viewer-box">
+      <div style="padding:12px 16px; background:#004080; color:#ffffff; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <strong id="m-viewer-title">Dokument</strong>
+        <div style="display:flex; gap:8px;">
+          <a id="m-viewer-download" href="#" download="dokument" class="m-btn m-btn-green" style="padding:6px 12px;">⬇ Herunterladen</a>
+          <button type="button" id="m-viewer-close" class="m-btn m-btn-red" style="padding:6px 12px;">✕ Schließen</button>
+        </div>
+      </div>
+      <div id="m-viewer-body" style="padding:14px; overflow:auto; flex:1; text-align:center; background:#f4f4f4;"></div>
+    </div>
+  </div>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="intern-statistik.html">Statistik</a>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+<script>
+  window.fflwCompressPdfFile = async function (file, options) {
+    const opts = options || {};
+    const grayscale = !!opts.grayscale;
+    const targetScale = opts.scale || 1.35;
+    const jpegQuality = opts.quality || 0.68;
+
+    if (!window.pdfjsLib || !window.jspdf || !window.jspdf.jsPDF) {
+      throw new Error("PDF-Bibliothek im Browser nicht verfügbar.");
+    }
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfDoc = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const totalPages = pdfDoc.numPages;
+
+    let outPdf = null;
+    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+      if (typeof opts.onProgress === "function") {
+        opts.onProgress(pageNum, totalPages);
+      }
+      const page = await pdfDoc.getPage(pageNum);
+      const viewport = page.getViewport({ scale: targetScale });
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(viewport.width);
+      canvas.height = Math.round(viewport.height);
+      const ctx = canvas.getContext("2d");
+
+      await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+
+      if (grayscale) {
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imgData.data;
+        for (let i = 0; i < d.length; i += 4) {
+          let lum = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+          lum = lum < 140 ? Math.max(0, lum * 0.85) : Math.min(255, lum * 1.08);
+          d[i] = d[i + 1] = d[i + 2] = lum;
+        }
+        ctx.putImageData(imgData, 0, 0);
+      }
+
+      const pageDataUrl = canvas.toDataURL("image/jpeg", jpegQuality);
+      const orientation = canvas.width > canvas.height ? "l" : "p";
+      const pageW = viewport.width * 0.264583;
+      const pageH = viewport.height * 0.264583;
+
+      if (pageNum === 1) {
+        outPdf = new window.jspdf.jsPDF({ orientation: orientation, unit: "mm", format: [pageW, pageH], compress: true });
+      } else {
+        outPdf.addPage([pageW, pageH], orientation);
+      }
+      outPdf.addImage(pageDataUrl, "JPEG", 0, 0, pageW, pageH, undefined, "FAST");
+    }
+
+    const base64Full = outPdf.output("datauristring");
+    const base64Pure = base64Full.split(",")[1];
+    const approxBytes = Math.round((base64Pure.length * 3) / 4);
+    const suffix = grayscale ? "_SW_klein.pdf" : "_klein.pdf";
+    const newName = file.name.replace(/\.pdf$/i, "") + suffix;
+
+    return {
+      fileName: newName,
+      mimeType: "application/pdf",
+      base64: base64Pure,
+      sizeBytes: approxBytes
+    };
+  };
+</script>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      const CACHE_KEY = "fflw_master_overview_cache_v3";
+
+      const LEVEL_LABELS = {
+        dream: { icon: "✨", name: "Traum & Neugier", bg: "#fffbeb", fg: "#92400e", border: "#fcd34d" },
+        everyday: { icon: "🏠", name: "Alltag", bg: "#f1f5f9", fg: "#334155", border: "#cbd5e1" },
+        helper: { icon: "🤝", name: "Helfende Hand", bg: "#e0f2fe", fg: "#075985", border: "#7dd3fc" },
+        experienced: { icon: "🛠️", name: "Erfahrene Fachkraft", bg: "#dcfce7", fg: "#166534", border: "#86efac" },
+        master: { icon: "🎓", name: "Meister / Spezialist", bg: "#fae8ff", fg: "#86198f", border: "#f0abfc" }
+      };
+
+      const codeInput = document.getElementById("m-code-input");
+      if (typeof window.fflwNeutralizeCodeInput === "function") {
+        window.fflwNeutralizeCodeInput(codeInput);
+      }
+      const eyeBtn = document.getElementById("m-toggle-code-eye");
+      if (eyeBtn && codeInput) {
+        eyeBtn.addEventListener("click", () => {
+          const isUnmasked = codeInput.classList.toggle("fflw-unmasked");
+          codeInput.style.webkitTextSecurity = isUnmasked ? "none" : "disc";
+          eyeBtn.textContent = isUnmasked ? "🙈" : "👁️";
+        });
+      }
+
+      let currentCode = sessionStorage.getItem("fflw_master_session_code") || (window.FFLW_SupermasterDevice ? window.FFLW_SupermasterDevice.getCode() : "") || "";
+      let currentData = null;
+      let selectedCountryFilter = "";
+
+      function normalizeTranslit(str) {
+        return String(str || "")
+          .toLowerCase()
+          .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
+          .replace(/[\s\-_'’`.,;:()\/]+/g, "")
+          .replace(/^al/, "")
+          .replace(/ou|oo|u/g, "o")
+          .replace(/ee|ei|ie|y|i/g, "i")
+          .replace(/ph/g, "f")
+          .replace(/kh|ch/g, "h")
+          .replace(/sh|sch/g, "s")
+          .replace(/th|dh|z/g, "s")
+          .replace(/q|ck|c/g, "k")
+          .replace(/w/g, "v")
+          .replace(/(.)\1+/g, "$1");
+      }
+
+      function switchTab(tabName) {
+        document.querySelectorAll(".m-tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tabName));
+        document.querySelectorAll(".m-tab-panel").forEach(p => p.style.display = (p.id === "tab-" + tabName) ? "block" : "none");
+      }
+
+      document.querySelectorAll(".m-tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+      });
+
+      function applyDashboardData(data, fromCache) {
+        currentData = data;
+        document.getElementById("m-login-box").style.display = "none";
+        document.getElementById("m-dashboard").style.display = "block";
+
+        const roleNames = {
+          master: "Supermaster (Vollzugriff)",
+          freischalter: "Team-Freischalter",
+          koordinator: "Koordinator (Bedarfe)",
+          copilot: "Copilot (Lesemodus)"
+        };
+        document.getElementById("m-role-label").textContent = "Rolle: " + (roleNames[data.role] || data.role);
+        document.getElementById("m-sync-hint").textContent = fromCache ? "⏳ Aktualisiere im Hintergrund …" : "✓ Aktuell";
+
+        if (data.visitStats) {
+          try { localStorage.setItem("fflw_ignore_my_visits", "1"); } catch (e) {}
+        document.getElementById("m-live-badge").textContent =
+            `Live: ${data.visitStats.onlineNow || 0} online · Heute: ${data.visitStats.counts.today || 0} · Gesamt: ${data.visitStats.counts.total || 0} Aufrufe`;
+          const statsBox = document.getElementById("sys-page-hits-table");
+          if (statsBox) {
+            const pList = Array.isArray(data.visitStats.pagesList) ? data.visitStats.pagesList : [];
+            const c = data.visitStats.counts || {};
+            statsBox.innerHTML = !pList.length
+              ? `<p style="margin:0; font-size:0.9rem;">Noch keine Einzel-Seitenaufrufe aufgezeichnet.</p>`
+              : `<div class="m-table-wrap"><table class="m-table">
+                  <thead>
+                    <tr>
+                      <th>Unterseite</th>
+                      <th style="text-align:right;">Aktuell</th>
+                      <th style="text-align:right;">Heute</th>
+                      <th style="text-align:right;">Woche</th>
+                      <th style="text-align:right;">Monat</th>
+                      <th style="text-align:right;">Gesamt</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style="background:#e0f2fe; font-weight:bold;">
+                      <td>Alle Seiten zusammen</td>
+                      <td style="text-align:right; color:#15803d;">${data.visitStats.onlineNow || 0}</td>
+                      <td style="text-align:right;">${c.today || 0}</td>
+                      <td style="text-align:right;">${c.week || 0}</td>
+                      <td style="text-align:right;">${c.month || 0}</td>
+                      <td style="text-align:right;">${c.total || 0}</td>
+                    </tr>` +
+                    pList.map(p => `<tr>
+                      <td><code>${p.page}</code></td>
+                      <td style="text-align:right; font-weight:bold; color:${p.active > 0 ? "#15803d" : "#64748b"};">${p.active || 0}</td>
+                      <td style="text-align:right;">${p.today || 0}</td>
+                      <td style="text-align:right;">${p.week || 0}</td>
+                      <td style="text-align:right;">${p.month || 0}</td>
+                      <td style="text-align:right;"><strong>${p.total || p.count || 0}</strong></td>
+                    </tr>`).join("") +
+                  `</tbody></table></div>`;
+          }
+        }
+
+        const isSuper = data.role === "master";
+        const canPublish = isSuper || data.role === "freischalter";
+        const canSeeTreasure = isSuper || data.role === "koordinator" || data.role === "freischalter";
+        document.getElementById("tab-btn-kiimport").style.display = canPublish ? "inline-block" : "none";
+        document.getElementById("tab-btn-akten").style.display = isSuper ? "inline-block" : "none";
+        document.getElementById("tab-btn-schatz").style.display = canSeeTreasure ? "inline-block" : "none";
+        document.getElementById("tab-btn-ideentafel").style.display = canSeeTreasure ? "inline-block" : "none";
+        document.getElementById("tab-btn-system").style.display = isSuper ? "inline-block" : "none";
+
+        const syncHubTile = (hubId, tabBtnId) => {
+          const hEl = document.getElementById(hubId);
+          const tEl = document.getElementById(tabBtnId);
+          if (hEl && tEl) hEl.style.display = tEl.style.display;
+        };
+        syncHubTile("hub-tile-kiimport", "tab-btn-kiimport");
+        syncHubTile("hub-tile-akten", "tab-btn-akten");
+        syncHubTile("hub-tile-schatz", "tab-btn-schatz");
+        syncHubTile("hub-tile-ideentafel", "tab-btn-ideentafel");
+        syncHubTile("hub-tile-system", "tab-btn-system");
+        if (document.getElementById("hub-tile-konten")) document.getElementById("hub-tile-konten").style.display = isSuper ? "flex" : "none";
+        const kiHubLink = document.getElementById("hub-tile-kiimport");
+        if (kiHubLink && currentCode) kiHubLink.href = "ki-import.html?code=" + encodeURIComponent(currentCode);
+
+        renderAllSections(data);
+      }
+
+      async function loadMasterData(codeToUse, silentBackground) {
+        const msgEl = document.getElementById("m-login-msg");
+        const loginBtn = document.getElementById("m-login-btn");
+        const code = String(codeToUse || codeInput.value || "").replace(/\s+/g, "").trim();
+        if (!code) {
+          msgEl.style.color = "#c62828";
+          msgEl.textContent = "Bitte Zugangscode eingeben.";
+          return { ok: false };
+        }
+
+        if (!silentBackground) {
+          try {
+            const cachedRaw = sessionStorage.getItem(CACHE_KEY);
+            if (cachedRaw) {
+              const cachedObj = JSON.parse(cachedRaw);
+              if (cachedObj && cachedObj.ok) applyDashboardData(cachedObj, true);
+            }
+          } catch (e) {}
+        }
+
+        const task = async () => {
+          const resp = await fetch(`${WEB_APP_URL}?action=master_overview&code=${encodeURIComponent(code)}&t=${Date.now()}`, {
+            method: "GET",
+            redirect: "follow"
+          });
+          const data = await resp.json();
+          if (!data || !data.ok) {
+            msgEl.style.color = "#c62828";
+            msgEl.textContent = (data && data.error) ? data.error : "Ungültiger Code.";
+            sessionStorage.removeItem("fflw_master_session_code");
+        if (window.FFLW_SupermasterDevice) window.FFLW_SupermasterDevice.deactivate();
+            sessionStorage.removeItem(CACHE_KEY);
+            document.getElementById("m-dashboard").style.display = "none";
+            document.getElementById("m-login-box").style.display = "block";
+            return { ok: false };
+          }
+
+          currentCode = code;
+          sessionStorage.setItem("fflw_master_session_code", code);
+          if (data.role === "master" && window.FFLW_SupermasterDevice) {
+            window.FFLW_SupermasterDevice.activate(code);
+          }
+          try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {}
+          applyDashboardData(data, false);
+          return { ok: true };
+        };
+
+        if (!silentBackground && document.getElementById("m-login-box").style.display !== "none" && typeof window.fflwRunButtonAction === "function") {
+          return await window.fflwRunButtonAction(loginBtn, task, {
+            loadingText: "Lade Cockpit …",
+            successText: "✓ Angemeldet!",
+            resetAfterMs: 1200
+          });
+        }
+        return await task();
+      }
+
+      document.getElementById("m-login-btn").addEventListener("click", () => loadMasterData());
+      codeInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); loadMasterData(); } });
+      document.getElementById("m-refresh-btn").addEventListener("click", () => loadMasterData(currentCode, false));
+      document.getElementById("m-logout-btn").addEventListener("click", () => {
+        sessionStorage.removeItem("fflw_master_session_code");
+        sessionStorage.removeItem(CACHE_KEY);
+        currentCode = "";
+        document.getElementById("m-dashboard").style.display = "none";
+        document.getElementById("m-login-box").style.display = "block";
+        codeInput.value = "";
+        delete codeInput.dataset.userTyped;
+      });
+
+      if (currentCode) loadMasterData(currentCode, false);
+
+      async function postAction(bodyObj) {
+        const resp = await fetch(WEB_APP_URL, {
+          method: "POST",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(Object.assign({ masterCode: currentCode }, bodyObj))
+        });
+        return await resp.json();
+      }
+
+      async function postMasterAction(actionName, extraObj) {
+        return await postAction(Object.assign({ action: actionName }, extraObj || {}));
+      }
+
+      function renderAllSections(data) {
+        const eingang = data.eingang || [];
+        const online = data.online || [];
+        const bedarfe = data.bedarfe || [];
+        const akten = data.personenAkten || [];
+        const schatzListe = data.schatzkiste || [];
+
+        document.getElementById("cnt-eingang").textContent = eingang.length;
+        if (document.getElementById("hub-cnt-eingang")) document.getElementById("hub-cnt-eingang").textContent = eingang.length;
+        // API-Key aus Backend nachladen, falls lokal leer
+        if (kiKeyInput && !kiKeyInput.value.trim()) {
+          fetch(`${WEB_APP_URL}?action=getGeminiApiKey&masterCode=${encodeURIComponent(currentCode)}&t=${Date.now()}`, { method: "GET", redirect: "follow" })
+            .then(r => r.json())
+            .then(kd => { if (kd && kd.ok && kd.apiKey && !kiKeyInput.value.trim()) kiKeyInput.value = kd.apiKey; })
+            .catch(() => {});
+        }
+        // Benutzer-Konten rendern
+        const userAccounts = Array.isArray(data.userAccounts) ? data.userAccounts : [];
+        const cntK = document.getElementById("cnt-konten");
+        if (cntK) cntK.textContent = userAccounts.length;
+        if (document.getElementById("hub-cnt-konten")) document.getElementById("hub-cnt-konten").textContent = userAccounts.length;
+        const listK = document.getElementById("list-user-accounts");
+        if (listK) {
+          listK.innerHTML = !userAccounts.length
+            ? `<p style="margin:0;">Noch keine registrierten Benutzer-Konten vorhanden.</p>`
+            : userAccounts.map(acc => `
+              <div class="m-card" style="padding:12px 14px; margin:8px 0; border-left-color:${acc.status === "freigegeben" ? "#16a34a" : (acc.status === "gesperrt" ? "#dc2626" : "#d97706")};">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+                  <div>
+                    <strong style="font-size:1.02rem; color:#003366;">👤 ${acc.username}</strong>
+                    <span class="m-badge" style="margin-left:6px; background:${acc.status === "freigegeben" ? "#dcfce7" : "#fef3c7"}; color:#111;">${acc.status}</span>
+                    ${acc.anonym ? `<span class="m-badge" style="margin-left:4px; background:#e0e7ff; color:#1e3a8a;">🕵️ Anonym aktiv</span>` : ""}
+                    <div style="font-size:0.9rem; margin-top:4px;">
+                      <strong>Name:</strong> ${acc.name} | <strong>Kontakt:</strong> ${acc.kontakt} | <strong>6-stellige Nr.:</strong> ${acc.personenCode || "-"}<br>
+                      <strong>Hinterlegtes Passwort:</strong> <code style="background:#f1f5f9; padding:2px 6px; border-radius:4px;">${acc.passwort}</code>
+                    </div>
+                  </div>
+                  <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                    ${acc.status !== "freigegeben" ? `<button type="button" class="m-btn m-btn-green btn-acc-op" data-id="${acc.fileId}" data-op="approve">✓ Freischalten</button>` : ""}
+                    ${acc.status === "freigegeben" ? `<button type="button" class="m-btn m-btn-orange btn-acc-op" data-id="${acc.fileId}" data-op="block">Sperren</button>` : ""}
+                    <button type="button" class="m-btn btn-acc-pw" data-id="${acc.fileId}" data-user="${acc.username}" data-pw="${String(acc.passwort || "").replace(/"/g, "&quot;")}">🔑 Passwort ändern</button>
+                    <button type="button" class="m-btn m-btn-red btn-acc-op" data-id="${acc.fileId}" data-op="delete">🗑️ Löschen</button>
+                  </div>
+                </div>
+              </div>
+            `).join("");
+          listK.querySelectorAll(".btn-acc-op").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              if (btn.dataset.op === "delete" && !confirm("Dieses Konto wirklich löschen?")) return;
+              await postAction({ action: "manageUserAccount", fileId: btn.dataset.id, op: btn.dataset.op });
+              loadMasterData(currentCode, false);
+            });
+          listK.querySelectorAll(".btn-acc-pw").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              const neu = prompt(`Neues Passwort für Benutzer „${btn.dataset.user}“ eingeben (mind. 4 Zeichen):`, btn.dataset.pw || "");
+              if (neu === null) return;
+              if (neu.trim().length < 4) { alert("Das Passwort muss mindestens 4 Zeichen lang sein."); return; }
+              const res = await postAction({ action: "manageUserAccount", fileId: btn.dataset.id, op: "change_password", newPassword: neu.trim() });
+              if (res && res.ok) {
+                alert("✓ Passwort wurde geändert.");
+                loadMasterData(currentCode, true);
+              } else {
+                alert("Fehler: " + ((res && res.error) || "Speichern fehlgeschlagen"));
+              }
+            });
+          });
+          });
+        }
+        document.getElementById("cnt-online").textContent = online.length;
+        if (document.getElementById("hub-cnt-online")) document.getElementById("hub-cnt-online").textContent = online.length;
+        document.getElementById("cnt-bedarfe").textContent = bedarfe.length;
+        if (document.getElementById("hub-cnt-bedarfe")) document.getElementById("hub-cnt-bedarfe").textContent = bedarfe.length;
+        document.getElementById("cnt-akten").textContent = akten.length;
+        if (document.getElementById("hub-cnt-akten")) document.getElementById("hub-cnt-akten").textContent = akten.length;
+        document.getElementById("cnt-schatz").textContent = schatzListe.length;
+        if (document.getElementById("hub-cnt-schatz")) document.getElementById("hub-cnt-schatz").textContent = schatzListe.length;
+
+        // Hauptakten-Auswahl im Anlege-Formular befüllen
+        const parentSel = document.getElementById("ak-new-parent");
+        const mainAkten = akten
+          .filter(a => !a.familyHeadId)
+          .sort((a, b) => String(a.personenName || "").localeCompare(String(b.personenName || ""), "de"));
+        parentSel.innerHTML = `<option value="">– Eigene Hauptakte (alleinstehend / Oberhaupt) –</option>` +
+          mainAkten.map(m => `<option value="${m.id}">${m.personenName} (${m.herkunftsland || "-"}, Code ${m.aktenCode})</option>`).join("");
+
+        // 1. Eingang (mit Massen-Freischaltung Opt-Out, Löschen & Dubletten-Bündelung)
+        const eingangEl = document.getElementById("list-eingang");
+        const titleNormCounts = {};
+        eingang.forEach(it => {
+          const norm = String(it.titel || "").replace(/^\d+\s*[x×]\s*/i, "").toLowerCase().trim();
+          if (norm) titleNormCounts[norm] = (titleNormCounts[norm] || 0) + 1;
+        });
+        const dupGroups = Object.keys(titleNormCounts).filter(k => titleNormCounts[k] > 1);
+
+        eingangEl.innerHTML = eingang.length === 0
+          ? `<div class="m-card">Keine neuen Eingänge zur Prüfung vorhanden.</div>`
+          : `
+            <div class="m-card" style="background:#f0fdf4; border-left-color:#15803d;">
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+                <div>
+                  <strong style="color:#14532d;">Sammel-Aktionen (${eingang.length} Eingänge – alle vorausgewählt, einzelne bei Bedarf abhaken):</strong>
+                  <div style="margin-top:4px; font-size:0.86rem;">
+                    <label style="cursor:pointer; font-weight:bold;"><input type="checkbox" id="eingang-select-all" checked> Alle auswählen / abwählen (Opt-Out)</label>
+                  </div>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                  <button type="button" id="btn-eingang-bulk-pub" class="m-btn m-btn-green">✅ Alle markierten freischalten</button>
+                  <button type="button" id="btn-eingang-bulk-del" class="m-btn m-btn-red">🗑️ Markierte löschen</button>
+                </div>
+              </div>
+              ${dupGroups.length ? `
+                <div style="margin-top:10px; padding:8px 10px; background:#fffbeb; border:1px solid #f59e0b; border-radius:6px; font-size:0.88rem;">
+                  <strong>⚠️ Ähnliche / mehrfache Gegenstände erkannt (${dupGroups.length} Gruppe(n)):</strong>
+                  ${dupGroups.map(g => {
+                    const matching = eingang.filter(x => String(x.titel || "").replace(/^\d+\s*[x×]\s*/i, "").toLowerCase().trim() === g);
+                    const ids = matching.map(x => x.folderId).join(",");
+                    const sampleTitle = matching[0].titel.replace(/^\d+\s*[x×]\s*/i, "").trim();
+                    return `<div style="margin-top:5px;">• <strong>${matching.length}× ${sampleTitle}</strong>
+                      <button type="button" class="m-btn m-btn-warn btn-bundle-eingang" data-ids="${ids}" data-count="${matching.length}" data-title="${sampleTitle}" style="margin-left:6px; padding:3px 9px; font-size:0.82rem;">🔗 Als „${matching.length}× ${sampleTitle}“ bündeln</button> <button type="button" class="m-btn m-btn-red btn-del-dups-eingang" data-ids="${ids}" style="margin-left:4px; padding:3px 9px; font-size:0.82rem;">🗑️ Alle Dubletten bis auf 1 löschen</button>
+                    </div>`;
+                  }).join("")}
+                </div>
+              ` : ""}
+            </div>
+          ` + eingang.map(it => {
+            const norm = String(it.titel || "").replace(/^\d+\s*[x×]\s*/i, "").toLowerCase().trim();
+            const isDup = norm && titleNormCounts[norm] > 1;
+            return `
+              <div class="m-card" style="${isDup ? "border-left-color:#d97706; background:#fffdf7;" : ""}">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+                  <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <input type="checkbox" class="eingang-row-chk" data-id="${it.folderId}" data-whole="${it.isWholeProvider ? "1" : "0"}" checked style="width:19px; height:19px; margin-top:3px;">
+                    <div>
+                      <strong style="font-size:1.05rem; color:#003366;">${it.titel}</strong>
+                      ${isDup ? `<span class="m-badge" style="background:#fef3c7; color:#92400e; margin-left:6px;">Mehrfach (${titleNormCounts[norm]}×)</span>` : ""}
+                      <div style="font-size:0.9rem; color:#333;">Spender: ${it.spenderName} (${it.ort || "-"}) · Tel: ${it.telefon || "-"}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                    <button type="button" class="m-btn m-btn-green btn-pub" data-id="${it.folderId}" data-whole="${it.isWholeProvider ? "1" : "0"}">✓ Freischalten</button>
+                    <button type="button" class="m-btn m-btn-grey btn-arch" data-id="${it.folderId}">Archivieren</button>
+                    <button type="button" class="m-btn m-btn-red btn-del-eingang" data-id="${it.folderId}">🗑️ Löschen</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join("");
+
+        const selAllEl = document.getElementById("eingang-select-all");
+        if (selAllEl) {
+          selAllEl.addEventListener("change", () => {
+            document.querySelectorAll(".eingang-row-chk").forEach(c => { c.checked = selAllEl.checked; });
+          });
+        }
+        const bulkPubBtn = document.getElementById("btn-eingang-bulk-pub");
+        if (bulkPubBtn) {
+          bulkPubBtn.addEventListener("click", async () => {
+            const chks = Array.from(document.querySelectorAll(".eingang-row-chk:checked"));
+            if (!chks.length) return alert("Bitte mindestens einen Artikel markieren.");
+            bulkPubBtn.disabled = true;
+            bulkPubBtn.textContent = `⏳ Schalte ${chks.length} frei …`;
+            const ids = chks.map(c => c.dataset.id);
+            const res = await postAction({ action: "bulkPublishEingang", folderIds: ids });
+            if (res && res.ok) await loadMasterData(currentCode, false);
+            else { bulkPubBtn.disabled = false; bulkPubBtn.textContent = "✅ Alle markierten freischalten"; alert((res && res.error) || "Fehler"); }
+          });
+        }
+        const bulkDelBtn = document.getElementById("btn-eingang-bulk-del");
+        if (bulkDelBtn) {
+          bulkDelBtn.addEventListener("click", async () => {
+            const chks = Array.from(document.querySelectorAll(".eingang-row-chk:checked"));
+            if (!chks.length) return alert("Bitte mindestens einen Artikel markieren.");
+            if (!confirm(`${chks.length} markierte Eingänge wirklich endgültig löschen?`)) return;
+            bulkDelBtn.disabled = true;
+            bulkDelBtn.textContent = "⏳ Lösche …";
+            const ids = chks.map(c => c.dataset.id);
+            const res = await postAction({ action: "bulkDeleteEingang", folderIds: ids });
+            if (res && res.ok) await loadMasterData(currentCode, false);
+            else { bulkDelBtn.disabled = false; bulkDelBtn.textContent = "🗑️ Markierte löschen"; alert((res && res.error) || "Fehler"); }
+          });
+        }
+        eingangEl.querySelectorAll(".btn-del-eingang").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            if (!confirm("Diesen Eingang wirklich löschen?")) return;
+            btn.disabled = true;
+            const res = await postAction({ action: "bulkDeleteEingang", folderIds: [btn.dataset.id] });
+            if (res && res.ok) await loadMasterData(currentCode, false);
+          });
+        });
+        eingangEl.querySelectorAll(".btn-del-dups-eingang").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const ids = btn.dataset.ids.split(",").filter(Boolean);
+            if (!confirm(`Wirklich ${ids.length - 1} doppelte Einträge löschen und nur 1 behalten?`)) return;
+            btn.disabled = true;
+            await postAction({ action: "deleteDuplicateEingang", folderIds: ids });
+            loadMasterData(currentCode, false);
+          });
+        });
+        eingangEl.querySelectorAll(".btn-bundle-eingang").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const ids = btn.dataset.ids.split(",").filter(Boolean);
+            const newTitle = `${btn.dataset.count}× ${btn.dataset.title}`;
+            if (!confirm(`Alle ${ids.length} Einträge zu einem Artikel „${newTitle}“ zusammenfassen?`)) return;
+            btn.disabled = true;
+            btn.textContent = "⏳ Bündele …";
+            const res = await postAction({ action: "bundleEingangItems", folderIds: ids, newTitle: newTitle });
+            if (res && res.ok) await loadMasterData(currentCode, false);
+            else alert((res && res.error) || "Fehler beim Bündeln.");
+          });
+        });
+
+        // 2. Online & Reserviert
+        const onlineEl = document.getElementById("list-online");
+        onlineEl.innerHTML = online.length === 0
+          ? `<div class="m-card">Aktuell keine Artikel online oder reserviert.</div>`
+          : online.map(it => `
+            <div class="m-card" style="border-left-color:${it.reserviert ? "#d97706" : "#2e7d32"};">
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+                <div>
+                  <span class="m-badge" style="background:${it.reserviert ? "#fff3e0" : "#eaf6ec"}; color:${it.reserviert ? "#e65100" : "#1b5e20"};">
+                    ${it.reserviert ? "RESERVIERT" : "ONLINE"}
+                  </span>
+                  <strong style="margin-left:6px; color:#003366;">${it.titel}</strong>
+                </div>
+                <div>
+                  ${it.reserviert
+                    ? `<button type="button" class="m-btn m-btn-green btn-unres" data-id="${it.id}">↺ Wieder freigeben</button>`
+                    : `<button type="button" class="m-btn m-btn-orange btn-pause" data-id="${it.id}">⏸ Pausieren</button>`}
+                </div>
+              </div>
+            </div>
+          `).join("");
+
+        // 3. Bedarfe
+        const bedarfeEl = document.getElementById("list-bedarfe");
+        bedarfeEl.innerHTML = bedarfe.length === 0
+          ? `<div class="m-card">Aktuell keine offenen Bedarfsanmeldungen.</div>`
+          : bedarfe.map(b => `
+            <div class="m-card">
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px;">
+                <div>
+                  <strong style="color:#003366;">${b.artikelName}</strong> (${b.prioritaet})
+                  <div style="font-size:0.9rem;">Name: <strong>${b.name}</strong> · Kontakt: ${b.kontakt || "-"} · Code: ${b.editCode || "-"}</div>
+                </div>
+                <button type="button" class="m-btn m-btn-orange btn-dem-done" data-id="${b.id}">✓ Erledigt</button>
+              </div>
+            </div>
+          `).join("");
+
+        if (data.role === "master") {
+          renderAktenListe(akten);
+          renderSystemConfig(data);
+        }
+        renderSchatzListe(schatzListe);
+        if (typeof renderRadListe === "function") renderRadListe(data.radwerkstatt || {});
+      }
+
+      function readAdminFile(file, pdfMode) {
+        return new Promise((resolve, reject) => {
+          if (((file.type === "application/pdf") || /\.pdf$/i.test(file.name)) && pdfMode && pdfMode !== "orig" && typeof window.fflwCompressPdfFile === "function") {
+            window.fflwCompressPdfFile(file, { grayscale: pdfMode === "sw" })
+              .then(res => resolve({ fileName: res.fileName, mimeType: res.mimeType, base64: res.base64 }))
+              .catch(() => {
+                const reader = new FileReader();
+                reader.onload = ev => resolve({ fileName: file.name, mimeType: "application/pdf", base64: String(ev.target.result || "").split(",")[1] });
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+              });
+            return;
+          }
+          if (file.type && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              const img = new Image();
+              img.onload = () => {
+                const maxDim = 1800;
+                let w = img.width, h = img.height;
+                if (w > maxDim || h > maxDim) {
+                  if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                  else { w = Math.round(w * maxDim / h); h = maxDim; }
+                }
+                const c = document.createElement("canvas");
+                c.width = w; c.height = h;
+                c.getContext("2d").drawImage(img, 0, 0, w, h);
+                const d = c.toDataURL("image/jpeg", 0.86);
+                resolve({ fileName: file.name, mimeType: "image/jpeg", base64: d.split(",")[1] });
+              };
+              img.onerror = reject;
+              img.src = ev.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          } else {
+            const reader = new FileReader();
+            reader.onload = ev => {
+              resolve({
+                fileName: file.name,
+                mimeType: file.type || "application/octet-stream",
+                base64: String(ev.target.result || "").split(",")[1]
+              });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+
+      function renderSingleAkteCard(a, allAkten, isMember, baseDir) {
+        const uploadLink = `${baseDir}unterlagen.html?c=${encodeURIComponent(a.aktenCode)}`;
+        const schatzLink = `${baseDir}schatzsuche.html?c=${encodeURIComponent(a.aktenCode)}`;
+        const waText = encodeURIComponent(
+          `Hallo ${a.personenName},\nhier ist dein persönlicher Link für vertrauliche Unterlagen beim Freundeskreis:\n${uploadLink}\nDein Zugangs-Code: ${a.aktenCode}`
+        );
+        const dateien = a.dateien || [];
+
+        const roleBadge = a.familyRole === "ehepartner"
+          ? `<span class="m-badge" style="background:#e0f2fe; color:#0369a1; margin-left:4px;">💍 Ehefrau / Ehegatte</span>`
+          : (a.familyRole === "kind"
+            ? `<span class="m-badge" style="background:#fef3c7; color:#92400e; margin-left:4px;">👶 Kind</span>`
+            : `<span class="m-badge" style="background:#f1f5f9; color:#334155; margin-left:4px;">👤 Hauptakte</span>`);
+
+        const potentialHeads = allAkten
+          .filter(x => x.id !== a.id && !x.familyHeadId)
+          .sort((x, y) => String(x.personenName || "").localeCompare(String(y.personenName || ""), "de"));
+
+        return `
+          <article class="m-akte-card ${isMember ? "is-family-member" : ""}">
+            <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:10px;">
+              <div>
+                ${isMember ? `<span style="color:#0284c7; font-weight:bold; margin-right:4px;">↳</span>` : ""}
+                <strong style="font-size:1.08rem; color:#003366;">${a.personenName}</strong>
+                ${roleBadge}
+                <span class="m-badge" style="background:#e3f2fd; color:#0d47a1; margin-left:4px;">Code: ${a.aktenCode}</span>
+                <span class="m-badge" style="background:#f3e5f5; color:#4a148c; margin-left:4px;">${a.hauptThema || "-"}</span>
+                ${a.einwilligungErteilt
+                  ? `<span class="m-badge" style="background:#eaf6ec; color:#1b5e20; margin-left:4px;">✓ DSGVO-Einwilligung</span>`
+                  : `<span class="m-badge" style="background:#fff3e0; color:#e65100; margin-left:4px;">Einwilligung offen</span>`}
+                ${a.aliasNamen ? `<div style="font-size:0.84rem; color:#455a64;">Varianten / Suchwörter: <em>${a.aliasNamen}</em></div>` : ""}
+                <div style="font-size:0.89rem; color:#333; margin-top:4px;">
+                  ${a.telefon ? `Tel: ${a.telefon} · ` : ""}Notiz/Frist: <strong>${a.notiz || "–"}</strong>
+                </div>
+              </div>
+
+              <div style="display:flex; flex-wrap:wrap; gap:6px;">
+                <button type="button" class="m-btn btn-copy-link" data-link="${uploadLink}" data-code="${a.aktenCode}">📋 Upload-Link</button>
+                <button type="button" class="m-btn m-btn-orange btn-copy-schatz" data-link="${schatzLink}">✨ Schatzsuche</button>
+                <a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener" class="m-btn m-btn-green">📲 WhatsApp</a>
+                ${a.driveUrl ? `<a href="${a.driveUrl}" target="_blank" rel="noopener" class="m-btn m-btn-grey">📁 Drive</a>` : ""}
+                <button type="button" class="m-btn m-btn-red btn-del-akte" data-id="${a.id}" data-name="${a.personenName}">🗑</button>
+              </div>
+            </div>
+
+            <!-- Familien-Verknüpfung & Rollentausch -->
+            <details style="margin-top:8px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:7px; padding:7px 11px;">
+              <summary style="cursor:pointer; font-weight:bold; color:#0369a1; font-size:0.9rem;">
+                👨‍👩‍👧‍👦 Familie &amp; Rolle verwalten (Ehefrau / Ehegatte / Kinder verknüpfen oder Hauptakte wechseln)
+              </summary>
+              <div style="margin-top:9px; display:flex; flex-wrap:wrap; gap:8px; align-items:flex-end;">
+                <div style="min-width:170px;">
+                  <label style="font-size:0.8rem; font-weight:bold;">Rolle</label>
+                  <select class="m-select fam-role-sel">
+                    <option value="haupt" ${(!a.familyRole || a.familyRole === "haupt") ? "selected" : ""}>👤 Hauptakte / Oberhaupt</option>
+                    <option value="ehepartner" ${a.familyRole === "ehepartner" ? "selected" : ""}>💍 Ehefrau / Ehegatte</option>
+                    <option value="kind" ${a.familyRole === "kind" ? "selected" : ""}>👶 Kind / Jugendlicher</option>
+                  </select>
+                </div>
+                <div style="min-width:220px; flex:1;">
+                  <label style="font-size:0.8rem; font-weight:bold;">Verknüpft mit Hauptakte</label>
+                  <select class="m-select fam-head-sel">
+                    <option value="">– Eigenständige Hauptakte –</option>
+                    ${potentialHeads.map(h => `<option value="${h.id}" ${a.familyHeadId === h.id ? "selected" : ""}>${h.personenName} (${h.herkunftsland || "-"})</option>`).join("")}
+                  </select>
+                </div>
+                <button type="button" class="m-btn btn-save-family" data-akteid="${a.id}">✓ Zuordnung speichern</button>
+                ${a.familyHeadId ? `<button type="button" class="m-btn m-btn-orange btn-promote-head" data-akteid="${a.id}">⇄ Zur Hauptakte der Familie machen</button>` : ""}
+              </div>
+            </details>
+
+            <!-- Eigener Datei- / Foto-Upload durch Supermaster -->
+            <details style="margin-top:8px; background:#f8fbff; border:1px solid #b8d4ec; border-radius:7px; padding:7px 11px;">
+              <summary style="cursor:pointer; font-weight:bold; color:#003366; font-size:0.9rem;">
+                ➕ Selbst Datei, Foto oder Notiz in diese Akte ablegen
+              </summary>
+              <div style="margin-top:9px; display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
+                <div>
+                  <label style="font-size:0.8rem; font-weight:bold;">Bereich / Unterordner</label>
+                  <select class="m-select adm-up-thema">
+                    <option value="Asylantrag & Aufenthalt">1. Asylantrag &amp; Aufenthalt</option>
+                    <option value="Arbeit & Ehrenamt">2. Arbeit &amp; Ehrenamt</option>
+                    <option value="Wohnung & Unterkunft">3. Wohnung &amp; Unterkunft</option>
+                    <option value="Fotos & Einverständnis">4. Fotos &amp; Einverständnis</option>
+                    <option value="Notizen & Sonstiges">5. Notizen &amp; Sonstiges</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.8rem; font-weight:bold;">Foto-Schutzstufe</label>
+                  <select class="m-select adm-up-perm">
+                    <option value="Stufe 0: Nur intern in der Akte">Stufe 0: Nur intern (keine Veröffentlichung)</option>
+                    <option value="Stufe 1: Nur intern im Helferkreis">Stufe 1: Nur intern im Helferkreis</option>
+                    <option value="Stufe 2: Webseite/Presse NUR anonymisiert">Stufe 2: Webseite NUR anonymisiert</option>
+                    <option value="Stufe 3: Webseite/Presse mit Foto erlaubt">Stufe 3: Webseite/Presse freigegeben</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size:0.8rem; font-weight:bold;">Bezeichnung / Notiz</label>
+                  <input type="text" class="m-input adm-up-note" placeholder="z. B. Porträtfoto, Notiz">
+                </div>
+                <div>
+                  <label style="font-size:0.8rem; font-weight:bold;">Datei(en) auswählen</label>
+                  <input type="file" class="m-input adm-up-files" multiple style="padding:5px;">
+                </div>
+                <div>
+                  <label style="font-size:0.8rem; font-weight:bold;">PDF-Option (bei großen Scans)</label>
+                  <select class="m-select adm-up-pdfmode">
+                    <option value="sw">⚫⚪ PDF verkleinern + Schwarz-Weiß</option>
+                    <option value="color">🎨 PDF verkleinern (Farbe)</option>
+                    <option value="orig">📎 Original-PDF behalten</option>
+                  </select>
+                </div>
+              </div>
+              <div style="margin-top:8px;">
+                <button type="button" class="m-btn m-btn-green btn-adm-upload" data-akteid="${a.id}">⬆ In Akte speichern</button>
+              </div>
+            </details>
+
+            <div style="margin-top:9px; padding-top:8px; border-top:1px solid #cbd5e1;">
+              <strong style="font-size:0.9rem; color:#003366;">Abgelegte Unterlagen &amp; Fotos (${dateien.length}):</strong>
+              ${dateien.length === 0
+                ? `<div style="font-size:0.86rem; color:#555; margin-top:3px;">Noch keine Dateien hochgeladen.</div>`
+                : dateien.map(df => {
+                  const permBadge = df.fotoFreigabe
+                    ? `<span class="m-badge" style="background:${df.fotoFreigabe.includes("Stufe 3") ? "#eaf6ec" : (df.fotoFreigabe.includes("Stufe 2") ? "#fff8e1" : "#ffebee")}; color:${df.fotoFreigabe.includes("Stufe 3") ? "#1b5e20" : (df.fotoFreigabe.includes("Stufe 2") ? "#b45309" : "#b71c1c")}; margin-left:4px;">🛡️ ${df.fotoFreigabe}</span>`
+                    : "";
+                  return `
+                    <div class="m-file-row">
+                      <div>
+                        <strong>${df.fileName}</strong>
+                        <span style="font-size:0.82rem; color:#555;"> (${df.bereich} · ${df.sizeKb} KB · ${df.datum})</span>
+                        ${permBadge}
+                        ${df.nachricht ? `<div style="font-size:0.85rem; color:#111; margin-top:2px;">💬 „${df.nachricht}“</div>` : ""}
+                      </div>
+                      <div style="display:flex; gap:6px;">
+                        <button type="button" class="m-btn btn-view-file" data-fid="${df.fileId}" data-fname="${df.fileName}">👁 Ansehen</button>
+                        <button type="button" class="m-btn m-btn-red btn-del-file" data-fid="${df.fileId}" data-fname="${df.fileName}">✕</button>
+                      </div>
+                    </div>
+                  `;
+                }).join("")}
+            </div>
+          </article>
+        `;
+      }
+
+      function renderAktenListe(akten) {
+        const rawQuery = (document.getElementById("ak-search").value || "").trim().toLowerCase();
+        const normQuery = normalizeTranslit(rawQuery);
+
+        const countryCounts = {};
+        akten.forEach(a => {
+          const land = (a.herkunftsland || "Ohne Landesangabe").trim();
+          countryCounts[land] = (countryCounts[land] || 0) + 1;
+        });
+
+        const chipsEl = document.getElementById("ak-country-chips");
+        const laenderSorted = Object.keys(countryCounts).sort((a, b) => a.localeCompare(b, "de"));
+        chipsEl.innerHTML = [
+          `<button type="button" class="m-chip ${selectedCountryFilter === "" ? "active" : ""}" data-land="">Alle Länder (${akten.length})</button>`,
+          ...laenderSorted.map(l =>
+            `<button type="button" class="m-chip ${selectedCountryFilter === l ? "active" : ""}" data-land="${l}">${l} (${countryCounts[l]})</button>`
+          )
+        ].join("");
+
+        chipsEl.querySelectorAll(".m-chip").forEach(ch => {
+          ch.addEventListener("click", () => {
+            selectedCountryFilter = ch.dataset.land;
+            renderAktenListe(akten);
+          });
+        });
+
+        const matchesSearch = (a) => {
+          if (!rawQuery) return true;
+          const land = (a.herkunftsland || "Ohne Landesangabe").trim();
+          const directHay = `${a.personenName || ""} ${a.aliasNamen || ""} ${land} ${a.aktenCode || ""} ${a.hauptThema || ""} ${a.notiz || ""}`.toLowerCase();
+          if (directHay.includes(rawQuery)) return true;
+          if (normQuery.length >= 2) {
+            const normName = normalizeTranslit(`${a.personenName || ""} ${a.aliasNamen || ""}`);
+            if (normName.includes(normQuery)) return true;
+          }
+          return false;
+        };
+
+        // Familienmitglieder einer Hauptakte finden
+        const childrenByHead = {};
+        const akteById = {};
+        akten.forEach(a => { akteById[a.id] = a; });
+        akten.forEach(a => {
+          if (a.familyHeadId && akteById[a.familyHeadId]) {
+            if (!childrenByHead[a.familyHeadId]) childrenByHead[a.familyHeadId] = [];
+            childrenByHead[a.familyHeadId].push(a);
+          }
+        });
+
+        // Hauptakten (inkl. zugehöriger Familienmitglieder) nach Land gruppieren
+        const groups = {};
+        akten.forEach(a => {
+          const isLinkedChild = !!(a.familyHeadId && akteById[a.familyHeadId]);
+          if (isLinkedChild) return; // Wird direkt unter der Hauptakte gerendert!
+
+          const members = childrenByHead[a.id] || [];
+          const land = (a.herkunftsland || "Ohne Landesangabe").trim();
+          if (selectedCountryFilter && land !== selectedCountryFilter && !members.some(m => (m.herkunftsland || "").trim() === selectedCountryFilter)) {
+            return;
+          }
+          if (!matchesSearch(a) && !members.some(m => matchesSearch(m))) {
+            return;
+          }
+          if (!groups[land]) groups[land] = [];
+          groups[land].push({ head: a, members: members });
+        });
+
+        const container = document.getElementById("list-akten");
+        const groupKeys = Object.keys(groups).sort((a, b) => a.localeCompare(b, "de"));
+        if (!groupKeys.length) {
+          container.innerHTML = `<div class="m-card">Keine passenden Personen-Akten gefunden.</div>`;
+          return;
+        }
+
+        const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
+
+        container.innerHTML = groupKeys.map(land => {
+          const families = groups[land].sort((x, y) => String(x.head.personenName || "").localeCompare(String(y.head.personenName || ""), "de"));
+          const totalPersons = families.reduce((sum, f) => sum + 1 + f.members.length, 0);
+          return `
+            <details class="m-country-group" open>
+              <summary class="m-country-summary">
+                <span>🌍 ${land} (${totalPersons} ${totalPersons === 1 ? "Person" : "Personen"})</span>
+                <span style="font-size:0.85rem; opacity:0.9;">▾</span>
+              </summary>
+              <div>
+                ${families.map(fam => {
+                  const headHtml = renderSingleAkteCard(fam.head, akten, false, baseDir);
+                  const sortedMembers = fam.members.sort((m1, m2) => {
+                    const order = { ehepartner: 1, kind: 2 };
+                    return (order[m1.familyRole] || 9) - (order[m2.familyRole] || 9);
+                  });
+                  const membersHtml = sortedMembers.map(m => renderSingleAkteCard(m, akten, true, baseDir)).join("");
+                  return headHtml + membersHtml;
+                }).join("")}
+              </div>
+            </details>
+          `;
+        }).join("");
+
+        // Event-Listener binden
+        container.querySelectorAll(".btn-save-family").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const box = btn.closest("details");
+            const roleVal = box.querySelector(".fam-role-sel").value;
+            const headVal = box.querySelector(".fam-head-sel").value;
+            await postAction({
+              action: "updatePersonFamilyLink",
+              akteId: btn.dataset.akteid,
+              familyRole: headVal ? roleVal : "haupt",
+              familyHeadId: headVal
+            });
+            loadMasterData(currentCode, false);
+          });
+        });
+
+        container.querySelectorAll(".btn-promote-head").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            if (!confirm("Diese Person zur neuen Hauptakte der Familie machen?")) return;
+            await postAction({
+              action: "promoteFamilyHead",
+              newHeadId: btn.dataset.akteid
+            });
+            loadMasterData(currentCode, false);
+          });
+        });
+
+        container.querySelectorAll(".btn-copy-link").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            await navigator.clipboard.writeText(`Vertraulicher Upload-Link (Freundeskreis): ${btn.dataset.link}\nZugangs-Code: ${btn.dataset.code}`);
+            btn.textContent = "✓ Kopiert!";
+            setTimeout(() => { btn.textContent = "📋 Upload-Link"; }, 2000);
+          });
+        });
+
+        container.querySelectorAll(".btn-copy-schatz").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            await navigator.clipboard.writeText(`Schatzsuche – Deine Begabungen & Träume (Freundeskreis): ${btn.dataset.link}`);
+            btn.textContent = "✓ Kopiert!";
+            setTimeout(() => { btn.textContent = "✨ Schatzsuche"; }, 2000);
+          });
+        });
+
+        container.querySelectorAll(".btn-adm-upload").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const wrap = btn.closest("details");
+            const fileInput = wrap.querySelector(".adm-up-files");
+            const rawFiles = Array.from(fileInput.files || []);
+            if (!rawFiles.length) { alert("Bitte zuerst eine Datei auswählen."); return; }
+            const task = async () => {
+              const prepared = [];
+              const pdfMode = (wrap.querySelector(".adm-up-pdfmode") && wrap.querySelector(".adm-up-pdfmode").value) || "sw";
+              for (let i = 0; i < rawFiles.length; i++) prepared.push(await readAdminFile(rawFiles[i], pdfMode));
+              const res = await postAction({
+                action: "adminUploadToCase",
+                akteId: btn.dataset.akteid,
+                thema: wrap.querySelector(".adm-up-thema").value,
+                fotoFreigabe: wrap.querySelector(".adm-up-perm").value,
+                nachricht: wrap.querySelector(".adm-up-note").value.trim(),
+                files: prepared
+              });
+              if (res && res.ok) { loadMasterData(currentCode, false); return { ok: true }; }
+              return { ok: false };
+            };
+            if (typeof window.fflwRunButtonAction === "function") {
+              await window.fflwRunButtonAction(btn, task, { loadingText: "Speichere …", successText: "✓ Gespeichert!" });
+            } else { await task(); }
+          });
+        });
+
+        container.querySelectorAll(".btn-del-akte").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            if (!confirm(`Personen-Akte „${btn.dataset.name}“ inklusive ALLER Dokumente in den Papierkorb verschieben?`)) return;
+            await postAction({ action: "deletePersonCaseOrFile", akteId: btn.dataset.id });
+            loadMasterData(currentCode, false);
+          });
+        });
+
+        container.querySelectorAll(".btn-del-file").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            if (!confirm(`Datei „${btn.dataset.fname}“ wirklich löschen?`)) return;
+            await postAction({ action: "deletePersonCaseOrFile", fileId: btn.dataset.fid });
+            loadMasterData(currentCode, false);
+          });
+        });
+
+        container.querySelectorAll(".btn-view-file").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const modal = document.getElementById("m-file-viewer-modal");
+            const body = document.getElementById("m-viewer-body");
+            const titleEl = document.getElementById("m-viewer-title");
+            const dlEl = document.getElementById("m-viewer-download");
+
+            titleEl.textContent = btn.dataset.fname;
+            body.innerHTML = `<p style="padding:20px; font-weight:bold;">Lade geschützte Datei aus Tresor …</p>`;
+            modal.style.display = "flex";
+
+            const resp = await fetch(`${WEB_APP_URL}?action=getCaseFileContent&masterCode=${encodeURIComponent(currentCode)}&fileId=${encodeURIComponent(btn.dataset.fid)}&t=${Date.now()}`, {
+              method: "GET",
+              redirect: "follow"
+            });
+            const res = await resp.json();
+            if (!res || !res.ok) {
+              body.innerHTML = `<p style="color:#c62828; font-weight:bold;">Fehler: ${res && res.error ? res.error : "Unbekannt"}</p>`;
+              return;
+            }
+
+            const dataUrl = `data:${res.mimeType};base64,${res.base64}`;
+            dlEl.href = dataUrl;
+            dlEl.download = res.fileName;
+
+            if (res.mimeType.startsWith("image/")) {
+              body.innerHTML = `<img src="${dataUrl}" alt="${res.fileName}" style="max-width:100%; max-height:74vh; border-radius:6px;">`;
+            } else if (res.mimeType === "application/pdf") {
+              body.innerHTML = `<iframe src="${dataUrl}" style="width:100%; height:74vh; border:none;"></iframe>`;
+            } else {
+              const decodedText = atob(res.base64);
+              body.innerHTML = `<pre style="text-align:left; white-space:pre-wrap; background:#fff; padding:14px; border-radius:6px;">${decodedText}</pre>`;
+            }
+          });
+        });
+      }
+
+      let lastFilteredSchatz = [];
+      
+      function renderRadListe(radData) {
+        const anfEl = document.getElementById("list-rad-anfragen");
+        const ausEl = document.getElementById("list-rad-ausgaben");
+        if (!anfEl || !ausEl) return;
+        const anfragen = (radData && Array.isArray(radData.anfragen)) ? radData.anfragen : [];
+        const ausgaben = (radData && Array.isArray(radData.ausgaben)) ? radData.ausgaben : [];
+
+        anfEl.innerHTML = `<h4 style="color:#003366; margin:14px 0 6px 0;">📋 Offene Radanfragen / Vorbestellungen (${anfragen.length})</h4>` +
+          (anfragen.length === 0
+            ? `<div class="m-card">Keine offenen Radanfragen vorhanden.</div>`
+            : anfragen.map(a => `
+              <div class="m-card" style="border-left-color:#d97706;">
+                <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px;">
+                  <div>
+                    <strong>${a.name || "Unbekannt"}</strong> ${a.personenCode ? `(Nr. ${a.personenCode})` : ""} · <strong>${a.radTyp || "Fahrrad"}</strong> (${a.groesse || "-"})
+                    <div style="font-size:0.88rem; color:#333;">Kontakt: ${a.kontakt || "-"} · Bemerkung: ${a.bemerkung || "-"}</div>
+                  </div>
+                  <button type="button" class="m-btn m-btn-green btn-rad-to-doc" data-id="${a.id}" data-name="${a.name || ""}" data-code="${a.personenCode || ""}" data-typ="${a.radTyp || ""}">→ Als ausgegeben übernehmen</button>
+                </div>
+              </div>
+            `).join(""));
+
+        ausEl.innerHTML = `<h4 style="color:#1b5e20; margin:16px 0 6px 0;">✅ Dokumentierte Fahrrad-Ausgaben (${ausgaben.length})</h4>` +
+          (ausgaben.length === 0
+            ? `<div class="m-card">Noch keine Fahrrad-Ausgaben eingetragen.</div>`
+            : ausgaben.map(g => `
+              <div class="m-card" style="border-left-color:#2e7d32;">
+                <strong>${g.datum || "-"}: ${g.name}</strong> ${g.personenCode ? `(Nr. ${g.personenCode})` : ""} → <strong>${g.fahrrad}</strong>
+                <div style="font-size:0.88rem; color:#333;">Unkostenbeitrag / Info: ${g.unkostenbeitrag || "–"}</div>
+              </div>
+            `).join(""));
+
+        anfEl.querySelectorAll(".btn-rad-to-doc").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.getElementById("rad-doc-name").value = btn.dataset.name;
+            document.getElementById("rad-doc-code").value = btn.dataset.code;
+            document.getElementById("rad-doc-bike").value = btn.dataset.typ;
+            document.getElementById("rad-doc-date").value = new Date().toISOString().slice(0, 10);
+            document.getElementById("rad-doc-name").scrollIntoView({ behavior: "smooth", block: "center" });
+          });
+        });
+      }
+
+      const radSaveBtn = document.getElementById("rad-doc-save-btn");
+      if (radSaveBtn) {
+        radSaveBtn.addEventListener("click", async () => {
+          const name = document.getElementById("rad-doc-name").value.trim();
+          const bike = document.getElementById("rad-doc-bike").value.trim();
+          const msg = document.getElementById("rad-doc-msg");
+          if (!name || !bike) { msg.style.color = "#b91c1c"; msg.textContent = "Bitte Empfänger und Fahrrad angeben."; return; }
+          radSaveBtn.disabled = true;
+          const res = await postAction({
+            action: "saveBikeHandover",
+            name: name,
+            personenCode: document.getElementById("rad-doc-code").value.trim(),
+            fahrrad: bike,
+            unkostenbeitrag: document.getElementById("rad-doc-fee").value.trim(),
+            datum: document.getElementById("rad-doc-date").value || new Date().toISOString().slice(0, 10)
+          });
+          radSaveBtn.disabled = false;
+          if (res && res.ok) {
+            msg.style.color = "#15803d";
+            msg.textContent = "✓ Gespeichert!";
+            ["rad-doc-name", "rad-doc-code", "rad-doc-bike", "rad-doc-fee"].forEach(id => { document.getElementById(id).value = ""; });
+            await loadMasterData(currentCode, false);
+          } else {
+            msg.style.color = "#b91c1c";
+            msg.textContent = (res && res.error) || "Fehler beim Speichern.";
+          }
+        });
+      }
+
+      function renderSchatzListe(liste) {
+        const q = (document.getElementById("sz-search").value || "").trim().toLowerCase();
+        const domFilter = document.getElementById("sz-domain-filter").value;
+        const lvlFilter = document.getElementById("sz-level-filter").value;
+        const normQ = normalizeTranslit(q);
+
+        const filtered = liste.filter(s => {
+          const detMap = s.domainDetails || {};
+          if (domFilter) {
+            const domObj = detMap[domFilter];
+            if (!domObj) return false;
+            if (lvlFilter && (!Array.isArray(domObj.levels) || !domObj.levels.includes(lvlFilter))) return false;
+          } else if (lvlFilter) {
+            const hasLevel = Object.values(detMap).some(d => Array.isArray(d.levels) && d.levels.includes(lvlFilter));
+            if (!hasLevel) return false;
+          }
+          if (!q) return true;
+          const domainTexts = Object.values(detMap).map(d =>
+            `${d.title || ""} ${(d.options || []).join(" ")} ${d.detail || ""}`
+          ).join(" ");
+          const hay = `${s.name || ""} ${s.herkunftsland || ""} ${s.beruf || ""} ${s.muttersprache || ""} ${s.sprachen || ""} ${s.schatzCode || ""} ${domainTexts}`.toLowerCase();
+          if (hay.includes(q)) return true;
+          if (normQ.length >= 2 && normalizeTranslit(s.name || "").includes(normQ)) return true;
+          return false;
+        });
+
+        const container = document.getElementById("list-schatz");
+        if (!filtered.length) {
+          container.innerHTML = `<div class="m-card">Keine passenden Einträge in der Schatzkiste gefunden.</div>`;
+          return;
+        }
+
+        const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
+
+        const allSchatzList = (cachedOverview && cachedOverview.schatzkiste) ? cachedOverview.schatzkiste : [];
+        const nameCountMap = {};
+        allSchatzList.forEach(item => {
+          const nn = String(item.name || "").toLowerCase().trim();
+          if (nn) nameCountMap[nn] = (nameCountMap[nn] || 0) + 1;
+        });
+        const vorschlaegeAll = allSchatzList.filter(item => item.vorschlagNeuesFeld && item.vorschlagNeuesFeld.trim());
+        const vorschlagBoxHtml = vorschlaegeAll.length ? `
+          <div class="m-card" style="border-left-color:#7c3aed; background:#faf5ff;">
+            <strong style="color:#5b21b6;">💡 Eingereichte Themen- &amp; Hobby-Vorschläge (${vorschlaegeAll.length}):</strong>
+            <ul style="margin:6px 0 0 0; padding-left:18px; font-size:0.9rem;">
+              ${vorschlaegeAll.map(v => `<li><strong>${v.name || "Anonym"}:</strong> ${v.vorschlagNeuesFeld}</li>`).join("")}
+            </ul>
+          </div>
+        ` : "";
+        lastFilteredSchatz = filtered;
+        container.innerHTML = vorschlagBoxHtml + filtered.map(s => {
+          const detMap = s.domainDetails || {};
+          const domainKeys = Object.keys(detMap);
+          const editLink = s.schatzCode ? `${baseDir}schatzsuche.html?sc=${encodeURIComponent(s.schatzCode)}` : "";
+          const mailHref = s.email
+            ? `mailto:${encodeURIComponent(s.email)}?subject=${encodeURIComponent("Einladung vom Freundeskreis Leutenbach & Winnenden")}&body=${encodeURIComponent("Hallo " + (s.name || "") + ",\n\nvielen Dank für deinen Eintrag in unserer Schatzsuche! Wir würden dich gerne einladen …")}`
+            : "";
+
+          return `
+            <div class="m-card" style="border-left-color:#b45309;">
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-start; gap:10px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  ${s.fotoDataUrl ? `<img src="${s.fotoDataUrl}" alt="${s.name}" style="width:54px; height:54px; border-radius:50%; object-fit:cover; border:2px solid #b45309; flex-shrink:0;">` : ""}
+                  <div>
+                    <strong style="font-size:1.08rem; color:#003366;">${s.name}</strong>
+                    <span class="m-badge" style="background:#e3f2fd; color:#0d47a1; margin-left:6px;">🌍 ${s.herkunftsland || "-"}</span>
+                    ${s.schatzCode ? `<span class="m-badge" style="background:#fef3c7; color:#92400e; margin-left:4px;">Schatz-Code: ${s.schatzCode}</span>` : ""}
+                    ${s.aktenCode ? `<span class="m-badge" style="background:#f3e5f5; color:#4a148c; margin-left:4px;">Akte: ${s.aktenCode}</span>` : ""}
+                  </div>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+                  <span style="font-size:0.88rem; color:#333;">Kontakt: <strong>${s.kontakt || "-"}</strong>${s.email ? ` · ${s.email}` : ""}</span>
+                  ${mailHref ? `<a href="${mailHref}" class="m-btn m-btn-green">✉️ E-Mail</a>` : ""}
+                  ${editLink ? `<button type="button" class="m-btn btn-copy-sz-edit" data-link="${editLink}" data-code="${s.schatzCode}">📋 Ergänzungs-Link</button>` : ""}
+                </div>
+              </div>
+              <div style="font-size:0.92rem; margin-top:6px;">
+                <strong>Beruf / Wunsch:</strong> ${s.beruf || "–"} · <strong>Sprachen:</strong> ${[s.muttersprache, s.sprachen].filter(Boolean).join(", ") || "–"}
+              </div>
+              ${domainKeys.map(k => {
+                const d = detMap[k];
+                const badges = (d.levels || []).map(lv => {
+                  const info = LEVEL_LABELS[lv] || { icon: "•", name: lv, bg: "#eee", fg: "#111", border: "#ccc" };
+                  return `<span class="m-badge" style="background:${info.bg}; color:${info.fg}; border:1px solid ${info.border}; margin-right:4px;">${info.icon} ${info.name}</span>`;
+                }).join("");
+                return `
+                  <div style="margin-top:8px; padding:8px 11px; background:#f8fafc; border:1px solid #cbd5e1; border-radius:7px;">
+                    <div><strong>${d.title || k}:</strong> ${badges}</div>
+                    ${(d.options && d.options.length) ? `<div style="font-size:0.88rem; color:#1e293b; margin-top:4px;">• ${d.options.join(" · ")}</div>` : ""}
+                    ${d.detail ? `<div style="font-size:0.88rem; color:#003366; margin-top:4px;">💬 <em>„${d.detail}“</em></div>` : ""}
+                  </div>
+                `;
+              }).join("")}
+              ${s.sprachniveau ? `<div style="font-size:0.86rem; color:#334155; margin-top:4px;">🗣️ <strong>Deutsch-Sprachniveau:</strong> ${s.sprachniveau}</div>` : ""}
+              ${s.vorschlagNeuesFeld ? `<div style="margin-top:6px; padding:6px 9px; background:#faf5ff; border:1px solid #d8b4fe; border-radius:6px; font-size:0.87rem; color:#5b21b6;"><strong>💡 Themen-/Hobby-Vorschlag:</strong> ${s.vorschlagNeuesFeld}</div>` : ""}
+              ${(() => {
+                const nn = String(s.name || "").toLowerCase().trim();
+                const dups = (nn && nameCountMap[nn] > 1)
+                  ? allSchatzList.filter(o => o.fileId && s.fileId && o.fileId !== s.fileId && String(o.name || "").toLowerCase().trim() === nn)
+                  : [];
+                if (!dups.length) return "";
+                return `<div style="margin-top:8px; padding:8px 10px; background:#fffbeb; border:1px solid #f59e0b; border-radius:6px; font-size:0.87rem;">
+                  <strong>⚠️ Mögliche Dublette:</strong> Zweiter Eintrag für „${s.name}“ (Code ${dups[0].schatzCode || "—"}).
+                  <button type="button" class="m-btn m-btn-warn btn-merge-sz-dup" data-keep="${s.fileId}" data-drop="${dups[0].fileId}" style="margin-left:8px; padding:4px 10px; font-size:0.83rem;">🔗 Vereinigen</button>
+                </div>`;
+              })()}
+              ${s.fileId ? `
+                <details style="margin-top:8px; font-size:0.87rem;">
+                  <summary style="cursor:pointer; font-weight:bold; color:#004080;">🌐 Deutsche Übersetzung / Team-Notiz ${s.deutscheUebersetzung ? "(vorhanden)" : ""}</summary>
+                  <div style="margin-top:6px;">
+                    <textarea class="m-textarea sz-trans-ta" data-fileid="${s.fileId}" rows="2" placeholder="Hier deutsche Übersetzung fremdsprachiger Freitexte eintragen …">${s.deutscheUebersetzung || ""}</textarea>
+                    <button type="button" class="m-btn btn-save-sz-trans" data-fileid="${s.fileId}" style="margin-top:6px; padding:5px 11px; font-size:0.84rem;">Übersetzung speichern</button>
+                  </div>
+                </details>
+              ` : ""}
+            </div>
+          `;
+        }).join("");
+
+        container.querySelectorAll(".btn-merge-sz-dup").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            if (!confirm("Möchtest du beide Einträge zu einem vollständigen Datensatz vereinigen?")) return;
+            btn.disabled = true;
+            btn.textContent = "⏳ Vereinige …";
+            const res = await postMasterAction("mergeTreasureEntries", { keepFileId: btn.dataset.keep, dropFileId: btn.dataset.drop });
+            if (res && res.ok) await loadMasterOverview();
+            else alert((res && res.error) || "Vereinigen fehlgeschlagen.");
+          });
+        });
+
+        container.querySelectorAll(".btn-save-sz-trans").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const fid = btn.dataset.fileid;
+            const ta = container.querySelector(`.sz-trans-ta[data-fileid="${fid}"]`);
+            btn.disabled = true;
+            btn.textContent = "⏳ Speichere …";
+            const res = await postMasterAction("saveTreasureTranslation", { fileId: fid, translationText: ta ? ta.value : "" });
+            btn.disabled = false;
+            btn.textContent = (res && res.ok) ? "✓ Gespeichert!" : "Fehler";
+          });
+        });
+
+        container.querySelectorAll(".btn-copy-sz-edit").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            await navigator.clipboard.writeText(`Schatzsuche weiterbearbeiten & ergänzen (Freundeskreis):\n${btn.dataset.link}\nDein Schatzsuche-Code: ${btn.dataset.code}`);
+            btn.textContent = "✓ Kopiert!";
+            setTimeout(() => { btn.textContent = "📋 Ergänzungs-Link"; }, 2000);
+          });
+        });
+      }
+
+      document.getElementById("sz-search").addEventListener("input", () => {
+        if (currentData && currentData.schatzkiste) renderSchatzListe(currentData.schatzkiste);
+      });
+      document.getElementById("sz-domain-filter").addEventListener("change", () => {
+        if (currentData && currentData.schatzkiste) renderSchatzListe(currentData.schatzkiste);
+      });
+      document.getElementById("sz-level-filter").addEventListener("change", () => {
+        if (currentData && currentData.schatzkiste) renderSchatzListe(currentData.schatzkiste);
+      });
+      document.getElementById("sz-invite-filtered-btn").addEventListener("click", () => {
+        const emails = Array.from(new Set(lastFilteredSchatz.map(x => String(x.email || "").trim()).filter(e => e.includes("@"))));
+        if (!emails.length) {
+          alert("In der aktuellen Filter-Auswahl sind keine E-Mail-Adressen hinterlegt.");
+          return;
+        }
+        const subject = encodeURIComponent("Einladung vom Freundeskreis Flüchtlinge Leutenbach & Winnenden");
+        const body = encodeURIComponent("Hallo zusammen,\n\nwir freuen uns über euer Interesse in unserer Schatzsuche und möchten euch herzlich einladen …");
+        window.location.href = `mailto:?bcc=${encodeURIComponent(emails.join(","))}&subject=${subject}&body=${body}`;
+      });
+
+      document.getElementById("sz-copy-link-btn").addEventListener("click", async function () {
+        const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
+        await navigator.clipboard.writeText(`${baseDir}schatzsuche.html`);
+        this.textContent = "✓ Link kopiert!";
+        setTimeout(() => { this.textContent = "📋 Link zur Schatzsuche kopieren"; }, 2000);
+      });
+
+      document.getElementById("m-viewer-close").addEventListener("click", () => {
+        document.getElementById("m-file-viewer-modal").style.display = "none";
+        document.getElementById("m-viewer-body").innerHTML = "";
+      });
+
+      document.getElementById("ak-search").addEventListener("input", () => {
+        if (currentData && currentData.personenAkten) renderAktenListe(currentData.personenAkten);
+      });
+
+      document.getElementById("ak-create-btn").addEventListener("click", async function () {
+        const name = document.getElementById("ak-new-name").value.trim();
+        const land = document.getElementById("ak-new-land").value.trim() || "Ohne Landesangabe";
+        const msgEl = document.getElementById("ak-create-msg");
+        if (!name) { msgEl.style.color = "#c62828"; msgEl.textContent = "Bitte Name oder Kürzel angeben."; return; }
+
+        const parentId = document.getElementById("ak-new-parent").value;
+        let roleVal = document.getElementById("ak-new-role").value;
+        if (!parentId) roleVal = "haupt";
+
+        const task = async () => {
+          const res = await postAction({
+            action: "createPersonCase",
+            herkunftsland: land,
+            personenName: name,
+            familyRole: roleVal,
+            familyHeadId: parentId,
+            aliasNamen: document.getElementById("ak-new-alias").value.trim(),
+            hauptThema: document.getElementById("ak-new-thema").value,
+            telefon: document.getElementById("ak-new-tel").value.trim(),
+            notiz: document.getElementById("ak-new-notiz").value.trim()
+          });
+          if (res && res.ok) {
+            document.getElementById("ak-new-name").value = "";
+            document.getElementById("ak-new-alias").value = "";
+            document.getElementById("ak-new-tel").value = "";
+            document.getElementById("ak-new-notiz").value = "";
+            msgEl.style.color = "#1b5e20";
+            msgEl.textContent = `✓ Akte angelegt (${land})! Einwurf-Code: ${res.akte.aktenCode}`;
+            loadMasterData(currentCode, false);
+            return { ok: true };
+          }
+          msgEl.style.color = "#c62828";
+          msgEl.textContent = "Fehler: " + (res && res.error ? res.error : "Unbekannt");
+          return { ok: false };
+        };
+        if (typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(this, task, { loadingText: "Erstelle Akte …", successText: "✓ Angelegt!" });
+        } else { await task(); }
+      });
+
+      async function renderSystemConfig(data) {
+        const cfg = data.siteConfig || {};
+        const codes = data.teamCodes || {};
+        document.getElementById("sys-zugangscode").value = cfg.zugangscode || "";
+        document.getElementById("sys-code-master").value = codes.master || "";
+        document.getElementById("sys-code-team").value = codes.freischalter || "";
+        document.getElementById("sys-code-koord").value = codes.koordinator || "";
+        document.getElementById("sys-code-copilot").value = codes.copilot || "";
+        if (document.getElementById("sys-code-kiimport")) document.getElementById("sys-code-kiimport").value = codes.kiimport || "FFLW-KI";
+        if (document.getElementById("sys-code-rad")) document.getElementById("sys-code-rad").value = codes.radwerkstatt || "FFLW-RAD";
+        if (document.getElementById("sys-code-ideen")) document.getElementById("sys-code-ideen").value = codes.ideen || "FFLW-IDEEN";
+        if (document.getElementById("sys-code-schatz")) document.getElementById("sys-code-schatz").value = codes.schatzkiste || "FFLW-SCHATZ";
+        document.getElementById("sys-flaggen").value = cfg.flaggenStil || "A";
+
+        const wartungSet = new Set(cfg.wartungSeiten || []);
+        const hiddenSet = new Set(cfg.versteckteSeiten || ["unterlagen.html"]);
+        const maskSet = new Set(cfg.maskierteSeiten || ["unterlagen.html", "master.html"]);
+
+        const dyn = (typeof window.fetchFflwDynamicPages === "function")
+          ? await window.fetchFflwDynamicPages(cfg.versteckteSeiten)
+          : { pages: [] };
+
+        const tbody = document.getElementById("sys-pages-tbody");
+        tbody.innerHTML = dyn.pages.map(p => `
+          <tr>
+            <td><code>${p.file}</code></td>
+            <td>${p.title}</td>
+            <td><input type="checkbox" class="chk-wartung" data-file="${p.file}" ${wartungSet.has(p.file) ? "checked" : ""}></td>
+            <td><input type="checkbox" class="chk-hidden" data-file="${p.file}" ${hiddenSet.has(p.file) ? "checked" : ""}></td>
+            <td><input type="checkbox" class="chk-mask" data-file="${p.file}" ${maskSet.has(p.file) ? "checked" : ""}></td>
+          </tr>
+        `).join("");
+      }
+
+      document.getElementById("sys-save-btn").addEventListener("click", async function () {
+        const msgEl = document.getElementById("sys-save-msg");
+        const wartungSeiten = Array.from(document.querySelectorAll(".chk-wartung:checked")).map(c => c.dataset.file);
+        const versteckteSeiten = Array.from(document.querySelectorAll(".chk-hidden:checked")).map(c => c.dataset.file);
+        const maskierteSeiten = Array.from(document.querySelectorAll(".chk-mask:checked")).map(c => c.dataset.file);
+
+        const task = async () => {
+          const res = await postAction({
+            action: "save_site_status",
+            zugangscode: document.getElementById("sys-zugangscode").value.trim(),
+            teamCodes: {
+              master: document.getElementById("sys-code-master").value.trim(),
+              freischalter: document.getElementById("sys-code-team").value.trim(),
+              koordinator: document.getElementById("sys-code-koord").value.trim(),
+              copilot: document.getElementById("sys-code-copilot").value.trim(),
+              kiimport: document.getElementById("sys-code-kiimport") ? document.getElementById("sys-code-kiimport").value.trim() : "FFLW-KI",
+              radwerkstatt: document.getElementById("sys-code-rad") ? document.getElementById("sys-code-rad").value.trim() : "FFLW-RAD",
+              ideen: document.getElementById("sys-code-ideen") ? document.getElementById("sys-code-ideen").value.trim() : "FFLW-IDEEN",
+              schatzkiste: document.getElementById("sys-code-schatz") ? document.getElementById("sys-code-schatz").value.trim() : "FFLW-SCHATZ"
+            },
+            flaggenStil: document.getElementById("sys-flaggen").value,
+            wartungSeiten: wartungSeiten,
+            versteckteSeiten: versteckteSeiten,
+            maskierteSeiten: maskierteSeiten
+          });
+          if (res && res.ok) {
+            msgEl.style.color = "#1b5e20";
+            msgEl.textContent = "✓ Alle Einstellungen gespeichert!";
+            return { ok: true };
+          }
+          msgEl.style.color = "#c62828";
+          msgEl.textContent = "Fehler beim Speichern.";
+          return { ok: false };
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(this, task, { loadingText: "Speichere …", successText: "✓ Gespeichert!" });
+        } else { await task(); }
+      });
+
+      document.getElementById("m-release-all-btn").addEventListener("click", async function () {
+        if (!confirm("Wirklich ALLE reservierten Artikel wieder öffentlich freigeben?")) return;
+        await postAction({ action: "admin_release_all" });
+        loadMasterData(currentCode, false);
+      });
+
+
+      function renderIdeenTafelMaster(liste) {
+        const arr = Array.isArray(liste) ? liste : [];
+        const cntEl = document.getElementById("cnt-ideentafel");
+        const container = document.getElementById("list-ideentafel");
+        if (cntEl) cntEl.textContent = arr.length;
+        if (!container) return;
+        if (!arr.length) {
+          container.innerHTML = "<div class='m-card'><p>Noch keine Beiträge auf der Ideen- &amp; Lob-Tafel.</p></div>";
+          return;
+        }
+        container.innerHTML = arr.map(it => {
+          const isPublic = it.status === "freigegeben";
+          return `
+            <div class="m-card" style="border-left-color:${isPublic ? "#16a34a" : "#d97706"};">
+              <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px;">
+                <div>
+                  <span class="m-badge" style="background:${isPublic ? "#dcfce7; color:#166534;" : "#fef3c7; color:#92400e;"}">${isPublic ? "🌐 Öffentlich" : "⏳ Neu / Wartet auf Freigabe"}</span>
+                  <span class="m-badge" style="background:#e0e7ff; color:#1e3a8a; margin-left:4px;">${it.typ || "Idee"}</span>
+                  <strong style="margin-left:6px; font-size:1.05rem;">${it.titel || "Ohne Titel"}</strong>
+                </div>
+                <div style="font-size:0.86rem; color:#475569;">
+                  von <strong>${it.autor || "Anonym"}</strong>${it.personenCode ? ` · Personen-Nr.: <strong>${it.personenCode}</strong>` : ""}
+                </div>
+              </div>
+              <p style="margin:8px 0; white-space:pre-line;">${it.text || ""}</p>
+              <div style="margin-top:8px;">
+                <label style="font-size:0.84rem; font-weight:bold;">Offizielle Antwort vom Freundeskreis (erscheint öffentlich unter dem Beitrag):</label>
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:4px;">
+                  <input type="text" class="m-input it-adm-reply" data-fid="${it.fileId}" value="${String(it.antwortTeam || "").replace(/"/g, "&quot;")}" placeholder="Optional: Antwort oder Rückmeldung des Teams …" style="flex:1; min-width:240px;">
+                  <button type="button" class="m-btn m-btn-green btn-it-publish" data-fid="${it.fileId}">🌐 Freigeben &amp; Antwort speichern</button>
+                  ${isPublic ? `<button type="button" class="m-btn m-btn-grey btn-it-hide" data-fid="${it.fileId}">Verbergen</button>` : ""}
+                  <button type="button" class="m-btn m-btn-red btn-it-del" data-fid="${it.fileId}">🗑 Löschen</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        container.querySelectorAll(".btn-it-publish").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const fid = btn.dataset.fid;
+            const replyInp = container.querySelector(`.it-adm-reply[data-fid="${fid}"]`);
+            await postAction({ action: "manageIdeaWallEntry", fileId: fid, status: "freigegeben", antwortTeam: replyInp ? replyInp.value : "" });
+            loadMasterData(currentCode, false);
+          });
+        });
+        container.querySelectorAll(".btn-it-hide").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            await postAction({ action: "manageIdeaWallEntry", fileId: btn.dataset.fid, status: "neu" });
+            loadMasterData(currentCode, false);
+          });
+        });
+        container.querySelectorAll(".btn-it-del").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            if (!confirm("Diesen Beitrag wirklich löschen?")) return;
+            await postAction({ action: "manageIdeaWallEntry", fileId: btn.dataset.fid, mode: "delete" });
+            loadMasterData(currentCode, false);
+          });
+        });
+      }
+
+      // =====================================================================
+      // WOHNUNGS-IMPORT & KI-GRÖSSENSCHÄTZUNG (VARIANTE B)
+      // =====================================================================
+      let kiLoadedPhotos = []; // [{ name, dataUrl, base64, mimeType }]
+      let kiDetectedItems = []; // [{ selected, titel, kategorie, beschreibung, masse, bildIndex }]
+
+      const kiKeyInput = document.getElementById("ki-gemini-key");
+      try {
+        const savedKey = localStorage.getItem("fflw_gemini_api_key");
+        if (savedKey) kiKeyInput.value = savedKey;
+      } catch (e) {}
+
+      function compressKiPhoto(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = ev => {
+            const img = new Image();
+            img.onload = () => {
+              // Für Google Drive Speicherung (1024px) & für schnelle KI-Analyse (768px) aufbereiten -> kein NetworkError!
+              const makeScaled = (maxDim, quality) => {
+                let w = img.width, h = img.height;
+                if (w > maxDim || h > maxDim) {
+                  if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                  else { w = Math.round(w * maxDim / h); h = maxDim; }
+                }
+                const c = document.createElement("canvas");
+                c.width = w; c.height = h;
+                c.getContext("2d").drawImage(img, 0, 0, w, h);
+                return c.toDataURL("image/jpeg", quality);
+              };
+              const dataUrl = makeScaled(1024, 0.80);
+              const aiDataUrl = makeScaled(768, 0.72);
+              resolve({
+                name: file.name,
+                dataUrl: dataUrl,
+                mimeType: "image/jpeg",
+                base64: dataUrl.split(",")[1],
+                aiBase64: aiDataUrl.split(",")[1]
+              });
+            };
+            img.onerror = reject;
+            img.src = ev.target.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      document.getElementById("ki-drive-import-btn").addEventListener("click", async function () {
+        const q = document.getElementById("ki-drive-folder").value.trim();
+        const st = document.getElementById("ki-drive-status");
+        if (!q) { st.style.color = "#b91c1c"; st.textContent = "Bitte Drive-Ordner-Link oder Namen eingeben."; return; }
+        const orig = this.textContent;
+        this.disabled = true;
+        this.textContent = "⏳ Lade Bilder …";
+        st.style.color = "#b45309";
+        st.textContent = "⏳ Suche Bilder im Drive-Ordner …";
+        try {
+          const res = await postMasterAction("importPhotosFromDriveFolder", { folderQuery: q });
+          this.disabled = false;
+          this.textContent = orig;
+          if (!res || !res.ok) throw new Error((res && res.error) || "Fehler beim Laden.");
+          const arr = res.photos || [];
+          if (!arr.length) {
+            st.style.color = "#b45309";
+            st.textContent = `Im Ordner „${res.folderName}“ wurden keine Bilddateien gefunden.`;
+            return;
+          }
+          const thumbsEl = document.getElementById("ki-thumbs-grid");
+          const countEl = document.getElementById("ki-photos-count");
+          for (const p of arr) {
+            const respBlob = await fetch(`data:${p.mimeType};base64,${p.base64}`);
+            const blob = await respBlob.blob();
+            const file = new File([blob], p.name, { type: p.mimeType });
+            kiLoadedPhotos.push(await compressKiPhoto(file));
+          }
+          countEl.textContent = `${kiLoadedPhotos.length} Bild(er) bereit`;
+          thumbsEl.innerHTML = kiLoadedPhotos.map((p, idx) => `
+            <div style="border:1px solid #cbd5e1; border-radius:6px; padding:4px; background:#f8fafc; text-align:center; width:96px;">
+              <img src="${p.dataUrl}" alt="Bild ${idx + 1}" style="width:86px; height:64px; object-fit:cover; border-radius:4px;">
+              <div style="font-size:0.75rem; color:#475569; margin-top:2px;">Bild ${idx + 1}</div>
+            </div>
+          `).join("");
+          st.style.color = "#15803d";
+          st.textContent = `✓ ${arr.length} Foto(s) aus „${res.folderName}“ hinzugefügt!`;
+        } catch (err) {
+          this.disabled = false;
+          this.textContent = orig;
+          st.style.color = "#b91c1c";
+          st.textContent = "Fehler: " + err.message;
+        }
+      });
+
+      document.getElementById("ki-photos-input").addEventListener("change", async function () {
+        const files = Array.from(this.files || []);
+        if (!files.length) return;
+        const countEl = document.getElementById("ki-photos-count");
+        const thumbsEl = document.getElementById("ki-thumbs-grid");
+        countEl.textContent = "Verarbeite Bilder …";
+        kiLoadedPhotos = [];
+        for (let i = 0; i < files.length; i++) {
+          kiLoadedPhotos.push(await compressKiPhoto(files[i]));
+        }
+        countEl.textContent = `${kiLoadedPhotos.length} Bild(er) bereit`;
+        thumbsEl.innerHTML = kiLoadedPhotos.map((p, idx) => `
+          <div style="border:1px solid #cbd5e1; border-radius:6px; padding:4px; background:#f8fafc; text-align:center; width:96px;">
+            <img src="${p.dataUrl}" alt="Bild ${idx + 1}" style="width:86px; height:64px; object-fit:cover; border-radius:4px;">
+            <div style="font-size:0.75rem; font-weight:bold; color:#003366;">Bild #${idx + 1}</div>
+          </div>
+        `).join("");
+        renderKiPreviewTable();
+      });
+
+      function renderKiPreviewTable() {
+        const card = document.getElementById("ki-preview-card");
+        const listEl = document.getElementById("ki-items-list");
+        const cntEl = document.getElementById("ki-items-count");
+        if (!kiDetectedItems.length) {
+          card.style.display = "none";
+          return;
+        }
+        card.style.display = "block";
+        cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
+
+        const photoOptionsHtml = (selIdx) => {
+          const opts = [`<option value="0" ${!selIdx ? "selected" : ""}>– Kein Foto –</option>`];
+          kiLoadedPhotos.forEach((p, i) => {
+            const num = i + 1;
+            opts.push(`<option value="${num}" ${Number(selIdx) === num ? "selected" : ""}>Bild #${num} (${p.name.substring(0, 18)})</option>`);
+          });
+          return opts.join("");
+        };
+
+        listEl.innerHTML = kiDetectedItems.map((item, idx) => {
+          const pIdx = Number(item.bildIndex || 0);
+          const thumbHtml = (pIdx >= 1 && kiLoadedPhotos[pIdx - 1])
+            ? `<img src="${kiLoadedPhotos[pIdx - 1].dataUrl}" style="width:90px; height:70px; object-fit:cover; border-radius:6px; border:1px solid #94a3b8;">`
+            : `<div style="width:90px; height:70px; background:#f1f5f9; border:1px dashed #94a3b8; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#64748b;">Ohne Bild</div>`;
+
+          return `
+            <div class="m-card" style="padding:12px 14px; margin:10px 0; border-left-color:${item.selected !== false ? "#2e7d32" : "#94a3b8"}; background:${item.selected !== false ? "#ffffff" : "#f8fafc"};">
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                  <label style="font-size:0.82rem; font-weight:bold; cursor:pointer;">
+                    <input type="checkbox" class="ki-row-chk" data-idx="${idx}" ${item.selected !== false ? "checked" : ""}> Übernehmen
+                  </label>
+                  ${thumbHtml}
+                </div>
+                <div style="flex:1; min-width:250px; display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Artikel-Titel *</label>
+                    <input type="text" class="m-input ki-row-titel" data-idx="${idx}" value="${String(item.titel || "").replace(/"/g, "&quot;")}">
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Kategorie</label>
+                    <select class="m-select ki-row-kat" data-idx="${idx}">
+                      ${["Wohnzimmer", "Schlafzimmer", "Küche & Haushalt", "Kinderzimmer", "Elektro & Technik", "Garten & Fahrrad", "Sonstiges"].map(k =>
+                        `<option value="${k}" ${item.kategorie === k ? "selected" : ""}>${k}</option>`
+                      ).join("")}
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Geschätzte Maße (ca. B × T × H)</label>
+                    <input type="text" class="m-input ki-row-masse" data-idx="${idx}" value="${String(item.masse || "").replace(/"/g, "&quot;")}" placeholder="z. B. ca. 180 x 90 x 75 cm">
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Zugeordnetes Foto</label>
+                    <select class="m-select ki-row-bild" data-idx="${idx}">${photoOptionsHtml(pIdx)}</select>
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <label style="font-size:0.78rem; font-weight:bold;">Beschreibung &amp; Zustand</label>
+                    <input type="text" class="m-input ki-row-beschr" data-idx="${idx}" value="${String(item.beschreibung || "").replace(/"/g, "&quot;")}">
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        listEl.querySelectorAll(".ki-row-chk").forEach(el => {
+          el.addEventListener("change", () => {
+            kiDetectedItems[Number(el.dataset.idx)].selected = el.checked;
+            cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
+          });
+        });
+        listEl.querySelectorAll(".ki-row-titel").forEach(el => {
+          el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].titel = el.value; });
+        });
+        listEl.querySelectorAll(".ki-row-kat").forEach(el => {
+          el.addEventListener("change", () => { kiDetectedItems[Number(el.dataset.idx)].kategorie = el.value; });
+        });
+        listEl.querySelectorAll(".ki-row-masse").forEach(el => {
+          el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].masse = el.value; });
+        });
+        listEl.querySelectorAll(".ki-row-beschr").forEach(el => {
+          el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].beschreibung = el.value; });
+        });
+        listEl.querySelectorAll(".ki-row-bild").forEach(el => {
+          el.addEventListener("change", () => {
+            kiDetectedItems[Number(el.dataset.idx)].bildIndex = Number(el.value);
+            renderKiPreviewTable();
+          });
+        });
+      }
+
+      
+      document.getElementById("ki-reset-next-apt-btn").addEventListener("click", () => {
+        kiLoadedPhotos = [];
+        kiDetectedItems = [];
+        const pInp = document.getElementById("ki-photos-input");
+        if (pInp) pInp.value = "";
+        const dInp = document.getElementById("ki-drive-folder");
+        if (dInp) dInp.value = "";
+        const dSt = document.getElementById("ki-drive-status");
+        if (dSt) dSt.textContent = "";
+        const sMsg = document.getElementById("ki-status-msg");
+        if (sMsg) sMsg.textContent = "";
+        const iMsg = document.getElementById("ki-import-msg");
+        if (iMsg) iMsg.textContent = "";
+        const cEl = document.getElementById("ki-photos-count");
+        if (cEl) cEl.textContent = "0 Bilder geladen";
+        const tEl = document.getElementById("ki-thumbs-grid");
+        if (tEl) tEl.innerHTML = "";
+        const rawJ = document.getElementById("ki-raw-json");
+        if (rawJ) rawJ.value = "";
+        ["ki-spender", "ki-ort", "ki-telefon"].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.value = "";
+        });
+        renderKiPreviewTable();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // Hilfsfunktion: Einzelgegenstand per box_2d [ymin, xmin, ymax, xmax] (0..1000) aus Raumfoto ausschneiden
+      function cropPhotoByBox2d(photoObj, box2d) {
+        return new Promise((resolve) => {
+          if (!photoObj || !Array.isArray(box2d) || box2d.length !== 4) {
+            resolve(null);
+            return;
+          }
+          const [ymin, xmin, ymax, xmax] = box2d.map(Number);
+          if ([ymin, xmin, ymax, xmax].some(v => isNaN(v)) || ymax <= ymin || xmax <= xmin) {
+            resolve(null);
+            return;
+          }
+          const img = new Image();
+          img.onload = function () {
+            try {
+              const pad = 35; // 3.5% Sicherheitsrand rund ums Möbelstück
+              const y1 = Math.max(0, (ymin - pad) / 1000) * img.naturalHeight;
+              const x1 = Math.max(0, (xmin - pad) / 1000) * img.naturalWidth;
+              const y2 = Math.min(1, (ymax + pad) / 1000) * img.naturalHeight;
+              const x2 = Math.min(1, (xmax + pad) / 1000) * img.naturalWidth;
+              const cw = Math.max(80, Math.round(x2 - x1));
+              const ch = Math.max(80, Math.round(y2 - y1));
+
+              const canvas = document.createElement("canvas");
+              const scale = Math.min(1, 1000 / Math.max(cw, ch));
+              canvas.width = Math.round(cw * scale);
+              canvas.height = Math.round(ch * scale);
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, x1, y1, cw, ch, 0, 0, canvas.width, canvas.height);
+              const dataUrl = canvas.toDataURL("image/jpeg", 0.86);
+              resolve({
+                dataUrl: dataUrl,
+                base64: dataUrl.split(",")[1],
+                mimeType: "image/jpeg"
+              });
+            } catch (e) {
+              resolve(null);
+            }
+          };
+          img.onerror = () => resolve(null);
+          img.src = photoObj.dataUrl;
+        });
+      }
+
+      const saveKeyBackendBtn = document.getElementById("ki-save-key-backend-btn");
+      if (saveKeyBackendBtn) {
+        saveKeyBackendBtn.addEventListener("click", async function () {
+          const apiKey = kiKeyInput.value.trim();
+          const statusEl = document.getElementById("ki-status-msg");
+          try { localStorage.setItem("fflw_gemini_api_key", apiKey); } catch (e) {}
+          this.disabled = true;
+          const res = await postAction({ action: "saveGeminiApiKey", apiKey: apiKey });
+          this.disabled = false;
+          if (res && res.ok) {
+            statusEl.style.color = "#15803d";
+            statusEl.textContent = apiKey ? "✓ API-Key dauerhaft im Google Script gespeichert!" : "✓ API-Key im Script gelöscht.";
+          } else {
+            statusEl.style.color = "#b91c1c";
+            statusEl.textContent = "Fehler: " + ((res && res.error) || "Speichern fehlgeschlagen");
+          }
+        });
+      }
+
+      document.getElementById("ki-analyze-btn").addEventListener("click", async function () {
+        const apiKey = kiKeyInput.value.trim();
+        const statusEl = document.getElementById("ki-status-msg");
+        if (!kiLoadedPhotos.length) {
+          statusEl.style.color = "#c62828";
+          statusEl.textContent = "Bitte zuerst mindestens ein Foto auswählen.";
+          return;
+        }
+        if (!apiKey) {
+          statusEl.style.color = "#c62828";
+          statusEl.textContent = "Bitte Gemini API-Key eingeben.";
+          return;
+        }
+        try { localStorage.setItem("fflw_gemini_api_key", apiKey); } catch (e) {}
+
+        const task = async () => {
+          // Paketweise (max. 4 komprimierte Bilder pro Anfrage), damit auf Handy & Notebook kein NetworkError auftritt!
+          const batchSize = 4;
+          const totalBatches = Math.ceil(kiLoadedPhotos.length / batchSize);
+          const allParsed = [];
+          // Verfügbare Gemini-Vision-Modelle automatisch beim API-Key abfragen (nie wieder "model not found"!)
+          let candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-flash-latest"];
+          try {
+            const listResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
+            if (listResp.ok) {
+              const listData = await listResp.json();
+              const valid = (listData.models || [])
+                .filter(mod => Array.isArray(mod.supportedGenerationMethods) && mod.supportedGenerationMethods.includes("generateContent"))
+                .map(mod => String(mod.name || "").replace(/^models\//, ""))
+                .filter(name => name.includes("gemini") && !name.includes("embedding") && !name.includes("tts") && !name.includes("imagen"));
+              if (valid.length) {
+                const preferred = valid.filter(n => n.includes("flash") && !n.includes("8b"));
+                const others = valid.filter(n => !preferred.includes(n));
+                candidateModels = [...preferred, ...others];
+              }
+            }
+          } catch (e) {}
+
+          for (let b = 0; b < totalBatches; b++) {
+            const startIdx = b * batchSize;
+            const slice = kiLoadedPhotos.slice(startIdx, startIdx + batchSize);
+            statusEl.style.color = "#312e81";
+            statusEl.textContent = totalBatches > 1
+              ? `⏳ KI analysiert Bild-Paket ${b + 1} von ${totalBatches} (Bilder #${startIdx + 1}–#${startIdx + slice.length}) …`
+              : "⏳ KI analysiert Bilder, gruppiert gleiche Artikel & schätzt Maße …";
+
+            const parts = [
+              {
+                text:
+                  "Du hilfst einem ehrenamtlichen Flüchtlings-Freundeskreis bei der Wohnungsausstattung. " +
+                  "Analysiere die folgenden Wohnungsbilder (nummeriert mit ihren exakten Bildnummern). " +
+                  "Liste ALLE gut erkennbaren, sinnvollen Möbelstücke, Haushaltsgeräte und Einrichtungsgegenstände auf. " +
+                  "WICHTIG 1 (Mehrere Fotos desselben Artikels zusammenfassen): Wenn dasselbe Möbelstück auf mehreren Bildern aus verschiedenen Blickwinkeln oder mit Detail-/Innenansicht zu sehen ist (z. B. Bild #1 und Bild #2 zeigen denselben Schrank), fasse sie als EINEN gemeinsamen Eintrag zusammen und gib ALLE dazugehörigen Bildnummern im Array 'bildIndizes' an (z. B. [1, 2])! " +
+                  "WICHTIG 2 (Sets zusammenfassen): Wenn mehrere identische Gegenstände zusammengehören (z. B. 6 gleiche Stühle), fasse sie als EINEN Eintrag mit Stückzahl im Titel zusammen (z. B. '6× Esszimmerstuhl'). " +
+                  "WICHTIG 3: Gib für die Hauptansicht ('bildIndex') die Bounding-Box im Bild an als 'box_2d': [ymin, xmin, ymax, xmax] (normiert auf 0 bis 1000). " +
+                  "Schätze außerdem realistische ungefähre Außenmaße im Format 'ca. B x T x H cm'. " +
+                  "Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array ohne Markdown-Blöcke in diesem Schema: " +
+                  '[{"titel":"...","kategorie":"Wohnzimmer|Schlafzimmer|Küche & Haushalt|Kinderzimmer|Elektro & Technik|Garten & Fahrrad|Sonstiges","beschreibung":"...","masse":"ca. ... cm","bildIndex":1,"bildIndizes":[1,2],"box_2d":[100,150,850,700]}]'
+              }
+            ];
+
+            slice.forEach((p, localIdx) => {
+              const globalNum = startIdx + localIdx + 1;
+              parts.push({ text: `Bild #${globalNum}:` });
+              parts.push({ inline_data: { mime_type: "image/jpeg", data: p.aiBase64 || p.base64 } });
+            });
+
+            let data = null;
+            let resp = { ok: false };
+            let lastNetErr = "";
+            for (const modelName of candidateModels) {
+              try {
+                resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    contents: [{ parts: parts }],
+                    generationConfig: { temperature: 0.2 }
+                  })
+                });
+                data = await resp.json();
+                if (resp.ok && data && data.candidates && data.candidates[0]) break;
+              } catch (netErr) {
+                lastNetErr = netErr.message || "Netzwerkfehler";
+              }
+            }
+            if (!resp.ok || !data || !data.candidates || !data.candidates[0]) {
+              const errMsg = (data && data.error && data.error.message) ? data.error.message : (lastNetErr || "KI-Anfrage fehlgeschlagen.");
+              statusEl.style.color = "#c62828";
+              statusEl.textContent = "Fehler: " + errMsg;
+              return { ok: false };
+            }
+
+            let rawText = data.candidates[0].content.parts.map(pt => pt.text || "").join("").trim();
+            rawText = rawText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+            const parsed = JSON.parse(rawText);
+            if (Array.isArray(parsed)) {
+              allParsed.push(...parsed);
+            }
+          }
+
+          const enriched = [];
+          for (const x of allParsed) {
+            const rawList = Array.isArray(x.bildIndizes) && x.bildIndizes.length
+              ? x.bildIndizes.map(n => Number(n)).filter(n => n >= 1 && n <= kiLoadedPhotos.length)
+              : [];
+            const primaryIdx = Number(x.bildIndex || rawList[0] || 1);
+            const uniqueIndices = Array.from(new Set([primaryIdx, ...rawList].filter(n => n >= 1 && n <= kiLoadedPhotos.length)));
+
+            const photoObj = (primaryIdx >= 1 && kiLoadedPhotos[primaryIdx - 1]) ? kiLoadedPhotos[primaryIdx - 1] : null;
+            // Einzel-Ausschnitt nur dann vorschlagen, wenn nur 1 Foto zugeordnet ist (bei mehreren Fotos eines Artikels direkt die Originalfotos behalten)
+            const cropped = (uniqueIndices.length <= 1) ? await cropPhotoByBox2d(photoObj, x.box_2d) : null;
+
+            enriched.push({
+              selected: true,
+              titel: x.titel || "Gegenstand",
+              kategorie: x.kategorie || "Sonstiges",
+              beschreibung: x.beschreibung || "",
+              masse: x.masse || "",
+              bildIndex: primaryIdx,
+              bildIndizes: uniqueIndices.length ? uniqueIndices : (primaryIdx ? [primaryIdx] : []),
+              useCrop: !!cropped,
+              croppedPhoto: cropped
+            });
+          }
+          kiDetectedItems = enriched;
+
+          statusEl.style.color = "#1b5e20";
+          statusEl.textContent = `✓ ${kiDetectedItems.length} Artikel erkannt (zusammengehörige Fotos wurden gebündelt)!`;
+          renderKiPreviewTable();
+          return { ok: true };
+        };
+
+        try {
+          if (typeof window.fflwRunButtonAction === "function") {
+            await window.fflwRunButtonAction(this, task, { loadingText: "KI analysiert …", successText: "✓ Fertig!" });
+          } else {
+            await task();
+          }
+        } catch (err) {
+          statusEl.style.color = "#c62828";
+          statusEl.textContent = "Fehler: " + err.message;
+        }
+      });
+
+      function parseBildIndizesStr(strVal) {
+        return Array.from(new Set(
+          String(strVal || "")
+            .split(/[,;\s]+/)
+            .map(s => Number(s.replace(/[^\d]/g, "")))
+            .filter(n => n >= 1 && n <= kiLoadedPhotos.length)
+        ));
+      }
+
+      function renderKiPreviewTable() {
+        const card = document.getElementById("ki-preview-card");
+        const listEl = document.getElementById("ki-items-list");
+        const cntEl = document.getElementById("ki-items-count");
+        if (!kiDetectedItems.length) {
+          card.style.display = "none";
+          return;
+        }
+        card.style.display = "block";
+        cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
+
+        listEl.innerHTML = kiDetectedItems.map((item, idx) => {
+          const indices = Array.isArray(item.bildIndizes) && item.bildIndizes.length
+            ? item.bildIndizes
+            : (Number(item.bildIndex || 0) >= 1 ? [Number(item.bildIndex)] : []);
+
+          let thumbsHtml = "";
+          if (item.useCrop && item.croppedPhoto) {
+            thumbsHtml = `<img src="${item.croppedPhoto.dataUrl}" style="width:92px; height:72px; object-fit:cover; border-radius:6px; border:1px solid #94a3b8;">`;
+          } else if (indices.length > 0) {
+            thumbsHtml = `<div style="display:flex; flex-wrap:wrap; gap:4px; max-width:196px; justify-content:center;">` +
+              indices.map(num => {
+                const ph = kiLoadedPhotos[num - 1];
+                return ph ? `<div style="position:relative;"><img src="${ph.dataUrl}" style="width:${indices.length > 1 ? "60px" : "92px"}; height:${indices.length > 1 ? "52px" : "72px"}; object-fit:cover; border-radius:5px; border:1px solid #94a3b8;"><span style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.72); color:#fff; font-size:0.68rem; padding:1px 4px; border-radius:3px;">#${num}</span></div>` : "";
+              }).join("") + `</div>`;
+          } else {
+            thumbsHtml = `<div style="width:92px; height:72px; background:#f1f5f9; border:1px dashed #94a3b8; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#64748b;">Ohne Bild</div>`;
+          }
+
+          return `
+            <div class="m-card" style="padding:12px 14px; margin:10px 0; border-left-color:${item.selected !== false ? "#2e7d32" : "#94a3b8"}; background:${item.selected !== false ? "#ffffff" : "#f8fafc"};">
+              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start;">
+                <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
+                  <label style="font-size:0.82rem; font-weight:bold; cursor:pointer;">
+                    <input type="checkbox" class="ki-row-chk" data-idx="${idx}" ${item.selected !== false ? "checked" : ""}> Übernehmen
+                  </label>
+                  ${thumbsHtml}
+                  ${(item.croppedPhoto && indices.length <= 1) ? `<label style="font-size:0.74rem; color:#1e40af; cursor:pointer;"><input type="checkbox" class="ki-row-crop" data-idx="${idx}" ${item.useCrop ? "checked" : ""}> Einzel-Ausschnitt</label>` : ""}
+                </div>
+                <div style="flex:1; min-width:250px; display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Artikel-Titel *</label>
+                    <input type="text" class="m-input ki-row-titel" data-idx="${idx}" value="${String(item.titel || "").replace(/"/g, "&quot;")}">
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Kategorie</label>
+                    <select class="m-select ki-row-kat" data-idx="${idx}">
+                      ${["Wohnzimmer", "Schlafzimmer", "Küche & Haushalt", "Kinderzimmer", "Elektro & Technik", "Garten & Fahrrad", "Sonstiges"].map(k =>
+                        `<option value="${k}" ${item.kategorie === k ? "selected" : ""}>${k}</option>`
+                      ).join("")}
+                    </select>
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Geschätzte Maße (ca. B × T × H)</label>
+                    <input type="text" class="m-input ki-row-masse" data-idx="${idx}" value="${String(item.masse || "").replace(/"/g, "&quot;")}" placeholder="z. B. ca. 180 x 90 x 75 cm">
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; font-weight:bold;">Zugeordnete Bild-Nr. (mehrere mit Komma, z. B. 1, 2)</label>
+                    <input type="text" class="m-input ki-row-imgs" data-idx="${idx}" value="${indices.join(", ")}" placeholder="z. B. 1, 2">
+                  </div>
+                  <div style="grid-column: 1 / -1;">
+                    <label style="font-size:0.78rem; font-weight:bold;">Beschreibung / Zustand</label>
+                    <input type="text" class="m-input ki-row-desc" data-idx="${idx}" value="${String(item.beschreibung || "").replace(/"/g, "&quot;")}">
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        listEl.querySelectorAll(".ki-row-chk").forEach(el => el.addEventListener("change", () => {
+          kiDetectedItems[Number(el.dataset.idx)].selected = el.checked;
+          cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
+        }));
+        listEl.querySelectorAll(".ki-row-crop").forEach(el => el.addEventListener("change", () => {
+          kiDetectedItems[Number(el.dataset.idx)].useCrop = el.checked;
+          renderKiPreviewTable();
+        }));
+        listEl.querySelectorAll(".ki-row-titel").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].titel = el.value; }));
+        listEl.querySelectorAll(".ki-row-kat").forEach(el => el.addEventListener("change", () => { kiDetectedItems[Number(el.dataset.idx)].kategorie = el.value; }));
+        listEl.querySelectorAll(".ki-row-masse").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].masse = el.value; }));
+        listEl.querySelectorAll(".ki-row-desc").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].beschreibung = el.value; }));
+        listEl.querySelectorAll(".ki-row-imgs").forEach(el => el.addEventListener("change", () => {
+          const i = Number(el.dataset.idx);
+          const parsedList = parseBildIndizesStr(el.value);
+          kiDetectedItems[i].bildIndizes = parsedList;
+          kiDetectedItems[i].bildIndex = parsedList[0] || 0;
+          kiDetectedItems[i].useCrop = false;
+          renderKiPreviewTable();
+        }));
+      }
+
+      // Einzeln pro Artikel nacheinander speichern (inkl. aller gebündelten Fotos in einem Artikel-Unterordner!)
+      async function executeBulkKiImport(triggerBtn) {
+        const spenderName = document.getElementById("ki-spender").value.trim() || "Wohnungsauflösung / Sachspende";
+        const ort = document.getElementById("ki-ort").value.trim() || "Leutenbach / Winnenden";
+        const telefon = document.getElementById("ki-telefon").value.trim();
+        const zielStatus = document.getElementById("ki-ziel-status").value;
+        const msgEl = document.getElementById("ki-import-msg");
+
+        const toImport = kiDetectedItems
+          .filter(x => x.selected !== false && String(x.titel || "").trim())
+          .map(x => {
+            const indices = Array.isArray(x.bildIndizes) && x.bildIndizes.length
+              ? x.bildIndizes
+              : (Number(x.bildIndex || 0) >= 1 ? [Number(x.bildIndex)] : []);
+
+            let photosPayload = [];
+            if (x.useCrop && x.croppedPhoto && indices.length <= 1) {
+              photosPayload.push({
+                photoBase64: x.croppedPhoto.base64,
+                photoMime: x.croppedPhoto.mimeType,
+                photoName: "ausschnitt.jpg"
+              });
+            } else {
+              indices.forEach(num => {
+                const ph = kiLoadedPhotos[num - 1];
+                if (ph && ph.base64) {
+                  photosPayload.push({
+                    photoBase64: ph.base64,
+                    photoMime: ph.mimeType || "image/jpeg",
+                    photoName: ph.name || `bild_${num}.jpg`
+                  });
+                }
+              });
+            }
+
+            const fullDesc = [
+              x.beschreibung || "",
+              x.masse ? `Geschätzte Maße (KI): ${x.masse}` : ""
+            ].filter(Boolean).join(" | ");
+
+            return {
+              titel: String(x.titel).trim(),
+              kategorie: x.kategorie || "Sonstiges",
+              beschreibung: fullDesc,
+              masse: x.masse || "",
+              photos: photosPayload
+            };
+          });
+
+        if (!toImport.length) {
+          alert("Bitte mindestens einen Artikel mit Titel auswählen.");
+          return;
+        }
+
+        const task = async () => {
+          let savedOk = 0;
+          for (let i = 0; i < toImport.length; i++) {
+            msgEl.style.color = "#312e81";
+            msgEl.textContent = `⏳ Speichere Artikel ${i + 1} von ${toImport.length}: „${toImport[i].titel}“ (${toImport[i].photos.length} Foto/s) …`;
+            const res = await postAction({
+              action: "bulkImportApartmentItems",
+              spenderName: spenderName,
+              ort: ort,
+              telefon: telefon,
+              zielStatus: zielStatus,
+              items: [toImport[i]]
+            });
+            if (res && res.ok) {
+              savedOk += (res.importedCount || 1);
+            } else {
+              msgEl.style.color = "#c62828";
+              msgEl.textContent = `Fehler bei Artikel ${i + 1} (${toImport[i].titel}): ` + ((res && res.error) || "Unbekannt");
+              return { ok: false };
+            }
+          }
+          msgEl.style.color = "#1b5e20";
+          msgEl.textContent = `✓ Alle ${savedOk} Artikel (inkl. gebündelter Mehrfach-Fotos) erfolgreich gespeichert!`;
+          loadMasterData(currentCode, false);
+          return { ok: true };
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(triggerBtn, task, {
+            loadingText: "Speichere Artikel …",
+            successText: "✓ Gespeichert!"
+          });
+        } else {
+          await task();
+        }
+      }
+
+      document.getElementById("ki-import-all-btn").addEventListener("click", function () { executeBulkKiImport(this); });
+      document.getElementById("ki-import-all-btn-bottom").addEventListener("click", function () { executeBulkKiImport(this); });
+
+    });
+  
+      // Supermaster Kachel-Übersicht & Zurück-Navigation
+      (function initMasterHubNavigation() {
+        const hubOverview = document.getElementById("m-hub-overview");
+        const subviewBar = document.getElementById("m-subview-bar");
+        const subviewTitle = document.getElementById("m-subview-title");
+        const backBtn = document.getElementById("m-back-to-hub-btn");
+        const panels = document.querySelectorAll(".m-tab-panel");
+
+        function openMasterSection(tabName, labelText) {
+          if (hubOverview) hubOverview.style.display = "none";
+          if (subviewBar) subviewBar.style.display = "flex";
+          if (subviewTitle) subviewTitle.textContent = labelText || tabName;
+          panels.forEach(p => {
+            p.style.display = (p.id === "tab-" + tabName) ? "block" : "none";
+          });
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function showMasterHub() {
+          panels.forEach(p => { p.style.display = "none"; });
+          if (subviewBar) subviewBar.style.display = "none";
+          if (hubOverview) hubOverview.style.display = "grid";
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        document.querySelectorAll(".m-hub-tile[data-open-tab]").forEach(tile => {
+          tile.addEventListener("click", () => {
+            const tab = tile.getAttribute("data-open-tab");
+            const titleEl = tile.querySelector(".m-hub-tile-title");
+            openMasterSection(tab, titleEl ? titleEl.textContent.trim() : tab);
+          });
+        });
+
+        if (backBtn) {
+          backBtn.addEventListener("click", showMasterHub);
+        }
+      })();
+
+      async function runVisitStatsReset(mode, triggerBtn) {
+        const msg = mode === "today"
+          ? "Möchtest du nur die heutigen Seitenaufrufe auf 0 zurücksetzen?"
+          : "ECHTER KOMPLETT-RESET: Möchtest du wirklich ALLE bisherigen Besucherzahlen (Heute, Woche, Monat und Gesamt) unwiderruflich auf 0 setzen?";
+        if (!confirm(msg)) return;
+        if (triggerBtn) triggerBtn.disabled = true;
+        try {
+          const res = await postAction({ action: "reset_visit_stats", mode: mode });
+          if (triggerBtn) triggerBtn.disabled = false;
+          if (res && res.ok) {
+            try { sessionStorage.removeItem(CACHE_KEY); } catch (e) {}
+            if (res.visitStats && currentData) {
+              currentData.visitStats = res.visitStats;
+              applyDashboardData(currentData, false);
+            }
+            await loadMasterData(currentCode, true);
+            alert(mode === "today" ? "✓ Heutige Zähler wurden auf 0 gesetzt." : "✓ Alle Besucherzahlen wurden komplett auf 0 zurückgesetzt.");
+          } else {
+            alert("Fehler: " + ((res && res.error) || "Nicht erlaubt (nur Supermaster)"));
+          }
+        } catch (e) {
+          if (triggerBtn) triggerBtn.disabled = false;
+          alert("Verbindungsfehler: " + e.message);
+        }
+      }
+
+      const btnResetToday = document.getElementById("btn-reset-visit-today");
+      if (btnResetToday) btnResetToday.addEventListener("click", () => runVisitStatsReset("today", btnResetToday));
+
+      const btnResetAll = document.getElementById("btn-reset-visit-all");
+      if (btnResetAll) btnResetAll.addEventListener("click", () => runVisitStatsReset("all", btnResetAll));
+
+
+  
+
+
+  
+      (function initIgnoreMyDeviceToggle() {
+        const statusEl = document.getElementById("my-device-ignore-status");
+        const toggleBtn = document.getElementById("btn-toggle-ignore-device");
+        function refreshIgnoreUi() {
+          let ignored = false;
+          try { ignored = localStorage.getItem("fflw_ignore_my_visits") === "1"; } catch (e) {}
+          if (statusEl) {
+            statusEl.textContent = ignored
+              ? "✓ Dieses Gerät (Notebook/Handy) wird NICHT als Besucher mitgezählt."
+              : "⚠ Dieses Gerät wird aktuell als normaler Besucher mitgezählt.";
+            statusEl.style.color = ignored ? "#15803d" : "#b45309";
+          }
+        }
+        refreshIgnoreUi();
+        if (toggleBtn) {
+          toggleBtn.addEventListener("click", () => {
+            try {
+              const cur = localStorage.getItem("fflw_ignore_my_visits") === "1";
+              localStorage.setItem("fflw_ignore_my_visits", cur ? "0" : "1");
+            } catch (e) {}
+            refreshIgnoreUi();
+          });
+        }
+      })();
+
+  
+      const genStrongBtn = document.getElementById("sys-gen-strong-codes-btn");
+      if (genStrongBtn) {
+        genStrongBtn.addEventListener("click", () => {
+          const rndPart = () => {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let out = "";
+            for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * chars.length)];
+            return out;
+          };
+          document.getElementById("sys-code-team").value = "TEAM-" + rndPart();
+          document.getElementById("sys-code-koord").value = "KOORD-" + rndPart();
+          document.getElementById("sys-code-copilot").value = "INFO-" + rndPart();
+          if (document.getElementById("sys-code-kiimport")) {
+            document.getElementById("sys-code-kiimport").value = "KI-" + rndPart();
+          }
+          if (document.getElementById("sys-code-rad")) document.getElementById("sys-code-rad").value = "RAD-" + rndPart();
+          if (document.getElementById("sys-code-ideen")) document.getElementById("sys-code-ideen").value = "IDEEN-" + rndPart();
+          if (document.getElementById("sys-code-schatz")) document.getElementById("sys-code-schatz").value = "SCHATZ-" + rndPart();
+          alert("✓ Neue schwer erratbare Codes wurden in die Felder eingetragen.\n\nBitte prüfe sie kurz (oder passe sie an) und klicke anschließend auf „Einstellungen speichern“, um sie dauerhaft zu aktivieren!");
+        });
+      }
+
+  </script>
+
+  <script>
+    (function initFocusedSubpage() {
+      const ALLOWED_ROLES = ["master", "freischalter", "koordinator", "radwerkstatt", "copilot"];
+      const PAGE_TABS = ["radwerkstatt"];
+
+      // URL ?code=... übernehmen
+      const params = new URLSearchParams(window.location.search);
+      const urlCode = params.get("code");
+      if (urlCode) {
+        try { sessionStorage.setItem("fflw_master_session_code", urlCode.trim()); } catch (e) {}
+        const inp = document.getElementById("m-code-input");
+        if (inp && !inp.value) inp.value = urlCode.trim();
+      }
+
+      // Hub-Kacheln auf dieser Unterseite dauerhaft ausblenden und direkt den Fachbereich zeigen
+      const hub = document.getElementById("m-hub-overview");
+      if (hub) hub.style.display = "none";
+      const subBar = document.getElementById("m-subview-bar");
+      if (subBar) subBar.style.display = "flex";
+      const subTitle = document.getElementById("m-subview-title");
+      if (subTitle) subTitle.textContent = 'Radwerkstatt – Ausgabe & Vorbestellungen';
+
+      // Falls 2 Tabs (z. B. Warenhaus: Eingang + Online), kompakte Umschalt-Leiste anzeigen
+      if (PAGE_TABS.length > 1) {
+        const tabBar = document.getElementById("m-tab-bar");
+        if (tabBar) {
+          tabBar.style.display = "flex";
+          tabBar.querySelectorAll(".m-tab-btn").forEach(btn => {
+            btn.style.display = PAGE_TABS.includes(btn.dataset.tab) ? "inline-block" : "none";
+          });
+        }
+      }
+
+      // Überwachen, sobald Dashboard sichtbar wird: Rolle prüfen & Fachbereich öffnen
+      const dash = document.getElementById("m-dashboard");
+      const enforceFocus = () => {
+        if (!dash || dash.style.display === "none") return;
+        if (hub) hub.style.display = "none";
+        if (subBar) subBar.style.display = "flex";
+        const roleTxt = (document.getElementById("m-role-label")?.textContent || "").toLowerCase();
+        const isAllowed = ALLOWED_ROLES.some(r => {
+          if (r === "master" && roleTxt.includes("supermaster")) return true;
+          if (r === "freischalter" && roleTxt.includes("freischalter")) return true;
+          if (r === "koordinator" && roleTxt.includes("koordinator")) return true;
+          if (r === "copilot" && roleTxt.includes("copilot")) return true;
+          if (roleTxt.includes(r)) return true;
+          return false;
+        });
+        if (!isAllowed) {
+          alert("Dieser Code hat keine Berechtigung für „Radwerkstatt – Ausgabe & Vorbestellungen“.");
+          document.getElementById("m-logout-btn")?.click();
+          return;
+        }
+        // Ersten Tab der Seite aktivieren, falls noch keiner offen ist
+        const anyOpen = PAGE_TABS.some(t => {
+          const el = document.getElementById("tab-" + t);
+          return el && el.style.display === "block";
+        });
+        if (!anyOpen && PAGE_TABS[0]) {
+          document.querySelectorAll(".m-tab-panel").forEach(p => {
+            p.style.display = (p.id === "tab-" + PAGE_TABS[0]) ? "block" : "none";
+          });
+        }
+      };
+      if (dash && "MutationObserver" in window) {
+        new MutationObserver(enforceFocus).observe(dash, { attributes: true, attributeFilter: ["style"] });
+      }
+      setTimeout(enforceFocus, 150);
+    })();
+  </script>
+</body>
+</html>

@@ -1196,3 +1196,83 @@ window.FFLW_Account = {
     try { localStorage.removeItem(this.KEY); } catch (e) {}
   }
 };
+
+
+// ============================================================================
+// 5. SUPERMASTER-DIREKTMODUS AUF EIGENEM GERÄT (OHNE REGISTRIERUNGSZWANG)
+// ============================================================================
+window.FFLW_SupermasterDevice = {
+  KEY: "fflw_supermaster_device_v1",
+  get: function () {
+    try {
+      const obj = JSON.parse(localStorage.getItem(this.KEY) || "null");
+      if (obj && obj.active && obj.code) return obj;
+    } catch (e) {}
+    return null;
+  },
+  isActive: function () {
+    return !!this.get();
+  },
+  getCode: function () {
+    const obj = this.get();
+    return obj ? String(obj.code || "").trim() : "";
+  },
+  activate: function (code) {
+    const c = String(code || "").trim();
+    if (!c) return;
+    try {
+      localStorage.setItem(this.KEY, JSON.stringify({ active: true, code: c, updatedAt: new Date().toISOString() }));
+      localStorage.setItem("fflw_ignore_my_visits", "1");
+    } catch (e) {}
+  },
+  deactivate: function () {
+    try {
+      localStorage.removeItem(this.KEY);
+      sessionStorage.removeItem("fflw_master_session_code");
+      sessionStorage.removeItem("fflw_ki_import_code");
+    } catch (e) {}
+  }
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  const sm = window.FFLW_SupermasterDevice && window.FFLW_SupermasterDevice.get();
+  if (!sm) return;
+
+  // 1. Konto-/Registrierungs-Hinweise auf öffentlichen Seiten (z. B. aktuelle-angebote.html) für Supermaster ausblenden
+  document.querySelectorAll('a[href="konto-anlegen.html"]').forEach(a => {
+    const box = a.closest("div");
+    if (box && box.textContent.includes("Konto-Vorteil")) {
+      box.style.display = "none";
+    }
+  });
+
+  // 2. Falls Reservierungs-Formular auf der Seite existiert, Supermaster-Daten direkt vorausfüllen
+  setTimeout(() => {
+    const reqName = document.getElementById("fflw-req-name");
+    const reqKontakt = document.getElementById("fflw-req-kontakt");
+    if (reqName && !reqName.value) reqName.value = "Supermaster (Freundeskreis)";
+    if (reqKontakt && !reqKontakt.value) reqKontakt.value = "Kontakt@freundeleuwi.org";
+  }, 150);
+
+  // 3. Dezente Status-Pill unten links zum jederzeitigen Beenden (für Tests als normaler Besucher)
+  if (!document.getElementById("fflw-sm-device-pill")) {
+    const pill = document.createElement("div");
+    pill.id = "fflw-sm-device-pill";
+    pill.style.cssText = [
+      "position:fixed", "bottom:10px", "left:10px", "z-index:2147483630",
+      "background:rgba(15,23,42,0.90)", "color:#f8fafc", "font-size:0.78rem",
+      "padding:5px 10px", "border-radius:999px", "display:flex", "align-items:center",
+      "gap:8px", "box-shadow:0 2px 8px rgba(0,0,0,0.25)", "font-family:inherit"
+    ].join(";");
+    pill.innerHTML = `
+      <span>👑 Supermaster-Modus</span>
+      <a href="master.html" style="color:#fde047; text-decoration:underline; font-weight:bold;">Cockpit</a>
+      <button type="button" id="fflw-sm-exit-btn" style="background:transparent; border:1px solid #94a3b8; color:#e2e8f0; border-radius:999px; padding:1px 7px; font-size:0.72rem; cursor:pointer;">Beenden</button>
+    `;
+    document.body.appendChild(pill);
+    document.getElementById("fflw-sm-exit-btn").addEventListener("click", () => {
+      window.FFLW_SupermasterDevice.deactivate();
+      location.reload();
+    });
+  }
+});

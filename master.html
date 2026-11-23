@@ -274,42 +274,46 @@
         </div>
 
         <div id="m-hub-overview" class="m-hub-grid">
-          <button type="button" class="m-hub-tile" data-open-tab="eingang">
-            <span class="m-hub-tile-title">📥 Eingangs-Prüfung (<span id="hub-cnt-eingang">0</span>)</span>
-            <span class="m-hub-tile-desc">Neue Sachspenden &amp; Importe prüfen und freigeben</span>
-          </button>
-          <button type="button" class="m-hub-tile" data-open-tab="online">
-            <span class="m-hub-tile-title">🌐 Online &amp; Reserviert (<span id="hub-cnt-online">0</span>)</span>
-            <span class="m-hub-tile-desc">Aktive Angebote verwalten, Reservierungen &amp; Archiv</span>
-          </button>
-          <button type="button" class="m-hub-tile" data-open-tab="bedarfe">
-            <span class="m-hub-tile-title">📋 Offene Bedarfe (<span id="hub-cnt-bedarfe">0</span>)</span>
-            <span class="m-hub-tile-desc">Gesuche einsehen &amp; erfüllte Bedarfe abschließen</span>
-          </button>
-          <a href="ki-import.html" class="m-hub-tile is-ai" id="hub-tile-kiimport" style="display:none; text-decoration:none;">
-            <span class="m-hub-tile-title">🪄 Wohnungs-Import (KI) ↗</span>
-            <span class="m-hub-tile-desc">Öffnet die eigene KI-Erfassungsseite (auch für Helfer mit eigenem KI-Code nutzbar)</span>
+          <a href="warenhaus-admin.html" class="m-hub-tile m-hub-page-link" id="hub-tile-warenhaus" style="text-decoration:none;">
+            <span class="m-hub-tile-title">📥 Eingangs-Prüfung (<span id="hub-cnt-eingang">0</span>) ↗</span>
+            <span class="m-hub-tile-desc">Neue Sachspenden &amp; Importe prüfen und freigeben (eigene Seite)</span>
           </a>
-          <button type="button" class="m-hub-tile is-secret" id="hub-tile-akten" data-open-tab="akten" style="display:none;">
-            <span class="m-hub-tile-title">🗂️ Personen-Akten (<span id="hub-cnt-akten">0</span>)</span>
-            <span class="m-hub-tile-desc">Vertrauliche Akten, Familien-Zuordnung &amp; Dokumente</span>
-          </button>
-          <button type="button" class="m-hub-tile is-treasure" id="hub-tile-schatz" data-open-tab="schatz" style="display:none;">
-            <span class="m-hub-tile-title">✨ Schatzkiste (<span id="hub-cnt-schatz">0</span>)</span>
-            <span class="m-hub-tile-desc">Talente, Fähigkeiten &amp; Unterstützer-Verzeichnis</span>
-          </button>
-          <button type="button" class="m-hub-tile" id="hub-tile-ideentafel" data-open-tab="ideentafel" style="display:none; border-color:#fde047; border-left-color:#ca8a04; background:#fefce8;">
-            <span class="m-hub-tile-title">💡 Ideen, Lob &amp; Tipps (<span id="hub-cnt-ideentafel">0</span>)</span>
-            <span class="m-hub-tile-desc">Eingereichte Ideen &amp; Gesprächs-Tipps freigeben</span>
-          </button>
-          <button type="button" class="m-hub-tile" id="hub-tile-radwerkstatt" data-open-tab="radwerkstatt">
-            <span class="m-hub-tile-title">🚲 Radwerkstatt</span>
-            <span class="m-hub-tile-desc">Rad-Ausgaben &amp; Vorbestellungen verwalten</span>
-          </button>
-          <button type="button" class="m-hub-tile" id="hub-tile-system" data-open-tab="system" style="display:none;">
-            <span class="m-hub-tile-title">📊 Seiten-Hits, Codes &amp; System</span>
-            <span class="m-hub-tile-desc">Besucher-Statistik pro Seite, Wartung &amp; Zugangs-Codes</span>
-          </button>
+          <a href="warenhaus-admin.html" class="m-hub-tile m-hub-page-link" id="hub-tile-online" style="text-decoration:none;">
+            <span class="m-hub-tile-title">🌐 Online &amp; Reserviert (<span id="hub-cnt-online">0</span>) ↗</span>
+            <span class="m-hub-tile-desc">Aktive Angebote verwalten, Reservierungen &amp; Archiv (eigene Seite)</span>
+          </a>
+          <a href="bedarfe-admin.html" class="m-hub-tile m-hub-page-link" id="hub-tile-bedarfe" style="text-decoration:none;">
+            <span class="m-hub-tile-title">📋 Offene Bedarfe (<span id="hub-cnt-bedarfe">0</span>) ↗</span>
+            <span class="m-hub-tile-desc">Gesuche einsehen &amp; erfüllte Bedarfe abschließen (eigene Seite)</span>
+          </a>
+          <a href="ki-import.html" class="m-hub-tile is-ai m-hub-page-link" id="hub-tile-kiimport" style="display:none; text-decoration:none;">
+            <span class="m-hub-tile-title">🪄 Wohnungs-Import (KI) ↗</span>
+            <span class="m-hub-tile-desc">Eigene KI-Erfassungsseite (auch für Helfer mit eigenem KI-Code)</span>
+          </a>
+          <a href="personen-akten.html" class="m-hub-tile is-secret m-hub-page-link" id="hub-tile-akten" style="display:none; text-decoration:none;">
+            <span class="m-hub-tile-title">🗂️ Personen-Akten (<span id="hub-cnt-akten">0</span>) ↗</span>
+            <span class="m-hub-tile-desc">Vertrauliche Akten, Familien-Zuordnung &amp; Dokumente (eigene Seite)</span>
+          </a>
+          <a href="schatzkiste-admin.html" class="m-hub-tile is-treasure m-hub-page-link" id="hub-tile-schatz" style="display:none; text-decoration:none;">
+            <span class="m-hub-tile-title">✨ Schatzkiste (<span id="hub-cnt-schatz">0</span>) ↗</span>
+            <span class="m-hub-tile-desc">Talente, Fähigkeiten &amp; Unterstützer-Verzeichnis (eigene Seite)</span>
+          </a>
+          <a href="ideen-admin.html" class="m-hub-tile m-hub-page-link" id="hub-tile-ideentafel" style="display:none; text-decoration:none; border-color:#fde047; border-left-color:#ca8a04; background:#fefce8;">
+            <span class="m-hub-tile-title">💡 Ideen, Lob &amp; Tipps (<span id="hub-cnt-ideentafel">0</span>) ↗</span>
+            <span class="m-hub-tile-desc">Eingereichte Ideen &amp; Gesprächs-Tipps freigeben (eigene Seite)</span>
+          </a>
+          <a href="radwerkstatt-admin.html" class="m-hub-tile m-hub-page-link" id="hub-tile-radwerkstatt" style="text-decoration:none;">
+            <span class="m-hub-tile-title">🚲 Radwerkstatt ↗</span>
+            <span class="m-hub-tile-desc">Rad-Ausgaben &amp; Vorbestellungen verwalten (eigene Seite)</span>
+          </a>
+          <a href="konten-admin.html" class="m-hub-tile m-hub-page-link" id="hub-tile-konten" style="display:none; text-decoration:none;">
+            <span class="m-hub-tile-title">👤 Benutzer-Konten &amp; Passwörter (<span id="hub-cnt-konten">0</span>) ↗</span>
+            <span class="m-hub-tile-desc">Nutzer freischalten, Passwörter einsehen &amp; ändern (eigene Seite)</span>
+          </a>
+          <a href="system-admin.html" class="m-hub-tile m-hub-page-link" id="hub-tile-system" style="display:none; text-decoration:none;">
+            <span class="m-hub-tile-title">📊 Seiten-Hits, Codes &amp; System ↗</span>
+            <span class="m-hub-tile-desc">Besucher-Statistik, Codes ändern &amp; Wartung (eigene Seite)</span>
+          </a>
         </div>
 
         <div id="m-subview-bar" class="m-subview-bar">
@@ -672,6 +676,18 @@
                 <input type="text" id="sys-code-kiimport" class="m-input" placeholder="Standard: FFLW-KI">
               </div>
               <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Radwerkstatt-Code (<code>radwerkstatt-admin.html</code>)</label>
+                <input type="text" id="sys-code-rad" class="m-input" placeholder="Standard: FFLW-RAD">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Ideen-Team-Code (<code>ideen-admin.html</code>)</label>
+                <input type="text" id="sys-code-ideen" class="m-input" placeholder="Standard: FFLW-IDEEN">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">Schatzkisten-Code (<code>schatzkiste-admin.html</code>)</label>
+                <input type="text" id="sys-code-schatz" class="m-input" placeholder="Standard: FFLW-SCHATZ">
+              </div>
+              <div>
                 <label style="font-weight:bold; font-size:0.88rem;">Flaggenband-Stil</label>
                 <select id="sys-flaggen" class="m-select">
                   <option value="A">Stil A (Sanftes Blau)</option>
@@ -700,7 +716,8 @@
               </table>
             </div>
             <div style="margin-top:14px; display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
-              <button type="button" id="sys-save-btn" class="m-btn m-btn-green">Alle Einstellungen speichern</button>
+              <button type="button" id="sys-gen-strong-codes-btn" class="m-btn m-btn-orange" style="margin-right:8px;">🎲 Sichere Zufallscodes für Team/KI vorschlagen</button>
+            <button type="button" id="sys-save-btn" class="m-btn m-btn-green">Alle Einstellungen speichern</button>
               <span id="sys-save-msg" style="font-weight:bold;"></span>
             </div>
           </div>
@@ -826,7 +843,7 @@
         });
       }
 
-      let currentCode = sessionStorage.getItem("fflw_master_session_code") || "";
+      let currentCode = sessionStorage.getItem("fflw_master_session_code") || (window.FFLW_SupermasterDevice ? window.FFLW_SupermasterDevice.getCode() : "") || "";
       let currentData = null;
       let selectedCountryFilter = "";
 
@@ -931,6 +948,9 @@
         syncHubTile("hub-tile-schatz", "tab-btn-schatz");
         syncHubTile("hub-tile-ideentafel", "tab-btn-ideentafel");
         syncHubTile("hub-tile-system", "tab-btn-system");
+        if (document.getElementById("hub-tile-konten")) document.getElementById("hub-tile-konten").style.display = isSuper ? "flex" : "none";
+        const kiHubLink = document.getElementById("hub-tile-kiimport");
+        if (kiHubLink && currentCode) kiHubLink.href = "ki-import.html?code=" + encodeURIComponent(currentCode);
 
         renderAllSections(data);
       }
@@ -965,6 +985,7 @@
             msgEl.style.color = "#c62828";
             msgEl.textContent = (data && data.error) ? data.error : "Ungültiger Code.";
             sessionStorage.removeItem("fflw_master_session_code");
+        if (window.FFLW_SupermasterDevice) window.FFLW_SupermasterDevice.deactivate();
             sessionStorage.removeItem(CACHE_KEY);
             document.getElementById("m-dashboard").style.display = "none";
             document.getElementById("m-login-box").style.display = "block";
@@ -973,6 +994,9 @@
 
           currentCode = code;
           sessionStorage.setItem("fflw_master_session_code", code);
+          if (data.role === "master" && window.FFLW_SupermasterDevice) {
+            window.FFLW_SupermasterDevice.activate(code);
+          }
           try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {}
           applyDashboardData(data, false);
           return { ok: true };
@@ -1037,6 +1061,7 @@
         const userAccounts = Array.isArray(data.userAccounts) ? data.userAccounts : [];
         const cntK = document.getElementById("cnt-konten");
         if (cntK) cntK.textContent = userAccounts.length;
+        if (document.getElementById("hub-cnt-konten")) document.getElementById("hub-cnt-konten").textContent = userAccounts.length;
         const listK = document.getElementById("list-user-accounts");
         if (listK) {
           listK.innerHTML = !userAccounts.length
@@ -1055,7 +1080,8 @@
                   </div>
                   <div style="display:flex; flex-wrap:wrap; gap:6px;">
                     ${acc.status !== "freigegeben" ? `<button type="button" class="m-btn m-btn-green btn-acc-op" data-id="${acc.fileId}" data-op="approve">✓ Freischalten</button>` : ""}
-                    ${acc.status === "freigegeben" ? `<button type="button" class="m-btn m-btn-warn btn-acc-op" data-id="${acc.fileId}" data-op="block">Sperren</button>` : ""}
+                    ${acc.status === "freigegeben" ? `<button type="button" class="m-btn m-btn-orange btn-acc-op" data-id="${acc.fileId}" data-op="block">Sperren</button>` : ""}
+                    <button type="button" class="m-btn btn-acc-pw" data-id="${acc.fileId}" data-user="${acc.username}" data-pw="${String(acc.passwort || "").replace(/"/g, "&quot;")}">🔑 Passwort ändern</button>
                     <button type="button" class="m-btn m-btn-red btn-acc-op" data-id="${acc.fileId}" data-op="delete">🗑️ Löschen</button>
                   </div>
                 </div>
@@ -1067,6 +1093,20 @@
               await postAction({ action: "manageUserAccount", fileId: btn.dataset.id, op: btn.dataset.op });
               loadMasterData(currentCode, false);
             });
+          listK.querySelectorAll(".btn-acc-pw").forEach(btn => {
+            btn.addEventListener("click", async () => {
+              const neu = prompt(`Neues Passwort für Benutzer „${btn.dataset.user}“ eingeben (mind. 4 Zeichen):`, btn.dataset.pw || "");
+              if (neu === null) return;
+              if (neu.trim().length < 4) { alert("Das Passwort muss mindestens 4 Zeichen lang sein."); return; }
+              const res = await postAction({ action: "manageUserAccount", fileId: btn.dataset.id, op: "change_password", newPassword: neu.trim() });
+              if (res && res.ok) {
+                alert("✓ Passwort wurde geändert.");
+                loadMasterData(currentCode, true);
+              } else {
+                alert("Fehler: " + ((res && res.error) || "Speichern fehlgeschlagen"));
+              }
+            });
+          });
           });
         }
         document.getElementById("cnt-online").textContent = online.length;
@@ -1987,6 +2027,10 @@
         document.getElementById("sys-code-team").value = codes.freischalter || "";
         document.getElementById("sys-code-koord").value = codes.koordinator || "";
         document.getElementById("sys-code-copilot").value = codes.copilot || "";
+        if (document.getElementById("sys-code-kiimport")) document.getElementById("sys-code-kiimport").value = codes.kiimport || "FFLW-KI";
+        if (document.getElementById("sys-code-rad")) document.getElementById("sys-code-rad").value = codes.radwerkstatt || "FFLW-RAD";
+        if (document.getElementById("sys-code-ideen")) document.getElementById("sys-code-ideen").value = codes.ideen || "FFLW-IDEEN";
+        if (document.getElementById("sys-code-schatz")) document.getElementById("sys-code-schatz").value = codes.schatzkiste || "FFLW-SCHATZ";
         document.getElementById("sys-flaggen").value = cfg.flaggenStil || "A";
 
         const wartungSet = new Set(cfg.wartungSeiten || []);
@@ -2024,7 +2068,10 @@
               freischalter: document.getElementById("sys-code-team").value.trim(),
               koordinator: document.getElementById("sys-code-koord").value.trim(),
               copilot: document.getElementById("sys-code-copilot").value.trim(),
-              kiimport: document.getElementById("sys-code-kiimport") ? document.getElementById("sys-code-kiimport").value.trim() : "FFLW-KI"
+              kiimport: document.getElementById("sys-code-kiimport") ? document.getElementById("sys-code-kiimport").value.trim() : "FFLW-KI",
+              radwerkstatt: document.getElementById("sys-code-rad") ? document.getElementById("sys-code-rad").value.trim() : "FFLW-RAD",
+              ideen: document.getElementById("sys-code-ideen") ? document.getElementById("sys-code-ideen").value.trim() : "FFLW-IDEEN",
+              schatzkiste: document.getElementById("sys-code-schatz") ? document.getElementById("sys-code-schatz").value.trim() : "FFLW-SCHATZ"
             },
             flaggenStil: document.getElementById("sys-flaggen").value,
             wartungSeiten: wartungSeiten,
@@ -2851,6 +2898,39 @@
           });
         }
       })();
+
+  
+      const genStrongBtn = document.getElementById("sys-gen-strong-codes-btn");
+      if (genStrongBtn) {
+        genStrongBtn.addEventListener("click", () => {
+          const rndPart = () => {
+            const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let out = "";
+            for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * chars.length)];
+            return out;
+          };
+          document.getElementById("sys-code-team").value = "TEAM-" + rndPart();
+          document.getElementById("sys-code-koord").value = "KOORD-" + rndPart();
+          document.getElementById("sys-code-copilot").value = "INFO-" + rndPart();
+          if (document.getElementById("sys-code-kiimport")) {
+            document.getElementById("sys-code-kiimport").value = "KI-" + rndPart();
+          }
+          if (document.getElementById("sys-code-rad")) document.getElementById("sys-code-rad").value = "RAD-" + rndPart();
+          if (document.getElementById("sys-code-ideen")) document.getElementById("sys-code-ideen").value = "IDEEN-" + rndPart();
+          if (document.getElementById("sys-code-schatz")) document.getElementById("sys-code-schatz").value = "SCHATZ-" + rndPart();
+          alert("✓ Neue schwer erratbare Codes wurden in die Felder eingetragen.\n\nBitte prüfe sie kurz (oder passe sie an) und klicke anschließend auf „Einstellungen speichern“, um sie dauerhaft zu aktivieren!");
+        });
+      }
+
+  
+      function syncHubPageLinksWithCode() {
+        if (!currentCode) return;
+        document.querySelectorAll(".m-hub-page-link").forEach(a => {
+          const baseHref = a.getAttribute("href").split("?")[0];
+          a.setAttribute("href", baseHref + "?code=" + encodeURIComponent(currentCode));
+        });
+      }
+      setInterval(syncHubPageLinksWithCode, 800);
 
   </script>
 </body>
