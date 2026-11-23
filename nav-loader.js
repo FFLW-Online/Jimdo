@@ -40,7 +40,7 @@ function applySelectiveUrlMasking(currentPage, maskierteSeiten) {
     if (!liste.includes(currentPage)) return;
     if (currentPage === "index.html") return;
 
-    const params = new URLSearchParams(window.location.search);
+
     const cVal = params.get("c") || params.get("code") || "";
     if (cVal) {
       sessionStorage.setItem("fflw_masked_case_code", cVal.trim());
