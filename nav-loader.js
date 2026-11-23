@@ -3,7 +3,7 @@ const FFLW_GLOBAL_MASTER_CODE = "FFLW99";
 const FFLW_STATUS_CACHE_KEY = "fflw_site_status_cache_v3";
 const FFLW_GITHUB_OWNER = "FFLW-Online";
 const FFLW_GITHUB_REPO = "Jimdo";
-const FFLW_GITHUB_BRANCH = "main";
+const FFLW_GITHUB_BRANCH = "Jimdo";
 
 // ============================================================================
 // SCHUTZ GEGEN BROWSER-AUTOFILL BEI CODE-FELDERN
@@ -39,8 +39,6 @@ function applySelectiveUrlMasking(currentPage, maskierteSeiten) {
     const liste = Array.isArray(maskierteSeiten) ? maskierteSeiten : ["unterlagen.html"];
     if (!liste.includes(currentPage)) return;
     if (currentPage === "index.html") return;
-
-
     const cVal = params.get("c") || params.get("code") || "";
     if (cVal) {
       sessionStorage.setItem("fflw_masked_case_code", cVal.trim());
@@ -70,6 +68,66 @@ function applySelectiveUrlMasking(currentPage, maskierteSeiten) {
 })();
 
 // ============================================================================
+
+// ============================================================================
+// 3D-MÜNZDREHUNG MIT NEUEM & ALTEM FFLW-LOGO ALS LADE-SYMBOL
+// ============================================================================
+(function ensureFflwCoinSpinnerStyles() {
+  if (typeof document === "undefined") return;
+  const inject = () => {
+    if (document.getElementById("fflw-coin-spinner-style")) return;
+    const st = document.createElement("style");
+    st.id = "fflw-coin-spinner-style";
+    st.textContent = `
+      @keyframes fflwCoinFlipY {
+        0%   { transform: rotateY(0deg); }
+        100% { transform: rotateY(360deg); }
+      }
+      .fflw-coin-wrap {
+        display: inline-block;
+        perspective: 320px;
+        vertical-align: middle;
+        flex-shrink: 0;
+      }
+      .fflw-coin-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        animation: fflwCoinFlipY 3.6s linear infinite;
+      }
+      .fflw-coin-face {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: contain;
+        background: #ffffff;
+        padding: 1px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+      .fflw-coin-back {
+        transform: rotateY(180deg);
+      }
+    `;
+    (document.head || document.documentElement).appendChild(st);
+  };
+  if (document.head) inject();
+  else document.addEventListener("DOMContentLoaded", inject);
+})();
+
+window.fflwGetLogoSpinnerHtml = function (sizePx) {
+  const sz = Number(sizePx) || 22;
+  return `<span class="fflw-coin-wrap" style="width:${sz}px; height:${sz}px;" aria-hidden="true">`
+    + `<span class="fflw-coin-inner">`
+    + `<img src="assets/logo-ffwl-neu-trans.png" alt="" class="fflw-coin-face fflw-coin-front">`
+    + `<img src="assets/logo-alt.png" alt="" class="fflw-coin-face fflw-coin-back" onerror="this.src='assets/logo-ffwl-neu-trans.png'">`
+    + `</span></span>`;
+};
+
 // GLOBALE BUTTON-RÜCKMELDUNG (ROTIERENDES ZEICHEN + FARBWECHSEL BEI ERFOLG)
 // ============================================================================
 window.fflwRunButtonAction = async function (btn, asyncTask, options) {
@@ -92,7 +150,7 @@ window.fflwRunButtonAction = async function (btn, asyncTask, options) {
   btn.disabled = true;
   btn.classList.remove("fflw-btn-confirmed", "fflw-btn-error");
   btn.classList.add("fflw-btn-loading");
-  btn.innerHTML = `<span class="fflw-spinner fflw-spinner-light"></span> <span>${opts.loadingText}</span>`;
+  btn.innerHTML = `${window.fflwGetLogoSpinnerHtml(20)} <span>${opts.loadingText}</span>`;
 
   try {
     const result = await asyncTask();

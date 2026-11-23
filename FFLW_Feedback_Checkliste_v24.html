@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FFLW Feedback-Bogen – Versionierte Checkliste (ab ZIP v24 (3D-Logo-Spinner, Jimdo-Branch & Schnellstart seiten-steuerung.html))</title>
+  <style>
+    :root {
+      --primary: #004080;
+      --primary-dark: #002b59;
+      --accent: #1e6b24;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --border: #cbd5e1;
+      --text: #0f172a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding-bottom: 90px;
+    }
+    header {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    header h1 { margin: 0; font-size: 1.15rem; }
+    header p { margin: 2px 0 0 0; font-size: 0.85rem; opacity: 0.92; }
+    .container {
+      max-width: 960px;
+      margin: 18px auto;
+      padding: 0 14px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 6px solid var(--primary);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+    }
+    .card h2 {
+      margin: 0 0 10px 0;
+      font-size: 1.08rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      padding: 9px 11px;
+      cursor: pointer;
+      font-size: 0.92rem;
+    }
+    .check-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: var(--primary);
+    }
+    .check-item.checked {
+      background: #eff6ff;
+      border-color: #60a5fa;
+    }
+    label.field-label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.88rem;
+      margin: 12px 0 5px 0;
+      color: #1e293b;
+    }
+    textarea, input[type="text"], select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #94a3b8;
+      border-radius: 7px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      background: #ffffff;
+    }
+    textarea:focus, input[type="text"]:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 64, 128, 0.14);
+    }
+    .extra-row {
+      display: grid;
+      grid-template-columns: 210px 1fr auto;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: start;
+    }
+    @media (max-width: 640px) {
+      .extra-row { grid-template-columns: 1fr; }
+    }
+    .btn {
+      background: var(--primary);
+      color: #ffffff !important;
+      border: none;
+      border-radius: 7px;
+      padding: 9px 15px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { background: var(--primary-dark); }
+    .btn-green { background: var(--accent); color: #ffffff !important; }
+    .btn-green:hover { background: #14532d; }
+    .btn-outline {
+      background: #ffffff;
+      color: var(--primary) !important;
+      border: 1px solid var(--primary);
+    }
+    .btn-del {
+      background: #fee2e2;
+      color: #991b1b !important;
+      border: 1px solid #fca5a5;
+      padding: 9px 11px;
+    }
+    .floating-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.25);
+      z-index: 200;
+    }
+    .output-box {
+      background: #f8fafc;
+      border: 2px dashed #64748b;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.86rem;
+      white-space: pre-wrap;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .badge {
+      background: #dbeafe;
+      color: #1e3a8a;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>🛠️ FFLW Rückmelde- &amp; Verbesserungs-Checkliste</h1>
+      <p>Punkte ankreuzen, Ergänzungen eintippen und am Ende mit 1 Klick für den Chat kopieren.</p>
+    </div>
+    <button type="button" class="btn btn-green" onclick="copyReport()">📋 Alles für Chat kopieren</button>
+  </header>
+
+  <div class="container">
+
+    <!-- BEZUGSVERSION / ZIP-NUMMERIERUNG -->
+    <section class="card" style="border-left-color: #0284c7; background: #f0f9ff;">
+      <h2>📦 Bezugs-ZIP &amp; Ziel-Versionierung</h2>
+      <div class="grid-2">
+        <div>
+          <label class="field-label" style="margin-top:0;">Aktuell getestete ZIP-Version:</label>
+          <select id="zip-current-version">
+            <option value="ZIP v24 (3D-Logo-Spinner, Jimdo-Branch &amp; Schnellstart seiten-steuerung.html)" selected>ZIP v24 (3D-Logo-Spinner, Jimdo-Branch &amp; Schnellstart seiten-steuerung.html)</option>
+            <option value="ZIP v23">ZIP v23</option>
+            <option value="ZIP v23">ZIP v23</option>
+            <option value="ZIP v22">ZIP v22</option>
+            <option value="ZIP v21">ZIP v21</option>
+            <option value="ZIP v20">ZIP v20</option>
+            <option value="ZIP v23">ZIP v23</option>
+            <option value="ZIP v24">ZIP v24</option>
+            <option value="ZIP v25">ZIP v25</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label" style="margin-top:0;">Nächste Ziel-ZIP erst auf Aufforderung anfordern als:</label>
+          <select id="zip-next-version">
+            <option value="Erst Rückmeldung besprechen (noch kein Code/ZIP erzeugen)" selected>Erst Rückmeldung besprechen (noch kein Code/ZIP erzeugen)</option>
+            <option value="ZIP v24 (Schnellstart seiten-steuerung.html + echte Dreh-Sanduhr + nav-loader Fix) erstellen">ZIP v24 (Schnellstart seiten-steuerung.html + echte Dreh-Sanduhr + nav-loader Fix) erstellen</option>
+            <option value="ZIP v24 erstellen">ZIP v24 erstellen</option>
+            <option value="ZIP v25 erstellen">ZIP v25 erstellen</option>
+            <option value="ZIP v26 erstellen">ZIP v26 erstellen</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. SUPERMASTER-DIREKTMODUS & LOGIN -->
+    <section class="card" data-section="1. Supermaster-Direktmodus &amp; Anmeldung">
+      <h2>👑 1. Supermaster-Direktmodus &amp; Anmeldung <span class="badge">nav-loader.js / master.html</span></h2>
+      <div class="grid-2">
+        <label class="check-item"><input type="checkbox" value="Supermaster-Modus funktioniert wie gewünscht"> <span>Supermaster-Modus funktioniert wie gewünscht</span></label>
+        <label class="check-item"><input type="checkbox" value="Supermaster-Modus merkt sich das Gerät noch nicht zuverlässig / fragt trotzdem nach Code"> <span>Supermaster-Modus merkt sich das Gerät noch nicht / fragt trotzdem nach Code</span></label>
+        <label class="check-item"><input type="checkbox" value="Leiste 'Supermaster-Modus' unten links stört oder sitzt ungünstig"> <span>Leiste „Supermaster-Modus“ unten links stört oder sitzt ungünstig</span></label>
+        <label class="check-item"><input type="checkbox" value="Konto-Hinweis-Balken oben auf den Seiten passt / soll angepasst werden"> <span>Konto-Hinweis-Balken oben auf den Seiten soll angepasst werden</span></label>
+      </div>
+      <label class="field-label">Konkrete Beobachtung oder Wunsch dazu:</label>
+      <textarea rows="2" placeholder="z. B. Verhalten auf Startseite, Angebotsseite oder im Master-Cockpit …"></textarea>
+    </section>
+
+    <!-- 2. MENÜ, SPRACHE & DARSTELLUNG -->
+    <section class="card" data-section="2. Menü, Sprache &amp; Button-Lesbarkeit">
+      <h2>🧭 2. Menü, Sprache &amp; Button-Lesbarkeit <span class="badge">nav-loader.js / CSS</span></h2>
+      <div class="grid-2">
+        <label class="check-item"><input type="checkbox" value="Menüpunkt 'Lob, Tipps &amp; neue Ideen' unter Mitarbeit passt"> <span>Menüpunkt „Lob, Tipps &amp; neue Ideen“ unter Mitarbeit passt</span></label>
+        <label class="check-item"><input type="checkbox" value="Menüpunkt 'Eigenes Konto anlegen' ganz unten vor Kontakt passt"> <span>Menüpunkt „Eigenes Konto anlegen“ ganz unten vor Kontakt passt</span></label>
+        <label class="check-item"><input type="checkbox" value="Schrift auf allen Buttons ist jetzt gut lesbar"> <span>Schrift auf allen Buttons ist jetzt gut lesbar</span></label>
+        <label class="check-item"><input type="checkbox" value="Lade-Symbol als langsame 3D-Münzdrehung mit neuem &amp; altem FFLW-Logo einbauen"> <span>Lade-Symbol als langsame 3D-Münzdrehung mit neuem &amp; altem FFLW-Logo einbauen</span></label>
+        <label class="check-item"><input type="checkbox" value="Es gibt noch irgendwo unlesbare Buttons oder unerwünschte Emoticons"> <span>Es gibt noch irgendwo unlesbare Buttons oder unerwünschte Emoticons</span></label>
+      </div>
+      <label class="field-label">Konkrete Beobachtung oder Wunsch dazu:</label>
+      <textarea rows="2" placeholder="z. B. Wo genau ist noch etwas schwer lesbar oder falsch platziert?"></textarea>
+    </section>
+
+    <!-- 3. LOB, TIPPS & NEUE IDEEN + KI-IMPORT -->
+    <section class="card" data-section="3. Lob, Tipps &amp; neue Ideen + KI-Import">
+      <h2>💡 3. Lob, Tipps &amp; neue Ideen + KI-Import <span class="badge">ideen-admin.html / ki-import.html / Code.gs</span></h2>
+      <div class="grid-2">
+        <label class="check-item"><input type="checkbox" value="Eingereichte Beiträge unter 'Lob, Tipps &amp; neue Ideen' werden jetzt angezeigt"> <span>Eingereichte Beiträge unter „Lob, Tipps &amp; neue Ideen“ werden jetzt angezeigt</span></label>
+        <label class="check-item"><input type="checkbox" value="Diagnose-/Statuszeile bei 'Lob, Tipps &amp; neue Ideen' hilft bei der Prüfung"> <span>Diagnose-/Statuszeile zeigt Ordner/Status klar an</span></label>
+        <label class="check-item"><input type="checkbox" value="KI-Import lässt sich jetzt als Supermaster und per Code öffnen"> <span>KI-Import lässt sich jetzt als Supermaster und per Code öffnen</span></label>
+        <label class="check-item"><input type="checkbox" value="Code.gs wurde als neue Version im Apps Script bereitgestellt"> <span>Code.gs wurde als neue Version im Apps Script bereitgestellt</span></label>
+      </div>
+      <label class="field-label">Konkrete Beobachtung oder Wunsch dazu:</label>
+      <textarea rows="2" placeholder="z. B. Was steht in der Statuszeile oder was passiert im KI-Import?"></textarea>
+    </section>
+
+    <!-- 4. EINZELNE UNTERSEITEN -->
+    <section class="card" data-section="4. Einzelne Arbeits-Unterseiten">
+      <h2>📄 4. Einzelne Arbeits-Unterseiten <span class="badge">warenhaus / rad / bedarfe / schatz / akten / system</span></h2>
+      <div class="grid-2">
+        <label class="check-item"><input type="checkbox" value="warenhaus-admin.html: Eingangs-Prüfung oder Online-Artikel haken"> <span><strong>Warenhaus:</strong> Eingangs-Prüfung oder Online-Artikel haken</span></label>
+        <label class="check-item"><input type="checkbox" value="bedarfe-admin.html: Offene Bedarfe/Gesuche haken"> <span><strong>Bedarfe:</strong> Offene Bedarfe/Gesuche haken</span></label>
+        <label class="check-item"><input type="checkbox" value="radwerkstatt-admin.html: Rad-Ausgabe oder Vorbestellungen haken"> <span><strong>Radwerkstatt:</strong> Ausgabe oder Vorbestellungen haken</span></label>
+        <label class="check-item"><input type="checkbox" value="schatzkiste-admin.html: Filter, Suche oder Einladungs-Mail hakt"> <span><strong>Schatzkiste:</strong> Filter, Suche oder Einladungs-Mail hakt</span></label>
+        <label class="check-item"><input type="checkbox" value="konten-admin.html: Passwörter oder Benutzer-Konten haken"> <span><strong>Konten-Admin:</strong> Passwörter oder Benutzer-Konten haken</span></label>
+        <label class="check-item"><input type="checkbox" value="personen-akten.html / system-admin.html: Akten oder Codes haken"> <span><strong>Akten / System:</strong> Personen-Akten oder Bereichs-Codes haken</span></label>
+      </div>
+      <label class="field-label">Konkrete Beobachtung oder Wunsch zu den Unterseiten:</label>
+      <textarea rows="3" placeholder="Beschreibe hier gerne genau, auf welcher Seite was passiert ist …"></textarea>
+    </section>
+
+    <!-- 5. FREIE WÜNSCHE & NEUE IDEEN -->
+    <section class="card" data-section="5. Weitere Punkte &amp; neue Wünsche">
+      <h2>✨ 5. Weitere Punkte, Design &amp; neue Wünsche</h2>
+      <p style="margin:0 0 10px 0; font-size:0.9rem; color:#475569;">
+        Beliebig viele eigene Punkte eintragen (z. B. Layout, Texte, neue Funktionen):
+      </p>
+      <div id="extra-points-list">
+        <div class="extra-row">
+          <select>
+            <option value="Allgemein / Überall">Allgemein / Überall</option>
+            <option value="Menü (nav.html / nav-loader.js)">Menü (nav.html / nav-loader.js)</option>
+            <option value="master.html">master.html</option>
+            <option value="ki-import.html">ki-import.html</option>
+            <option value="warenhaus-admin.html">warenhaus-admin.html</option>
+            <option value="bedarfe-admin.html">bedarfe-admin.html</option>
+            <option value="radwerkstatt-admin.html">radwerkstatt-admin.html</option>
+            <option value="ideen-admin.html">ideen-admin.html</option>
+            <option value="schatzkiste-admin.html">schatzkiste-admin.html</option>
+            <option value="konten-admin.html">konten-admin.html</option>
+            <option value="personen-akten.html">personen-akten.html</option>
+            <option value="system-admin.html">system-admin.html</option>
+            <option value="Code.gs">Code.gs</option>
+          </select>
+          <input type="text" placeholder="Dein Punkt / Verbesserungswunsch …">
+          <button type="button" class="btn btn-del" onclick="this.parentElement.remove(); updatePreview();">✕</button>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline" onclick="addExtraRow()">+ Weiteren Punkt hinzufügen</button>
+    </section>
+
+    <!-- VORSCHAU DER ZUSAMMENFASSUNG -->
+    <section class="card" style="border-left-color: var(--accent);">
+      <h2>📤 Fertige Zusammenfassung für den Chat</h2>
+      <p style="margin:0 0 8px 0; font-size:0.88rem; color:#475569;">
+        Wird automatisch aktualisiert. Klicke auf <strong>„Alles für Chat kopieren“</strong> und füge es hier im Chat ein:
+      </p>
+      <div id="live-output" class="output-box">Noch nichts ausgewählt oder eingetragen.</div>
+    </section>
+
+  </div>
+
+  <div class="floating-bar">
+    <span id="copy-status" style="font-size:0.9rem; font-weight:600;">Bereit zum Ausfüllen</span>
+    <button type="button" class="btn btn-green" onclick="copyReport()">📋 Alles für Chat kopieren</button>
+    <button type="button" class="btn btn-outline" style="background:#1e293b; color:#fff !important; border-color:#64748b;" onclick="resetForm()">↺ Zurücksetzen</button>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "fflw_feedback_sheet_v22";
+
+    function addExtraRow(pageVal = "Allgemein / Überall", textVal = "") {
+      const list = document.getElementById("extra-points-list");
+      const row = document.createElement("div");
+      row.className = "extra-row";
+      row.innerHTML = `
+        <select>
+          <option value="Allgemein / Überall">Allgemein / Überall</option>
+          <option value="Menü (nav.html / nav-loader.js)">Menü (nav.html / nav-loader.js)</option>
+          <option value="master.html">master.html</option>
+          <option value="ki-import.html">ki-import.html</option>
+          <option value="warenhaus-admin.html">warenhaus-admin.html</option>
+          <option value="bedarfe-admin.html">bedarfe-admin.html</option>
+          <option value="radwerkstatt-admin.html">radwerkstatt-admin.html</option>
+          <option value="ideen-admin.html">ideen-admin.html</option>
+          <option value="schatzkiste-admin.html">schatzkiste-admin.html</option>
+          <option value="konten-admin.html">konten-admin.html</option>
+          <option value="personen-akten.html">personen-akten.html</option>
+          <option value="system-admin.html">system-admin.html</option>
+          <option value="Code.gs">Code.gs</option>
+        </select>
+        <input type="text" placeholder="Dein Punkt / Verbesserungswunsch …">
+        <button type="button" class="btn btn-del" onclick="this.parentElement.remove(); updatePreview();">✕</button>
+      `;
+      row.querySelector("select").value = pageVal;
+      row.querySelector("input").value = textVal;
+      list.appendChild(row);
+      bindEvents();
+      updatePreview();
+    }
+
+    function buildReportText() {
+      const curZip = document.getElementById("zip-current-version")?.value || "ZIP v22";
+      const nextZip = document.getElementById("zip-next-version")?.value || "Erst Rückmeldung besprechen";
+      const lines = [
+        `### Rückmeldung zu ${curZip} (${nextZip})`,
+        ""
+      ];
+      let hasAny = false;
+
+      document.querySelectorAll("section.card[data-section]").forEach(sec => {
+        const title = sec.getAttribute("data-section");
+        const checked = Array.from(sec.querySelectorAll("input[type='checkbox']:checked")).map(cb => cb.value);
+        const ta = sec.querySelector("textarea");
+        const note = ta ? ta.value.trim() : "";
+
+        const extraItems = [];
+        if (sec.querySelector("#extra-points-list")) {
+          sec.querySelectorAll(".extra-row").forEach(r => {
+            const p = r.querySelector("select").value;
+            const t = r.querySelector("input").value.trim();
+            if (t) extraItems.push(`[${p}] ${t}`);
+          });
+        }
+
+        if (checked.length || note || extraItems.length) {
+          hasAny = true;
+          lines.push(`**${title}**`);
+          checked.forEach(c => lines.push(`- [x] ${c}`));
+          extraItems.forEach(e => lines.push(`- ${e}`));
+          if (note) lines.push(`- Bemerkung: ${note}`);
+          lines.push("");
+        }
+      });
+
+      return hasAny ? lines.join("\n").trim() : "Noch nichts ausgewählt oder eingetragen.";
+    }
+
+    function updatePreview() {
+      document.querySelectorAll(".check-item").forEach(lbl => {
+        const cb = lbl.querySelector("input[type='checkbox']");
+        lbl.classList.toggle("checked", !!(cb && cb.checked));
+      });
+      const txt = buildReportText();
+      document.getElementById("live-output").textContent = txt;
+      saveState();
+    }
+
+    function saveState() {
+      try {
+        const state = {
+          checks: Array.from(document.querySelectorAll("section.card[data-section] input[type='checkbox']")).map(cb => cb.checked),
+          notes: Array.from(document.querySelectorAll("section.card[data-section] textarea")).map(ta => ta.value),
+          extras: Array.from(document.querySelectorAll("#extra-points-list .extra-row")).map(r => ({
+            page: r.querySelector("select").value,
+            text: r.querySelector("input").value
+          }))
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (Array.isArray(state.checks)) {
+          document.querySelectorAll("section.card[data-section] input[type='checkbox']").forEach((cb, i) => {
+            cb.checked = !!state.checks[i];
+          });
+        }
+        if (Array.isArray(state.notes)) {
+          document.querySelectorAll("section.card[data-section] textarea").forEach((ta, i) => {
+            ta.value = state.notes[i] || "";
+          });
+        }
+        if (Array.isArray(state.extras) && state.extras.length) {
+          const list = document.getElementById("extra-points-list");
+          list.innerHTML = "";
+          state.extras.forEach(ex => addExtraRow(ex.page, ex.text));
+        }
+      } catch (e) {}
+    }
+
+    function bindEvents() {
+      document.querySelectorAll("input, textarea, select").forEach(el => {
+        el.removeEventListener("input", updatePreview);
+        el.removeEventListener("change", updatePreview);
+        el.addEventListener("input", updatePreview);
+        el.addEventListener("change", updatePreview);
+      });
+    }
+
+    async function copyReport() {
+      const txt = buildReportText();
+      const status = document.getElementById("copy-status");
+      try {
+        await navigator.clipboard.writeText(txt);
+        status.textContent = "✅ In Zwischenablage kopiert! Jetzt hier im Chat einfügen.";
+        status.style.color = "#86efac";
+      } catch (e) {
+        status.textContent = "⚠️ Bitte Text unten markieren & kopieren.";
+        status.style.color = "#fde047";
+      }
+    }
+
+    function resetForm() {
+      if (!confirm("Alle Eingaben im Feedback-Bogen zurücksetzen?")) return;
+      localStorage.removeItem(STORAGE_KEY);
+      document.querySelectorAll("input[type='checkbox']").forEach(cb => cb.checked = false);
+      document.querySelectorAll("textarea").forEach(ta => ta.value = "");
+      document.getElementById("extra-points-list").innerHTML = "";
+      addExtraRow();
+      updatePreview();
+    }
+
+    loadState();
+    bindEvents();
+    updatePreview();
+  </script>
+</body>
+</html>
