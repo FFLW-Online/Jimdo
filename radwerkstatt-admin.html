@@ -11,6 +11,7 @@
 <!doctype html>
 <html lang="de">
 <head>
+  <script>window.FFLW_TARGET_SECTION = "rad";</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow, noarchive">
@@ -848,7 +849,7 @@
           copilot: "Copilot (Lesemodus)"
         };
         document.getElementById("m-role-label").textContent = "Rolle: " + (roleNames[data.role] || data.role);
-        document.getElementById("m-sync-hint").textContent = fromCache ? "⏳ Aktualisiere im Hintergrund …" : "✓ Aktuell";
+        document.getElementById("m-sync-hint").textContent = fromCache ? `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Aktualisiere im Hintergrund …` : "✓ Aktuell";
 
         if (data.visitStats) {
           try { localStorage.setItem("fflw_ignore_my_visits", "1"); } catch (e) {}
@@ -919,19 +920,39 @@
         renderAllSections(data);
       }
 
+      async function fetchJsonRetry(url, retries = 2) {
+        let lastErr = null;
+        for (let attempt = 0; attempt <= retries; attempt++) {
+          try {
+            const resp = await fetch(url, { method: "GET", redirect: "follow", cache: "no-store" });
+            if (!resp.ok) throw new Error("HTTP " + resp.status);
+            return await resp.json();
+          } catch (err) {
+            lastErr = err;
+            if (attempt < retries) {
+              await new Promise(r => setTimeout(r, 800 * (attempt + 1)));
+            }
+          }
+        }
+        throw lastErr;
+      }
+
       async function loadMasterData(codeToUse, silentBackground) {
         const msgEl = document.getElementById("m-login-msg");
         const loginBtn = document.getElementById("m-login-btn");
-        const code = String(codeToUse || codeInput.value || "").replace(/\s+/g, "").trim();
+        const code = String(codeToUse || codeInput.value || "").replace(/[\s\-–—_]+/g, "").trim();
         if (!code) {
           msgEl.style.color = "#c62828";
           msgEl.textContent = "Bitte Zugangscode eingeben.";
           return { ok: false };
         }
 
+        const targetSection = window.FFLW_TARGET_SECTION || "";
+        const sectionCacheKey = targetSection ? `${CACHE_KEY}_${targetSection}` : CACHE_KEY;
+
         if (!silentBackground) {
           try {
-            const cachedRaw = sessionStorage.getItem(CACHE_KEY);
+            const cachedRaw = sessionStorage.getItem(sectionCacheKey);
             if (cachedRaw) {
               const cachedObj = JSON.parse(cachedRaw);
               if (cachedObj && cachedObj.ok) applyDashboardData(cachedObj, true);
@@ -940,30 +961,84 @@
         }
 
         const task = async () => {
-          const resp = await fetch(`${WEB_APP_URL}?action=master_overview&code=${encodeURIComponent(code)}&t=${Date.now()}`, {
-            method: "GET",
-            redirect: "follow"
-          });
-          const data = await resp.json();
-          if (!data || !data.ok) {
+          try {
+            if (targetSection) {
+              const data = await fetchJsonRetry(
+                `${WEB_APP_URL}?action=admin_section&code=${encodeURIComponent(code)}&section=${encodeURIComponent(targetSection)}&t=${Date.now()}`,
+                2
+              );
+              if (!data || !data.ok) {
+                msgEl.style.color = "#c62828";
+                msgEl.textContent = (data && data.error) ? data.error : "Ungültiger Code.";
+                sessionStorage.removeItem("fflw_master_session_code");
+                if (window.FFLW_SupermasterDevice) window.FFLW_SupermasterDevice.deactivate();
+                sessionStorage.removeItem(sectionCacheKey);
+                document.getElementById("m-dashboard").style.display = "none";
+                document.getElementById("m-login-box").style.display = "block";
+                return { ok: false };
+              }
+              currentCode = code;
+              sessionStorage.setItem("fflw_master_session_code", code);
+              if (data.role === "master" && window.FFLW_SupermasterDevice) {
+                window.FFLW_SupermasterDevice.activate(code);
+              }
+              try { sessionStorage.setItem(sectionCacheKey, JSON.stringify(data)); } catch (e) {}
+              applyDashboardData(data, false);
+              return { ok: true };
+            }
+
+            const auth = await fetchJsonRetry(
+              `${WEB_APP_URL}?action=verify_master_code&code=${encodeURIComponent(code)}&t=${Date.now()}`,
+              2
+            );
+            if (!auth || !auth.ok) {
+              msgEl.style.color = "#c62828";
+              msgEl.textContent = (auth && auth.error) ? auth.error : "Ungültiger Code.";
+              sessionStorage.removeItem("fflw_master_session_code");
+              if (window.FFLW_SupermasterDevice) window.FFLW_SupermasterDevice.deactivate();
+              sessionStorage.removeItem(CACHE_KEY);
+              document.getElementById("m-dashboard").style.display = "none";
+              document.getElementById("m-login-box").style.display = "block";
+              return { ok: false };
+            }
+
+            currentCode = code;
+            sessionStorage.setItem("fflw_master_session_code", code);
+            if (auth.role === "master" && window.FFLW_SupermasterDevice) {
+              window.FFLW_SupermasterDevice.activate(code);
+            }
+
+            const merged = Object.assign({}, currentData || {}, auth);
+            applyDashboardData(merged, true);
+            const syncEl = document.getElementById("m-sync-hint");
+            if (syncEl) {
+              const coin = (typeof window.fflwGetLogoSpinnerHtml === "function") ? window.fflwGetLogoSpinnerHtml(18) : "";
+              syncEl.innerHTML = `${coin} Lade Kachel-Zähler …`;
+            }
+
+            const sectionsToLoad = ["hits", "bedarfe", "rad", "ideen", "schatz", "warenhaus"];
+            if (auth.role === "master" || auth.role === "freischalter") sectionsToLoad.push("konten");
+            if (auth.role === "master") sectionsToLoad.push("akten");
+
+            await Promise.allSettled(sectionsToLoad.map(async sec => {
+              const part = await fetchJsonRetry(
+                `${WEB_APP_URL}?action=admin_section&code=${encodeURIComponent(code)}&section=${encodeURIComponent(sec)}&t=${Date.now()}`,
+                1
+              );
+              if (part && part.ok) {
+                Object.assign(merged, part);
+                applyDashboardData(merged, true);
+              }
+            }));
+
+            try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(merged)); } catch (e) {}
+            if (syncEl) syncEl.textContent = "✓ Aktuell";
+            return { ok: true };
+          } catch (err) {
             msgEl.style.color = "#c62828";
-            msgEl.textContent = (data && data.error) ? data.error : "Ungültiger Code.";
-            sessionStorage.removeItem("fflw_master_session_code");
-        if (window.FFLW_SupermasterDevice) window.FFLW_SupermasterDevice.deactivate();
-            sessionStorage.removeItem(CACHE_KEY);
-            document.getElementById("m-dashboard").style.display = "none";
-            document.getElementById("m-login-box").style.display = "block";
+            msgEl.textContent = "Verbindungsfehler beim Laden. Bitte kurz erneut versuchen (" + err.message + ").";
             return { ok: false };
           }
-
-          currentCode = code;
-          sessionStorage.setItem("fflw_master_session_code", code);
-          if (data.role === "master" && window.FFLW_SupermasterDevice) {
-            window.FFLW_SupermasterDevice.activate(code);
-          }
-          try { sessionStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {}
-          applyDashboardData(data, false);
-          return { ok: true };
         };
 
         if (!silentBackground && document.getElementById("m-login-box").style.display !== "none" && typeof window.fflwRunButtonAction === "function") {
@@ -1165,7 +1240,7 @@
             const chks = Array.from(document.querySelectorAll(".eingang-row-chk:checked"));
             if (!chks.length) return alert("Bitte mindestens einen Artikel markieren.");
             bulkPubBtn.disabled = true;
-            bulkPubBtn.textContent = `⏳ Schalte ${chks.length} frei …`;
+            bulkPubBtn.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Schalte ${chks.length} frei …`;
             const ids = chks.map(c => c.dataset.id);
             const res = await postAction({ action: "bulkPublishEingang", folderIds: ids });
             if (res && res.ok) await loadMasterData(currentCode, false);
@@ -1179,7 +1254,7 @@
             if (!chks.length) return alert("Bitte mindestens einen Artikel markieren.");
             if (!confirm(`${chks.length} markierte Eingänge wirklich endgültig löschen?`)) return;
             bulkDelBtn.disabled = true;
-            bulkDelBtn.textContent = "⏳ Lösche …";
+            bulkDelBtn.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Lösche …`;
             const ids = chks.map(c => c.dataset.id);
             const res = await postAction({ action: "bulkDeleteEingang", folderIds: ids });
             if (res && res.ok) await loadMasterData(currentCode, false);
@@ -1209,7 +1284,7 @@
             const newTitle = `${btn.dataset.count}× ${btn.dataset.title}`;
             if (!confirm(`Alle ${ids.length} Einträge zu einem Artikel „${newTitle}“ zusammenfassen?`)) return;
             btn.disabled = true;
-            btn.textContent = "⏳ Bündele …";
+            btn.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Bündele …`;
             const res = await postAction({ action: "bundleEingangItems", folderIds: ids, newTitle: newTitle });
             if (res && res.ok) await loadMasterData(currentCode, false);
             else alert((res && res.error) || "Fehler beim Bündeln.");
@@ -1879,7 +1954,7 @@
           btn.addEventListener("click", async () => {
             if (!confirm("Möchtest du beide Einträge zu einem vollständigen Datensatz vereinigen?")) return;
             btn.disabled = true;
-            btn.textContent = "⏳ Vereinige …";
+            btn.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Vereinige …`;
             const res = await postMasterAction("mergeTreasureEntries", { keepFileId: btn.dataset.keep, dropFileId: btn.dataset.drop });
             if (res && res.ok) await loadMasterOverview();
             else alert((res && res.error) || "Vereinigen fehlgeschlagen.");
@@ -1891,7 +1966,7 @@
             const fid = btn.dataset.fileid;
             const ta = container.querySelector(`.sz-trans-ta[data-fileid="${fid}"]`);
             btn.disabled = true;
-            btn.textContent = "⏳ Speichere …";
+            btn.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Speichere …`;
             const res = await postMasterAction("saveTreasureTranslation", { fileId: fid, translationText: ta ? ta.value : "" });
             btn.disabled = false;
             btn.textContent = (res && res.ok) ? "✓ Gespeichert!" : "Fehler";
@@ -2088,7 +2163,7 @@
             <div class="m-card" style="border-left-color:${isPublic ? "#16a34a" : "#d97706"};">
               <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px;">
                 <div>
-                  <span class="m-badge" style="background:${isPublic ? "#dcfce7; color:#166534;" : "#fef3c7; color:#92400e;"}">${isPublic ? "🌐 Öffentlich" : "⏳ Neu / Wartet auf Freigabe"}</span>
+                  <span class="m-badge" style="background:${isPublic ? "#dcfce7; color:#166534;" : "#fef3c7; color:#92400e;"}">${isPublic ? "🌐 Öffentlich" : `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Neu / Wartet auf Freigabe`}</span>
                   <span class="m-badge" style="background:#e0e7ff; color:#1e3a8a; margin-left:4px;">${it.typ || "Idee"}</span>
                   <strong style="margin-left:6px; font-size:1.05rem;">${it.titel || "Ohne Titel"}</strong>
                 </div>
@@ -2187,9 +2262,9 @@
         if (!q) { st.style.color = "#b91c1c"; st.textContent = "Bitte Drive-Ordner-Link oder Namen eingeben."; return; }
         const orig = this.textContent;
         this.disabled = true;
-        this.textContent = "⏳ Lade Bilder …";
+        this.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Lade Bilder …`;
         st.style.color = "#b45309";
-        st.textContent = "⏳ Suche Bilder im Drive-Ordner …";
+        st.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Suche Bilder im Drive-Ordner …`;
         try {
           const res = await postMasterAction("importPhotosFromDriveFolder", { folderQuery: q });
           this.disabled = false;
@@ -2472,8 +2547,8 @@
             const slice = kiLoadedPhotos.slice(startIdx, startIdx + batchSize);
             statusEl.style.color = "#312e81";
             statusEl.textContent = totalBatches > 1
-              ? `⏳ KI analysiert Bild-Paket ${b + 1} von ${totalBatches} (Bilder #${startIdx + 1}–#${startIdx + slice.length}) …`
-              : "⏳ KI analysiert Bilder, gruppiert gleiche Artikel & schätzt Maße …";
+              ? `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} KI analysiert Bild-Paket ${b + 1} von ${totalBatches} (Bilder #${startIdx + 1}–#${startIdx + slice.length}) …`
+              : `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} KI analysiert Bilder, gruppiert gleiche Artikel & schätzt Maße …`;
 
             const parts = [
               {
@@ -2733,7 +2808,7 @@
           let savedOk = 0;
           for (let i = 0; i < toImport.length; i++) {
             msgEl.style.color = "#312e81";
-            msgEl.textContent = `⏳ Speichere Artikel ${i + 1} von ${toImport.length}: „${toImport[i].titel}“ (${toImport[i].photos.length} Foto/s) …`;
+            msgEl.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Speichere Artikel ${i + 1} von ${toImport.length}: „${toImport[i].titel}“ (${toImport[i].photos.length} Foto/s) …`;
             const res = await postAction({
               action: "bulkImportApartmentItems",
               spenderName: spenderName,

@@ -952,7 +952,7 @@ function openTranslationHelpDialog(activeLang) {
     const sentCount = parseInt(sessionStorage.getItem("fflw_help_sent_count") || "0", 10);
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "⏳ ...";
+    submitBtn.innerHTML = (typeof window.fflwGetLogoSpinnerHtml === "function") ? window.fflwGetLogoSpinnerHtml(18) : "…";
 
     const showFakeOrRealSuccess = () => {
       submitBtn.style.background = "#1b5e20";

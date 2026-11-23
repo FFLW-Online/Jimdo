@@ -218,7 +218,7 @@
           return;
         }
         loginMsg.style.color = "#312e81";
-        loginMsg.textContent = "⏳ Prüfe Zugangscode …";
+        loginMsg.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Prüfe Zugangscode …`;
         try {
           const resp = await fetch(`${WEB_APP_URL}?action=getGeminiApiKey&masterCode=${encodeURIComponent(code)}&t=${Date.now()}`, {
             method: "GET",
@@ -397,9 +397,9 @@
         if (!q) { st.style.color = "#b91c1c"; st.textContent = "Bitte Drive-Ordner-Link oder Namen eingeben."; return; }
         const orig = this.textContent;
         this.disabled = true;
-        this.textContent = "⏳ Lade Bilder …";
+        this.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Lade Bilder …`;
         st.style.color = "#b45309";
-        st.textContent = "⏳ Suche Bilder im Drive-Ordner …";
+        st.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Suche Bilder im Drive-Ordner …`;
         try {
           const resp = await fetch(WEB_APP_URL, {
             method: "POST",
@@ -521,8 +521,8 @@
             const slice = kiLoadedPhotos.slice(startIdx, startIdx + batchSize);
             statusEl.style.color = "#312e81";
             statusEl.textContent = totalBatches > 1
-              ? `⏳ KI analysiert Bild-Paket ${b + 1} von ${totalBatches} (Bilder #${startIdx + 1}–#${startIdx + slice.length}) …`
-              : "⏳ KI analysiert Bilder, bündelt gleiche Artikel & schätzt Maße …";
+              ? `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} KI analysiert Bild-Paket ${b + 1} von ${totalBatches} (Bilder #${startIdx + 1}–#${startIdx + slice.length}) …`
+              : `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} KI analysiert Bilder, bündelt gleiche Artikel & schätzt Maße …`;
 
             const parts = [
               {
@@ -810,7 +810,7 @@
           let savedOk = 0;
           for (let i = 0; i < toImport.length; i++) {
             msgEl.style.color = "#312e81";
-            msgEl.textContent = `⏳ Speichere Artikel ${i + 1} von ${toImport.length}: „${toImport[i].titel}“ (${toImport[i].photos.length} Foto/s) …`;
+            msgEl.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Speichere Artikel ${i + 1} von ${toImport.length}: „${toImport[i].titel}“ (${toImport[i].photos.length} Foto/s) …`;
             const resp = await fetch(WEB_APP_URL, {
               method: "POST",
               redirect: "follow",
