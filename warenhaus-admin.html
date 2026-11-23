@@ -113,20 +113,24 @@
     }
     .m-btn {
       background: #004080;
-      color: #ffffff;
+      color: #ffffff !important;
       border: none;
-      padding: 7px 12px;
+      padding: 8px 13px;
       border-radius: 6px;
-      font-weight: bold;
+      font-weight: 700;
       cursor: pointer;
-      font-size: 0.88rem;
+      font-size: 0.9rem;
+      line-height: 1.3;
       text-decoration: none;
       display: inline-block;
     }
-    .m-btn-green { background: #2e7d32; }
-    .m-btn-orange { background: #d97706; }
-    .m-btn-red { background: #b71c1c; }
-    .m-btn-grey { background: #455a64; }
+    .m-btn:hover { filter: brightness(0.92); color: #ffffff !important; }
+    .m-btn-green { background: #1e6b24; color: #ffffff !important; }
+    .m-btn-orange, .m-btn-warn { background: #b45309; color: #ffffff !important; }
+    .m-btn-red { background: #b71c1c; color: #ffffff !important; }
+    .m-btn-grey { background: #374151; color: #ffffff !important; }
+    #tab-btn-kiimport.active { background: #312e81 !important; color: #ffffff !important; border-color: #1e1b4b !important; }
+    #tab-btn-ideentafel.active { background: #854d0e !important; color: #ffffff !important; border-color: #713f12 !important; }
     .m-input, .m-select, .m-textarea {
       width: 100%;
       padding: 9px 11px;
@@ -275,12 +279,12 @@
 
         
 
-        <div id="m-subview-bar" class="m-subview-bar">
-          <a href="master.html" id="m-back-to-hub-btn" class="m-btn">← Zurück zur Master-Übersicht</a>
-          <strong id="m-subview-title" style="color:#003366; font-size:1.05rem;">Bereich</strong>
+        <div id="m-subview-bar" class="m-subview-bar" style="display:flex;">
+          <a href="master.html?nomask=1" id="m-back-to-hub-btn" class="m-btn">← Zurück zur Master-Übersicht</a>
+          <strong id="m-subview-title" style="color:#003366; font-size:1.05rem;">Warenhaus-Verwaltung (Eingang & Online)</strong>
         </div>
 
-        <div class="m-tabs" id="m-tab-bar" style="display:none;">
+        <div class="m-tabs" id="m-tab-bar" style="display:flex;">
           <button type="button" class="m-tab-btn active" data-tab="eingang">📥 Eingangs-Prüfung (<span id="cnt-eingang">0</span>)</button>
           <button type="button" class="m-tab-btn" data-tab="online">🌐 Online &amp; Reserviert (<span id="cnt-online">0</span>)</button>
           <button type="button" class="m-tab-btn" data-tab="bedarfe">📋 Offene Bedarfe (<span id="cnt-bedarfe">0</span>)</button>
@@ -293,7 +297,7 @@
         </div>
 
         <!-- TAB 1: EINGANG -->
-        <section id="tab-eingang" class="m-tab-panel" style="display:none;"><div id="list-eingang"></div></section>
+        <section id="tab-eingang" class="m-tab-panel" style="display:block;"><div id="list-eingang"></div></section>
 
         <!-- TAB 2: ONLINE & RESERVIERT -->
         <section id="tab-online" class="m-tab-panel" style="display:none;">
@@ -907,6 +911,7 @@
         syncHubTile("hub-tile-schatz", "tab-btn-schatz");
         syncHubTile("hub-tile-ideentafel", "tab-btn-ideentafel");
         syncHubTile("hub-tile-system", "tab-btn-system");
+        syncHubTile("hub-tile-seitensteuerung", "tab-btn-system");
         if (document.getElementById("hub-tile-konten")) document.getElementById("hub-tile-konten").style.display = isSuper ? "flex" : "none";
         const kiHubLink = document.getElementById("hub-tile-kiimport");
         if (kiHubLink && currentCode) kiHubLink.href = "ki-import.html?code=" + encodeURIComponent(currentCode);
@@ -2914,15 +2919,9 @@
         if (inp && !inp.value) inp.value = urlCode.trim();
       }
 
-      const subBar = document.getElementById("m-subview-bar");
-      if (subBar) subBar.style.display = "flex";
-      const subTitle = document.getElementById("m-subview-title");
-      if (subTitle) subTitle.textContent = 'Warenhaus-Verwaltung (Eingang & Online)';
-
       if (PAGE_TABS.length > 1) {
         const tabBar = document.getElementById("m-tab-bar");
         if (tabBar) {
-          tabBar.style.display = "flex";
           tabBar.querySelectorAll(".m-tab-btn").forEach(btn => {
             btn.style.display = PAGE_TABS.includes(btn.dataset.tab) ? "inline-block" : "none";
           });
@@ -2932,8 +2931,8 @@
       const dash = document.getElementById("m-dashboard");
       const enforceFocus = () => {
         if (!dash || dash.style.display === "none") return;
-        if (subBar) subBar.style.display = "flex";
         const roleTxt = (document.getElementById("m-role-label")?.textContent || "").toLowerCase();
+        if (!roleTxt || roleTxt === "rolle: –") return;
         const isAllowed = ALLOWED_ROLES.some(r => {
           if (r === "master" && roleTxt.includes("supermaster")) return true;
           if (r === "freischalter" && roleTxt.includes("freischalter")) return true;
@@ -2945,22 +2944,12 @@
         if (!isAllowed) {
           alert("Dieser Code hat keine Berechtigung für „Warenhaus-Verwaltung (Eingang & Online)“.");
           document.getElementById("m-logout-btn")?.click();
-          return;
-        }
-        const anyOpen = PAGE_TABS.some(t => {
-          const el = document.getElementById("tab-" + t);
-          return el && el.style.display === "block";
-        });
-        if (!anyOpen && PAGE_TABS[0]) {
-          document.querySelectorAll(".m-tab-panel").forEach(p => {
-            p.style.display = (p.id === "tab-" + PAGE_TABS[0]) ? "block" : "none";
-          });
         }
       };
       if (dash && "MutationObserver" in window) {
         new MutationObserver(enforceFocus).observe(dash, { attributes: true, attributeFilter: ["style"] });
       }
-      setTimeout(enforceFocus, 150);
+      setTimeout(enforceFocus, 300);
     })();
   </script>
 </body>

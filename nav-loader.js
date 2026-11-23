@@ -31,7 +31,12 @@ window.fflwNeutralizeCodeInput = function (inputEl) {
 // ============================================================================
 function applySelectiveUrlMasking(currentPage, maskierteSeiten) {
   try {
-    const liste = Array.isArray(maskierteSeiten) ? maskierteSeiten : ["unterlagen.html", "master.html"];
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("nomask") === "1") {
+      sessionStorage.setItem("fflw_disable_url_masking", "1");
+    }
+    if (sessionStorage.getItem("fflw_disable_url_masking") === "1") return;
+    const liste = Array.isArray(maskierteSeiten) ? maskierteSeiten : ["unterlagen.html"];
     if (!liste.includes(currentPage)) return;
     if (currentPage === "index.html") return;
 
@@ -53,7 +58,7 @@ function applySelectiveUrlMasking(currentPage, maskierteSeiten) {
   try {
     const currentPage = window.location.pathname.split("/").pop() || "index.html";
     const raw = sessionStorage.getItem(FFLW_STATUS_CACHE_KEY);
-    let maskList = ["unterlagen.html", "master.html"];
+    let maskList = ["unterlagen.html"];
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && Array.isArray(parsed.maskierteSeiten)) {
@@ -149,7 +154,19 @@ window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
     "unterlagen.html",
     "schatzsuche.html",
     "ideen-lob-kritik.html",
-    "begegnung-tipps.html"
+    "begegnung-tipps.html",
+    "konto-anlegen.html",
+    "ki-import.html",
+    "warenhaus-admin.html",
+    "bedarfe-admin.html",
+    "radwerkstatt-admin.html",
+    "ideen-admin.html",
+    "schatzkiste-admin.html",
+    "konten-admin.html",
+    "personen-akten.html",
+    "seiten-steuerung.html",
+    "seiten-hits.html",
+    "system-admin.html"
   ];
 
   const extraHiddenSet = new Set(Array.isArray(extraHiddenFiles) ? extraHiddenFiles : []);
@@ -182,7 +199,7 @@ window.fetchFflwDynamicPages = async function (extraHiddenFiles) {
   let source = "github";
   try {
     const ghUrl = `https://api.github.com/repos/${FFLW_GITHUB_OWNER}/${FFLW_GITHUB_REPO}/git/trees/${FFLW_GITHUB_BRANCH}?recursive=1`;
-    const ghResp = await fetch(ghUrl, { headers: { "Accept": "application/vnd.github.v3+json" } });
+    const ghResp = await fetch(`${ghUrl}&t=${Date.now()}`, { cache: "no-store", headers: { "Accept": "application/vnd.github.v3+json" } });
     if (ghResp.ok) {
       const ghData = await ghResp.json();
       if (ghData && Array.isArray(ghData.tree)) {
@@ -553,7 +570,7 @@ function syncGlobalSiteStatus(currentPage) {
       const fresh = {
         wartungSeiten: Array.isArray(data.wartungSeiten) ? data.wartungSeiten : [],
         versteckteSeiten: Array.isArray(data.versteckteSeiten) ? data.versteckteSeiten : ["unterlagen.html"],
-        maskierteSeiten: Array.isArray(data.maskierteSeiten) ? data.maskierteSeiten : ["unterlagen.html", "master.html"],
+        maskierteSeiten: Array.isArray(data.maskierteSeiten) ? data.maskierteSeiten : ["unterlagen.html"],
         flaggenStil: ["A", "B", "C", "OFF"].includes(data.flaggenStil) ? data.flaggenStil : "A",
         zugangscode: typeof data.zugangscode === "string" ? data.zugangscode : "11"
       };
@@ -1100,7 +1117,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 const subUl = mitarbeitDetails.querySelector("ul");
                 if (subUl) {
                   const liIdeen = document.createElement("li");
-                  liIdeen.innerHTML = '<a href="ideen-lob-kritik.html">💡 Lob, Tipps &amp; neue Ideen</a>';
+                  liIdeen.innerHTML = '<a href="ideen-lob-kritik.html">Lob, Tipps &amp; neue Ideen</a>';
                   subUl.appendChild(liIdeen);
                 }
               }
@@ -1113,7 +1130,7 @@ document.addEventListener("DOMContentLoaded", function () {
               if (li) li.remove();
             });
             const liKonto = document.createElement("li");
-            liKonto.innerHTML = '<a href="konto-anlegen.html">👤 Eigenes Konto anlegen</a>';
+            liKonto.innerHTML = '<a href="konto-anlegen.html">Eigenes Konto anlegen</a>';
             const kontaktLink = Array.from(navListEl.querySelectorAll("a")).find(a =>
               /kontakt/i.test(a.textContent || "") || (a.getAttribute("href") || "").includes("kontakt")
             );

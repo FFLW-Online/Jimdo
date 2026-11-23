@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Webseiten ein- &amp; ausschalten (Seiten-Steuerung) – FFLW</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .sc-card {
+      background: #ffffff;
+      color: #111111;
+      border: 2px solid #c5d7eb;
+      border-left: 6px solid #004080;
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 14px 0;
+      box-shadow: 0 3px 10px rgba(0, 64, 128, 0.08);
+    }
+    .sc-btn {
+      background: #004080;
+      color: #ffffff !important;
+      border: none;
+      padding: 9px 14px;
+      border-radius: 7px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.9rem;
+      line-height: 1.3;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .sc-btn:hover { filter: brightness(0.92); color: #ffffff !important; }
+    .sc-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .sc-btn-green { background: #1e6b24; color: #ffffff !important; }
+    .sc-btn-amber { background: #b45309; color: #ffffff !important; }
+    .sc-btn-grey { background: #374151; color: #ffffff !important; }
+    .sc-input {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid #8faadc;
+      border-radius: 6px;
+      font-size: 15px;
+      color: #111111;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+    .sc-table-box {
+      border: 1.5px solid #93c5fd;
+      border-radius: 8px;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 62vh;
+      background: #ffffff;
+      margin-top: 8px;
+    }
+    .sc-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.92rem;
+      color: #0f172a;
+    }
+    .sc-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: #004080;
+      color: #ffffff;
+      text-align: left;
+      padding: 11px 10px;
+      font-weight: 700;
+      border-bottom: 2px solid #002b59;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
+    }
+    .sc-table td {
+      padding: 9px 10px;
+      border-bottom: 1px solid #dbeafe;
+      vertical-align: middle;
+    }
+    .sc-table tbody tr:nth-child(even) td { background: #f8fbff; }
+    .sc-table tbody tr.is-locked td { background: #fef2f2; }
+    .sc-chk {
+      width: 19px;
+      height: 19px;
+      accent-color: #004080;
+      cursor: pointer;
+    }
+    .sc-chk-warn { accent-color: #b91c1c; }
+    .sc-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .sc-sticky-save {
+      position: sticky;
+      bottom: 10px;
+      z-index: 40;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 11px 16px;
+      border-radius: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 16px;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.28);
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
+
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+    <main class="content">
+      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
+        <h2 style="margin:0; color:#003366;">🚦 Webseiten ein- &amp; ausschalten (Seiten-Steuerung)</h2>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <a href="seiten-hits.html" class="sc-btn sc-btn-grey" style="font-size:0.84rem;">📊 Zu Seiten-Hits &amp; Codes</a>
+          <a href="master.html?nomask=1" class="sc-btn" style="font-size:0.84rem;">← Zurück zur Master-Übersicht</a>
+        </div>
+      </div>
+
+      <!-- LOGIN -->
+      <section id="sc-login-box" class="sc-card">
+        <h3 style="margin-top:0; color:#003366;">🔐 Supermaster-Zugang</h3>
+        <p style="font-size:0.92rem; margin-bottom:10px;">
+          Auf deinem eigenen Supermaster-Gerät wirst du automatisch durchgelassen. Ansonsten bitte Supermaster-Code eingeben:
+        </p>
+        <form id="sc-login-form" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+          <input type="password" id="sc-code-input" class="sc-input" placeholder="Supermaster-Code …" style="max-width:260px;">
+          <button type="submit" id="sc-login-btn" class="sc-btn">Anmelden &amp; Seiten laden</button>
+        </form>
+        <div id="sc-login-msg" style="margin-top:8px; font-weight:bold; color:#b91c1c;"></div>
+      </section>
+
+      <!-- ARBEITSBEREICH -->
+      <div id="sc-workspace" style="display:none;">
+        <div class="sc-card" style="background:#f0f9ff; border-left-color:#0284c7; padding:12px 16px;">
+          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+            <div>
+              <strong style="color:#0369a1;">🔄 Live-Seitenliste (automatisch aktualisiert)</strong>
+              <div id="sc-discovery-status" style="font-size:0.86rem; color:#334155; margin-top:2px;">Lade Seiten aus GitHub …</div>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:8px;">
+              <button type="button" id="sc-reload-pages-btn" class="sc-btn sc-btn-amber">🔄 Seitenliste jetzt neu einlesen</button>
+              <button type="button" id="sc-unlock-all-btn" class="sc-btn sc-btn-green">✅ Alle Wartungs-Sperren aufheben</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TABELLE 1: ÖFFENTLICHE MENÜ-SEITEN -->
+        <section class="sc-card">
+          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
+            <h3 style="margin:0; color:#003366;">🌐 1. Öffentliche Menü-Seiten (<span id="sc-cnt-open">0</span>)</h3>
+            <span style="font-size:0.84rem; color:#475569;">Alle regulär im Hauptmenü verlinkten Seiten</span>
+          </div>
+          <div class="sc-table-box">
+            <table class="sc-table">
+              <thead>
+                <tr>
+                  <th>Datei</th>
+                  <th>Seitentitel</th>
+                  <th style="text-align:center;">Status</th>
+                  <th style="text-align:center;">Wartung (ausschalten / sperren)</th>
+                  <th style="text-align:center;">Im Menü verstecken</th>
+                  <th style="text-align:center;">Adressleiste tarnen (index.html)</th>
+                </tr>
+              </thead>
+              <tbody id="sc-tbody-open"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- TABELLE 2: VERSTECKTE & INTERNE SEITEN -->
+        <section class="sc-card" style="border-left-color:#475569;">
+          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
+            <h3 style="margin:0; color:#1e293b;">🔒 2. Versteckte &amp; interne Seiten (<span id="sc-cnt-hidden">0</span>)</h3>
+            <span style="font-size:0.84rem; color:#475569;">Spezial-, Geheim-, Admin- und Rechtstext-Seiten außerhalb des Hauptmenüs</span>
+          </div>
+          <div class="sc-table-box">
+            <table class="sc-table">
+              <thead>
+                <tr>
+                  <th>Datei</th>
+                  <th>Seitentitel</th>
+                  <th style="text-align:center;">Status</th>
+                  <th style="text-align:center;">Wartung (ausschalten / sperren)</th>
+                  <th style="text-align:center;">Im Menü verstecken</th>
+                  <th style="text-align:center;">Adressleiste tarnen (index.html)</th>
+                </tr>
+              </thead>
+              <tbody id="sc-tbody-hidden"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- FIXIERTE SPEICHER-LEISTE UNTEN -->
+        <div class="sc-sticky-save">
+          <span id="sc-save-msg" style="font-size:0.9rem; font-weight:700;">Änderungen unten rechts speichern</span>
+          <button type="button" id="sc-save-btn" class="sc-btn sc-btn-green" style="font-size:0.96rem; padding:10px 18px;">💾 Seiten-Einstellungen speichern</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a>
+  </footer>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+      let currentCode = "";
+      let currentSystemData = null;
+
+      const loginBox = document.getElementById("sc-login-box");
+      const workspace = document.getElementById("sc-workspace");
+      const codeInput = document.getElementById("sc-code-input");
+      const loginMsg = document.getElementById("sc-login-msg");
+
+      if (typeof window.fflwNeutralizeCodeInput === "function") {
+        window.fflwNeutralizeCodeInput(codeInput);
+      }
+
+      function renderRowHtml(p, wartungSet, hiddenSet, maskSet) {
+        const isLocked = wartungSet.has(p.file);
+        const statusBadge = isLocked
+          ? '<span class="sc-badge" style="background:#fee2e2; color:#991b1b;">⛔ Ausgeschaltet</span>'
+          : '<span class="sc-badge" style="background:#dcfce7; color:#166534;">✓ Aktiv</span>';
+        return `
+          <tr class="${isLocked ? "is-locked" : ""}" data-row-file="${p.file}">
+            <td><a href="${p.file}?nomask=1" target="_blank" style="font-family:monospace; font-weight:bold; color:#004080;">${p.file}</a></td>
+            <td>${p.title}</td>
+            <td style="text-align:center;" class="sc-status-cell">${statusBadge}</td>
+            <td style="text-align:center;"><input type="checkbox" class="sc-chk sc-chk-warn chk-wartung" data-file="${p.file}" ${isLocked ? "checked" : ""}></td>
+            <td style="text-align:center;"><input type="checkbox" class="sc-chk chk-hidden" data-file="${p.file}" ${hiddenSet.has(p.file) ? "checked" : ""}></td>
+            <td style="text-align:center;"><input type="checkbox" class="sc-chk chk-mask" data-file="${p.file}" ${maskSet.has(p.file) ? "checked" : ""}></td>
+          </tr>
+        `;
+      }
+
+      async function refreshPagesTables() {
+        const statusEl = document.getElementById("sc-discovery-status");
+        statusEl.textContent = "⏳ Prüfe alle HTML-Dateien im Repository …";
+        const cfg = (currentSystemData && currentSystemData.siteConfig) ? currentSystemData.siteConfig : {};
+        const wartungSet = new Set(cfg.wartungSeiten || []);
+        const hiddenSet = new Set(cfg.versteckteSeiten || ["unterlagen.html"]);
+        const maskSet = new Set(cfg.maskierteSeiten || ["unterlagen.html"]);
+
+        const dyn = (typeof window.fetchFflwDynamicPages === "function")
+          ? await window.fetchFflwDynamicPages(cfg.versteckteSeiten)
+          : { pages: [], source: "fallback" };
+
+        const openPages = dyn.pages.filter(p => p.inMenu && !p.isLegal);
+        const hiddenPages = dyn.pages.filter(p => !p.inMenu || p.isLegal);
+
+        document.getElementById("sc-cnt-open").textContent = openPages.length;
+        document.getElementById("sc-cnt-hidden").textContent = hiddenPages.length;
+
+        document.getElementById("sc-tbody-open").innerHTML = openPages.map(p => renderRowHtml(p, wartungSet, hiddenSet, maskSet)).join("");
+        document.getElementById("sc-tbody-hidden").innerHTML = hiddenPages.map(p => renderRowHtml(p, wartungSet, hiddenSet, maskSet)).join("");
+
+        document.querySelectorAll(".chk-wartung").forEach(chk => {
+          chk.addEventListener("change", () => {
+            const tr = chk.closest("tr");
+            const cell = tr ? tr.querySelector(".sc-status-cell") : null;
+            if (tr) tr.classList.toggle("is-locked", chk.checked);
+            if (cell) {
+              cell.innerHTML = chk.checked
+                ? '<span class="sc-badge" style="background:#fee2e2; color:#991b1b;">⛔ Ausgeschaltet</span>'
+                : '<span class="sc-badge" style="background:#dcfce7; color:#166534;">✓ Aktiv</span>';
+            }
+          });
+        });
+
+        const nowStr = new Date().toLocaleTimeString("de-DE");
+        statusEl.textContent = `✓ ${dyn.pages.length} Seiten erkannt (${openPages.length} öffentliche Menü-Seiten, ${hiddenPages.length} versteckte/interne Seiten) · Stand: ${nowStr} (${dyn.source === "github" ? "Live aus GitHub" : "Lokale Liste"})`;
+      }
+
+      async function loadConfigAndStart(codeRaw) {
+        const code = String(codeRaw || "").replace(/\s+/g, "").trim();
+        if (!code) {
+          loginMsg.textContent = "Bitte Supermaster-Code eingeben.";
+          return;
+        }
+        loginMsg.style.color = "#004080";
+        loginMsg.textContent = "⏳ Lade Seiten-Steuerung …";
+        try {
+          const resp = await fetch(`${WEB_APP_URL}?action=master_overview&code=${encodeURIComponent(code)}&t=${Date.now()}`, {
+            method: "GET",
+            redirect: "follow"
+          });
+          const data = await resp.json();
+          if (!data || !data.ok || data.role !== "master") {
+            loginMsg.style.color = "#b91c1c";
+            loginMsg.textContent = (data && data.error) ? data.error : "Zugriff nur für Supermaster.";
+            return;
+          }
+          currentCode = code;
+          currentSystemData = data;
+          try { sessionStorage.setItem("fflw_master_session_code", code); } catch (e) {}
+          if (window.FFLW_SupermasterDevice) window.FFLW_SupermasterDevice.activate(code);
+
+          loginBox.style.display = "none";
+          workspace.style.display = "block";
+          await refreshPagesTables();
+        } catch (err) {
+          loginMsg.style.color = "#b91c1c";
+          loginMsg.textContent = "Verbindungsfehler: " + err.message;
+        }
+      }
+
+      document.getElementById("sc-login-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        loadConfigAndStart(codeInput.value);
+      });
+
+      document.getElementById("sc-reload-pages-btn").addEventListener("click", refreshPagesTables);
+
+      document.getElementById("sc-unlock-all-btn").addEventListener("click", () => {
+        document.querySelectorAll(".chk-wartung:checked").forEach(chk => {
+          chk.checked = false;
+          chk.dispatchEvent(new Event("change"));
+        });
+        document.getElementById("sc-save-msg").textContent = "Alle Wartungs-Haken entfernt – jetzt noch rechts auf „Speichern“ klicken!";
+      });
+
+      document.getElementById("sc-save-btn").addEventListener("click", async function () {
+        const msgEl = document.getElementById("sc-save-msg");
+        const cfg = (currentSystemData && currentSystemData.siteConfig) ? currentSystemData.siteConfig : {};
+        const codes = (currentSystemData && currentSystemData.teamCodes) ? currentSystemData.teamCodes : {};
+
+        const wartungSeiten = Array.from(document.querySelectorAll(".chk-wartung:checked")).map(c => c.dataset.file);
+        const versteckteSeiten = Array.from(document.querySelectorAll(".chk-hidden:checked")).map(c => c.dataset.file);
+        const maskierteSeiten = Array.from(document.querySelectorAll(".chk-mask:checked")).map(c => c.dataset.file);
+
+        const task = async () => {
+          const resp = await fetch(WEB_APP_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "save_site_status",
+              masterCode: currentCode,
+              zugangscode: cfg.zugangscode || "11",
+              teamCodes: codes,
+              flaggenStil: cfg.flaggenStil || "A",
+              wartungSeiten: wartungSeiten,
+              versteckteSeiten: versteckteSeiten,
+              maskierteSeiten: maskierteSeiten
+            })
+          });
+          const res = await resp.json();
+          if (res && res.ok) {
+            if (currentSystemData && currentSystemData.siteConfig) {
+              currentSystemData.siteConfig.wartungSeiten = wartungSeiten;
+              currentSystemData.siteConfig.versteckteSeiten = versteckteSeiten;
+              currentSystemData.siteConfig.maskierteSeiten = maskierteSeiten;
+            }
+            try { sessionStorage.removeItem("fflw_site_status_cache_v3"); } catch (e) {}
+            msgEl.style.color = "#86efac";
+            msgEl.textContent = `✓ Gespeichert! (${wartungSeiten.length} gesperrt, ${versteckteSeiten.length} versteckt, ${maskierteSeiten.length} getarnt)`;
+            return { ok: true };
+          }
+          msgEl.style.color = "#fca5a5";
+          msgEl.textContent = (res && res.error) ? res.error : "Fehler beim Speichern.";
+          return { ok: false };
+        };
+
+        if (typeof window.fflwRunButtonAction === "function") {
+          await window.fflwRunButtonAction(this, task, { loadingText: "Speichere …", successText: "✓ Gespeichert!" });
+        } else {
+          await task();
+        }
+      });
+
+      // Auto-Login über Supermaster-Direktmodus, Session oder URL-Parameter ?code=
+      const params = new URLSearchParams(window.location.search);
+      const autoCode = params.get("code")
+        || sessionStorage.getItem("fflw_master_session_code")
+        || (window.FFLW_SupermasterDevice && window.FFLW_SupermasterDevice.getCode())
+        || "";
+      if (autoCode) {
+        loadConfigAndStart(autoCode);
+      }
+    });
+  </script>
+</body>
+</html>
