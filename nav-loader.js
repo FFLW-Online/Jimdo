@@ -1083,6 +1083,49 @@ document.addEventListener("DOMContentLoaded", function () {
         navContainer.innerHTML = html;
         applyHiddenNavItems(getCachedSiteStatus().versteckteSeiten);
 
+        // 1. Menü-Struktur ergänzen:
+        //    a) "Lob, Tipps & neue Ideen" unter "Mitarbeit"
+        //    b) "Eigenes Konto anlegen" als eigener Menüpunkt ganz unten direkt vor "Kontakt"
+        try {
+          const navListEl = navContainer.querySelector("#nav-list") || navContainer.querySelector("ul");
+          if (navListEl) {
+            // a) Unter "Mitarbeit" einfügen, falls noch nicht vorhanden
+            if (!navListEl.querySelector('a[href="ideen-lob-kritik.html"]')) {
+              const allDetails = Array.from(navListEl.querySelectorAll("details"));
+              const mitarbeitDetails = allDetails.find(d => {
+                const sum = d.querySelector("summary");
+                return sum && /mitarbeit/i.test(sum.textContent || "");
+              });
+              if (mitarbeitDetails) {
+                const subUl = mitarbeitDetails.querySelector("ul");
+                if (subUl) {
+                  const liIdeen = document.createElement("li");
+                  liIdeen.innerHTML = '<a href="ideen-lob-kritik.html">💡 Lob, Tipps &amp; neue Ideen</a>';
+                  subUl.appendChild(liIdeen);
+                }
+              }
+            }
+
+            // b) "Eigenes Konto anlegen" ganz unten vor "Kontakt" einfügen (und doppelte obere Einträge vermeiden)
+            const existingKontoLinks = Array.from(navListEl.querySelectorAll('a[href="konto-anlegen.html"]'));
+            existingKontoLinks.forEach(a => {
+              const li = a.closest("li");
+              if (li) li.remove();
+            });
+            const liKonto = document.createElement("li");
+            liKonto.innerHTML = '<a href="konto-anlegen.html">👤 Eigenes Konto anlegen</a>';
+            const kontaktLink = Array.from(navListEl.querySelectorAll("a")).find(a =>
+              /kontakt/i.test(a.textContent || "") || (a.getAttribute("href") || "").includes("kontakt")
+            );
+            const kontaktLi = kontaktLink ? kontaktLink.closest("li") : null;
+            if (kontaktLi && kontaktLi.parentElement === navListEl) {
+              navListEl.insertBefore(liKonto, kontaktLi);
+            } else {
+              navListEl.appendChild(liKonto);
+            }
+          }
+        } catch (e) {}
+
         navContainer.querySelectorAll('a[href*="docuseal.com"]').forEach(link => {
           link.href = cleanDocuSealUrl;
         });
@@ -1275,4 +1318,56 @@ document.addEventListener("DOMContentLoaded", function () {
       location.reload();
     });
   }
+});
+
+
+// ============================================================================
+// 6. KONTEXT-BALKEN FÜR EIGENES KONTO AUF HILFREICHEN SEITEN (OBEN)
+// ============================================================================
+document.addEventListener("DOMContentLoaded", function () {
+  const page = (window.history.state && window.history.state.fflwMaskedFrom)
+    || window.location.pathname.split("/").pop()
+    || "index.html";
+
+  const helpfulPages = [
+    "aktuelle-angebote.html",
+    "sachen-anbieten.html",
+    "bedarf-anmelden.html",
+    "radwerkstatt.html",
+    "schatzsuche.html",
+    "ideen-lob-kritik.html",
+    "begegnung-tipps.html"
+  ];
+  if (!helpfulPages.includes(page)) return;
+
+  // Für Supermaster oder bereits angemeldete Kontoinhaber nicht nötig
+  if (window.FFLW_SupermasterDevice && window.FFLW_SupermasterDevice.isActive()) return;
+  const acc = window.FFLW_Account && window.FFLW_Account.get();
+  if (acc && (acc.username || acc.code)) return;
+
+  const mainEl = document.querySelector("main.content") || document.querySelector("main");
+  if (!mainEl || document.getElementById("fflw-top-account-hint")) return;
+
+  const bar = document.createElement("div");
+  bar.id = "fflw-top-account-hint";
+  bar.style.cssText = [
+    "background:#eff6ff",
+    "border:1.5px solid #93c5fd",
+    "border-left:5px solid #004080",
+    "border-radius:8px",
+    "padding:9px 13px",
+    "margin:0 0 14px 0",
+    "display:flex",
+    "flex-wrap:wrap",
+    "align-items:center",
+    "justify-content:space-between",
+    "gap:8px",
+    "font-size:0.9rem",
+    "color:#0f172a"
+  ].join(";");
+  bar.innerHTML = `
+    <span>👤 <strong>Tipp:</strong> Mit einem eigenen Konto bleiben deine Kontaktdaten &amp; deine 6-stellige Personen-Nr. für Reservierungen, Angebote und Rückmeldungen gespeichert.</span>
+    <a href="konto-anlegen.html" style="background:#004080; color:#ffffff; text-decoration:none; font-weight:bold; padding:6px 12px; border-radius:6px; white-space:nowrap;">Konto anlegen / anmelden →</a>
+  `;
+  mainEl.insertBefore(bar, mainEl.firstChild);
 });

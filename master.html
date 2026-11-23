@@ -299,7 +299,7 @@
             <span class="m-hub-tile-desc">Talente, Fähigkeiten &amp; Unterstützer-Verzeichnis (eigene Seite)</span>
           </a>
           <a href="ideen-admin.html" class="m-hub-tile m-hub-page-link" id="hub-tile-ideentafel" style="display:none; text-decoration:none; border-color:#fde047; border-left-color:#ca8a04; background:#fefce8;">
-            <span class="m-hub-tile-title">💡 Ideen, Lob &amp; Tipps (<span id="hub-cnt-ideentafel">0</span>) ↗</span>
+            <span class="m-hub-tile-title">💡 Lob, Tipps &amp; neue Ideen (<span id="hub-cnt-ideentafel">0</span>) ↗</span>
             <span class="m-hub-tile-desc">Eingereichte Ideen &amp; Gesprächs-Tipps freigeben (eigene Seite)</span>
           </a>
           <a href="radwerkstatt-admin.html" class="m-hub-tile m-hub-page-link" id="hub-tile-radwerkstatt" style="text-decoration:none;">
@@ -328,7 +328,7 @@
           <button type="button" class="m-tab-btn" id="tab-btn-kiimport" data-tab="kiimport" style="display:none; background:#eef2ff; color:#312e81; border-color:#a5b4fc;">🪄 Wohnungs-Import (KI)</button>
           <button type="button" class="m-tab-btn secret-tab" id="tab-btn-akten" data-tab="akten" style="display:none;">🗂️ Personen-Akten (<span id="cnt-akten">0</span>)</button>
           <button type="button" class="m-tab-btn treasure-tab" id="tab-btn-schatz" data-tab="schatz" style="display:none;">✨ Schatzkiste (<span id="cnt-schatz">0</span>)</button>
-          <button type="button" class="m-tab-btn" id="tab-btn-ideentafel" data-tab="ideentafel" style="display:none; background:#fefce8; color:#854d0e; border-color:#fde047;">💡 Ideen &amp; Lob (<span id="cnt-ideentafel">0</span>)</button>
+          <button type="button" class="m-tab-btn" id="tab-btn-ideentafel" data-tab="ideentafel" style="display:none; background:#fefce8; color:#854d0e; border-color:#fde047;">💡 Lob, Tipps &amp; neue Ideen (<span id="cnt-ideentafel">0</span>)</button>
           <button type="button" class="m-tab-btn" id="tab-btn-radwerkstatt" data-tab="radwerkstatt">🚲 Rad-Ausgabe &amp; Anfragen</button>
           <button type="button" class="m-tab-btn" id="tab-btn-system" data-tab="system" style="display:none;">⚙ Seitenschutz, URL-Tarnung &amp; Codes</button>
         </div>
@@ -569,9 +569,9 @@
         <!-- TAB 5B: IDEEN- & LOB-TAFEL MODERATION -->
         <section id="tab-ideentafel" class="m-tab-panel" style="display:none;">
           <div class="m-card" style="border-left-color:#ca8a04; background:#fefce8;">
-            <h3 style="margin-top:0; color:#854d0e;">💡 Wichtiges, Ideen &amp; Lob-Tafel verwalten</h3>
+            <h3 style="margin-top:0; color:#854d0e;">💡 Wichtiges, Ideen &amp; Lob, Tipps &amp; neue Ideen verwalten</h3>
             <p style="margin:0; font-size:0.93rem;">
-              Hier siehst du alle eingereichten Ideen, Lob-Beiträge und wichtigen Hinweise. Du kannst Beiträge auf der öffentlichen Tafel freischalten, eine offizielle Antwort ergänzen oder Beiträge löschen.
+              Hier siehst du alle eingereichten Ideen, Lob-Beiträge und wichtigen Hinweise. Du kannst Beiträge öffentlich sichtbar freischalten, eine offizielle Antwort ergänzen oder Beiträge löschen.
             </p>
           </div>
           <div id="list-ideentafel"></div>
@@ -1295,6 +1295,7 @@
           renderSystemConfig(data);
         }
         renderSchatzListe(schatzListe);
+        if (typeof renderIdeenTafelMaster === "function") renderIdeenTafelMaster(data.ideenTafel || [], data.ideenOrdnerInfo || "");
         if (typeof renderRadListe === "function") renderRadListe(data.radwerkstatt || {});
       }
 
@@ -2100,17 +2101,24 @@
       });
 
 
-      function renderIdeenTafelMaster(liste) {
+      function renderIdeenTafelMaster(liste, ordnerInfo) {
         const arr = Array.isArray(liste) ? liste : [];
         const cntEl = document.getElementById("cnt-ideentafel");
+        const hubCntEl = document.getElementById("hub-cnt-ideentafel");
         const container = document.getElementById("list-ideentafel");
         if (cntEl) cntEl.textContent = arr.length;
+        if (hubCntEl) hubCntEl.textContent = arr.length;
         if (!container) return;
+        const diagBox = `
+          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:7px; padding:8px 12px; margin-bottom:10px; font-size:0.84rem; color:#334155;">
+            <strong>Status &amp; Speicherort:</strong> ${arr.length} Beitrag/Beiträge geladen${ordnerInfo ? ` · Durchsuchte Google-Drive-Ordner: <code>${ordnerInfo}</code>` : " · Hinweis: Falls hier kein Ordnername steht, bitte die aktuelle <code>Code.gs</code> im Google Apps Script als neue Version bereitstellen."}
+          </div>
+        `;
         if (!arr.length) {
-          container.innerHTML = "<div class='m-card'><p>Noch keine Beiträge auf der Ideen- &amp; Lob-Tafel.</p></div>";
+          container.innerHTML = diagBox + "<div class='m-card'><p style='margin:0;'>Aktuell liegen noch keine Einreichungen unter <strong>Lob, Tipps &amp; neue Ideen</strong> vor (oder die neue <code>Code.gs</code> wurde noch nicht als neue Bereitstellung veröffentlicht).</p></div>";
           return;
         }
-        container.innerHTML = arr.map(it => {
+        container.innerHTML = diagBox + arr.map(it => {
           const isPublic = it.status === "freigegeben";
           return `
             <div class="m-card" style="border-left-color:${isPublic ? "#16a34a" : "#d97706"};">

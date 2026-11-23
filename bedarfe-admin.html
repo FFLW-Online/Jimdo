@@ -273,48 +273,7 @@
           </div>
         </div>
 
-        <div id="m-hub-overview" class="m-hub-grid">
-          <button type="button" class="m-hub-tile" data-open-tab="eingang">
-            <span class="m-hub-tile-title">📥 Eingangs-Prüfung (<span id="hub-cnt-eingang">0</span>)</span>
-            <span class="m-hub-tile-desc">Neue Sachspenden &amp; Importe prüfen und freigeben</span>
-          </button>
-          <button type="button" class="m-hub-tile" data-open-tab="online">
-            <span class="m-hub-tile-title">🌐 Online &amp; Reserviert (<span id="hub-cnt-online">0</span>)</span>
-            <span class="m-hub-tile-desc">Aktive Angebote verwalten, Reservierungen &amp; Archiv</span>
-          </button>
-          <button type="button" class="m-hub-tile" data-open-tab="bedarfe">
-            <span class="m-hub-tile-title">📋 Offene Bedarfe (<span id="hub-cnt-bedarfe">0</span>)</span>
-            <span class="m-hub-tile-desc">Gesuche einsehen &amp; erfüllte Bedarfe abschließen</span>
-          </button>
-          <a href="ki-import.html" class="m-hub-tile is-ai" id="hub-tile-kiimport" style="display:none; text-decoration:none;">
-            <span class="m-hub-tile-title">🪄 Wohnungs-Import (KI) ↗</span>
-            <span class="m-hub-tile-desc">Öffnet die eigene KI-Erfassungsseite (auch für Helfer mit eigenem KI-Code nutzbar)</span>
-          </a>
-          <button type="button" class="m-hub-tile is-secret" id="hub-tile-akten" data-open-tab="akten" style="display:none;">
-            <span class="m-hub-tile-title">🗂️ Personen-Akten (<span id="hub-cnt-akten">0</span>)</span>
-            <span class="m-hub-tile-desc">Vertrauliche Akten, Familien-Zuordnung &amp; Dokumente</span>
-          </button>
-          <button type="button" class="m-hub-tile is-treasure" id="hub-tile-schatz" data-open-tab="schatz" style="display:none;">
-            <span class="m-hub-tile-title">✨ Schatzkiste (<span id="hub-cnt-schatz">0</span>)</span>
-            <span class="m-hub-tile-desc">Talente, Fähigkeiten &amp; Unterstützer-Verzeichnis</span>
-          </button>
-          <button type="button" class="m-hub-tile" id="hub-tile-ideentafel" data-open-tab="ideentafel" style="display:none; border-color:#fde047; border-left-color:#ca8a04; background:#fefce8;">
-            <span class="m-hub-tile-title">💡 Ideen, Lob &amp; Tipps (<span id="hub-cnt-ideentafel">0</span>)</span>
-            <span class="m-hub-tile-desc">Eingereichte Ideen &amp; Gesprächs-Tipps freigeben</span>
-          </button>
-          <button type="button" class="m-hub-tile" id="hub-tile-radwerkstatt" data-open-tab="radwerkstatt">
-            <span class="m-hub-tile-title">🚲 Radwerkstatt</span>
-            <span class="m-hub-tile-desc">Rad-Ausgaben &amp; Vorbestellungen verwalten</span>
-          </button>
-          <button type="button" class="m-hub-tile" id="hub-tile-konten" data-open-tab="konten" style="display:none;">
-            <span class="m-hub-tile-title">👤 Benutzer-Konten &amp; Passwörter (<span id="hub-cnt-konten">0</span>)</span>
-            <span class="m-hub-tile-desc">Registrierte Nutzer freischalten, Passwörter einsehen &amp; ändern</span>
-          </button>
-          <button type="button" class="m-hub-tile" id="hub-tile-system" data-open-tab="system" style="display:none;">
-            <span class="m-hub-tile-title">📊 Seiten-Hits, Codes &amp; System</span>
-            <span class="m-hub-tile-desc">Besucher-Statistik pro Seite, Team-/KI-Codes ändern &amp; Wartung</span>
-          </button>
-        </div>
+        
 
         <div id="m-subview-bar" class="m-subview-bar">
           <a href="master.html" id="m-back-to-hub-btn" class="m-btn">← Zurück zur Master-Übersicht</a>
@@ -328,7 +287,7 @@
           <button type="button" class="m-tab-btn" id="tab-btn-kiimport" data-tab="kiimport" style="display:none; background:#eef2ff; color:#312e81; border-color:#a5b4fc;">🪄 Wohnungs-Import (KI)</button>
           <button type="button" class="m-tab-btn secret-tab" id="tab-btn-akten" data-tab="akten" style="display:none;">🗂️ Personen-Akten (<span id="cnt-akten">0</span>)</button>
           <button type="button" class="m-tab-btn treasure-tab" id="tab-btn-schatz" data-tab="schatz" style="display:none;">✨ Schatzkiste (<span id="cnt-schatz">0</span>)</button>
-          <button type="button" class="m-tab-btn" id="tab-btn-ideentafel" data-tab="ideentafel" style="display:none; background:#fefce8; color:#854d0e; border-color:#fde047;">💡 Ideen &amp; Lob (<span id="cnt-ideentafel">0</span>)</button>
+          <button type="button" class="m-tab-btn" id="tab-btn-ideentafel" data-tab="ideentafel" style="display:none; background:#fefce8; color:#854d0e; border-color:#fde047;">💡 Lob, Tipps &amp; neue Ideen (<span id="cnt-ideentafel">0</span>)</button>
           <button type="button" class="m-tab-btn" id="tab-btn-radwerkstatt" data-tab="radwerkstatt">🚲 Rad-Ausgabe &amp; Anfragen</button>
           <button type="button" class="m-tab-btn" id="tab-btn-system" data-tab="system" style="display:none;">⚙ Seitenschutz, URL-Tarnung &amp; Codes</button>
         </div>
@@ -569,9 +528,9 @@
         <!-- TAB 5B: IDEEN- & LOB-TAFEL MODERATION -->
         <section id="tab-ideentafel" class="m-tab-panel" style="display:none;">
           <div class="m-card" style="border-left-color:#ca8a04; background:#fefce8;">
-            <h3 style="margin-top:0; color:#854d0e;">💡 Wichtiges, Ideen &amp; Lob-Tafel verwalten</h3>
+            <h3 style="margin-top:0; color:#854d0e;">💡 Wichtiges, Ideen &amp; Lob, Tipps &amp; neue Ideen verwalten</h3>
             <p style="margin:0; font-size:0.93rem;">
-              Hier siehst du alle eingereichten Ideen, Lob-Beiträge und wichtigen Hinweise. Du kannst Beiträge auf der öffentlichen Tafel freischalten, eine offizielle Antwort ergänzen oder Beiträge löschen.
+              Hier siehst du alle eingereichten Ideen, Lob-Beiträge und wichtigen Hinweise. Du kannst Beiträge öffentlich sichtbar freischalten, eine offizielle Antwort ergänzen oder Beiträge löschen.
             </p>
           </div>
           <div id="list-ideentafel"></div>
@@ -1295,6 +1254,7 @@
           renderSystemConfig(data);
         }
         renderSchatzListe(schatzListe);
+        if (typeof renderIdeenTafelMaster === "function") renderIdeenTafelMaster(data.ideenTafel || [], data.ideenOrdnerInfo || "");
         if (typeof renderRadListe === "function") renderRadListe(data.radwerkstatt || {});
       }
 
@@ -2100,17 +2060,24 @@
       });
 
 
-      function renderIdeenTafelMaster(liste) {
+      function renderIdeenTafelMaster(liste, ordnerInfo) {
         const arr = Array.isArray(liste) ? liste : [];
         const cntEl = document.getElementById("cnt-ideentafel");
+        const hubCntEl = document.getElementById("hub-cnt-ideentafel");
         const container = document.getElementById("list-ideentafel");
         if (cntEl) cntEl.textContent = arr.length;
+        if (hubCntEl) hubCntEl.textContent = arr.length;
         if (!container) return;
+        const diagBox = `
+          <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:7px; padding:8px 12px; margin-bottom:10px; font-size:0.84rem; color:#334155;">
+            <strong>Status &amp; Speicherort:</strong> ${arr.length} Beitrag/Beiträge geladen${ordnerInfo ? ` · Durchsuchte Google-Drive-Ordner: <code>${ordnerInfo}</code>` : " · Hinweis: Falls hier kein Ordnername steht, bitte die aktuelle <code>Code.gs</code> im Google Apps Script als neue Version bereitstellen."}
+          </div>
+        `;
         if (!arr.length) {
-          container.innerHTML = "<div class='m-card'><p>Noch keine Beiträge auf der Ideen- &amp; Lob-Tafel.</p></div>";
+          container.innerHTML = diagBox + "<div class='m-card'><p style='margin:0;'>Aktuell liegen noch keine Einreichungen unter <strong>Lob, Tipps &amp; neue Ideen</strong> vor (oder die neue <code>Code.gs</code> wurde noch nicht als neue Bereitstellung veröffentlicht).</p></div>";
           return;
         }
-        container.innerHTML = arr.map(it => {
+        container.innerHTML = diagBox + arr.map(it => {
           const isPublic = it.status === "freigegeben";
           return `
             <div class="m-card" style="border-left-color:${isPublic ? "#16a34a" : "#d97706"};">
@@ -2922,6 +2889,16 @@
         });
       }
 
+  
+      function syncHubPageLinksWithCode() {
+        if (!currentCode) return;
+        document.querySelectorAll(".m-hub-page-link").forEach(a => {
+          const baseHref = a.getAttribute("href").split("?")[0];
+          a.setAttribute("href", baseHref + "?code=" + encodeURIComponent(currentCode));
+        });
+      }
+      setInterval(syncHubPageLinksWithCode, 800);
+
   </script>
 
   <script>
@@ -2929,7 +2906,6 @@
       const ALLOWED_ROLES = ["master", "freischalter", "koordinator", "copilot"];
       const PAGE_TABS = ["bedarfe"];
 
-      // URL ?code=... übernehmen
       const params = new URLSearchParams(window.location.search);
       const urlCode = params.get("code");
       if (urlCode) {
@@ -2938,15 +2914,11 @@
         if (inp && !inp.value) inp.value = urlCode.trim();
       }
 
-      // Hub-Kacheln auf dieser Unterseite dauerhaft ausblenden und direkt den Fachbereich zeigen
-      const hub = document.getElementById("m-hub-overview");
-      if (hub) hub.style.display = "none";
       const subBar = document.getElementById("m-subview-bar");
       if (subBar) subBar.style.display = "flex";
       const subTitle = document.getElementById("m-subview-title");
       if (subTitle) subTitle.textContent = 'Offene Bedarfe & Gesuche';
 
-      // Falls 2 Tabs (z. B. Warenhaus: Eingang + Online), kompakte Umschalt-Leiste anzeigen
       if (PAGE_TABS.length > 1) {
         const tabBar = document.getElementById("m-tab-bar");
         if (tabBar) {
@@ -2957,11 +2929,9 @@
         }
       }
 
-      // Überwachen, sobald Dashboard sichtbar wird: Rolle prüfen & Fachbereich öffnen
       const dash = document.getElementById("m-dashboard");
       const enforceFocus = () => {
         if (!dash || dash.style.display === "none") return;
-        if (hub) hub.style.display = "none";
         if (subBar) subBar.style.display = "flex";
         const roleTxt = (document.getElementById("m-role-label")?.textContent || "").toLowerCase();
         const isAllowed = ALLOWED_ROLES.some(r => {
@@ -2977,7 +2947,6 @@
           document.getElementById("m-logout-btn")?.click();
           return;
         }
-        // Ersten Tab der Seite aktivieren, falls noch keiner offen ist
         const anyOpen = PAGE_TABS.some(t => {
           const el = document.getElementById("tab-" + t);
           return el && el.style.display === "block";

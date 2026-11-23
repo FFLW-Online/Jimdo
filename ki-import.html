@@ -298,9 +298,7 @@
         const inviteUrl = `${baseUrl}?code=${encodeURIComponent(activeCode)}`;
         try {
           await navigator.clipboard.writeText(inviteUrl);
-          alert("✓ Direkt-Link kopiert! Wer diesen Link öffnet, gelangt sofort ohne Code-Eingabe in die KI-Erfassung:
-
-" + inviteUrl);
+          alert("✓ Direkt-Link kopiert! Wer diesen Link öffnet, gelangt sofort ohne Code-Eingabe in die KI-Erfassung:\n\n" + inviteUrl);
         } catch (e) {
           prompt("Direkt-Link zum Kopieren:", inviteUrl);
         }
