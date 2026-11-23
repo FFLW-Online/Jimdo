@@ -286,10 +286,10 @@
             <span class="m-hub-tile-title">📋 Offene Bedarfe (<span id="hub-cnt-bedarfe">0</span>)</span>
             <span class="m-hub-tile-desc">Gesuche einsehen &amp; erfüllte Bedarfe abschließen</span>
           </button>
-          <button type="button" class="m-hub-tile is-ai" id="hub-tile-kiimport" data-open-tab="kiimport" style="display:none;">
-            <span class="m-hub-tile-title">🪄 Wohnungs-Import (KI)</span>
-            <span class="m-hub-tile-desc">Mehrere Fotos hochladen &amp; automatisch erkennen lassen</span>
-          </button>
+          <a href="ki-import.html" class="m-hub-tile is-ai" id="hub-tile-kiimport" style="display:none; text-decoration:none;">
+            <span class="m-hub-tile-title">🪄 Wohnungs-Import (KI) ↗</span>
+            <span class="m-hub-tile-desc">Öffnet die eigene KI-Erfassungsseite (auch für Helfer mit eigenem KI-Code nutzbar)</span>
+          </a>
           <button type="button" class="m-hub-tile is-secret" id="hub-tile-akten" data-open-tab="akten" style="display:none;">
             <span class="m-hub-tile-title">🗂️ Personen-Akten (<span id="hub-cnt-akten">0</span>)</span>
             <span class="m-hub-tile-desc">Vertrauliche Akten, Familien-Zuordnung &amp; Dokumente</span>
@@ -666,6 +666,10 @@
               <div>
                 <label style="font-weight:bold; font-size:0.88rem;">Copilot-Code</label>
                 <input type="text" id="sys-code-copilot" class="m-input">
+              </div>
+              <div>
+                <label style="font-weight:bold; font-size:0.88rem;">KI-Import Helfer-Code (<code>ki-import.html</code>)</label>
+                <input type="text" id="sys-code-kiimport" class="m-input" placeholder="Standard: FFLW-KI">
               </div>
               <div>
                 <label style="font-weight:bold; font-size:0.88rem;">Flaggenband-Stil</label>
@@ -2019,7 +2023,8 @@
               master: document.getElementById("sys-code-master").value.trim(),
               freischalter: document.getElementById("sys-code-team").value.trim(),
               koordinator: document.getElementById("sys-code-koord").value.trim(),
-              copilot: document.getElementById("sys-code-copilot").value.trim()
+              copilot: document.getElementById("sys-code-copilot").value.trim(),
+              kiimport: document.getElementById("sys-code-kiimport") ? document.getElementById("sys-code-kiimport").value.trim() : "FFLW-KI"
             },
             flaggenStil: document.getElementById("sys-flaggen").value,
             wartungSeiten: wartungSeiten,
