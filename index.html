@@ -1,232 +1,153 @@
-<!DOCTYPE html>
+<!-- ==========================================================================
+  DATEI: index.html – von Gemini
+  ERSTELLT VON GEMINI AM: 2026-11-20 19:02 CET
+  BESCHREIBUNG: Startseite (bereinigt von Test-Header & doppeltem Script-Aufruf)
+========================================================================== -->
+<!doctype html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warenhaus & Aktions-Plattform v26</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Die Idee - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#003366">
+  <link rel="apple-touch-icon" href="assets/logo-ffwl-neu-trans.png">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <!-- Lade-Overlay mit sich drehender Standard-Sanduhr (Fallback, kein Dreh-Logo) -->
-    <div id="global-loader" class="loader-overlay hidden">
-        <div class="hourglass-spinner" aria-label="Lädt...">⏳</div>
-        <p id="loader-text">Lade Daten...</p>
-    </div>
+  <header class="site-header">
+    <a href="index.html" aria-label="Zur Startseite">
+      <img
+        src="assets/images/logo-mit-text.png"
+        alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+    </a>
+  </header>
 
-    <header class="topbar">
-        <div class="brand">
-            <h1>Warenhaus <span class="badge-v26">v26</span></h1>
-            <span class="campaign-pill">Aktionswährung: <strong id="active-campaign-label">AKTION-2026-Q4</strong></span>
-        </div>
-        <nav class="nav-tabs">
-            <button class="nav-btn active" data-target="view-warenhaus">Warenhaus</button>
-            <button class="nav-btn" data-target="view-angebote">Angebote & Direkt-Aktionen</button>
-            <button class="nav-btn" data-target="view-ideen">Ideen-Board</button>
-            <button class="nav-btn" data-target="view-feedback">Feedback & Checkliste</button>
-            <button id="btn-supermaster-direct" class="nav-btn supermaster-btn" title="Direktzugang Supermaster">
-                ⚡ Supermaster
-            </button>
-        </nav>
-    </header>
+  <div class="layout">
+    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
 
-    <main class="container">
-        <!-- SUPERMASTER CONTROL PANEL (Ein-/Ausklappbar, persistent nach Reload) -->
-        <section id="supermaster-panel" class="card supermaster-card hidden">
-            <div class="card-header">
-                <h2>⚡ Supermaster-Zentrale</h2>
-                <button id="btn-close-supermaster" class="btn-small btn-secondary">Schließen</button>
-            </div>
-            <div class="supermaster-grid">
-                <div class="stat-box">
-                    <span class="stat-label">Seitenaufrufe (Gesamt)</span>
-                    <strong id="stat-views" class="stat-value">0</strong>
-                </div>
-                <div class="stat-box">
-                    <span class="stat-label">Klicks auf Originale</span>
-                    <strong id="stat-clicks" class="stat-value">0</strong>
-                </div>
-                <div class="stat-box">
-                    <span class="stat-label">Thumbnail-Status (Aktuelle Aktion)</span>
-                    <strong id="stat-thumbs" class="stat-value">0 / 0 bereit</strong>
-                </div>
-            </div>
-            <div class="action-row">
-                <button id="btn-reset-stats" class="btn-danger">🔄 Zugriffsstatistik zurücksetzen</button>
-                <button id="btn-sync-thumbs" class="btn-primary">🖼️ Fehlende Thumbnails (nur aktuelle Aktion) erzeugen</button>
-            </div>
-        </section>
+    <main class="content">
+      <h2>Die Idee</h2>
 
-        <!-- VIEW 1: WARENHAUS (Schnelle Thumbnails, EXIF-Auto-Drehung, 300x300 Padding, KI-Kleider/Schuhgrößen) -->
-        <section id="view-warenhaus" class="view-section active">
-            <div class="section-toolbar">
-                <h2>Warenhaus-Bestand (<span id="campaign-display">AKTION-2026-Q4</span>)</h2>
-                <button id="btn-open-upload" class="btn-primary">+ Artikel / Bild hochladen</button>
-            </div>
+      <p style="text-align: justify;">
+        Im Oktober 2014 gründete sich der Freundeskreis Flüchtlinge Leutenbach
+        &amp; Winnenden mit dem Ziel die Integration geflüchteter Menschen in
+        Leutenbach und Winnenden zu unterstützen. Seitdem gab es zahlreiche
+        Projekte und Aktivitäten wie wöchentliche Begegnungscafés, eine
+        Fahrradwerkstatt, ein gemeinsam angelegter Gemüsegarten, Sprachtandems,
+        Kochkurse, Fußballturniere, Sommer- und Weihnachtsfeste. Die Begegnung
+        zwischen Menschen steht dabei stets im Vordergrund.
+           <br>     <br>
+        Unsere derzeiten Schwerpunkte finden sie auf dieser Webseite.
+      </p>
 
-            <!-- Upload & KI-Größen-Panel -->
-            <div id="upload-panel" class="card hidden">
-                <h3>Neuen Artikel einstellen (Auto-Thumbnail & KI-Größenprüfung)</h3>
-                <form id="item-upload-form" class="form-grid">
-                    <div class="form-group">
-                        <label for="item-title">Artikelbezeichnung *</label>
-                        <input type="text" id="item-title" required placeholder="z.B. Winterstiefel, Jacke, Kaffeemaschine...">
-                    </div>
-                    <div class="form-group">
-                        <label for="item-category">Kategorie (KI-Erkennung aktiv) *</label>
-                        <select id="item-category">
-                            <option value="standard">Standard / Haushalt / Technik (Maße in cm)</option>
-                            <option value="shoes">Schuhe (Schuhgröße erforderlich)</option>
-                            <option value="clothing">Kleidung (Kleidergröße – kein Schwerpunkt)</option>
-                        </select>
-                    </div>
-                    <div class="form-group" id="size-input-container">
-                        <label id="item-size-label" for="item-size">Abmessungen (cm)</label>
-                        <input type="text" id="item-size" placeholder="z.B. 40 x 30 x 20 cm">
-                        <small id="ai-size-hint" class="hint-text"></small>
-                    </div>
-                    <div class="form-group">
-                        <label for="item-image">Bilddatei (wird auto-gedreht & auf 300x300 gepaddet)</label>
-                        <input type="file" id="item-image" accept="image/*">
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">Speichern & Thumbnail erzeugen</button>
-                        <button type="button" id="btn-cancel-upload" class="btn-secondary">Abbrechen</button>
-                    </div>
-                </form>
-            </div>
+      <hr>
 
-            <!-- Artikel-Grid -->
-            <div id="warehouse-grid" class="warehouse-grid"></div>
-        </section>
+      <img
+        src="assets/images/bluehender-obstbaum.jpg"
+        alt="Blühender Obstbaum und Apfelkerne - leider nicht zu sehen"
+        class="content-image">
 
-        <!-- VIEW 2: ANGEBOTE & DIREKT-AKTIONEN -->
-        <section id="view-angebote" class="view-section hidden">
-            <div class="section-toolbar">
-                <h2>Angebote & Direkt-Aktionen</h2>
-                <button id="btn-new-offer" class="btn-primary">+ Neues Angebot</button>
-            </div>
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Artikel / Titel</th>
-                            <th>Aktionswährung</th>
-                            <th>Status</th>
-                            <th>Direkt-Aktionen</th>
-                        </tr>
-                    </thead>
-                    <tbody id="offers-tbody"></tbody>
-                </table>
-            </div>
-        </section>
+      <p>
+        <em>
+          <strong>
+            Ein im Herzen eines Apfels versteckter Kern ist ein unsichtbarer
+            Obstgarten. Doch wenn dieser Kern auf felsigen Boden fällt, wird
+            nichts daraus hervorgehen. (Khalil Gibran)
+          </strong>
+        </em>
+      </p>
 
-        <!-- VIEW 3: IDEEN-ANZEIGE -->
-        <section id="view-ideen" class="view-section hidden">
-            <div class="section-toolbar">
-                <h2>Ideen-Anzeige & Vorschläge</h2>
-                <div class="toolbar-controls">
-                    <select id="ideas-sort">
-                        <option value="newest">Neueste zuerst</option>
-                        <option value="votes">Beliebteste zuerst</option>
-                    </select>
-                    <button id="btn-add-idea" class="btn-primary">+ Neue Idee</button>
-                </div>
-            </div>
-            <div id="ideas-list" class="ideas-grid"></div>
-        </section>
+      <hr>
 
-        <!-- VIEW 4: FEEDBACKFORMULAR & UPDATE-CHECKLISTE v26 (Keine toten Knöpfe!) -->
-        <section id="view-feedback" class="view-section hidden">
-            <div class="two-col-layout">
-                <!-- Feedbackformular -->
-                <div class="card">
-                    <h2>Feedback & Fehlermeldung senden</h2>
-                    <p class="subtext">Direkte Rückmeldung zum Warenhaus, zu Bildern oder neuen Wünschen.</p>
-                    <form id="feedback-form" class="form-stack">
-                        <div class="form-group">
-                            <label for="fb-name">Name / Kürzel</label>
-                            <input type="text" id="fb-name" required placeholder="z.B. Supermaster / Team">
-                        </div>
-                        <div class="form-group">
-                            <label for="fb-area">Bereich</label>
-                            <select id="fb-area">
-                                <option value="Warenhaus & Thumbnails">Warenhaus & Thumbnails</option>
-                                <option value="KI-Größen (Kleidung/Schuhe)">KI-Größen (Kleidung/Schuhe)</option>
-                                <option value="Angebote & Direkt-Aktionen">Angebote & Direkt-Aktionen</option>
-                                <option value="Ideen & Sonstiges">Ideen & Sonstiges</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="fb-message">Nachricht / Beobachtung *</label>
-                            <textarea id="fb-message" rows="4" required placeholder="Was läuft gut? Wo klemmt noch etwas?"></textarea>
-                        </div>
-                        <button type="submit" class="btn-primary">Feedback speichern</button>
-                    </form>
-                    <div id="feedback-history" class="feedback-history"></div>
-                </div>
-
-                <!-- Checkliste v26 + Export-Buttons (alle voll funktionsfähig!) -->
-                <div class="card">
-                    <h2>Checkliste Update-Paket v26</h2>
-                    <ul id="checklist-v26" class="checklist">
-                        <li><label><input type="checkbox" checked data-key="c1"> 1. Thumbnails (300×300 Padding, EXIF-Auto-Drehung, Anti-Mega-Scan)</label></li>
-                        <li><label><input type="checkbox" checked data-key="c2"> 2. KI-Größenlogik für Kleidung & Schuhe</label></li>
-                        <li><label><input type="checkbox" checked data-key="c3"> 3. Performance & drehende Standard-Sanduhr</label></li>
-                        <li><label><input type="checkbox" checked data-key="c4"> 4. Supermaster-Direktzugang (persistent)</label></li>
-                        <li><label><input type="checkbox" checked data-key="c5"> 5. Zugriffsstatistik-Reset mit Sicherheitsabfrage</label></li>
-                        <li><label><input type="checkbox" checked data-key="c6"> 6. Direkt-Aktionen in der Angebotsübersicht</label></li>
-                        <li><label><input type="checkbox" checked data-key="c7"> 7. Ideen-Anzeige mit Sortierung & Empty State</label></li>
-                        <li><label><input type="checkbox" checked data-key="c8"> 8. Keine toten Knöpfe (Textdatei- & Export-Aktionen aktiv)</label></li>
-                    </ul>
-                    <hr>
-                    <h4>Zurückgestellt (Später):</h4>
-                    <ul class="checklist muted">
-                        <li><label><input type="checkbox" disabled> A. Webseiten-Zwilling (/staging/) nach Stabilisierung</label></li>
-                        <li><label><input type="checkbox" disabled> B. 3D-Münze & eigenes Dreh-Logo</label></li>
-                        <li><label><input type="checkbox" disabled> C. Foto-Hinweis für Größenetiketten</label></li>
-                    </ul>
-                </div>
-            </div>
-        </section>
+      <p>
+        Was dieser „kryptisch-poetische Satz“ bedeuten kann und ein paar
+        persönliche Gedanken dazu, die auch für unsere Arbeit und Motivation
+        wichtig sind, finden sie
+        <a href="der-versteckte-obstgarten.html">
+          <strong>hier.</strong>
+        </a>
+      </p>
     </main>
+  </div>
 
-    <!-- FOOTER MIT FUNKTIONSFÄHIGEN AKTIONS-BUTTONS NEBEN DER TEXTDATEI (Keine toten Knöpfe!) -->
-    <footer class="footer-bar">
-        <div class="footer-info">
-            <span>Systemstatus: <strong class="status-ok">● Bereit (Anti-Mega-Scan aktiv)</strong></span>
-        </div>
-        <div class="footer-actions">
-            <button id="btn-export-txt" class="btn-secondary" title="Exportiert Checkliste & Feedback als Textdatei">
-                📄 Textdatei (.txt) herunterladen
-            </button>
-            <button id="btn-copy-github" class="btn-secondary" title="Kopiert GitHub-Commit-Kommentare">
-                📋 GitHub-Kommentare kopieren
-            </button>
-            <button id="btn-export-json" class="btn-secondary" title="Sichert gesamten Datenstand als JSON">
-                💾 Daten-Backup (.json)
-            </button>
-            <button id="btn-quick-feedback" class="btn-primary" title="Öffnet direkt das Feedbackformular">
-                💬 Feedback geben
-            </button>
-        </div>
-    </footer>
+  <section class="contact-block">
+    <p>
+      <strong>
+        Du möchtest aktiv werden? Oder einfach mal den Kontakt zum
+        Freundeskreis aufnehmen? Dann schreib uns doch, wir freuen uns!
+      </strong>
+    </p>
 
-    <!-- LIGHTBOX MODAL FÜR ORIGINALBILD (Wird erst bei Klick geladen!) -->
-    <div id="image-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-title">Originalansicht</h3>
-                <button id="btn-close-modal" class="btn-small btn-secondary">✕ Schließen</button>
-            </div>
-            <div class="modal-body">
-                <img id="modal-full-img" src="" alt="Originalbild">
-                <p id="modal-meta" class="modal-meta"></p>
-            </div>
-        </div>
-    </div>
+    <p>
+      <strong>
+        Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden
+      </strong>
+    </p>
 
-    <script src="thumbnail-engine.js"></script>
-    <script src="app.js"></script>
+    <p>
+      <strong>Allgemeines:</strong>
+      <a href="mailto:Kontakt@freundeleuwi.org">
+        Kontakt@freundeleuwi.org
+      </a>
+      <br>
+
+      <strong>Sachen-Spenden (Infos, Kontakt):</strong>
+      <a href="mailto:Warenhaus@freundeleuwi.org">
+        Warenhaus@freundeleuwi.org
+      </a>
+      <br>
+
+      <strong>Sachen-Suchen (Infos, Kontakt):</strong>
+      <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">
+        Warenhaus-anfrage@freundeleuwi.org
+      </a>
+      <br>
+
+      <strong>Transport-Mithilfe (Infos, Kontakt):</strong>
+      <a href="mailto:Transport-Hilfe@freundeleuwi.org">
+        Transport-Hilfe@freundeleuwi.org
+      </a>
+      <br>
+
+      <strong>Rad-Werkstatt (Spenden, aktive Mithilfe):</strong>
+      <a href="mailto:Rad-Werkstatt@freundeleuwi.org">
+        Rad-Werkstatt@freundeleuwi.org
+      </a>
+      <br>
+
+      <strong>Geldspenden und Spendenbescheinigungen:</strong>
+      <a href="mailto:Kasse-FFLW@freundeleuwi.org">
+        Kasse-FFLW@freundeleuwi.org
+      </a>
+      <br>
+
+      <strong>Lust auf Mitmachen / Mitgliedschaft:</strong>
+      <a href="mailto:Kontakt@freundeleuwi.org">
+        Kontakt@freundeleuwi.org
+      </a>
+    </p>
+
+    <p>
+      <a href="https://docuseal.com/d/Mcvg84UEAD5aay">
+        Mitgliedsantrag: Hier klicken
+      </a>
+      <br>
+
+      <a href="https://drive.google.com/file/d/1WnPaR-iuMEsvg-mLMCiaXJF38-p0-MUm/view?usp=sharing">
+        Unsere Satzung
+      </a>
+    </p>
+  </section>
+
+  <footer class="legal-footer">
+    <a href="impressum.html">Impressum</a>
+    |
+    <a href="datenschutz.html">Datenschutz</a>
+    |
+    <a href="sitemap.html">Sitemap</a>
+  </footer>
+  <script src="nav-loader.js"></script>
 </body>
 </html>
