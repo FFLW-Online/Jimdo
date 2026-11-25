@@ -893,7 +893,7 @@
           copilot: "Copilot (Lesemodus)"
         };
         document.getElementById("m-role-label").textContent = "Rolle: " + (roleNames[data.role] || data.role);
-        document.getElementById("m-sync-hint").textContent = fromCache ? `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Aktualisiere im Hintergrund …` : "✓ Aktuell";
+        document.getElementById("m-sync-hint").textContent = fromCache ? "⏳ Aktualisiere im Hintergrund …" : "✓ Aktuell";
 
         if (data.visitStats) {
           try { localStorage.setItem("fflw_ignore_my_visits", "1"); } catch (e) {}
@@ -1909,7 +1909,7 @@
 
         const baseDir = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
 
-        const allSchatzList = (cachedOverview && cachedOverview.schatzkiste) ? cachedOverview.schatzkiste : [];
+        const allSchatzList = (currentData && currentData.schatzkiste) ? currentData.schatzkiste : [];
         const nameCountMap = {};
         allSchatzList.forEach(item => {
           const nn = String(item.name || "").toLowerCase().trim();
