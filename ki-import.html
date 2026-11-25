@@ -1,851 +1,614 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KI-Wohnungs-Import – Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KI-Wohnungs-Import – FFLW Warenhaus</title>
   <style>
-    .ki-card {
-      background: #ffffff;
-      color: #111111;
-      border: 2px solid #c7d2fe;
-      border-left: 6px solid #4338ca;
-      border-radius: 10px;
-      padding: 16px 18px;
-      margin: 14px 0;
-      box-shadow: 0 3px 10px rgba(49, 46, 129, 0.08);
+    :root {
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --ink: #17202a;
+      --muted: #5d6d7e;
+      --brand: #1b4f72;
+      --brand-2: #117a65;
+      --warn: #b7791f;
+      --danger: #9b2c2c;
+      --line: #dce3ea;
     }
-    .ki-btn {
-      background: #4338ca;
-      color: #ffffff !important;
-      border: none;
-      padding: 9px 14px;
-      border-radius: 7px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 0.92rem;
-      line-height: 1.3;
-      text-decoration: none;
-      display: inline-block;
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
     }
-    .ki-btn:hover { background: #312e81; color: #ffffff !important; }
-    .ki-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .ki-btn-green { background: #1e6b24; color: #ffffff !important; }
-    .ki-btn-green:hover { background: #14532d; color: #ffffff !important; }
-    .ki-btn-orange { background: #b45309; color: #ffffff !important; }
-    .ki-btn-orange:hover { background: #92400e; color: #ffffff !important; }
-    .ki-btn-grey { background: #374151; color: #ffffff !important; }
-    .ki-input, .ki-select, .ki-textarea {
+    header {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff;
+      padding: 20px 24px;
+    }
+    header h1 { margin: 0 0 6px; font-size: 1.45rem; }
+    header p { margin: 0; opacity: 0.92; font-size: 0.95rem; }
+    .container { max-width: 1120px; margin: 20px auto 60px; padding: 0 16px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .card h2 { margin: 0 0 12px; font-size: 1.15rem; color: var(--brand); }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--ink); }
+    input, select, textarea {
       width: 100%;
       padding: 9px 11px;
-      border: 1px solid #8faadc;
-      border-radius: 6px;
-      font-size: 15px;
-      color: #111111;
-      background: #ffffff;
-      box-sizing: border-box;
+      border: 1px solid #c5d0dc;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-family: inherit;
+      background: #fff;
     }
+    textarea { min-height: 70px; resize: vertical; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 15px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--brand);
+      color: #fff;
+    }
+    button:hover { opacity: 0.92; }
+    button.secondary { background: #e9eff4; color: var(--ink); }
+    button.success { background: var(--brand-2); color: #fff; }
+    button.warn { background: var(--warn); color: #fff; }
+    button.danger { background: var(--danger); color: #fff; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .hint { font-size: 0.84rem; color: var(--muted); margin-top: 6px; }
+    .status-msg { margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; display: none; }
+    .status-msg.ok { display: block; background: #e6f4ea; color: #137333; border: 1px solid #b7e1cd; }
+    .status-msg.err { display: block; background: #fce8e6; color: #c5221f; border: 1px solid #f6aea9; }
+    .photo-strip { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .photo-chip {
+      width: 118px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 6px;
+      background: #fafbfc;
+      text-align: center;
+      font-size: 0.76rem;
+    }
+    .photo-chip img {
+      width: 100%;
+      height: 76px;
+      object-fit: cover;
+      border-radius: 6px;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .item-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 14px;
+      background: #fcfdfd;
+    }
+    .item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .thumbs-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+    .thumb-box {
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      padding: 6px;
+      width: 130px;
+      background: #fff;
+      text-align: center;
+    }
+    .thumb-box.is-cover { border-color: var(--brand-2); background: #f2fbf8; }
+    .thumb-box img { width: 100%; height: 84px; object-fit: cover; border-radius: 6px; display: block; }
+    .thumb-actions { display: flex; justify-content: space-between; gap: 4px; margin-top: 6px; }
+    .thumb-actions button { padding: 4px 7px; font-size: 0.75rem; }
+    .check-inline { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-top: 10px; cursor: pointer; }
+    .check-inline input { width: auto; }
   </style>
 </head>
 <body>
-  <header class="site-header">
-    <a href="index.html" aria-label="Zur Startseite">
-      <img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
-    </a>
+  <header>
+    <h1>KI-Wohnungs- &amp; Spenden-Import</h1>
+    <p>Fotos einlesen, Objekte automatisch bündeln, realistische Maße mit Toleranz (&plusmn;) prüfen und ins Warenhaus übertragen</p>
   </header>
 
-  <div class="layout">
-    <nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
-
-    <main class="content">
-      <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;">
-        <h2 style="margin:0; color:#312e81;">🪄 KI-Wohnungs-Import &amp; Artikel-Erfassung</h2>
-        <a href="master.html" id="ki-back-master-link" class="ki-btn ki-btn-grey" style="display:none; font-size:0.85rem;">← Zurück zum Master</a>
+  <div class="container">
+    <div class="card">
+      <h2>1. Zugangscode &amp; KI-Verbindung</h2>
+      <div class="grid-2">
+        <div>
+          <label for="accessCode">Zugangscode (Supermaster / Freischalter / KI-Code)</label>
+          <input type="password" id="accessCode" placeholder="z. B. FFLW99 oder FFLW-KI" />
+        </div>
+        <div>
+          <label for="geminiApiKey">Gemini API-Key (optional, falls nicht im Backend hinterlegt)</label>
+          <input type="password" id="geminiApiKey" placeholder="AIza..." />
+        </div>
       </div>
-      <p style="margin-top:0; color:#334155;">
-        Eigene Erfassungsseite für Wohnungsauflösungen und größere Sachspenden-Pakete. Fotos werden automatisch verkleinert, zusammengehörige Blickwinkel eines Möbelstücks gebündelt und zur Prüfung ins Warenhaus übertragen.
-      </p>
+      <div class="row">
+        <button id="btnVerifyCode" type="button">Code prüfen &amp; Key laden</button>
+        <button id="btnSaveKey" type="button" class="secondary">Key im Backend speichern (Supermaster)</button>
+      </div>
+      <div id="authStatus" class="status-msg"></div>
+    </div>
 
-      <!-- ZUGANGS-BEREICH -->
-      <section id="ki-login-box" class="ki-card">
-        <h3 style="margin-top:0; color:#312e81;">🔐 Zugang zur KI-Erfassung</h3>
-        <p style="font-size:0.93rem; margin-bottom:12px;">
-          Gib den <strong>KI-Helfer-Code</strong> (vom Team erhalten, z. B. <code>FFLW-KI</code>) oder deinen Team-/Master-Code ein. Kein eigenes Benutzerkonto nötig.
-        </p>
-        <form id="ki-login-form" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-          <input type="text" id="ki-access-code" class="ki-input" placeholder="KI-Helfer-Code eingeben …" style="max-width:280px; font-weight:bold;">
-          <button type="submit" id="ki-login-btn" class="ki-btn">Anmelden &amp; starten</button>
-        </form>
-        <div id="ki-login-msg" style="margin-top:8px; font-weight:bold; color:#b91c1c;"></div>
-      </section>
-
-      <!-- HAUPTBEREICH (NACH LOGIN SICHTBAR) -->
-      <div id="ki-workspace" style="display:none;">
-        <div style="background:#eef2ff; border:1.5px solid #a5b4fc; border-radius:9px; padding:10px 14px; margin-bottom:12px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
-          <div>
-            <strong id="ki-role-badge" style="color:#312e81;">✓ Verbunden</strong>
-            <span id="ki-dest-hint" style="font-size:0.86rem; color:#475569; margin-left:8px;"></span>
-          </div>
-          <div style="display:flex; flex-wrap:wrap; gap:8px;">
-            <button type="button" id="ki-copy-invite-btn" class="ki-btn ki-btn-grey" style="font-size:0.82rem; padding:6px 11px;">🔗 Direkt-Link für Helfer kopieren</button>
-            <button type="button" id="ki-reset-all-btn" class="ki-btn ki-btn-orange" style="font-size:0.82rem; padding:6px 11px;">🔄 Nächste Wohnung / Leeren</button>
-            <button type="button" id="ki-logout-btn" class="ki-btn ki-btn-grey" style="font-size:0.82rem; padding:6px 11px;">Abmelden</button>
+    <div class="card">
+      <h2>2. Anbieter / Wohnungsauflösung &amp; Kontaktregelung</h2>
+      <div class="grid-3">
+        <div>
+          <label for="spenderName">Anbieter / Haushalt</label>
+          <input type="text" id="spenderName" placeholder="z. B. Familie Müller / Auflösung" />
+        </div>
+        <div>
+          <label for="ort">Ort</label>
+          <input type="text" id="ort" value="Leutenbach / Winnenden" />
+        </div>
+        <div>
+          <label for="telefon">Telefon / WhatsApp (intern / bei Direktkontakt)</label>
+          <input type="text" id="telefon" placeholder="z. B. 07195 / ..." />
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:10px;">
+        <div>
+          <label for="anbieterEmail">E-Mail des Anbieters (optional)</label>
+          <input type="email" id="anbieterEmail" placeholder="name@beispiel.de" />
+        </div>
+        <div>
+          <label for="zielStatus">Ablageziel</label>
+          <select id="zielStatus">
+            <option value="eingang">Zur Prüfung in Eingang (_Eingang_Pruefung)</option>
+            <option value="online">Direkt in Angebote freischalten (Team/Master)</option>
+          </select>
+        </div>
+      </div>
+      <label class="check-inline">
+        <input type="checkbox" id="direktKontaktFreigegeben" />
+        Direktkontakt zum Anbieter für Suchende freigeben (Standard: aus – Anfragen laufen zuerst über unsere Warenhausadresse)
+      </label>
+      <div class="grid-2" style="margin-top:10px;">
+        <div>
+          <label for="massenToleranz">Maß-Fehlertoleranz für Schätzungen (bei Möbeln/Geräten)</label>
+          <select id="massenToleranz">
+            <option value="&plusmn; 5 cm">&plusmn; 5 cm</option>
+            <option value="&plusmn; 10 cm" selected>&plusmn; 10 cm (empfohlen)</option>
+            <option value="&plusmn; 15 cm">&plusmn; 15 cm</option>
+            <option value="&plusmn; 20 cm">&plusmn; 20 cm</option>
+          </select>
+        </div>
+        <div>
+          <label for="driveOrdnerSuche">Optional: Fotos aus Google-Drive-Ordner laden (Link oder Name)</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="driveOrdnerSuche" placeholder="Ordner-Link oder Ordner-Name" />
+            <button id="btnLoadDrivePhotos" type="button" class="secondary">Laden</button>
           </div>
         </div>
-
-        <!-- SCHRITT 1: WOHNUNGS- / ANBIETERDATEN -->
-        <section class="ki-card">
-          <strong style="color:#312e81; font-size:1.02rem;">1. Gemeinsame Angaben für diese Wohnung / Sachspende:</strong>
-          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin-top:10px;">
-            <div>
-              <label style="font-size:0.84rem; font-weight:bold;">Spender-Name / Kürzel *</label>
-              <input type="text" id="ki-spender" class="ki-input" placeholder="z. B. Familie Müller / Haushaltsauflösung">
-            </div>
-            <div>
-              <label style="font-size:0.84rem; font-weight:bold;">Ort / Stadtteil *</label>
-              <input type="text" id="ki-ort" class="ki-input" placeholder="z. B. Leutenbach / Winnenden">
-            </div>
-            <div>
-              <label style="font-size:0.84rem; font-weight:bold;">Telefon / Kontakt (nur intern)</label>
-              <input type="text" id="ki-telefon" class="ki-input" placeholder="z. B. 0171 1234567">
-            </div>
-            <div id="ki-ziel-status-wrap">
-              <label style="font-size:0.84rem; font-weight:bold;">Ziel-Status nach Speichern</label>
-              <select id="ki-ziel-status" class="ki-select">
-                <option value="eingang">📥 In Eingangs-Prüfung ablegen (Empfohlen)</option>
-                <option value="online">🌐 Direkt öffentlich im Warenhaus freischalten</option>
-              </select>
-            </div>
-          </div>
-        </section>
-
-        <!-- SCHRITT 2: FOTOS AUSWÄHLEN -->
-        <section class="ki-card">
-          <strong style="color:#312e81; font-size:1.02rem;">2. Fotos auswählen (Smartphone, PC oder Google Drive):</strong>
-          <p style="font-size:0.88rem; color:#475569; margin:4px 0 10px 0;">
-            Alle Fotos werden im Browser automatisch verkleinert, damit der Upload auch mobil stabil läuft.
-          </p>
-          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
-            <input type="file" id="ki-photos-input" class="ki-input" accept="image/*" multiple style="max-width:420px; padding:6px;">
-            <span id="ki-photos-count" style="font-weight:bold; color:#312e81;">0 Bilder geladen</span>
-          </div>
-          <div id="ki-thumbs-grid" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;"></div>
-
-          <div style="margin-top:12px; padding:10px 12px; background:#eff6ff; border:1px solid #93c5fd; border-radius:7px;">
-            <label for="ki-drive-folder" style="display:block; font-weight:bold; color:#1e3a8a; margin-bottom:6px;">
-              📁 Oder Fotos direkt aus einem Google-Drive-Ordner holen (Ordner-Link oder Name):
-            </label>
-            <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-              <input type="text" id="ki-drive-folder" class="ki-input" placeholder="Google-Drive-Ordner-Link oder Name einfügen …" style="flex:1 1 240px;">
-              <button type="button" id="ki-drive-import-btn" class="ki-btn" style="background:#1d4ed8;">Bilder aus Drive holen</button>
-              <span id="ki-drive-status" style="font-size:0.88rem; font-weight:bold;"></span>
-            </div>
-          </div>
-        </section>
-
-        <!-- SCHRITT 3: KI-ANALYSE STARTEN -->
-        <section class="ki-card">
-          <strong style="color:#312e81; font-size:1.02rem;">3. Automatische KI-Erkennung &amp; Bündelung starten:</strong>
-          <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
-            <input type="password" id="ki-gemini-key" class="ki-input" placeholder="Gemini API-Key (wird automatisch geladen)" style="max-width:290px;">
-            <button type="button" id="ki-save-key-btn" class="ki-btn ki-btn-green" style="display:none;">💾 Key im Script speichern</button>
-            <button type="button" id="ki-analyze-btn" class="ki-btn">🪄 Bilder mit KI analysieren &amp; gleiche Artikel bündeln</button>
-            <span id="ki-status-msg" style="font-weight:bold;"></span>
-          </div>
-          <details style="margin-top:10px;">
-            <summary style="cursor:pointer; font-size:0.88rem; font-weight:bold; color:#312e81;">📋 Manuell: Leere Artikel-Zeile hinzufügen oder JSON-Liste einfügen</summary>
-            <div style="margin-top:8px;">
-              <textarea id="ki-raw-json" class="ki-textarea" rows="3" placeholder='[{"titel":"Kleiderschrank 3-türig","kategorie":"Schlafzimmer","beschreibung":"Helles Holz, guter Zustand","masse":"ca. 150 x 60 x 205 cm","bildIndizes":[1,2]}]'></textarea>
-              <div style="margin-top:6px; display:flex; flex-wrap:wrap; gap:8px;">
-                <button type="button" id="ki-parse-json-btn" class="ki-btn ki-btn-grey">JSON übernehmen</button>
-                <button type="button" id="ki-add-empty-row-btn" class="ki-btn">+ Leere Artikel-Zeile hinzufügen</button>
-              </div>
-            </div>
-          </details>
-        </section>
-
-        <!-- SCHRITT 4: ERGEBNISSE PRÜFEN & SPEICHERN -->
-        <section id="ki-preview-card" class="ki-card" style="display:none; border-left-color:#2e7d32;">
-          <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
-            <h3 style="margin:0; color:#1b5e20;">4. Erkannte Artikel prüfen &amp; speichern (<span id="ki-items-count">0</span>)</h3>
-            <button type="button" id="ki-import-all-btn" class="ki-btn ki-btn-green" style="font-size:0.98rem; padding:10px 16px;">⬆ Alle ausgewählten Artikel speichern</button>
-          </div>
-          <p style="font-size:0.88rem; color:#334155; margin:6px 0 10px 0;">
-            Mehrere Fotos desselben Artikels (z. B. <code>1, 2</code>) werden automatisch gemeinsam in <strong>einem</strong> Artikel-Unterordner gespeichert.
-          </p>
-          <div id="ki-items-list"></div>
-          <div style="margin-top:12px; display:flex; flex-wrap:wrap; align-items:center; gap:12px;">
-            <button type="button" id="ki-import-all-btn-bottom" class="ki-btn ki-btn-green" style="font-size:0.98rem; padding:10px 16px;">⬆ Alle ausgewählten Artikel speichern</button>
-            <span id="ki-import-msg" style="font-weight:bold;"></span>
-          </div>
-        </section>
       </div>
-    </main>
+    </div>
+
+    <div class="card">
+      <h2>3. Fotos auswählen &amp; KI-Objekterkennung starten</h2>
+      <input type="file" id="photoInput" accept="image/*" multiple />
+      <div class="hint">Mehrere Fotos gleichzeitig auswählbar. Die KI erkennt, welche Aufnahmen zum selben Objekt gehören, schlägt Titel, Kategorie, Beschreibung und ggf. sinnvolle Größenangaben vor.</div>
+      <div id="rawPhotosStrip" class="photo-strip"></div>
+      <div class="row">
+        <button id="btnAnalyzeKi" type="button" class="success">KI-Analyse &amp; Objekt-Gruppierung starten</button>
+        <button id="btnAddManualItem" type="button" class="secondary">+ Leeren Artikel hinzufügen</button>
+        <button id="btnClearPhotos" type="button" class="secondary">Fotos leeren</button>
+      </div>
+      <div id="kiStatus" class="status-msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>4. Erkannte Artikel prüfen, drehen &amp; speichern</h2>
+      <div id="itemsContainer"><p class="hint">Noch keine Artikel angelegt oder analysiert.</p></div>
+      <div class="row" style="margin-top:18px;">
+        <button id="btnSaveAllItems" type="button" class="success">Alle Artikel jetzt speichern</button>
+      </div>
+      <div id="saveStatus" class="status-msg"></div>
+    </div>
   </div>
 
-  <section class="contact-block">
-    <p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
-    <p><strong>Kontakt:</strong> <a href="mailto:Kontakt@freundeleuwi.org">Kontakt@freundeleuwi.org</a></p>
-  </section>
-
-  <script src="nav-loader.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
-      const STORAGE_CODE_KEY = "fflw_ki_import_code";
+    const GAS_URL = window.FFLW_GAS_URL || "";
+    let loadedPhotos = []; // { id, name, mimeType, base64, dataUrl }
+    let items = []; // { id, titel, kategorie, masse, beschreibung, coverIndex, photoEntries: [{ photoId, rotation }] }
 
-      let activeCode = "";
-      let activeRole = "";
-      let kiLoadedPhotos = [];
-      let kiDetectedItems = [];
+    function setMsg(elId, text, isErr) {
+      const el = document.getElementById(elId);
+      if (!el) return;
+      el.textContent = text || "";
+      el.className = "status-msg " + (text ? (isErr ? "err" : "ok") : "");
+    }
 
-      const loginBox = document.getElementById("ki-login-box");
-      const workspace = document.getElementById("ki-workspace");
-      const codeInput = document.getElementById("ki-access-code");
-      const loginMsg = document.getElementById("ki-login-msg");
-      const kiKeyInput = document.getElementById("ki-gemini-key");
+    function getGasUrl() {
+      if (GAS_URL) return GAS_URL;
+      const saved = localStorage.getItem("FFLW_GAS_URL");
+      return saved || "";
+    }
+
+    async function callGasGet(params) {
+      const base = getGasUrl();
+      if (!base) throw new Error("Keine Google-Apps-Script-URL hinterlegt (localStorage: FFLW_GAS_URL).");
+      const qs = new URLSearchParams(params).toString();
+      const res = await fetch(base + "?" + qs);
+      return res.json();
+    }
+
+    async function callGasPost(bodyObj) {
+      const base = getGasUrl();
+      if (!base) throw new Error("Keine Google-Apps-Script-URL hinterlegt (localStorage: FFLW_GAS_URL).");
+      const res = await fetch(base, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(bodyObj)
+      });
+      return res.json();
+    }
+
+    function renderRawPhotos() {
+      const strip = document.getElementById("rawPhotosStrip");
+      if (!loadedPhotos.length) {
+        strip.innerHTML = "";
+        return;
+      }
+      strip.innerHTML = loadedPhotos.map((p, idx) => `
+        <div class="photo-chip">
+          <img src="${p.dataUrl}" alt="${p.name}" />
+          <div>#${idx + 1} ${p.name.slice(0, 16)}</div>
+        </div>
+      `).join("");
+    }
+
+    function readFilesToPhotos(fileList) {
+      Array.from(fileList || []).forEach((file) => {
+        if (!file.type || !file.type.startsWith("image/")) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const dataUrl = String(ev.target.result || "");
+          const base64 = dataUrl.split(",")[1] || "";
+          loadedPhotos.push({
+            id: "ph_" + Math.random().toString(36).slice(2, 9),
+            name: file.name,
+            mimeType: file.type || "image/jpeg",
+            base64: base64,
+            dataUrl: dataUrl
+          });
+          renderRawPhotos();
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    document.getElementById("photoInput").addEventListener("change", (e) => {
+      readFilesToPhotos(e.target.files);
+      e.target.value = "";
+    });
+
+    document.getElementById("btnClearPhotos").addEventListener("click", () => {
+      loadedPhotos = [];
+      items = [];
+      renderRawPhotos();
+      renderItems();
+      setMsg("kiStatus", "", false);
+    });
+
+    document.getElementById("btnVerifyCode").addEventListener("click", async () => {
+      const code = document.getElementById("accessCode").value.trim();
+      if (!code) return setMsg("authStatus", "Bitte Zugangscode eingeben.", true);
+      try {
+        const res = await callGasGet({ action: "getGeminiApiKey", masterCode: code });
+        if (!res.ok) return setMsg("authStatus", res.error || "Code ungültig.", true);
+        if (res.apiKey && !document.getElementById("geminiApiKey").value.trim()) {
+          document.getElementById("geminiApiKey").value = res.apiKey;
+        }
+        setMsg("authStatus", "Zugang bestätigt (Rolle: " + res.role + ").", false);
+      } catch (err) {
+        setMsg("authStatus", "Fehler: " + err.message, true);
+      }
+    });
+
+    document.getElementById("btnSaveKey").addEventListener("click", async () => {
+      const code = document.getElementById("accessCode").value.trim();
+      const key = document.getElementById("geminiApiKey").value.trim();
+      try {
+        const res = await callGasPost({ action: "saveGeminiApiKey", masterCode: code, apiKey: key });
+        if (!res.ok) return setMsg("authStatus", res.error || "Speichern fehlgeschlagen.", true);
+        setMsg("authStatus", "API-Key im Backend gespeichert.", false);
+      } catch (err) {
+        setMsg("authStatus", "Fehler: " + err.message, true);
+      }
+    });
+
+    document.getElementById("btnLoadDrivePhotos").addEventListener("click", async () => {
+      const code = document.getElementById("accessCode").value.trim();
+      const q = document.getElementById("driveOrdnerSuche").value.trim();
+      if (!code) return setMsg("kiStatus", "Bitte zuerst oben den Zugangscode eingeben.", true);
+      if (!q) return setMsg("kiStatus", "Bitte Ordner-Link oder Ordner-Namen eingeben.", true);
+      try {
+        setMsg("kiStatus", "Lade Bilder aus Google Drive...", false);
+        const res = await callGasPost({ action: "importPhotosFromDriveFolder", masterCode: code, folderQuery: q });
+        if (!res.ok) return setMsg("kiStatus", res.error || "Ordner nicht gefunden.", true);
+        (res.photos || []).forEach((ph) => {
+          const mime = ph.mimeType || "image/jpeg";
+          loadedPhotos.push({
+            id: "ph_" + Math.random().toString(36).slice(2, 9),
+            name: ph.name || "drive_foto.jpg",
+            mimeType: mime,
+            base64: ph.base64,
+            dataUrl: "data:" + mime + ";base64," + ph.base64
+          });
+        });
+        renderRawPhotos();
+        setMsg("kiStatus", (res.photos || []).length + " Bilder aus '" + (res.folderName || q) + "' geladen.", false);
+      } catch (err) {
+        setMsg("kiStatus", "Fehler: " + err.message, true);
+      }
+    });
+
+    function buildKiPrompt(photoCount, toleranceLabel) {
+      return [
+        "Du unterstützt ein ehrenamtliches Sozial-Warenhaus bei der Erfassung von Spenden und Wohnungsauflösungen.",
+        "Du erhältst " + photoCount + " Bilder (Index 0 bis " + (photoCount - 1) + ").",
+        "1. Gruppiere Bilder, die dasselbe Objekt aus verschiedenen Blickwinkeln zeigen, in einen Artikel (photoIndices).",
+        "2. Lege als erstes Element in coverPhotoIndex den aussagekräftigsten Bildindex fest.",
+        "3. WICHTIG zu Größenangaben (masse): Erfinde NIEMALS B x T x H Maße für Schuhe, Kleidung, Geschirr, Töpfe, Bücher, Deko oder Kleinteile! Bei Schuhen/Kleidung/Textilien schreibe nur 'Größe prüfen / z. B. Gr. 39 oder M' oder lasse masse leer (''). Nur bei Möbeln, Tischen, Schränken, Sofas oder großen Geräten schätze sinnvolle Außenmaße mit der Toleranz " + toleranceLabel + ", z. B. 'ca. 120 x 60 x 75 cm (" + toleranceLabel + ")' – und weise in der Beschreibung darauf hin, dass Maße geschätzt sind.",
+        "4. Antworte AUSSCHLIESSLICH mit gültigem JSON im Format:",
+        "{"items":[{"titel":"...","kategorie":"Möbel|Haushalt|Küche|Kleidung & Schuhe|Elektronik|Kinder|Sonstiges","masse":"","beschreibung":"...","photoIndices":[0],"coverPhotoIndex":0}]}"
+      ].join("\n");
+    }
+
+    document.getElementById("btnAnalyzeKi").addEventListener("click", async () => {
+      if (!loadedPhotos.length) return setMsg("kiStatus", "Bitte zuerst Fotos auswählen.", true);
+      const apiKey = document.getElementById("geminiApiKey").value.trim();
+      const tol = document.getElementById("massenToleranz").value;
+
+      if (!apiKey) {
+        items = loadedPhotos.map((ph, idx) => ({
+          id: "it_" + Math.random().toString(36).slice(2, 8),
+          titel: "Artikel " + (idx + 1),
+          kategorie: "Sonstiges",
+          masse: "",
+          beschreibung: "",
+          coverIndex: 0,
+          photoEntries: [{ photoId: ph.id, rotation: 0 }]
+        }));
+        renderItems();
+        return setMsg("kiStatus", "Kein Gemini API-Key eingetragen – jedes Foto wurde als eigener Artikel zur manuellen Prüfung angelegt.", false);
+      }
 
       try {
-        const savedKey = localStorage.getItem("fflw_gemini_api_key");
-        if (savedKey) kiKeyInput.value = savedKey;
-      } catch (e) {}
+        setMsg("kiStatus", "KI analysiert Fotos und gruppiert zusammengehörige Objekte...", false);
+        const parts = [{ text: buildKiPrompt(loadedPhotos.length, tol) }];
+        loadedPhotos.forEach((ph) => {
+          parts.push({ inlineData: { mimeType: ph.mimeType, data: ph.base64 } });
+        });
 
-      async function verifyAndStart(codeRaw) {
-        const code = String(codeRaw || "").replace(/\s+/g, "").trim();
-        if (!code) {
-          loginMsg.textContent = "Bitte KI-Helfer-Code eingeben.";
-          return;
-        }
-        loginMsg.style.color = "#312e81";
-        loginMsg.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Prüfe Zugangscode …`;
-        try {
-          const resp = await fetch(`${WEB_APP_URL}?action=getGeminiApiKey&masterCode=${encodeURIComponent(code)}&t=${Date.now()}`, {
-            method: "GET",
-            redirect: "follow"
-          });
-          const res = await resp.json();
-          if (!res || !res.ok) {
-            loginMsg.style.color = "#b91c1c";
-            loginMsg.textContent = (res && res.error) ? res.error : "Ungültiger Zugangscode.";
-            try { sessionStorage.removeItem(STORAGE_CODE_KEY); } catch (e) {}
-            return;
-          }
+        const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + encodeURIComponent(apiKey);
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: parts }],
+            generationConfig: { responseMimeType: "application/json" }
+          })
+        });
+        const data = await resp.json();
+        const rawText = (((data.candidates || [])[0] || {}).content || {}).parts?.[0]?.text || "{}";
+        const parsed = JSON.parse(rawText);
+        const usedPhotoIds = new Set();
 
-          activeCode = code;
-          activeRole = res.role || "kiimport";
-          try { sessionStorage.setItem(STORAGE_CODE_KEY, code); } catch (e) {}
-          if (res.apiKey && !kiKeyInput.value.trim()) {
-            kiKeyInput.value = res.apiKey;
-          }
-
-          loginBox.style.display = "none";
-          workspace.style.display = "block";
-
-          const isTeamOrMaster = (activeRole === "master" || activeRole === "freischalter");
-          document.getElementById("ki-role-badge").textContent = isTeamOrMaster
-            ? `✓ Angemeldet als ${activeRole === "master" ? "Supermaster" : "Team-Freischalter"}`
-            : "✓ Angemeldet als KI-Erfassungshelfer";
-          document.getElementById("ki-dest-hint").textContent = isTeamOrMaster
-            ? "Du kannst direkt freischalten oder in die Eingangs-Prüfung speichern."
-            : "Deine erfassten Artikel landen sicher in der Eingangs-Prüfung zur Freigabe durch das Team.";
-
-          if (isTeamOrMaster) {
-            document.getElementById("ki-back-master-link").style.display = "inline-block";
-            document.getElementById("ki-save-key-btn").style.display = "inline-block";
-          } else {
-            const zielSel = document.getElementById("ki-ziel-status");
-            if (zielSel) {
-              zielSel.value = "eingang";
-              zielSel.disabled = true;
+        const created = (parsed.items || []).map((obj, idx) => {
+          const pIdxList = Array.isArray(obj.photoIndices) && obj.photoIndices.length ? obj.photoIndices : [idx];
+          const entries = [];
+          pIdxList.forEach((pIdx) => {
+            const ph = loadedPhotos[Number(pIdx)];
+            if (ph) {
+              usedPhotoIds.add(ph.id);
+              entries.push({ photoId: ph.id, rotation: 0 });
             }
-          }
-        } catch (err) {
-          loginMsg.style.color = "#b91c1c";
-          loginMsg.textContent = "Verbindungsfehler: " + err.message;
-        }
-      }
-
-      document.getElementById("ki-login-form").addEventListener("submit", function (e) {
-        e.preventDefault();
-        verifyAndStart(codeInput.value);
-      });
-
-      // Direkt-Link (?code=...) oder gespeicherte Session oder aktive Master-Session automatisch erkennen
-      (function autoLoginIfPossible() {
-        const params = new URLSearchParams(window.location.search);
-        const urlCode = params.get("code");
-        let saved = "";
-        try {
-          const smCode = (window.FFLW_SupermasterDevice && window.FFLW_SupermasterDevice.getCode()) || "";
-          saved = urlCode || sessionStorage.getItem(STORAGE_CODE_KEY) || sessionStorage.getItem("fflw_master_session_code") || smCode || "";
-        } catch (e) { saved = urlCode || ""; }
-        if (saved) {
-          codeInput.value = saved;
-          verifyAndStart(saved);
-        }
-      })();
-
-      document.getElementById("ki-logout-btn").addEventListener("click", () => {
-        activeCode = "";
-        activeRole = "";
-        try { sessionStorage.removeItem(STORAGE_CODE_KEY); } catch (e) {}
-        workspace.style.display = "none";
-        loginBox.style.display = "block";
-        loginMsg.textContent = "";
-      });
-
-      document.getElementById("ki-copy-invite-btn").addEventListener("click", async () => {
-        const baseUrl = window.location.origin + window.location.pathname;
-        const inviteUrl = `${baseUrl}?code=${encodeURIComponent(activeCode)}`;
-        try {
-          await navigator.clipboard.writeText(inviteUrl);
-          alert("✓ Direkt-Link kopiert! Wer diesen Link öffnet, gelangt sofort ohne Code-Eingabe in die KI-Erfassung:\n\n" + inviteUrl);
-        } catch (e) {
-          prompt("Direkt-Link zum Kopieren:", inviteUrl);
-        }
-      });
-
-      document.getElementById("ki-save-key-btn").addEventListener("click", async function () {
-        const apiKey = kiKeyInput.value.trim();
-        const statusEl = document.getElementById("ki-status-msg");
-        try { localStorage.setItem("fflw_gemini_api_key", apiKey); } catch (e) {}
-        this.disabled = true;
-        try {
-          const resp = await fetch(WEB_APP_URL, {
-            method: "POST",
-            redirect: "follow",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: "saveGeminiApiKey", masterCode: activeCode, apiKey: apiKey })
           });
-          const res = await resp.json();
-          this.disabled = false;
-          if (res && res.ok) {
-            statusEl.style.color = "#15803d";
-            statusEl.textContent = "✓ Gemini API-Key dauerhaft im Script gespeichert!";
-          } else {
-            statusEl.style.color = "#b91c1c";
-            statusEl.textContent = "Fehler: " + ((res && res.error) || "Speichern fehlgeschlagen");
+          if (!entries.length && loadedPhotos[idx]) {
+            usedPhotoIds.add(loadedPhotos[idx].id);
+            entries.push({ photoId: loadedPhotos[idx].id, rotation: 0 });
           }
-        } catch (err) {
-          this.disabled = false;
-          statusEl.style.color = "#b91c1c";
-          statusEl.textContent = "Fehler: " + err.message;
-        }
-      });
-
-      function compressKiPhoto(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = ev => {
-            const img = new Image();
-            img.onload = () => {
-              const makeScaled = (maxDim, quality) => {
-                let w = img.width, h = img.height;
-                if (w > maxDim || h > maxDim) {
-                  if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-                  else { w = Math.round(w * maxDim / h); h = maxDim; }
-                }
-                const c = document.createElement("canvas");
-                c.width = w; c.height = h;
-                c.getContext("2d").drawImage(img, 0, 0, w, h);
-                return c.toDataURL("image/jpeg", quality);
-              };
-              const dataUrl = makeScaled(1024, 0.80);
-              const aiDataUrl = makeScaled(768, 0.72);
-              resolve({
-                name: file.name,
-                dataUrl: dataUrl,
-                mimeType: "image/jpeg",
-                base64: dataUrl.split(",")[1],
-                aiBase64: aiDataUrl.split(",")[1]
-              });
-            };
-            img.onerror = reject;
-            img.src = ev.target.result;
+          const cov = Math.max(0, Math.min(entries.length - 1, Number(obj.coverPhotoIndex || 0)));
+          return {
+            id: "it_" + Math.random().toString(36).slice(2, 8),
+            titel: String(obj.titel || ("Artikel " + (idx + 1))).trim(),
+            kategorie: String(obj.kategorie || "Sonstiges").trim(),
+            masse: String(obj.masse || "").trim(),
+            beschreibung: String(obj.beschreibung || "").trim(),
+            coverIndex: cov,
+            photoEntries: entries
           };
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
         });
-      }
 
-      function renderLoadedThumbs() {
-        const countEl = document.getElementById("ki-photos-count");
-        const thumbsEl = document.getElementById("ki-thumbs-grid");
-        countEl.textContent = `${kiLoadedPhotos.length} Bild(er) bereit`;
-        thumbsEl.innerHTML = kiLoadedPhotos.map((p, idx) => `
-          <div style="border:1px solid #cbd5e1; border-radius:6px; padding:4px; background:#f8fafc; text-align:center; width:96px;">
-            <img src="${p.dataUrl}" alt="Bild ${idx + 1}" style="width:86px; height:64px; object-fit:cover; border-radius:4px;">
-            <div style="font-size:0.75rem; font-weight:bold; color:#003366;">Bild #${idx + 1}</div>
-          </div>
-        `).join("");
-      }
-
-      document.getElementById("ki-photos-input").addEventListener("change", async function () {
-        const files = Array.from(this.files || []);
-        if (!files.length) return;
-        document.getElementById("ki-photos-count").textContent = "Verarbeite Bilder …";
-        for (let i = 0; i < files.length; i++) {
-          kiLoadedPhotos.push(await compressKiPhoto(files[i]));
-        }
-        renderLoadedThumbs();
-      });
-
-      document.getElementById("ki-drive-import-btn").addEventListener("click", async function () {
-        const q = document.getElementById("ki-drive-folder").value.trim();
-        const st = document.getElementById("ki-drive-status");
-        if (!q) { st.style.color = "#b91c1c"; st.textContent = "Bitte Drive-Ordner-Link oder Namen eingeben."; return; }
-        const orig = this.textContent;
-        this.disabled = true;
-        this.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Lade Bilder …`;
-        st.style.color = "#b45309";
-        st.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Suche Bilder im Drive-Ordner …`;
-        try {
-          const resp = await fetch(WEB_APP_URL, {
-            method: "POST",
-            redirect: "follow",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: "importPhotosFromDriveFolder", masterCode: activeCode, folderQuery: q })
-          });
-          const res = await resp.json();
-          this.disabled = false;
-          this.textContent = orig;
-          if (!res || !res.ok) throw new Error((res && res.error) || "Fehler beim Laden.");
-          const arr = res.photos || [];
-          if (!arr.length) {
-            st.style.color = "#b45309";
-            st.textContent = `Im Ordner „${res.folderName}“ wurden keine Bilddateien gefunden.`;
-            return;
-          }
-          for (const p of arr) {
-            const respBlob = await fetch(`data:${p.mimeType};base64,${p.base64}`);
-            const blob = await respBlob.blob();
-            const file = new File([blob], p.name, { type: p.mimeType });
-            kiLoadedPhotos.push(await compressKiPhoto(file));
-          }
-          renderLoadedThumbs();
-          st.style.color = "#15803d";
-          st.textContent = `✓ ${arr.length} Bilder aus „${res.folderName}“ geladen!`;
-        } catch (err) {
-          this.disabled = false;
-          this.textContent = orig;
-          st.style.color = "#b91c1c";
-          st.textContent = "Fehler: " + err.message;
-        }
-      });
-
-      document.getElementById("ki-reset-all-btn").addEventListener("click", () => {
-        kiLoadedPhotos = [];
-        kiDetectedItems = [];
-        document.getElementById("ki-photos-input").value = "";
-        document.getElementById("ki-photos-count").textContent = "0 Bilder geladen";
-        document.getElementById("ki-thumbs-grid").innerHTML = "";
-        document.getElementById("ki-status-msg").textContent = "";
-        document.getElementById("ki-import-msg").textContent = "";
-        ["ki-spender", "ki-ort", "ki-telefon", "ki-drive-folder", "ki-raw-json"].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.value = "";
-        });
-        renderKiPreviewTable();
-      });
-
-      function cropPhotoByBox2d(photoObj, box2d) {
-        return new Promise((resolve) => {
-          if (!photoObj || !Array.isArray(box2d) || box2d.length !== 4) { resolve(null); return; }
-          const [ymin, xmin, ymax, xmax] = box2d.map(Number);
-          if ([ymin, xmin, ymax, xmax].some(v => isNaN(v)) || ymax <= ymin || xmax <= xmin) { resolve(null); return; }
-          const img = new Image();
-          img.onload = function () {
-            try {
-              const pad = 35;
-              const y1 = Math.max(0, (ymin - pad) / 1000) * img.naturalHeight;
-              const x1 = Math.max(0, (xmin - pad) / 1000) * img.naturalWidth;
-              const y2 = Math.min(1, (ymax + pad) / 1000) * img.naturalHeight;
-              const x2 = Math.min(1, (xmax + pad) / 1000) * img.naturalWidth;
-              const cw = Math.max(80, Math.round(x2 - x1));
-              const ch = Math.max(80, Math.round(y2 - y1));
-              const canvas = document.createElement("canvas");
-              const scale = Math.min(1, 1000 / Math.max(cw, ch));
-              canvas.width = Math.round(cw * scale);
-              canvas.height = Math.round(ch * scale);
-              canvas.getContext("2d").drawImage(img, x1, y1, cw, ch, 0, 0, canvas.width, canvas.height);
-              const dataUrl = canvas.toDataURL("image/jpeg", 0.85);
-              resolve({ dataUrl: dataUrl, base64: dataUrl.split(",")[1], mimeType: "image/jpeg" });
-            } catch (e) { resolve(null); }
-          };
-          img.onerror = () => resolve(null);
-          img.src = photoObj.dataUrl;
-        });
-      }
-
-      document.getElementById("ki-analyze-btn").addEventListener("click", async function () {
-        const apiKey = kiKeyInput.value.trim();
-        const statusEl = document.getElementById("ki-status-msg");
-        if (!kiLoadedPhotos.length) {
-          statusEl.style.color = "#b91c1c";
-          statusEl.textContent = "Bitte zuerst mindestens ein Foto auswählen.";
-          return;
-        }
-        if (!apiKey) {
-          statusEl.style.color = "#b91c1c";
-          statusEl.textContent = "Bitte Gemini API-Key eingeben.";
-          return;
-        }
-        try { localStorage.setItem("fflw_gemini_api_key", apiKey); } catch (e) {}
-
-        this.disabled = true;
-        try {
-          const batchSize = 4;
-          const totalBatches = Math.ceil(kiLoadedPhotos.length / batchSize);
-          const allParsed = [];
-
-          let candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-flash-latest"];
-          try {
-            const listResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`);
-            if (listResp.ok) {
-              const listData = await listResp.json();
-              const valid = (listData.models || [])
-                .filter(mod => Array.isArray(mod.supportedGenerationMethods) && mod.supportedGenerationMethods.includes("generateContent"))
-                .map(mod => String(mod.name || "").replace(/^models\//, ""))
-                .filter(name => name.includes("gemini") && !name.includes("embedding") && !name.includes("tts") && !name.includes("imagen"));
-              if (valid.length) {
-                const preferred = valid.filter(n => n.includes("flash") && !n.includes("8b"));
-                const others = valid.filter(n => !preferred.includes(n));
-                candidateModels = [...preferred, ...others];
-              }
-            }
-          } catch (e) {}
-
-          for (let b = 0; b < totalBatches; b++) {
-            const startIdx = b * batchSize;
-            const slice = kiLoadedPhotos.slice(startIdx, startIdx + batchSize);
-            statusEl.style.color = "#312e81";
-            statusEl.textContent = totalBatches > 1
-              ? `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} KI analysiert Bild-Paket ${b + 1} von ${totalBatches} (Bilder #${startIdx + 1}–#${startIdx + slice.length}) …`
-              : `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} KI analysiert Bilder, bündelt gleiche Artikel & schätzt Maße …`;
-
-            const parts = [
-              {
-                text:
-                  "Du hilfst einem ehrenamtlichen Flüchtlings-Freundeskreis bei der Wohnungsausstattung. " +
-                  "Analysiere die folgenden Wohnungsbilder (nummeriert mit ihren exakten Bildnummern). " +
-                  "Liste ALLE gut erkennbaren, sinnvollen Möbelstücke, Haushaltsgeräte und Einrichtungsgegenstände auf. " +
-                  "WICHTIG 1 (Mehrere Fotos desselben Artikels zusammenfassen): Wenn dasselbe Möbelstück auf mehreren Bildern aus verschiedenen Blickwinkeln oder mit Detail-/Innenansicht zu sehen ist (z. B. Bild #1 und Bild #2 zeigen denselben Schrank), fasse sie als EINEN gemeinsamen Eintrag zusammen und gib ALLE dazugehörigen Bildnummern im Array 'bildIndizes' an (z. B. [1, 2])! " +
-                  "WICHTIG 2 (Sets zusammenfassen): Wenn mehrere identische Gegenstände zusammengehören (z. B. 6 gleiche Stühle), fasse sie als EINEN Eintrag mit Stückzahl im Titel zusammen (z. B. '6× Esszimmerstuhl'). " +
-                  "WICHTIG 3: Gib für die Hauptansicht ('bildIndex') die Bounding-Box im Bild an als 'box_2d': [ymin, xmin, ymax, xmax] (normiert auf 0 bis 1000). " +
-                  "Schätze außerdem realistische ungefähre Außenmaße im Format 'ca. B x T x H cm'. " +
-                  "Antworte AUSSCHLIESSLICH mit einem gültigen JSON-Array ohne Markdown-Blöcke in diesem Schema: " +
-                  '[{"titel":"...","kategorie":"Wohnzimmer|Schlafzimmer|Küche & Haushalt|Kinderzimmer|Elektro & Technik|Garten & Fahrrad|Sonstiges","beschreibung":"...","masse":"ca. ... cm","bildIndex":1,"bildIndizes":[1,2],"box_2d":[100,150,850,700]}]'
-              }
-            ];
-
-            slice.forEach((p, localIdx) => {
-              const globalNum = startIdx + localIdx + 1;
-              parts.push({ text: `Bild #${globalNum}:` });
-              parts.push({ inline_data: { mime_type: "image/jpeg", data: p.aiBase64 || p.base64 } });
-            });
-
-            let data = null;
-            let resp = { ok: false };
-            let lastNetErr = "";
-            for (const modelName of candidateModels) {
-              try {
-                resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(apiKey)}`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    contents: [{ parts: parts }],
-                    generationConfig: { temperature: 0.2 }
-                  })
-                });
-                data = await resp.json();
-                if (resp.ok && data && data.candidates && data.candidates[0]) break;
-              } catch (netErr) {
-                lastNetErr = netErr.message || "Netzwerkfehler";
-              }
-            }
-            if (!resp.ok || !data || !data.candidates || !data.candidates[0]) {
-              const errMsg = (data && data.error && data.error.message) ? data.error.message : (lastNetErr || "KI-Anfrage fehlgeschlagen.");
-              statusEl.style.color = "#b91c1c";
-              statusEl.textContent = "Fehler: " + errMsg;
-              this.disabled = false;
-              return;
-            }
-
-            let rawText = data.candidates[0].content.parts.map(pt => pt.text || "").join("").trim();
-            rawText = rawText.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
-            const parsed = JSON.parse(rawText);
-            if (Array.isArray(parsed)) allParsed.push(...parsed);
-          }
-
-          const enriched = [];
-          for (const x of allParsed) {
-            const rawList = Array.isArray(x.bildIndizes) && x.bildIndizes.length
-              ? x.bildIndizes.map(n => Number(n)).filter(n => n >= 1 && n <= kiLoadedPhotos.length)
-              : [];
-            const primaryIdx = Number(x.bildIndex || rawList[0] || 1);
-            const uniqueIndices = Array.from(new Set([primaryIdx, ...rawList].filter(n => n >= 1 && n <= kiLoadedPhotos.length)));
-
-            const photoObj = (primaryIdx >= 1 && kiLoadedPhotos[primaryIdx - 1]) ? kiLoadedPhotos[primaryIdx - 1] : null;
-            const cropped = (uniqueIndices.length <= 1) ? await cropPhotoByBox2d(photoObj, x.box_2d) : null;
-
-            enriched.push({
-              selected: true,
-              titel: x.titel || "Gegenstand",
-              kategorie: x.kategorie || "Sonstiges",
-              beschreibung: x.beschreibung || "",
-              masse: x.masse || "",
-              bildIndex: primaryIdx,
-              bildIndizes: uniqueIndices.length ? uniqueIndices : (primaryIdx ? [primaryIdx] : []),
-              useCrop: !!cropped,
-              croppedPhoto: cropped
+        loadedPhotos.forEach((ph) => {
+          if (!usedPhotoIds.has(ph.id)) {
+            created.push({
+              id: "it_" + Math.random().toString(36).slice(2, 8),
+              titel: "Zusätzliches Foto",
+              kategorie: "Sonstiges",
+              masse: "",
+              beschreibung: "",
+              coverIndex: 0,
+              photoEntries: [{ photoId: ph.id, rotation: 0 }]
             });
           }
-          kiDetectedItems = enriched;
-          statusEl.style.color = "#15803d";
-          statusEl.textContent = `✓ ${kiDetectedItems.length} Artikel erkannt!`;
-          renderKiPreviewTable();
-        } catch (err) {
-          statusEl.style.color = "#b91c1c";
-          statusEl.textContent = "Fehler: " + err.message;
-        }
-        this.disabled = false;
-      });
-
-      document.getElementById("ki-parse-json-btn").addEventListener("click", () => {
-        try {
-          const arr = JSON.parse(document.getElementById("ki-raw-json").value.trim());
-          if (!Array.isArray(arr)) throw new Error("Bitte eine JSON-Liste [...] einfügen.");
-          kiDetectedItems = arr.map(x => {
-            const list = Array.isArray(x.bildIndizes) ? x.bildIndizes.map(Number) : (x.bildIndex ? [Number(x.bildIndex)] : []);
-            return {
-              selected: true,
-              titel: x.titel || "Gegenstand",
-              kategorie: x.kategorie || "Sonstiges",
-              beschreibung: x.beschreibung || "",
-              masse: x.masse || "",
-              bildIndex: list[0] || 0,
-              bildIndizes: list,
-              useCrop: false,
-              croppedPhoto: null
-            };
-          });
-          renderKiPreviewTable();
-        } catch (e) {
-          alert("JSON-Fehler: " + e.message);
-        }
-      });
-
-      document.getElementById("ki-add-empty-row-btn").addEventListener("click", () => {
-        kiDetectedItems.push({
-          selected: true,
-          titel: "",
-          kategorie: "Sonstiges",
-          beschreibung: "",
-          masse: "",
-          bildIndex: kiLoadedPhotos.length ? 1 : 0,
-          bildIndizes: kiLoadedPhotos.length ? [1] : [],
-          useCrop: false,
-          croppedPhoto: null
         });
-        renderKiPreviewTable();
-      });
 
-      function parseBildIndizesStr(strVal) {
-        return Array.from(new Set(
-          String(strVal || "")
-            .split(/[,;\s]+/)
-            .map(s => Number(s.replace(/[^\d]/g, "")))
-            .filter(n => n >= 1 && n <= kiLoadedPhotos.length)
-        ));
+        items = created.length ? created : [];
+        renderItems();
+        setMsg("kiStatus", items.length + " Artikel-Gruppen erstellt. Bitte Angaben und Bilddrehung prüfen.", false);
+      } catch (err) {
+        setMsg("kiStatus", "KI-Analyse-Hinweis: " + err.message + " – du kannst Artikel auch manuell anlegen.", true);
       }
+    });
 
-      function renderKiPreviewTable() {
-        const card = document.getElementById("ki-preview-card");
-        const listEl = document.getElementById("ki-items-list");
-        const cntEl = document.getElementById("ki-items-count");
-        if (!kiDetectedItems.length) {
-          card.style.display = "none";
-          return;
-        }
-        card.style.display = "block";
-        cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
+    document.getElementById("btnAddManualItem").addEventListener("click", () => {
+      const defaultPhoto = loadedPhotos[0] ? [{ photoId: loadedPhotos[0].id, rotation: 0 }] : [];
+      items.push({
+        id: "it_" + Math.random().toString(36).slice(2, 8),
+        titel: "",
+        kategorie: "Sonstiges",
+        masse: "",
+        beschreibung: "",
+        coverIndex: 0,
+        photoEntries: defaultPhoto
+      });
+      renderItems();
+    });
 
-        listEl.innerHTML = kiDetectedItems.map((item, idx) => {
-          const indices = Array.isArray(item.bildIndizes) && item.bildIndizes.length
-            ? item.bildIndizes
-            : (Number(item.bildIndex || 0) >= 1 ? [Number(item.bildIndex)] : []);
+    function rotateItemPhoto(itemId, entryIdx) {
+      const it = items.find((x) => x.id === itemId);
+      if (!it || !it.photoEntries[entryIdx]) return;
+      it.photoEntries[entryIdx].rotation = ((Number(it.photoEntries[entryIdx].rotation || 0) + 90) % 360);
+      renderItems();
+    }
 
-          let thumbsHtml = "";
-          if (item.useCrop && item.croppedPhoto) {
-            thumbsHtml = `<img src="${item.croppedPhoto.dataUrl}" style="width:92px; height:72px; object-fit:cover; border-radius:6px; border:1px solid #94a3b8;">`;
-          } else if (indices.length > 0) {
-            thumbsHtml = `<div style="display:flex; flex-wrap:wrap; gap:4px; max-width:196px; justify-content:center;">` +
-              indices.map(num => {
-                const ph = kiLoadedPhotos[num - 1];
-                return ph ? `<div style="position:relative;"><img src="${ph.dataUrl}" style="width:${indices.length > 1 ? "60px" : "92px"}; height:${indices.length > 1 ? "52px" : "72px"}; object-fit:cover; border-radius:5px; border:1px solid #94a3b8;"><span style="position:absolute; bottom:2px; right:2px; background:rgba(0,0,0,0.72); color:#fff; font-size:0.68rem; padding:1px 4px; border-radius:3px;">#${num}</span></div>` : "";
-              }).join("") + `</div>`;
-          } else {
-            thumbsHtml = `<div style="width:92px; height:72px; background:#f1f5f9; border:1px dashed #94a3b8; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#64748b;">Ohne Bild</div>`;
-          }
+    function setItemCover(itemId, entryIdx) {
+      const it = items.find((x) => x.id === itemId);
+      if (!it || !it.photoEntries[entryIdx]) return;
+      it.coverIndex = entryIdx;
+      renderItems();
+    }
 
+    function removeItemPhoto(itemId, entryIdx) {
+      const it = items.find((x) => x.id === itemId);
+      if (!it) return;
+      it.photoEntries.splice(entryIdx, 1);
+      if (it.coverIndex >= it.photoEntries.length) it.coverIndex = 0;
+      renderItems();
+    }
+
+    function removeItem(itemId) {
+      items = items.filter((x) => x.id !== itemId);
+      renderItems();
+    }
+
+    function renderItems() {
+      const container = document.getElementById("itemsContainer");
+      if (!items.length) {
+        container.innerHTML = '<p class="hint">Noch keine Artikel angelegt oder analysiert.</p>';
+        return;
+      }
+      container.innerHTML = items.map((it, idx) => {
+        const thumbsHtml = (it.photoEntries || []).map((pe, pIdx) => {
+          const ph = loadedPhotos.find((p) => p.id === pe.photoId);
+          if (!ph) return "";
+          const isCov = (Number(it.coverIndex || 0) === pIdx);
           return `
-            <div class="ki-card" style="padding:12px 14px; margin:10px 0; border-left-color:${item.selected !== false ? "#2e7d32" : "#94a3b8"}; background:${item.selected !== false ? "#ffffff" : "#f8fafc"};">
-              <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start;">
-                <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
-                  <label style="font-size:0.82rem; font-weight:bold; cursor:pointer;">
-                    <input type="checkbox" class="ki-row-chk" data-idx="${idx}" ${item.selected !== false ? "checked" : ""}> Übernehmen
-                  </label>
-                  ${thumbsHtml}
-                  ${(item.croppedPhoto && indices.length <= 1) ? `<label style="font-size:0.74rem; color:#1e40af; cursor:pointer;"><input type="checkbox" class="ki-row-crop" data-idx="${idx}" ${item.useCrop ? "checked" : ""}> Einzel-Ausschnitt</label>` : ""}
-                </div>
-                <div style="flex:1; min-width:250px; display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:8px;">
-                  <div>
-                    <label style="font-size:0.78rem; font-weight:bold;">Artikel-Titel *</label>
-                    <input type="text" class="ki-input ki-row-titel" data-idx="${idx}" value="${String(item.titel || "").replace(/"/g, "&quot;")}">
-                  </div>
-                  <div>
-                    <label style="font-size:0.78rem; font-weight:bold;">Kategorie</label>
-                    <select class="ki-select ki-row-kat" data-idx="${idx}">
-                      ${["Wohnzimmer", "Schlafzimmer", "Küche & Haushalt", "Kinderzimmer", "Elektro & Technik", "Garten & Fahrrad", "Sonstiges"].map(k =>
-                        `<option value="${k}" ${item.kategorie === k ? "selected" : ""}>${k}</option>`
-                      ).join("")}
-                    </select>
-                  </div>
-                  <div>
-                    <label style="font-size:0.78rem; font-weight:bold;">Geschätzte Maße (ca. B × T × H)</label>
-                    <input type="text" class="ki-input ki-row-masse" data-idx="${idx}" value="${String(item.masse || "").replace(/"/g, "&quot;")}" placeholder="z. B. ca. 180 x 90 x 75 cm">
-                  </div>
-                  <div>
-                    <label style="font-size:0.78rem; font-weight:bold;">Zugeordnete Bild-Nr. (mehrere mit Komma, z. B. 1, 2)</label>
-                    <input type="text" class="ki-input ki-row-imgs" data-idx="${idx}" value="${indices.join(", ")}" placeholder="z. B. 1, 2">
-                  </div>
-                  <div style="grid-column: 1 / -1;">
-                    <label style="font-size:0.78rem; font-weight:bold;">Beschreibung / Zustand</label>
-                    <input type="text" class="ki-input ki-row-desc" data-idx="${idx}" value="${String(item.beschreibung || "").replace(/"/g, "&quot;")}">
-                  </div>
-                </div>
+            <div class="thumb-box ${isCov ? "is-cover" : ""}">
+              <img src="${ph.dataUrl}" alt="${ph.name}" style="transform: rotate(${pe.rotation || 0}deg);" />
+              <div style="font-size:0.74rem; margin-top:4px;">${isCov ? "<strong>Titelbild</strong>" : ("Foto " + (pIdx + 1))} (${pe.rotation || 0}&deg;)</div>
+              <div class="thumb-actions">
+                <button type="button" class="secondary" onclick="rotateItemPhoto('${it.id}', ${pIdx})" title="90° drehen">&#8635;</button>
+                <button type="button" class="secondary" onclick="setItemCover('${it.id}', ${pIdx})" title="Als Titelbild">&#9733;</button>
+                <button type="button" class="danger" onclick="removeItemPhoto('${it.id}', ${pIdx})" title="Entfernen">&times;</button>
               </div>
             </div>
           `;
         }).join("");
 
-        listEl.querySelectorAll(".ki-row-chk").forEach(el => el.addEventListener("change", () => {
-          kiDetectedItems[Number(el.dataset.idx)].selected = el.checked;
-          cntEl.textContent = kiDetectedItems.filter(x => x.selected !== false).length;
-        }));
-        listEl.querySelectorAll(".ki-row-crop").forEach(el => el.addEventListener("change", () => {
-          kiDetectedItems[Number(el.dataset.idx)].useCrop = el.checked;
-          renderKiPreviewTable();
-        }));
-        listEl.querySelectorAll(".ki-row-titel").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].titel = el.value; }));
-        listEl.querySelectorAll(".ki-row-kat").forEach(el => el.addEventListener("change", () => { kiDetectedItems[Number(el.dataset.idx)].kategorie = el.value; }));
-        listEl.querySelectorAll(".ki-row-masse").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].masse = el.value; }));
-        listEl.querySelectorAll(".ki-row-desc").forEach(el => el.addEventListener("input", () => { kiDetectedItems[Number(el.dataset.idx)].beschreibung = el.value; }));
-        listEl.querySelectorAll(".ki-row-imgs").forEach(el => el.addEventListener("change", () => {
-          const i = Number(el.dataset.idx);
-          const parsedList = parseBildIndizesStr(el.value);
-          kiDetectedItems[i].bildIndizes = parsedList;
-          kiDetectedItems[i].bildIndex = parsedList[0] || 0;
-          kiDetectedItems[i].useCrop = false;
-          renderKiPreviewTable();
-        }));
+        return `
+          <div class="item-card">
+            <div class="item-head">
+              <strong>Artikel #${idx + 1}</strong>
+              <button type="button" class="danger" onclick="removeItem('${it.id}')">Artikel entfernen</button>
+            </div>
+            <div class="thumbs-row">${thumbsHtml || '<span class="hint">Kein Foto zugeordnet.</span>'}</div>
+            <div class="grid-3">
+              <div>
+                <label>Titel</label>
+                <input type="text" value="${(it.titel || "").replace(/"/g, "&quot;")}" onchange="items[${idx}].titel = this.value" />
+              </div>
+              <div>
+                <label>Kategorie</label>
+                <input type="text" value="${(it.kategorie || "").replace(/"/g, "&quot;")}" onchange="items[${idx}].kategorie = this.value" />
+              </div>
+              <div>
+                <label>Maße / Größe (optional, bei Möbeln/Geräten mit &plusmn;)</label>
+                <input type="text" placeholder="z. B. ca. 120 x 60 x 75 cm (&plusmn; 10 cm) oder Gr. 39" value="${(it.masse || "").replace(/"/g, "&quot;")}" onchange="items[${idx}].masse = this.value" />
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <label>Beschreibung / Zustand</label>
+              <textarea onchange="items[${idx}].beschreibung = this.value">${it.beschreibung || ""}</textarea>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("btnSaveAllItems").addEventListener("click", async () => {
+      const code = document.getElementById("accessCode").value.trim();
+      if (!code) return setMsg("saveStatus", "Bitte oben den Zugangscode eingeben.", true);
+      if (!items.length) return setMsg("saveStatus", "Keine Artikel zum Speichern vorhanden.", true);
+
+      const payloadItems = items
+        .filter((it) => String(it.titel || "").trim().length > 0)
+        .map((it) => {
+          const photos = (it.photoEntries || [])
+            .map((pe) => {
+              const ph = loadedPhotos.find((p) => p.id === pe.photoId);
+              if (!ph) return null;
+              return {
+                photoBase64: ph.base64,
+                photoMime: ph.mimeType,
+                photoName: ph.name,
+                rotation: pe.rotation || 0
+              };
+            })
+            .filter(Boolean);
+          return {
+            titel: it.titel.trim(),
+            kategorie: (it.kategorie || "Sonstiges").trim(),
+            masse: (it.masse || "").trim(),
+            beschreibung: (it.beschreibung || "").trim(),
+            coverIndex: Number(it.coverIndex || 0),
+            photos: photos
+          };
+        });
+
+      if (!payloadItems.length) return setMsg("saveStatus", "Bitte mindestens einen Artikel mit Titel angeben.", true);
+
+      try {
+        setMsg("saveStatus", "Speichere Artikel in Google Drive...", false);
+        const res = await callGasPost({
+          action: "bulkImportApartmentItems",
+          masterCode: code,
+          spenderName: document.getElementById("spenderName").value.trim(),
+          ort: document.getElementById("ort").value.trim(),
+          telefon: document.getElementById("telefon").value.trim(),
+          email: document.getElementById("anbieterEmail").value.trim(),
+          direktKontaktFreigegeben: document.getElementById("direktKontaktFreigegeben").checked,
+          zielStatus: document.getElementById("zielStatus").value,
+          items: payloadItems
+        });
+        if (!res.ok) return setMsg("saveStatus", res.error || "Fehler beim Speichern.", true);
+        setMsg("saveStatus", res.importedCount + " Artikel erfolgreich gespeichert!", false);
+      } catch (err) {
+        setMsg("saveStatus", "Fehler: " + err.message, true);
       }
-
-      async function executeBulkKiImport(triggerBtn) {
-        const spenderName = document.getElementById("ki-spender").value.trim() || "Wohnungsauflösung / Sachspende";
-        const ort = document.getElementById("ki-ort").value.trim() || "Leutenbach / Winnenden";
-        const telefon = document.getElementById("ki-telefon").value.trim();
-        const zielStatus = document.getElementById("ki-ziel-status").value;
-        const msgEl = document.getElementById("ki-import-msg");
-
-        const toImport = kiDetectedItems
-          .filter(x => x.selected !== false && String(x.titel || "").trim())
-          .map(x => {
-            const indices = Array.isArray(x.bildIndizes) && x.bildIndizes.length
-              ? x.bildIndizes
-              : (Number(x.bildIndex || 0) >= 1 ? [Number(x.bildIndex)] : []);
-
-            let photosPayload = [];
-            if (x.useCrop && x.croppedPhoto && indices.length <= 1) {
-              photosPayload.push({
-                photoBase64: x.croppedPhoto.base64,
-                photoMime: x.croppedPhoto.mimeType,
-                photoName: "ausschnitt.jpg"
-              });
-            } else {
-              indices.forEach(num => {
-                const ph = kiLoadedPhotos[num - 1];
-                if (ph && ph.base64) {
-                  photosPayload.push({
-                    photoBase64: ph.base64,
-                    photoMime: ph.mimeType || "image/jpeg",
-                    photoName: ph.name || `bild_${num}.jpg`
-                  });
-                }
-              });
-            }
-
-            const fullDesc = [
-              x.beschreibung || "",
-              x.masse ? `Geschätzte Maße (KI): ${x.masse}` : ""
-            ].filter(Boolean).join(" | ");
-
-            return {
-              titel: String(x.titel).trim(),
-              kategorie: x.kategorie || "Sonstiges",
-              beschreibung: fullDesc,
-              masse: x.masse || "",
-              photos: photosPayload
-            };
-          });
-
-        if (!toImport.length) {
-          alert("Bitte mindestens einen Artikel mit Titel auswählen.");
-          return;
-        }
-
-        if (triggerBtn) triggerBtn.disabled = true;
-        try {
-          let savedOk = 0;
-          for (let i = 0; i < toImport.length; i++) {
-            msgEl.style.color = "#312e81";
-            msgEl.innerHTML = `${window.fflwGetLogoSpinnerHtml ? window.fflwGetLogoSpinnerHtml(18) : ""} Speichere Artikel ${i + 1} von ${toImport.length}: „${toImport[i].titel}“ (${toImport[i].photos.length} Foto/s) …`;
-            const resp = await fetch(WEB_APP_URL, {
-              method: "POST",
-              redirect: "follow",
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify({
-                action: "bulkImportApartmentItems",
-                masterCode: activeCode,
-                spenderName: spenderName,
-                ort: ort,
-                telefon: telefon,
-                zielStatus: zielStatus,
-                items: [toImport[i]]
-              })
-            });
-            const res = await resp.json();
-            if (res && res.ok) {
-              savedOk += (res.importedCount || 1);
-            } else {
-              msgEl.style.color = "#b91c1c";
-              msgEl.textContent = `Fehler bei Artikel ${i + 1} (${toImport[i].titel}): ` + ((res && res.error) || "Unbekannt");
-              if (triggerBtn) triggerBtn.disabled = false;
-              return;
-            }
-          }
-          msgEl.style.color = "#15803d";
-          msgEl.textContent = `✓ Alle ${savedOk} Artikel (inkl. gebündelter Mehrfach-Fotos) erfolgreich gespeichert!`;
-        } catch (err) {
-          msgEl.style.color = "#b91c1c";
-          msgEl.textContent = "Verbindungsfehler: " + err.message;
-        }
-        if (triggerBtn) triggerBtn.disabled = false;
-      }
-
-      document.getElementById("ki-import-all-btn").addEventListener("click", function () { executeBulkKiImport(this); });
-      document.getElementById("ki-import-all-btn-bottom").addEventListener("click", function () { executeBulkKiImport(this); });
     });
   </script>
 </body>
