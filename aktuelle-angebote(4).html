@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aktuelle Angebote - Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.fflw-filter-bar {
+margin: 18px 0;
+padding: 16px 18px;
+border-radius: 10px;
+background: #eef6fc;
+border: 2px solid #90caf9;
+color: #111111;
+}
+.fflw-filter-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+gap: 10px;
+margin-top: 10px;
+}
+.fflw-filter-input, .fflw-filter-select {
+width: 100%;
+padding: 9px 11px;
+border-radius: 6px;
+border: 1px solid #8faadc;
+font-size: 15px;
+color: #111111;
+background: #ffffff;
+box-sizing: border-box;
+}
+.fflw-offers-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+gap: 18px;
+margin-top: 18px;
+}
+.fflw-provider-group {
+grid-column: 1 / -1;
+background: #f4f8fc;
+border: 2px solid #90caf9;
+border-left: 7px solid #004080;
+border-radius: 12px;
+padding: 16px;
+margin-bottom: 8px;
+}
+.fflw-provider-group-header {
+display: flex;
+flex-wrap: wrap;
+justify-content: space-between;
+align-items: center;
+gap: 10px;
+padding-bottom: 12px;
+margin-bottom: 14px;
+border-bottom: 1px solid #c5d7eb;
+}
+.fflw-provider-group-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+gap: 16px;
+}
+.fflw-offer-card {
+background: #ffffff;
+color: #111111;
+border: 2px solid #c5d7eb;
+border-radius: 10px;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+box-shadow: 0 3px 10px rgba(0, 64, 128, 0.08);
+}
+.fflw-offer-card.urgent {
+border: 2px solid #d84315;
+box-shadow: 0 4px 14px rgba(216, 67, 21, 0.22);
+}
+.fflw-urgent-badge {
+background: #d84315;
+color: #ffffff;
+font-weight: bold;
+font-size: 0.86rem;
+padding: 6px 10px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+.fflw-offer-img {
+width: 100%;
+      height: 210px;
+      height: 155px;
+object-fit: cover;
+background: #f4f4f4;
+display: block;
+      cursor: zoom-in;
+      transition: opacity 0.15s ease;
+    }
+    .fflw-offer-img:hover { opacity: 0.92; }
+    .fflw-img-wrap { position: relative; background: #f1f5f9; }
+    .fflw-img-zoom-hint {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      background: rgba(15, 23, 42, 0.78);
+      color: #ffffff;
+      font-size: 0.78rem;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 5px;
+      pointer-events: none;
+    }
+    .fflw-offers-grid.is-compact {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .fflw-offers-grid.is-compact .fflw-offer-card {
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .fflw-offers-grid.is-compact .fflw-offer-card > div:first-child {
+      display: flex;
+      align-items: center;
+      flex: 1 1 320px;
+    }
+    .fflw-offers-grid.is-compact .fflw-img-wrap {
+      width: 108px;
+      min-width: 108px;
+      height: 108px;
+    }
+    .fflw-offers-grid.is-compact .fflw-offer-img {
+      width: 108px;
+      height: 108px;
+    }
+    .fflw-offers-grid.is-compact .fflw-img-zoom-hint { display: none; }
+    .fflw-offers-grid.is-compact .fflw-offer-footer {
+      background: transparent;
+      border-top: none;
+      padding: 10px 14px;
+    }
+    #fflw-lightbox-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 2147483646;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    #fflw-lightbox-img {
+      max-width: 94vw;
+      max-height: 78vh;
+      border-radius: 8px;
+      border: 2px solid #ffffff;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      object-fit: contain;
+      background: #111111;
+}
+.fflw-offer-body {
+padding: 14px 16px;
+flex: 1;
+}
+.fflw-tag {
+display: inline-block;
+font-size: 0.82rem;
+padding: 3px 8px;
+border-radius: 5px;
+background: #eef6fc;
+border: 1px solid #b8d4ec;
+color: #003366;
+font-weight: bold;
+margin: 2px 4px 4px 0;
+}
+.fflw-provider-link {
+display: inline-block;
+margin-top: 8px;
+font-size: 0.85rem;
+color: #004080;
+background: #e3f2fd;
+border: 1px solid #90caf9;
+border-radius: 5px;
+padding: 4px 9px;
+cursor: pointer;
+font-weight: bold;
+}
+.fflw-provider-link:hover {
+background: #bbdefb;
+}
+.fflw-offer-footer {
+padding: 12px 16px;
+background: #f4f8fc;
+border-top: 1px solid #d8e3f0;
+}
+.fflw-btn-req {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+width: 100%;
+text-align: center;
+background: #004080;
+color: #ffffff;
+border: none;
+padding: 11px 14px;
+border-radius: 7px;
+font-weight: bold;
+font-size: 15px;
+cursor: pointer;
+text-decoration: none;
+box-sizing: border-box;
+}
+.fflw-btn-req:hover {
+background: #002b59;
+}
+#fflw-req-modal {
+position: fixed;
+inset: 0;
+background: rgba(0, 0, 0, 0.72);
+z-index: 2147483645;
+display: none;
+align-items: center;
+justify-content: center;
+padding: 16px;
+}
+.fflw-req-box {
+background: #ffffff;
+color: #111111;
+border: 2px solid #004080;
+border-top: 6px solid #004080;
+border-radius: 12px;
+max-width: 480px;
+width: 100%;
+padding: 20px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+<a href="index.html" aria-label="Zur Startseite">
+<img src="assets/images/logo-mit-text.png" alt="Freundeskreis Flüchtlinge Leutenbach und Winnenden">
+</a>
+</header>
+
+<div class="layout">
+<nav class="side-nav" id="main-nav" aria-label="Hauptnavigation"></nav>
+
+<main class="content">
+<h2>Aktuelle Angebote im Virtuellen Warenhaus</h2>
+<div style="background:#eff6ff; border:1.5px solid #93c5fd; border-left:6px solid #004080; border-radius:9px; padding:12px 16px; margin:12px 0 16px 0; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:10px;">
+<div id="aa-acc-info" style="font-size:0.93rem; color:#1e3a8a;">
+<strong>👤 Konto-Vorteil:</strong> Eingeloggt werden Name &amp; Kontakt beim Reservieren automatisch ausgefüllt (inkl. Anonym-Option). <em>Ohne Konto kannst du weiterhin mit dem vom Team mitgeteilten Zugangscode reservieren.</em>
+</div>
+<a href="konto-anlegen.html" style="background:#004080; color:#ffffff; text-decoration:none; padding:8px 14px; border-radius:6px; font-weight:bold; font-size:0.9rem; white-space:nowrap;">👤 Eigenes Konto / Login</a>
+</div>
+
+
+<p>
+Hier findest du gut erhaltene Möbel und Haushaltssachen, die uns aktuell zur Vermittlung an bedürftige Personen und Familien zur Verfügung gestellt wurden. <strong>Angebote, die schnell abgeholt werden müssen, stehen ganz oben.</strong> Über die Ansicht <em>„Nach Anbieter / Haushalt gruppieren“</em> siehst du sofort, welche Sachen am selben Abholort stehen.
+</p>
+
+<section class="fflw-filter-bar" aria-label="Angebote filtern">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px;">
+<strong style="font-size: 1.02rem; color: #003366;">Angebote durchsuchen &amp; gruppieren</strong>
+<span id="fflw-offer-count" style="font-size: 0.92rem; font-weight: bold; color: #004080; display: inline-flex; align-items: center; gap: 6px;">
+<span class="fflw-spinner"></span> <span>Lade Angebote …</span>
+</span>
+</div>
+
+<div class="fflw-filter-grid">
+<input type="text" id="fflw-f-text" class="fflw-filter-input" placeholder="Stichwort (z. B. Schrank, Bett, 90x200) …">
+
+<select id="fflw-f-room" class="fflw-filter-select">
+<option value="">Alle Bereiche / Zimmer</option>
+<option value="Schlafzimmer">Schlafzimmer</option>
+<option value="Wohnzimmer">Wohnzimmer</option>
+<option value="Küche">Küche &amp; Esszimmer</option>
+<option value="Kinderzimmer">Kinderzimmer &amp; Familie</option>
+<option value="Haushalt">Haushalt, Flur &amp; Sonstiges</option>
+</select>
+
+<select id="fflw-f-transport" class="fflw-filter-select">
+<option value="">Alle Transport-Größen</option>
+<option value="Tasche">Passt in Tasche / zu Fuß</option>
+<option value="Fahrrad">Passt auf Fahrrad-Anhänger</option>
+<option value="PKW">Passt in normalen PKW</option>
+<option value="Transporter">Transporter / Hänger nötig</option>
+</select>
+
+<select id="fflw-f-provider" class="fflw-filter-select">
+<option value="">Alle Anbieter / Haushalte</option>
+</select>
+
+<select id="fflw-f-urgent" class="fflw-filter-select">
+            <option value="urgent_first">Ansicht: Dringend zuerst</option>
+            <option value="group_provider">Ansicht: Nach Anbieter / Haushalt gruppieren</option>
+<option value="only_urgent">Nur „Muss schnell raus“</option>
+<option value="flexible">Nur „Auf Abruf“ (flexibel)</option>
+</select>
+
+          <select id="fflw-f-imgmode" class="fflw-filter-select">
+            <option value="compact" selected>Bilder: Kompakte Liste (kleine Vorschau)</option>
+            <option value="cards">Bilder: Normale Karten (Klick = Großbild)</option>
+          </select>
+</div>
+</section>
+
+<div id="fflw-offers-container" class="fflw-offers-grid is-compact"></div>
+
+<div style="margin-top: 26px; padding: 16px; border-radius: 10px; background: #eef6fc; border: 1px solid #b8d4ec; border-left: 6px solid #004080;">
+<strong>Nichts Passendes dabei?</strong>
+<p style="margin: 6px 0 0 0;">
+Melde deinen konkreten Bedarf einfach über <a href="suche-sachen.html"><strong>Sachen suchen / Bedarf anmelden</strong></a> – wir informieren dich, sobald etwas Passendes eingeht.
+</p>
+</div>
+</main>
+</div>
+
+<div id="fflw-req-modal">
+<div class="fflw-req-box">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+<strong style="color:#003366; font-size:1.1rem;">Interesse / Bedarf anmelden</strong>
+<button type="button" id="fflw-req-close" style="background:#e2e8f0; color:#111; border:none; border-radius:5px; padding:5px 11px; font-weight:bold; cursor:pointer;">✕</button>
+</div>
+<p id="fflw-req-item-title" style="font-weight:bold; color:#004080; margin:0 0 12px 0;"></p>
+<form id="fflw-req-form">
+<div style="margin-bottom:10px;">
+<label style="display:block; font-weight:bold; margin-bottom:4px;">Dein Name (oder Name des Paten/Helfers) *</label>
+<input type="text" id="fflw-req-name" required class="fflw-filter-input">
+</div>
+<div style="margin-bottom:10px;">
+<label style="display:block; font-weight:bold; margin-bottom:4px;">Telefon / WhatsApp oder E-Mail *</label>
+<input type="text" id="fflw-req-kontakt" required class="fflw-filter-input">
+</div>
+<div style="margin-bottom:10px;">
+<label style="display:block; font-weight:bold; margin-bottom:4px;">Wohnort &amp; kurzer Hinweis (z. B. Transportmöglichkeit) *</label>
+<textarea id="fflw-req-note" rows="3" required class="fflw-filter-input" placeholder="z. B. Für Familie in Winnenden, eigener PKW vorhanden"></textarea>
+</div>
+<div id="fflw-req-feedback" style="margin:8px 0; font-weight:bold;"></div>
+<button type="submit" id="fflw-req-submit" class="fflw-btn-req" style="background:#2e7d32;">
+Unverbindliche Anfrage absenden
+</button>
+</form>
+</div>
+</div>
+
+  <div id="fflw-lightbox-modal" role="dialog" aria-modal="true" aria-label="Bildvergrößerung">
+    <div style="display:flex; justify-content:space-between; align-items:center; width:100%; max-width:920px; color:#ffffff; margin-bottom:10px; gap:10px;">
+      <strong id="fflw-lightbox-caption" style="font-size:1rem;">Bildansicht</strong>
+      <button type="button" id="fflw-lightbox-close" style="background:#ffffff; color:#111111; border:none; border-radius:6px; padding:6px 14px; font-weight:bold; cursor:pointer;">✕ Schließen</button>
+    </div>
+    <img id="fflw-lightbox-img" src="" alt="Vergrößerte Ansicht">
+    <div id="fflw-lightbox-nav" style="display:none; gap:12px; margin-top:12px; align-items:center;">
+      <button type="button" id="fflw-lightbox-prev" style="background:#004080; color:#ffffff; border:1px solid #90caf9; border-radius:6px; padding:8px 16px; font-weight:bold; cursor:pointer;">◀ Vorheriges Foto</button>
+      <span id="fflw-lightbox-counter" style="color:#ffffff; font-weight:bold;">1 / 1</span>
+      <button type="button" id="fflw-lightbox-next" style="background:#004080; color:#ffffff; border:1px solid #90caf9; border-radius:6px; padding:8px 16px; font-weight:bold; cursor:pointer;">Nächstes Foto ▶</button>
+    </div>
+  </div>
+
+<section class="contact-block">
+<p><strong>Freundeskreis Flüchtlinge Leutenbach &amp; Winnenden</strong></p>
+<p>
+<strong>Sachen-Suchen:</strong> <a href="mailto:Warenhaus-anfrage@freundeleuwi.org">Warenhaus-anfrage@freundeleuwi.org</a><br>
+<strong>Transport-Mithilfe:</strong> <a href="mailto:Transport-Hilfe@freundeleuwi.org">Transport-Hilfe@freundeleuwi.org</a>
+</p>
+</section>
+
+<footer class="legal-footer">
+<a href="impressum.html">Impressum</a> | <a href="datenschutz.html">Datenschutz</a> | <a href="sitemap.html">Sitemap</a>
+</footer>
+
+<script src="nav-loader.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzjtI-x26-DtKdZLR0B4JprIYRdi53iG2l8TKhz6HkwPYRe70eoPOcCOixRUDxEC0k7/exec";
+const container = document.getElementById("fflw-offers-container");
+const countEl = document.getElementById("fflw-offer-count");
+const fText = document.getElementById("fflw-f-text");
+const fRoom = document.getElementById("fflw-f-room");
+const fTransport = document.getElementById("fflw-f-transport");
+const fProvider = document.getElementById("fflw-f-provider");
+const fUrgent = document.getElementById("fflw-f-urgent");
+
+let allOffers = [];
+let providerCounts = {};
+let selectedOffer = null;
+
+function isItemUrgent(item) {
+const s = `${item.lagerStatus || ""} ${item.beschreibung || ""} ${item.abholFrist || ""}`.toLowerCase();
+return s.includes("festen datum") || s.includes("dringend") || s.includes("7 tage") || Boolean(item.abholFrist);
+}
+
+function populateProviderDropdown(items) {
+const map = new Map();
+providerCounts = {};
+items.forEach(it => {
+const pid = it.spenderFolderId || "einzel";
+const label = it.anbieterLabel || "Einzelangebot";
+providerCounts[pid] = (providerCounts[pid] || 0) + 1;
+if (!map.has(pid)) map.set(pid, label);
+});
+
+const currentVal = fProvider.value;
+fProvider.innerHTML = `<option value="">Alle Anbieter / Haushalte (${map.size})</option>`;
+Array.from(map.entries())
+.sort((a, b) => (providerCounts[b[0]] - providerCounts[a[0]]) || a[1].localeCompare(b[1], "de"))
+.forEach(([pid, label]) => {
+const cnt = providerCounts[pid] || 1;
+const opt = document.createElement("option");
+opt.value = pid;
+opt.textContent = `${label} (${cnt} ${cnt === 1 ? "Teil" : "Teile"})`;
+fProvider.appendChild(opt);
+});
+fProvider.value = currentVal;
+}
+
+function createOfferCard(item, hideProviderJump) {
+const urgent = isItemUrgent(item);
+const card = document.createElement("article");
+card.className = "fflw-offer-card" + (urgent ? " urgent" : "");
+
+const imgUrl = (item.bilder && item.bilder.length > 0) ? item.bilder[0].url : "";
+const fristText = item.abholFrist ? ` bis ${item.abholFrist}` : "";
+const pid = item.spenderFolderId || "einzel";
+const siblingCount = providerCounts[pid] || 1;
+
+card.innerHTML = `
+         <div>
+           ${urgent ? `<div class="fflw-urgent-badge"><span>Muss schnell raus${fristText}</span><span>Eilig</span></div>` : ""}
+            ${imgUrl ? `
+              <div class="fflw-img-wrap">
+                <img src="${imgUrl}" alt="${item.titel || "Möbelstück"}" class="fflw-offer-img" loading="lazy">
+                <span class="fflw-img-zoom-hint">🔍 Vergrößern${(item.bilder && item.bilder.length > 1) ? ` (${item.bilder.length} Fotos)` : ""}</span>
+              </div>
+            ` : ""}
+           <div class="fflw-offer-body">
+             <h3 style="margin: 0 0 8px 0; font-size: 1.12rem; color: #003366;">${item.titel || item.pfad || "Sachspende"}</h3>
+             <div style="margin-bottom: 8px;">
+               ${item.ort ? `<span class="fflw-tag">${item.ort}</span>` : ""}
+               ${item.transportInfo ? `<span class="fflw-tag">${item.transportInfo}</span>` : ""}
+               ${item.zerlegbar ? `<span class="fflw-tag">${item.zerlegbar}</span>` : ""}
+             </div>
+             <p style="margin: 0; font-size: 0.94rem; color: #222222; white-space: pre-line;">${item.beschreibung || ""}</p>
+             ${(!hideProviderJump && siblingCount > 1) ? `
+               <div>
+                 <button type="button" class="fflw-provider-link" data-pid="${pid}">
+                   🚚 Weitere Sachen von diesem Haushalt (${siblingCount} Teile)
+                 </button>
+               </div>
+             ` : ""}
+           </div>
+         </div>
+         <div class="fflw-offer-footer">
+           <button type="button" class="fflw-btn-req">Dieses Stück anfragen</button>
+         </div>
+       `;
+
+        const imgEl = card.querySelector(".fflw-offer-img");
+        if (imgEl && item.bilder && item.bilder.length > 0) {
+          imgEl.addEventListener("click", () => {
+            openOfferLightbox(item.bilder, 0, item.titel || "Möbelstück");
+          });
+        }
+
+const jumpBtn = card.querySelector(".fflw-provider-link");
+if (jumpBtn) {
+jumpBtn.addEventListener("click", () => {
+fProvider.value = pid;
+renderOffers();
+fProvider.scrollIntoView({ behavior: "smooth", block: "center" });
+});
+}
+
+card.querySelector(".fflw-btn-req").addEventListener("click", () => {
+selectedOffer = item;
+document.getElementById("fflw-req-item-title").textContent = item.titel || item.pfad;
+document.getElementById("fflw-req-feedback").textContent = "";
+document.getElementById("fflw-req-modal").style.display = "flex";
+});
+
+return card;
+}
+
+function renderOffers() {
+const q = fText.value.trim().toLowerCase();
+const room = fRoom.value.toLowerCase();
+const trans = fTransport.value.toLowerCase();
+const provFilter = fProvider.value;
+const urgMode = fUrgent.value;
+
+let filtered = allOffers.filter(it => {
+const full = `${it.titel || ""} ${it.raumKategorie || ""} ${it.beschreibung || ""} ${it.ort || ""} ${it.transportInfo || ""} ${it.anbieterLabel || ""}`.toLowerCase();
+if (q && !full.includes(q)) return false;
+if (room && !full.includes(room)) return false;
+if (trans && !full.includes(trans)) return false;
+if (provFilter && (it.spenderFolderId || "einzel") !== provFilter) return false;
+const urg = isItemUrgent(it);
+if (urgMode === "only_urgent" && !urg) return false;
+if (urgMode === "flexible" && urg) return false;
+return true;
+});
+
+filtered.sort((a, b) => {
+const ua = isItemUrgent(a) ? 0 : 1;
+const ub = isItemUrgent(b) ? 0 : 1;
+if (ua !== ub) return ua - ub;
+if (a.abholFrist && b.abholFrist) return a.abholFrist.localeCompare(b.abholFrist);
+return 0;
+});
+
+countEl.textContent = `${filtered.length} Angebot(e) angezeigt`;
+container.innerHTML = "";
+
+if (filtered.length === 0) {
+container.innerHTML = `<div style="grid-column: 1/-1; padding: 20px; background: #f4f8fc; border: 1px solid #c5d7eb; border-radius: 8px; color: #111;">Keine passenden Angebote für diese Filterauswahl gefunden.</div>`;
+return;
+}
+
+if (urgMode === "group_provider" || provFilter) {
+const groups = new Map();
+filtered.forEach(item => {
+const pid = item.spenderFolderId || "einzel";
+if (!groups.has(pid)) {
+groups.set(pid, {
+pid: pid,
+label: item.anbieterLabel || "Einzelangebot",
+ort: item.ort || "",
+items: []
+});
+}
+groups.get(pid).items.push(item);
+});
+
+const sortedGroups = Array.from(groups.values()).sort((a, b) => b.items.length - a.items.length);
+sortedGroups.forEach(grp => {
+const section = document.createElement("section");
+section.className = "fflw-provider-group";
+const multiHint = grp.items.length > 1
+? `<span style="background:#2e7d32; color:#ffffff; padding:4px 10px; border-radius:6px; font-size:0.85rem; font-weight:bold;">🚚 ${grp.items.length} Artikel aus diesem Haushalt – ideal für eine gemeinsame Fahrt</span>`
+: `<span style="background:#e3f2fd; color:#003366; padding:4px 10px; border-radius:6px; font-size:0.85rem; font-weight:bold;">1 Artikel</span>`;
+
+section.innerHTML = `
+             <div class="fflw-provider-group-header">
+               <div>
+                 <strong style="font-size:1.1rem; color:#003366;">${grp.label}</strong>
+                 ${grp.ort ? `<span style="margin-left:8px; color:#333; font-size:0.92rem;">· Abholort: ${grp.ort}</span>` : ""}
+               </div>
+               <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                 ${multiHint}
+                 ${provFilter ? `<button type="button" class="fflw-provider-link btn-reset-prov" style="margin-top:0;">Alle Haushalte zeigen</button>` : ""}
+               </div>
+             </div>
+             <div class="fflw-provider-group-grid"></div>
+           `;
+
+const resetBtn = section.querySelector(".btn-reset-prov");
+if (resetBtn) {
+resetBtn.addEventListener("click", () => {
+fProvider.value = "";
+renderOffers();
+});
+}
+
+const grid = section.querySelector(".fflw-provider-group-grid");
+grp.items.forEach(it => grid.appendChild(createOfferCard(it, true)));
+container.appendChild(section);
+});
+return;
+}
+
+filtered.forEach(item => {
+container.appendChild(createOfferCard(item, false));
+});
+}
+
+[fText, fRoom, fTransport, fProvider, fUrgent].forEach(el => {
+el.addEventListener("input", renderOffers);
+el.addEventListener("change", renderOffers);
+});
+
+const urlVorschau = new URLSearchParams(window.location.search).get("vorschau") || "";
+const CACHE_STORAGE_KEY = "fflw_offers_local_cache_v1_" + (urlVorschau || "public");
+
+function applyLoadedItems(items) {
+const uniqueOffers = [];
+const seenOfferKeys = new Set();
+items.forEach(it => {
+const cleanBilder = [];
+const seenImgUrls = new Set();
+(Array.isArray(it.bilder) ? it.bilder : []).forEach(b => {
+const u = String((b && b.url) || "").trim();
+if (u && !seenImgUrls.has(u)) {
+seenImgUrls.add(u);
+cleanBilder.push(b);
+}
+});
+it.bilder = cleanBilder;
+const firstUrl = cleanBilder.length > 0 ? cleanBilder[0].url : "";
+const offerKey = `${(it.titel || "").trim().toLowerCase()}|${(it.anbieterLabel || "").trim().toLowerCase()}|${firstUrl}`;
+if (seenOfferKeys.has(offerKey)) return;
+seenOfferKeys.add(offerKey);
+uniqueOffers.push(it);
+});
+allOffers = uniqueOffers;
+populateProviderDropdown(allOffers);
+renderOffers();
+}
+
+try {
+const cachedRaw = sessionStorage.getItem(CACHE_STORAGE_KEY);
+if (cachedRaw) {
+const cachedItems = JSON.parse(cachedRaw);
+if (Array.isArray(cachedItems) && cachedItems.length > 0) {
+applyLoadedItems(cachedItems);
+}
+}
+} catch (e) {}
+
+function loadOffersFromBackend(attempt) {
+if (allOffers.length === 0 && attempt > 1) {
+countEl.innerHTML = `<span class="fflw-spinner"></span> <span>Server startet gerade, lade Angebote (Versuch ${attempt}) …</span>`;
+}
+fetch(`${WEB_APP_URL}?vorschau=${encodeURIComponent(urlVorschau)}`, { method: "GET", redirect: "follow" })
+.then(r => r.json())
+.then(data => {
+if (data && data.ok && Array.isArray(data.items)) {
+try { sessionStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(data.items)); } catch (e) {}
+applyLoadedItems(data.items);
+} else if (allOffers.length === 0) {
+countEl.textContent = "Keine Angebote geladen.";
+}
+})
+.catch(() => {
+if (attempt < 2) {
+setTimeout(() => loadOffersFromBackend(attempt + 1), 1500);
+} else if (allOffers.length === 0) {
+countEl.textContent = "Verbindungsfehler beim Laden.";
+}
+});
+}
+
+loadOffersFromBackend(1);
+
+if (window.FFLW_Account) {
+const acc = window.FFLW_Account.get();
+if (acc && (acc.username || acc.name)) {
+const infoEl = document.getElementById("aa-acc-info");
+if (infoEl) {
+infoEl.innerHTML = `✓ Angemeldet als <strong>${acc.anonym ? "Anonym (" + (acc.username || "Konto") + ")" : (acc.name || acc.username)}</strong> – deine Kontaktdaten werden beim Reservieren automatisch eingetragen.`;
+}
+const nEl = document.getElementById("fflw-req-name");
+const kEl = document.getElementById("fflw-req-kontakt");
+if (nEl) nEl.value = acc.anonym ? `Anonym (Konto: ${acc.username || acc.code || "Mitglied"})` : (acc.name || "");
+if (kEl) kEl.value = acc.kontakt || acc.email || "";
+}
+}
+const reqModal = document.getElementById("fflw-req-modal");
+document.getElementById("fflw-req-close").addEventListener("click", () => { reqModal.style.display = "none"; });
+
+document.getElementById("fflw-req-form").addEventListener("submit", async function (e) {
+e.preventDefault();
+if (!selectedOffer) return;
+const fb = document.getElementById("fflw-req-feedback");
+const btn = document.getElementById("fflw-req-submit");
+
+const sendTask = async () => {
+const resp = await fetch(WEB_APP_URL, {
+method: "POST",
+redirect: "follow",
+headers: { "Content-Type": "text/plain;charset=utf-8" },
+body: JSON.stringify({
+action: "reserveItem",
+itemId: selectedOffer.id || selectedOffer.pfad,
+titel: selectedOffer.titel || selectedOffer.pfad,
+name: document.getElementById("fflw-req-name").value.trim(),
+kontakt: document.getElementById("fflw-req-kontakt").value.trim(),
+notiz: document.getElementById("fflw-req-note").value.trim()
+})
+});
+const res = await resp.json();
+if (res && res.ok) {
+fb.style.color = "#1b5e20";
+fb.textContent = "✓ Anfrage eingegangen! Unser Team meldet sich in Kürze bei dir.";
+setTimeout(() => { reqModal.style.display = "none"; }, 1600);
+return { ok: true };
+} else {
+fb.style.color = "#c62828";
+fb.textContent = "Fehler: " + (res && res.error ? res.error : "Unbekannt");
+return { ok: false };
+}
+};
+
+if (typeof window.fflwRunButtonAction === "function") {
+await window.fflwRunButtonAction(btn, sendTask, {
+loadingText: "Wird gesendet …",
+successText: "✓ Anfrage gesendet!"
+});
+} else {
+await sendTask();
+}
+});
+    
+      // Lightbox & Bildansicht-Umschalter (Kompakt / Normale Karten)
+      const fImgMode = document.getElementById("fflw-f-imgmode");
+      if (fImgMode && container) {
+        fImgMode.addEventListener("change", () => {
+          container.classList.toggle("is-compact", fImgMode.value === "compact");
+        });
+      }
+
+      const lbModal = document.getElementById("fflw-lightbox-modal");
+      const lbImg = document.getElementById("fflw-lightbox-img");
+      const lbCap = document.getElementById("fflw-lightbox-caption");
+      const lbNav = document.getElementById("fflw-lightbox-nav");
+      const lbCounter = document.getElementById("fflw-lightbox-counter");
+      let lbImages = [];
+      let lbIndex = 0;
+
+      function updateLightboxView() {
+        if (!lbImages.length) return;
+        const cur = lbImages[lbIndex];
+        const fullUrl = String(cur.url || "").replace("&sz=w1000", "&sz=w1800");
+        lbImg.src = fullUrl;
+        lbCounter.textContent = `${lbIndex + 1} / ${lbImages.length}`;
+        lbNav.style.display = lbImages.length > 1 ? "flex" : "none";
+      }
+
+      function openOfferLightbox(bilder, startIdx, title) {
+        lbImages = Array.isArray(bilder) ? bilder : [];
+        lbIndex = startIdx || 0;
+        if (!lbImages.length || !lbModal) return;
+        lbCap.textContent = title || "Bildansicht";
+        updateLightboxView();
+        lbModal.style.display = "flex";
+      }
+
+      if (lbModal) {
+        document.getElementById("fflw-lightbox-close").addEventListener("click", () => { lbModal.style.display = "none"; });
+        lbModal.addEventListener("click", (e) => { if (e.target === lbModal) lbModal.style.display = "none"; });
+        document.getElementById("fflw-lightbox-prev").addEventListener("click", () => {
+          lbIndex = (lbIndex - 1 + lbImages.length) % lbImages.length;
+          updateLightboxView();
+        });
+        document.getElementById("fflw-lightbox-next").addEventListener("click", () => {
+          lbIndex = (lbIndex + 1) % lbImages.length;
+          updateLightboxView();
+        });
+      }
+
+});
+</script>
+</body>
+</html>
