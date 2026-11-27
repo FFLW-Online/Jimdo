@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Energy Watch – FFLW</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .ew-wrap {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+    .ew-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .ew-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .ew-field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .ew-field input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 9px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+    }
+    .ew-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .ew-btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+    .ew-btn.secondary {
+      background: #475569;
+    }
+    #sm-labels-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .sm-label-row {
+      display: grid;
+      grid-template-columns: 84px 120px 1fr 1fr;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      background: #f8fafc;
+    }
+    .sm-badge {
+      font-weight: 700;
+      text-align: center;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: #e2e8f0;
+    }
+    #ew-status {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      display: none;
+    }
+    #ew-status.ok {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+    }
+    #ew-status.err {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-placeholder"></div>
+
+  <main class="ew-wrap">
+    <div class="ew-topbar">
+      <div>
+        <h1>Energy Watch</h1>
+        <p>Erfassung von Grunddaten, Heizkörpern &amp; Thermostaten (Aufkleber &amp; Dokumentation)</p>
+      </div>
+    </div>
+
+    <form id="energy-watch-form">
+      <div class="ew-grid">
+        <div class="ew-field">
+          <label for="resident-name">Name / Haushalt</label>
+          <input type="text" id="resident-name" name="name" placeholder="z. B. Familie Müller" />
+        </div>
+        <div class="ew-field">
+          <label for="apartment-id">Wohnung / Unterkunft</label>
+          <input type="text" id="apartment-id" name="apartmentId" placeholder="z. B. Hauptstr. 12, OG" />
+        </div>
+        <div class="ew-field">
+          <label for="move-in-date">Datum / Einzug</label>
+          <input type="date" id="move-in-date" name="moveInDate" />
+        </div>
+      </div>
+
+      <div class="ew-grid">
+        <div class="ew-field">
+          <label for="heater-count">Anzahl Heizkörper</label>
+          <input type="number" id="heater-count" min="0" max="50" value="2" />
+        </div>
+        <div class="ew-field">
+          <label for="thermostat-count">Anzahl Thermostate</label>
+          <input type="number" id="thermostat-count" min="0" max="50" value="2" />
+        </div>
+      </div>
+
+      <div class="ew-actions">
+        <button type="button" class="ew-btn secondary" id="btn-build-labels">Aufkleber erzeugen</button>
+        <button type="button" class="ew-btn secondary" id="btn-print-labels">Aufkleber drucken</button>
+        <button type="submit" class="ew-btn" id="btn-save-ew">In Google Drive speichern</button>
+      </div>
+
+      <div id="sm-labels-list"></div>
+
+      <div style="margin-top: 14px;">
+        <label>
+          <input type="checkbox" id="final-check" />
+          Einweisung &amp; Endkontrolle durchgeführt
+        </label>
+      </div>
+
+      <div id="ew-status"></div>
+    </form>
+  </main>
+
+  <script src="nav-loader.js"></script>
+  <script>
+    // Nutzt dieselbe Apps-Script-URL wie die übrige Webseite (falls dort definiert)
+    // oder alternativ den Fallback unten:
+    const ENERGY_WATCH_EXEC_URL =
+      window.FFLW_EXEC_URL ||
+      window.APPS_SCRIPT_URL ||
+      localStorage.getItem("fflw_exec_url") ||
+      "HIER_EURE_APPS_SCRIPT_EXEC_URL_EINTRAGEN";
+
+    const DRAFT_STORAGE_KEY = "fflw_energy_watch_draft_v1";
+
+    function saveDraftLocal() {
+      try {
+        const labels = Array.from(document.querySelectorAll(".sm-label-row")).map((r) => ({
+          code: r.dataset.code,
+          type: r.dataset.type,
+          room: r.querySelector(".sm-room")?.value || "",
+          note: r.querySelector(".sm-note")?.value || ""
+        }));
+        const draft = {
+          name: document.getElementById("resident-name")?.value || "",
+          apartmentId: document.getElementById("apartment-id")?.value || "",
+          moveInDate: document.getElementById("move-in-date")?.value || "",
+          heaterCount: document.getElementById("heater-count")?.value || "2",
+          thermostatCount: document.getElementById("thermostat-count")?.value || "2",
+          finalCheck: !!document.getElementById("final-check")?.checked,
+          labels: labels
+        };
+        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draft));
+      } catch (e) {}
+    }
+
+    function buildLabels(presetLabels) {
+      const hk = Math.max(0, parseInt(document.getElementById("heater-count")?.value || "0", 10) || 0);
+      const th = Math.max(0, parseInt(document.getElementById("thermostat-count")?.value || "0", 10) || 0);
+      const box = document.getElementById("sm-labels-list");
+      if (!box) return;
+
+      const existingMap = {};
+      if (Array.isArray(presetLabels)) {
+        presetLabels.forEach((item) => {
+          if (item && item.code) {
+            existingMap[item.code] = {
+              room: item.room || "",
+              note: item.note || ""
+            };
+          }
+        });
+      }
+      box.querySelectorAll(".sm-label-row").forEach((row) => {
+        const code = row.dataset.code;
+        if (code && !existingMap[code]) {
+          existingMap[code] = {
+            room: row.querySelector(".sm-room")?.value || "",
+            note: row.querySelector(".sm-note")?.value || ""
+          };
+        }
+      });
+
+      const items = [];
+      for (let i = 1; i <= hk; i++) items.push({ code: `HK-${i}`, type: "Heizkörper" });
+      for (let j = 1; j <= th; j++) items.push({ code: `TH-${j}`, type: "Thermostat" });
+
+      box.innerHTML = items.map((x) => {
+        const prev = existingMap[x.code] || { room: "", note: "" };
+        return `
+          <div class="sm-label-row" data-code="${x.code}" data-type="${x.type}">
+            <span class="sm-badge">${x.code}</span>
+            <span>${x.type}</span>
+            <input type="text" class="sm-room" placeholder="Raum (z. B. Wohnzimmer)" value="${prev.room.replace(/"/g, "&quot;")}" />
+            <input type="text" class="sm-note" placeholder="Hinweis / Aufkleber" value="${prev.note.replace(/"/g, "&quot;")}" />
+          </div>
+        `;
+      }).join("");
+    }
+
+    function restoreDraftLocal() {
+      try {
+        const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
+        if (!raw) {
+          buildLabels();
+          return;
+        }
+        const d = JSON.parse(raw);
+        if (d.name !== undefined) document.getElementById("resident-name").value = d.name;
+        if (d.apartmentId !== undefined) document.getElementById("apartment-id").value = d.apartmentId;
+        if (d.moveInDate !== undefined) document.getElementById("move-in-date").value = d.moveInDate;
+        if (d.heaterCount !== undefined) document.getElementById("heater-count").value = d.heaterCount;
+        if (d.thermostatCount !== undefined) document.getElementById("thermostat-count").value = d.thermostatCount;
+        if (d.finalCheck !== undefined) document.getElementById("final-check").checked = !!d.finalCheck;
+        buildLabels(d.labels);
+      } catch (e) {
+        buildLabels();
+      }
+    }
+
+    function collectEnergyWatchData() {
+      const labels = Array.from(document.querySelectorAll(".sm-label-row")).map((r) => ({
+        code: r.dataset.code,
+        type: r.dataset.type,
+        room: r.querySelector(".sm-room")?.value.trim() || "",
+        note: r.querySelector(".sm-note")?.value.trim() || ""
+      }));
+
+      return {
+        action: "saveEnergyWatch",
+        page: "energy-watch.html",
+        name: document.getElementById("resident-name")?.value.trim() || "",
+        apartmentId: document.getElementById("apartment-id")?.value.trim() || "",
+        moveInDate: document.getElementById("move-in-date")?.value || "",
+        heaterCount: parseInt(document.getElementById("heater-count")?.value || "0", 10) || 0,
+        thermostatCount: parseInt(document.getElementById("thermostat-count")?.value || "0", 10) || 0,
+        finalCheck: !!document.getElementById("final-check")?.checked,
+        labels: labels
+      };
+    }
+
+    function setEwStatus(message, isOk) {
+      const el = document.getElementById("ew-status");
+      if (!el) return;
+      el.textContent = message;
+      el.className = isOk ? "ok" : "err";
+    }
+
+    document.getElementById("energy-watch-form")?.addEventListener("input", saveDraftLocal);
+    document.getElementById("energy-watch-form")?.addEventListener("change", saveDraftLocal);
+
+    document.getElementById("btn-build-labels")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      buildLabels();
+      saveDraftLocal();
+      setEwStatus("Aufkleberliste aktualisiert.", true);
+    });
+
+    document.getElementById("btn-print-labels")?.addEventListener("click", () => {
+      window.print();
+    });
+
+    document.getElementById("energy-watch-form")?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!ENERGY_WATCH_EXEC_URL || ENERGY_WATCH_EXEC_URL.includes("HIER_EURE_APPS_SCRIPT_EXEC_URL_EINTRAGEN")) {
+        setEwStatus("Bitte die /exec-URL eintragen (oder im Code definieren).", false);
+        return;
+      }
+
+      saveDraftLocal();
+      const payload = collectEnergyWatchData();
+      try {
+        await fetch(ENERGY_WATCH_EXEC_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify(payload)
+        });
+        setEwStatus("Daten wurden an Google Drive gesendet.", true);
+      } catch (err) {
+        setEwStatus("Fehler beim Senden: " + err.message, false);
+      }
+    });
+
+    restoreDraftLocal();
+  </script>
+</body>
+</html>
