@@ -5,7 +5,7 @@ const SM_FRONTEND_VERSION = "v4";
 
 const SM_CFG = {
   version: SM_FRONTEND_VERSION,
-  appsScriptUrl: "https://script.google.com/macros/s/DEINE_WEB_APP_ID/exec",
+  appsScriptUrl: "https://script.google.com/macros/s/AKfycbyi5V7JrFTMEl3wDHp5Z7L11oQYRAe6k8147CR6yPUa5SyVsyScS-snfSGcIev7rPWowg/exec",
   maxWidth: 1400,
   quality: 0.75
 };
