@@ -1,185 +1,210 @@
 <!DOCTYPE html>
-<html lang="de" data-fflw-lang="de">
+<html lang="de">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-sm-i18n="title">StromManager (v4) – Grunddaten</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="strommanager_v4.css" />
+  <title>StromManager v4</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f7fa; color: #1f2937; }
+    .container { max-width: 820px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+    .lang-box { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin-bottom: 20px; background: #fafafa; }
+    .carousel { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .carousel-stage { flex: 1; text-align: center; font-weight: bold; padding: 8px; background: #fff; border: 1px solid #d1d5db; border-radius: 6px; }
+    .flag-table { width: 100%; border-collapse: collapse; }
+    .flag-table td { border: 1px solid #e5e7eb; padding: 8px; text-align: center; cursor: pointer; background: #fff; }
+    .flag-table td.active { background: #dbeafe; border-color: #2563eb; font-weight: bold; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+    input[type="text"], input[type="date"], input[type="number"] { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+    button { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; background: #2563eb; color: #fff; }
+    button.secondary { background: #475569; }
+    #sm-labels-list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .sm-label-row { display: grid; grid-template-columns: 80px 120px 1fr 1fr; gap: 8px; align-items: center; padding: 8px; border: 1px solid #e5e7eb; border-radius: 6px; background: #f8fafc; }
+    .sm-badge { font-weight: bold; background: #e2e8f0; padding: 4px 8px; border-radius: 4px; text-align: center; }
+    #status-msg { margin-top: 14px; padding: 10px; border-radius: 6px; display: none; }
+    #status-msg.ok { display: block; background: #dcfce7; color: #166534; }
+    #status-msg.err { display: block; background: #fee2e2; color: #991b1b; }
+  </style>
 </head>
-<body class="fflw-page strommanager-app" data-sm-version="v4">
-  <header class="sm-header">
-    <div>
-      <h1 data-sm-i18n="title">StromManager <span class="sm-ver">(v4)</span></h1>
-      <p class="sm-subtitle" data-sm-i18n="subtitle">Grunddaten für Person, Wohnung, Heizkörper &amp; Tarif</p>
-    </div>
-    <div class="sm-controls">
-      <select id="sm-lang-select" aria-label="Sprache">
-        <option value="de">DE</option>
-        <option value="en">EN</option>
-        <option value="ar">AR</option>
-        <option value="uk">UK</option>
-        <option value="tr">TR</option>
-      </select>
-      <button type="button" id="sm-tts-toggle" class="sm-btn sm-btn-secondary" aria-pressed="false">
-        🔊 <span data-sm-i18n="ttsOff">Vorlesen: Aus</span>
-      </button>
-    </div>
-  </header>
+<body>
+  <div class="container">
+    <h1 id="title-text">StromManager v4</h1>
 
-  <main class="sm-container">
-    <form id="sm-grunddaten-form" novalidate>
-      <section class="sm-card">
-        <div class="sm-card-head">
-          <h2 data-sm-i18n="secPerson">1. Person (zieht bei Umzug mit)</h2>
-          <button type="button" class="sm-speak-btn" aria-label="Vorlesen">🔊</button>
-        </div>
-        <div class="sm-grid-2">
-          <div class="sm-field">
-            <label for="person-name" data-sm-i18n="personName">Name *</label>
-            <input id="person-name" name="personName" type="text" required />
-          </div>
-          <div class="sm-field">
-            <label for="person-id" data-sm-i18n="personId">Personen-ID</label>
-            <input id="person-id" name="personId" type="text" placeholder="z. B. P-101" />
-          </div>
-          <div class="sm-field">
-            <label for="autonomy-level" data-sm-i18n="autonomyLevel">Selbstständigkeit</label>
-            <select id="autonomy-level" name="autonomyLevel">
-              <option value="assisted" data-sm-i18n="autonomy1">1 – Mit Master-Hilfe</option>
-              <option value="review" data-sm-i18n="autonomy2">2 – User füllt aus, Master prüft</option>
-              <option value="independent" data-sm-i18n="autonomy3">3 – Selbstständig</option>
-            </select>
-          </div>
-          <div class="sm-field">
-            <label for="reminder-cycle" data-sm-i18n="reminderCycle">Erinnerungs-Turnus</label>
-            <select id="reminder-cycle" name="reminderCycle">
-              <option value="daily" data-sm-i18n="daily">Täglich</option>
-              <option value="every_2_days" data-sm-i18n="every2Days">Alle 2 Tage</option>
-              <option value="weekly" data-sm-i18n="weekly">Wöchentlich</option>
-              <option value="custom" data-sm-i18n="custom">Frei</option>
-            </select>
-          </div>
-          <div class="sm-field sm-span-2">
-            <label for="person-photo" data-sm-i18n="personPhoto">Profilbild (optional)</label>
-            <input id="person-photo" type="file" accept="image/*" />
-            <div class="sm-preview" id="preview-person-photo"></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="sm-card">
-        <div class="sm-card-head">
-          <h2 data-sm-i18n="secApartment">2. Wohnung &amp; Einzug</h2>
-          <button type="button" class="sm-speak-btn" aria-label="Vorlesen">🔊</button>
-        </div>
-        <div class="sm-grid-3">
-          <div class="sm-field">
-            <label for="move-in-date" data-sm-i18n="moveInDate">Datum Einzug *</label>
-            <input id="move-in-date" name="moveInDate" type="date" required />
-          </div>
-          <div class="sm-field">
-            <label for="apartment-label" data-sm-i18n="apartmentLabel">Wohnungs-ID / Ort *</label>
-            <input id="apartment-label" name="apartmentLabel" type="text" required />
-          </div>
-          <div class="sm-field">
-            <label for="master-name" data-sm-i18n="masterName">Master / Begleitung</label>
-            <input id="master-name" name="masterName" type="text" />
-          </div>
-          <div class="sm-field">
-            <label for="room-count" data-sm-i18n="roomCount">Zimmer</label>
-            <input id="room-count" name="roomCount" type="number" min="1" max="30" value="2" />
-          </div>
-          <div class="sm-field">
-            <label for="heater-count" data-sm-i18n="heaterCount">Heizkörper / Nachtspeicher</label>
-            <input id="heater-count" name="heaterCount" type="number" min="0" max="40" value="2" />
-          </div>
-          <div class="sm-field">
-            <label for="thermostat-count" data-sm-i18n="thermostatCount">Thermostate</label>
-            <input id="thermostat-count" name="thermostatCount" type="number" min="0" max="40" value="2" />
-          </div>
-          <div class="sm-field sm-span-3">
-            <label for="floorplan-photo" data-sm-i18n="floorplanPhoto">Foto Grundriss (optional)</label>
-            <input id="floorplan-photo" type="file" accept="image/*" />
-            <div class="sm-preview" id="preview-floorplan-photo"></div>
-          </div>
-        </div>
-
-        <div class="sm-subbox">
-          <div class="sm-subbox-head">
-            <h3 data-sm-i18n="secLabels">Aufkleber (HK-1, TH-1)</h3>
-            <button type="button" id="sm-generate-labels" class="sm-btn sm-btn-secondary" data-sm-i18n="genLabels">
-              Aufkleber erzeugen
-            </button>
-          </div>
-          <p class="sm-hint" data-sm-i18n="labelHint">Aufkleber an Heizkörper &amp; Thermostat anbringen und Raum zuordnen.</p>
-          <div id="sm-labels-list"></div>
-        </div>
-      </section>
-
-      <section class="sm-card">
-        <div class="sm-card-head">
-          <h2 data-sm-i18n="secTariff">3. Tarif, Vertrag &amp; Endkontrolle</h2>
-          <button type="button" class="sm-speak-btn" aria-label="Vorlesen">🔊</button>
-        </div>
-        <div class="sm-grid-2">
-          <div class="sm-field">
-            <label for="tariff-valid-from" data-sm-i18n="validFrom">Tarif gültig ab</label>
-            <input id="tariff-valid-from" name="tariffValidFrom" type="date" />
-          </div>
-          <div class="sm-field">
-            <label for="provider-name" data-sm-i18n="provider">Anbieter</label>
-            <input id="provider-name" name="providerName" type="text" />
-          </div>
-          <div class="sm-field sm-span-2">
-            <label for="contract-photo" data-sm-i18n="contractPhoto">Foto Vertrag (für KI-Auslesung)</label>
-            <div class="sm-upload-row">
-              <input id="contract-photo" type="file" accept="image/*" />
-              <button type="button" id="sm-ai-read-contract" class="sm-btn sm-btn-secondary" data-sm-i18n="aiRead">
-                ✨ Vertrag auslesen
-              </button>
-            </div>
-            <div class="sm-preview" id="preview-contract-photo"></div>
-            <div id="sm-ai-status" class="sm-status"></div>
-          </div>
-          <div class="sm-field">
-            <label for="price-household" data-sm-i18n="priceHH">Haushalt (ct/kWh)</label>
-            <input id="price-household" type="number" step="0.01" />
-          </div>
-          <div class="sm-field">
-            <label for="base-price-month" data-sm-i18n="basePrice">Grundpreis (€/Monat)</label>
-            <input id="base-price-month" type="number" step="0.01" />
-          </div>
-          <div class="sm-field">
-            <label for="price-nt" data-sm-i18n="priceNT">Heizstrom NT (ct/kWh)</label>
-            <input id="price-nt" type="number" step="0.01" />
-          </div>
-          <div class="sm-field">
-            <label for="price-ht" data-sm-i18n="priceHT">Heizstrom HT (ct/kWh)</label>
-            <input id="price-ht" type="number" step="0.01" />
-          </div>
-        </div>
-
-        <div class="sm-subbox">
-          <label class="sm-checkbox-label">
-            <input id="final-check-done" type="checkbox" />
-            <span data-sm-i18n="finalCheck">Endkontrolle durchgeführt (User oder Master)</span>
-          </label>
-          <div class="sm-field" style="margin-top: 0.6rem;">
-            <label for="checked-by" data-sm-i18n="checkedBy">Geprüft von</label>
-            <input id="checked-by" type="text" placeholder="User / Master" />
-          </div>
-        </div>
-      </section>
-
-      <div class="sm-actions">
-        <button type="submit" class="sm-btn sm-btn-primary" data-sm-i18n="save">Speichern</button>
-        <div id="sm-submit-feedback" class="sm-status"></div>
+    <div class="lang-box">
+      <div class="carousel">
+        <button type="button" class="secondary" id="prev-lang">◀</button>
+        <div class="carousel-stage" id="carousel-stage">🇩🇪 Deutsch (DE)</div>
+        <button type="button" class="secondary" id="next-lang">▶</button>
       </div>
-    </form>
-  </main>
+      <table class="flag-table" id="flag-table">
+        <tbody>
+          <tr>
+            <td data-lang="de" class="active">🇩🇪 DE</td>
+            <td data-lang="en">🇬🇧 EN</td>
+            <td data-lang="fr">🇫🇷 FR</td>
+          </tr>
+          <tr>
+            <td data-lang="es">🇪🇸 ES</td>
+            <td data-lang="it">🇮🇹 IT</td>
+            <td data-lang="tr">🇹🇷 TR</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <script src="i18n_v4.js"></script>
-  <script src="strommanager_v4.js"></script>
+    <form id="sm-form">
+      <div class="grid">
+        <div>
+          <label for="resident-name" id="lbl-name">Name</label>
+          <input type="text" id="resident-name" name="name" />
+        </div>
+        <div>
+          <label for="apartment-id" id="lbl-apt">Wohnungs-ID</label>
+          <input type="text" id="apartment-id" name="apartmentId" />
+        </div>
+        <div>
+          <label for="move-in-date" id="lbl-date">Einzugsdatum</label>
+          <input type="date" id="move-in-date" name="moveInDate" />
+        </div>
+      </div>
+
+      <div class="grid">
+        <div>
+          <label for="heater-count" id="lbl-hk">Anzahl Heizkörper</label>
+          <input type="number" id="heater-count" min="0" value="2" />
+        </div>
+        <div>
+          <label for="thermostat-count" id="lbl-th">Anzahl Thermostate</label>
+          <input type="number" id="thermostat-count" min="0" value="2" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="secondary" id="btn-labels">Aufkleber erzeugen</button>
+        <button type="submit" id="btn-save">Speichern</button>
+      </div>
+
+      <div id="sm-labels-list"></div>
+
+      <div style="margin-top: 14px;">
+        <label><input type="checkbox" id="final-check" /> <span id="lbl-check">Endkontrolle durchgeführt</span></label>
+      </div>
+
+      <div id="status-msg"></div>
+    </form>
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = "DEINE_APPS_SCRIPT_EXEC_URL";
+
+    const LANGS = [
+      { code: "de", flag: "🇩🇪", name: "Deutsch", title: "StromManager v4", nameLbl: "Name", aptLbl: "Wohnungs-ID", dateLbl: "Einzugsdatum", hkLbl: "Anzahl Heizkörper", thLbl: "Anzahl Thermostate", labelBtn: "Aufkleber erzeugen", saveBtn: "Speichern", checkLbl: "Endkontrolle durchgeführt" },
+      { code: "en", flag: "🇬🇧", name: "English", title: "StromManager v4", nameLbl: "Name", aptLbl: "Apartment ID", dateLbl: "Move-in Date", hkLbl: "Heaters", thLbl: "Thermostats", labelBtn: "Generate Labels", saveBtn: "Save", checkLbl: "Final check completed" },
+      { code: "fr", flag: "🇫🇷", name: "Français", title: "StromManager v4", nameLbl: "Nom", aptLbl: "ID logement", dateLbl: "Date d'entrée", hkLbl: "Radiateurs", thLbl: "Thermostats", labelBtn: "Créer étiquettes", saveBtn: "Enregistrer", checkLbl: "Contrôle final effectué" },
+      { code: "es", flag: "🇪🇸", name: "Español", title: "StromManager v4", nameLbl: "Nombre", aptLbl: "ID vivienda", dateLbl: "Fecha entrada", hkLbl: "Radiadores", thLbl: "Termostatos", labelBtn: "Crear etiquetas", saveBtn: "Guardar", checkLbl: "Revisión final realizada" },
+      { code: "it", flag: "🇮🇹", name: "Italiano", title: "StromManager v4", nameLbl: "Nome", aptLbl: "ID appartamento", dateLbl: "Data ingresso", hkLbl: "Radiatori", thLbl: "Termostati", labelBtn: "Crea etichette", saveBtn: "Salva", checkLbl: "Controllo finale eseguito" },
+      { code: "tr", flag: "🇹🇷", name: "Türkçe", title: "StromManager v4", nameLbl: "Ad Soyad", aptLbl: "Daire No", dateLbl: "Giriş Tarihi", hkLbl: "Petek Sayısı", thLbl: "Termostat Sayısı", labelBtn: "Etiket Oluştur", saveBtn: "Kaydet", checkLbl: "Son kontrol yapıldı" }
+    ];
+
+    let langIndex = 0;
+
+    function applyLanguage(code) {
+      const idx = LANGS.findIndex((l) => l.code === code);
+      if (idx === -1) return;
+      langIndex = idx;
+      const l = LANGS[langIndex];
+      document.documentElement.lang = l.code;
+      document.getElementById("carousel-stage").textContent = `${l.flag} ${l.name} (${l.code.toUpperCase()})`;
+      document.getElementById("title-text").textContent = l.title;
+      document.getElementById("lbl-name").textContent = l.nameLbl;
+      document.getElementById("lbl-apt").textContent = l.aptLbl;
+      document.getElementById("lbl-date").textContent = l.dateLbl;
+      document.getElementById("lbl-hk").textContent = l.hkLbl;
+      document.getElementById("lbl-th").textContent = l.thLbl;
+      document.getElementById("btn-labels").textContent = l.labelBtn;
+      document.getElementById("btn-save").textContent = l.saveBtn;
+      document.getElementById("lbl-check").textContent = l.checkLbl;
+
+      document.querySelectorAll("#flag-table td").forEach((td) => {
+        td.classList.toggle("active", td.dataset.lang === l.code);
+      });
+    }
+
+    document.getElementById("prev-lang").addEventListener("click", () => {
+      const nextIdx = (langIndex - 1 + LANGS.length) % LANGS.length;
+      applyLanguage(LANGS[nextIdx].code);
+    });
+
+    document.getElementById("next-lang").addEventListener("click", () => {
+      const nextIdx = (langIndex + 1) % LANGS.length;
+      applyLanguage(LANGS[nextIdx].code);
+    });
+
+    document.querySelectorAll("#flag-table td").forEach((td) => {
+      td.addEventListener("click", () => applyLanguage(td.dataset.lang));
+    });
+
+    function buildLabels() {
+      const hk = Math.max(0, parseInt(document.getElementById("heater-count")?.value || "0", 10));
+      const th = Math.max(0, parseInt(document.getElementById("thermostat-count")?.value || "0", 10));
+      const box = document.getElementById("sm-labels-list");
+      if (!box) return;
+      const items = [];
+      for (let i = 1; i <= hk; i++) items.push({ code: `HK-${i}`, type: "Heizkörper" });
+      for (let j = 1; j <= th; j++) items.push({ code: `TH-${j}`, type: "Thermostat" });
+      box.innerHTML = items.map((x) => `
+        <div class="sm-label-row" data-code="${x.code}" data-type="${x.type}">
+          <span class="sm-badge">${x.code}</span>
+          <span>${x.type}</span>
+          <input type="text" class="sm-room" placeholder="Raum (z. B. Wohnzimmer)" />
+          <input type="text" class="sm-note" placeholder="Hinweis / Aufkleber" />
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("btn-labels").addEventListener("click", buildLabels);
+
+    function showStatus(msg, ok) {
+      const el = document.getElementById("status-msg");
+      el.textContent = msg;
+      el.className = ok ? "ok" : "err";
+    }
+
+    document.getElementById("sm-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes("DEINE_APPS_SCRIPT_EXEC_URL")) {
+        showStatus("Bitte zuerst die /exec-URL in APPS_SCRIPT_URL eintragen.", false);
+        return;
+      }
+      const labels = Array.from(document.querySelectorAll(".sm-label-row")).map((r) => ({
+        code: r.dataset.code,
+        type: r.dataset.type,
+        room: r.querySelector(".sm-room")?.value.trim() || "",
+        note: r.querySelector(".sm-note")?.value.trim() || ""
+      }));
+      const payload = {
+        action: "saveGrunddaten",
+        lang: LANGS[langIndex].code,
+        name: document.getElementById("resident-name").value.trim(),
+        apartmentId: document.getElementById("apartment-id").value.trim(),
+        moveInDate: document.getElementById("move-in-date").value,
+        finalCheck: document.getElementById("final-check").checked,
+        labels
+      };
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify(payload)
+        });
+        showStatus("Daten wurden an Google Apps Script gesendet.", true);
+      } catch (err) {
+        showStatus("Fehler beim Senden: " + err.message, false);
+      }
+    });
+
+    buildLabels();
+  </script>
 </body>
 </html>
